@@ -1,0 +1,20 @@
+{
+    "private": true,
+    "name": "ms",
+    "version": "1.0.0",
+    "main": "index.js",
+    "author": "MiaoWoo <admin@yumc.pw>",
+    "license": "MIT",
+    "scripts": {
+        "clean": "npx lerna run clean",
+        "watch": "npx lerna run watch --parallel",
+        "build": "npx lerna run build",
+        "lp": "npx lerna publish"
+    },
+    "workspaces": [
+        "packages/*"
+    ],
+    "devDependencies": {
+        "lerna": "^3.16.4"
+    }
+}

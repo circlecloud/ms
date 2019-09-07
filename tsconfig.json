@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "baseUrl": "src",
+        "outDir": "dist",
+        "target": "es5",
+        "module": "commonjs",
+        "sourceMap": false,
+        "declaration": true,
+        "noImplicitAny": false,
+        "allowUnreachableCode": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "lib": []
+    }
+}
