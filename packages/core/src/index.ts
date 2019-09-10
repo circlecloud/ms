@@ -1,12 +1,23 @@
 import '@ms/nashorn'
 
-import { plugin, server, MiaoScriptConsole } from '@ms/api'
+import { plugin, server } from '@ms/api'
 import { DefaultContainer as container } from '@ms/container'
 import { PluginManagerImpl } from '@ms/plugin'
 
-import '@ms/bukkit'
+try {
+    Java.type("org.bukkit.Bukkit");
+    require('@ms/bukkit');
+} catch (ex) {
+}
 
-let Console: MiaoScriptConsole = container.get(server.Console);
+try {
+    Java.type("org.spongepowered.api.Sponge");
+    require('@ms/sponge');
+} catch (ex) {
+}
+
+let Console = container.get(server.Console);
+//@ts-ignore
 global.console = new Console();
 
 container.bind(plugin.PluginManager).to(PluginManagerImpl).inSingletonScope();
