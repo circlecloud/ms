@@ -1,26 +1,24 @@
 import '@ms/nashorn'
 
-import { injectable, postConstruct, inject } from 'inversify'
-import { command } from '@ms/api'
-import * as ref from '@ms/common/dist/reflect'
+import { command, plugin } from '@ms/api'
+import * as reflect from '@ms/common/dist/reflect'
+import { injectable, postConstruct, inject } from '@ms/container'
 
-var bukkit = require('./server');
-var plugin = bukkit.plugin.self;
-var commandMap = ref.on(bukkit.plugin.manager).get('commandMap').get();
-var PluginCommand = Java.type('org.bukkit.command.PluginCommand');
-
-var Arrays = Java.type('java.util.Arrays');
-var TabCompleter = Java.type("org.bukkit.command.TabCompleter");
-var CommandExecutor = Java.type("org.bukkit.command.CommandExecutor");
+let Bukkit = Java.type("org.bukkit.Bukkit");
+let Arrays = Java.type('java.util.Arrays');
+let TabCompleter = Java.type('org.bukkit.command.TabCompleter');
+let PluginCommand = Java.type('org.bukkit.command.PluginCommand');
+let CommandExecutor = Java.type('org.bukkit.command.CommandExecutor');
 
 @injectable()
 export class BukkitCommand extends command.Command {
-    @inject("Plugin.Self")
-    private plugin: any
+    @inject(plugin.PluginInstance)
+    private pluginInstance: any
+    private commandMap: any;
 
     @postConstruct()
     init() {
-
+        this.commandMap = reflect.on(Bukkit.pluginManager).get('commandMap').get();
     }
 
     enable(jsp) {
@@ -28,23 +26,19 @@ export class BukkitCommand extends command.Command {
         if (commands) {
             var pluginCommands = [];
             for (var name in commands) {
-                // noinspection JSUnfilteredForInLoop
                 var command = commands[name];
                 if (typeof command !== 'object') continue;
                 command.name = name;
-                // noinspection JSUnfilteredForInLoop
                 var newCmd = this.create(jsp, command);
                 if (command.description) newCmd.setDescription(command.description);
                 if (command.usage) newCmd.setUsage(command.usage);
-                /** @namespace command.aliases */
                 if (command.aliases) newCmd.setAliases(Arrays.asList(command.aliases));
                 if (command.permission) newCmd.setPermission(command.permission);
                 if (command['permission-message']) newCmd.setPermissionMessage(command['permission-message']);
                 pluginCommands.push(newCmd);
-                // noinspection JSUnfilteredForInLoop
                 console.debug(`插件 ${jsp.description.name} 注册命令 ${name} ...`);
             }
-            commandMap.registerAll(jsp.description.name, Arrays.asList(pluginCommands));
+            this.commandMap.registerAll(jsp.description.name, Arrays.asList(pluginCommands));
         }
     }
 
@@ -58,10 +52,10 @@ export class BukkitCommand extends command.Command {
     }
 
     create(jsp, command) {
-        var cmd = commandMap.getCommand(command.name)
+        var cmd = this.commandMap.getCommand(command.name)
         if (cmd && cmd instanceof PluginCommand) { return cmd };
-        cmd = ref.on(PluginCommand).create(command.name, plugin).get();
-        commandMap.register(jsp.description.name, cmd);
+        cmd = reflect.on(PluginCommand).create(command.name, this.pluginInstance).get();
+        this.commandMap.register(jsp.description.name, cmd);
         return cmd;
     }
 
