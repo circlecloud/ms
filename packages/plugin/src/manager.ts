@@ -1,4 +1,4 @@
-import { plugin, server } from '@ms/api'
+import { plugin, server, MiaoScriptConsole } from '@ms/api'
 import { injectable, inject, postConstruct, Container } from '@ms/container'
 import * as fs from '@ms/common/dist/fs'
 
@@ -11,6 +11,8 @@ export class PluginManagerImpl implements plugin.PluginManager {
     private pluginInstance: any;
     @inject(server.ServerType)
     private serverType: string;
+    @inject(server.Console)
+    private Console: MiaoScriptConsole;
 
     private pluginMap: Map<string, interfaces.Plugin>;
 
@@ -47,7 +49,6 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     private runCatch(pl: any, func: string) {
-        console.log(JSON.stringify(pl));
         try {
             pl[func].call(pl);
         } catch (ex) {
@@ -131,6 +132,8 @@ export class PluginManagerImpl implements plugin.PluginManager {
             this.pluginMap.set(metadata.name, container.getNamed(plugin.Plugin, metadata.name));
             let pluginInstance = this.pluginMap.get(metadata.name)
             pluginInstance.description = metadata;
+            // @ts-ignore
+            pluginInstance.logger = new this.Console(metadata.name);
         }
     }
 }

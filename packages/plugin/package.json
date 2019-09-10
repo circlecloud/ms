@@ -28,7 +28,7 @@
     },
     "dependencies": {
         "@ms/api": "^0.0.0",
-        "es6-map": "^0.1.5",
-        "inversify": "^5.0.1"
+        "@ms/common": "^0.0.0",
+        "@ms/container": "^0.0.0"
     }
 }

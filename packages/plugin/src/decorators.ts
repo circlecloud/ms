@@ -5,16 +5,15 @@ import { getPluginMetadatas } from './utils'
 
 /**
  * MiaoScript plugin
- * @param name namespace name default is '/'
- * @param middleware middleware array
+ * @param metadata PluginMetadata
  */
-export function plugin(currentMetadata: interfaces.PluginMetadata) {
+export function plugin(metadata: interfaces.PluginMetadata) {
     return function(target: any) {
-        target.description = currentMetadata;
-        currentMetadata.target = target;
+        target.description = metadata;
+        metadata.target = target;
         decorate(injectable(), target);
-        Reflect.defineMetadata(METADATA_KEY.plugin, currentMetadata, target);
+        Reflect.defineMetadata(METADATA_KEY.plugin, metadata, target);
         const previousMetadata: interfaces.PluginMetadata[] = getPluginMetadatas();
-        Reflect.defineMetadata(METADATA_KEY.plugin, [currentMetadata, ...previousMetadata], Reflect);
+        Reflect.defineMetadata(METADATA_KEY.plugin, [metadata, ...previousMetadata], Reflect);
     };
 }

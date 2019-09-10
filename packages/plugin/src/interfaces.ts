@@ -5,12 +5,7 @@ export namespace interfaces {
     @injectable()
     export abstract class Plugin {
         public description: PluginMetadata;
-        protected logger: Console;
-
-        @postConstruct()
-        private init() {
-            this.logger = global.console;
-        }
+        public logger: Console;
 
         public load() { }
         public enable() { }
