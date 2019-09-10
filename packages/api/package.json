@@ -23,7 +23,7 @@
     },
     "dependencies": {
         "@ms/common": "^0.0.0",
-        "inversify": "^5.0.1"
+        "@ms/container": "^0.0.0"
     },
     "devDependencies": {
         "reflect-metadata": "^0.1.13",

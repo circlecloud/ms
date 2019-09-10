@@ -1,7 +1,9 @@
-import { PluginInfo } from './typings/plugin';
+import { injectable } from "@ms/container";
+
 export namespace command {
+    @injectable()
     export abstract class Command {
-        on(plugin: PluginInfo, name: string, exec: { cmd: Function, tab?: Function }) {
+        on(plugin: any, name: string, exec: { cmd: Function, tab?: Function }) {
             var cmd = this.create(plugin, { name: name });
             console.debug(`插件 ${plugin.description.name} 创建命令 ${name}(${cmd})...`)
             if (exec.cmd && typeof exec.cmd === "function") {

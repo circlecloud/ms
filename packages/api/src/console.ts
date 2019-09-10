@@ -6,11 +6,12 @@ export class MiaoScriptConsole implements Console {
     Console: NodeJS.ConsoleConstructor;
 
     private _name: string = '';
-    private logger: any;
 
+    protected logger: any;
     protected prefix: string = '§6[§bMiaoScript§6]§r ';
 
-    constructor() {
+    constructor(name?: string) {
+        this.name = name;
         this.logger = global.logger;
     }
 
@@ -65,7 +66,8 @@ export class MiaoScriptConsole implements Console {
         stack.forEach(function(trace) {
             if (trace.className.startsWith('<')) {
                 var fileName = trace.fileName
-                fileName = fileName.indexOf('runtime') > -1 ? fileName.split('runtime')[1] : fileName;
+                if (fileName.startsWith(root)) { fileName = fileName.split(root)[1] }
+                if (fileName.startsWith('/runtime')) { fileName = fileName.split('/runtime')[1] }
                 cache.push(`    §e->§c ${fileName} => §4${trace.methodName}:${trace.lineNumber}`)
             } else {
                 var className = trace.className;
