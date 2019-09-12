@@ -1,0 +1,17 @@
+declare namespace org {
+    namespace bukkit {
+        namespace event {
+            namespace player {
+                class PlayerResourcePackStatusEvent {
+                    constructor(who: org.bukkit.entity.Player, resourcePackStatus: org.bukkit.event.player.PlayerResourcePackStatusEvent.Status)
+                    /**
+                     * Gets the status of this pack.
+                     */
+                    public getStatus(): org.bukkit.event.player.PlayerResourcePackStatusEvent.Status;
+                    public getHandlers(): org.bukkit.event.HandlerList;
+                    public static getHandlerList(): org.bukkit.event.HandlerList;
+                }
+            }
+        }
+    }
+}
