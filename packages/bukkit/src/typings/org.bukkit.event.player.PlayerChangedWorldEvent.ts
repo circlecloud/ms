@@ -1,0 +1,17 @@
+declare namespace org {
+    namespace bukkit {
+        namespace event {
+            namespace player {
+                class PlayerChangedWorldEvent {
+                    constructor(player: org.bukkit.entity.Player, from: org.bukkit.World)
+                    /**
+                     * Gets the world the player is switching from.
+                     */
+                    public getFrom(): org.bukkit.World;
+                    public getHandlers(): org.bukkit.event.HandlerList;
+                    public static getHandlerList(): org.bukkit.event.HandlerList;
+                }
+            }
+        }
+    }
+}
