@@ -2,27 +2,59 @@ import { interfaces } from './interfaces'
 import { METADATA_KEY } from './constants'
 
 function getPlugins() {
-    return getPluginMetadatas().map((target) => target.target);
+    return [...getPluginMetadatas().values()].map((target) => target.target);
+}
+
+function getPlugin(name: string) {
+    return getPluginMetadatas().get(name);
 }
 
 function getPluginMetadatas() {
-    let pluginMetadatas: interfaces.PluginMetadata[] = Reflect.getMetadata(
+    let pluginMetadatas: Map<string, interfaces.PluginMetadata> = Reflect.getMetadata(
         METADATA_KEY.plugin,
         Reflect
-    ) || [];
+    ) || new Map<string, interfaces.PluginMetadata>();
     return pluginMetadatas;
 }
 
 function getPluginMetadata(target: any) {
     let pluginMetadata: interfaces.PluginMetadata = Reflect.getMetadata(
         METADATA_KEY.plugin,
-        target
+        target.constructor
     ) || {};
     return pluginMetadata;
 }
 
+function getPluginCommandMetadata(target: any) {
+    let commandMetadata: Map<string, interfaces.CommandMetadata> = Reflect.getMetadata(
+        METADATA_KEY.cmd,
+        target.constructor
+    ) || new Map<string, interfaces.CommandMetadata>();
+    return commandMetadata;
+}
+
+function getPluginTabCompleterMetadata(target: any) {
+    let tabcompleterMetadata: Map<string, interfaces.CommandMetadata> = Reflect.getMetadata(
+        METADATA_KEY.tab,
+        target.constructor
+    ) || new Map<string, interfaces.TabCompleterMetadata>();
+    return tabcompleterMetadata;
+}
+
+function getPluginListenerMetadata(target: any) {
+    let listnerMetadata: interfaces.ListenerMetadata[] = Reflect.getMetadata(
+        METADATA_KEY.listener,
+        target.constructor
+    ) || [];
+    return listnerMetadata;
+}
+
 export {
+    getPlugin,
     getPlugins,
     getPluginMetadatas,
-    getPluginMetadata
+    getPluginMetadata,
+    getPluginCommandMetadata,
+    getPluginTabCompleterMetadata,
+    getPluginListenerMetadata,
 }
