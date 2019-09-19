@@ -98,15 +98,15 @@ export namespace event {
 
         /**
         * 添加事件监听
-        * @param jsp
+        * @param plugin
         * @param event
         * @param exec {function}
         * @param priority [LOWEST,LOW,NORMAL,HIGH,HIGHEST,MONITOR]
         * @param ignoreCancel
         */
-        listen(jsp, event, exec, priority, ignoreCancel) {
-            if (!jsp || !jsp.description || !jsp.description.name) throw new TypeError('插件名称为空 请检查传入参数!');
-            var name = jsp.description.name;
+        listen(plugin, event, exec, priority = 'NORMAL', ignoreCancel = false) {
+            if (!plugin || !plugin.description || !plugin.description.name) throw new TypeError('插件名称为空 请检查传入参数!');
+            var name = plugin.description.name;
             var eventCls = this.name2Class(name, event);
             if (!eventCls) { return; }
             if (typeof priority === 'boolean') {

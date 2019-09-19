@@ -15,10 +15,13 @@ export namespace command {
                 this.onTabComplete(plugin, cmd, exec.tab)
             }
         }
+        off(plugin: any, name: string) {
+
+        }
         /**
          * Create Server Command Object
          */
-        abstract create(plugin: object, opts: { name: string });
+        abstract create(name: string, opts: { name: string });
         abstract onCommand(plugin: object, command: any, opts: { name: string });
         abstract onTabComplete(plugin: object, command: any, opts: { name: string });
     }
