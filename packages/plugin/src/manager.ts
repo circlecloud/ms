@@ -1,8 +1,8 @@
-import { plugin, server, MiaoScriptConsole } from '@ms/api'
-import { injectable, inject, postConstruct, Container } from '@ms/container'
+import { plugin, server, command, event, MiaoScriptConsole } from '@ms/api'
+import { injectable, inject, postConstruct, Container, DefaultContainer as container } from '@ms/container'
 import * as fs from '@ms/common/dist/fs'
 
-import { getPluginMetadatas } from './utils'
+import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPlugin, getPluginTabCompleterMetadata } from './utils'
 import { interfaces } from './interfaces';
 
 @injectable()
@@ -13,6 +13,10 @@ export class PluginManagerImpl implements plugin.PluginManager {
     private serverType: string;
     @inject(server.Console)
     private Console: MiaoScriptConsole;
+    @inject(command.Command)
+    private CommandManager: command.Command;
+    @inject(event.Event)
+    private EventManager: event.Event;
 
     private pluginMap: Map<string, interfaces.Plugin>;
 
@@ -22,6 +26,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
             // 如果plugin不等于null 则代表是正式环境
             console.info(`Initialization MiaoScript Plugin System: ${this.pluginInstance} ...`);
             this.pluginMap = new Map();
+            console.info(`${this.EventManager.mapEventName().toFixed(0)} ${this.serverType} Event Mapping Complate...`);
         }
     }
 
@@ -35,17 +40,35 @@ export class PluginManagerImpl implements plugin.PluginManager {
         this.loadPlugins(files);
     }
 
-    load(container: Container): void {
+    build(container: Container): void {
         this.buildPlugins(container);
     }
 
-    enable(): void {
-        this.pluginMap.forEach(pl => this.runCatch(pl, 'load'));
-        this.pluginMap.forEach(pl => this.runCatch(pl, 'enable'));
+    load(...args: any[]): void {
+        this.checkAndGet(args[0]).forEach(pl => this.runCatch(pl, 'load'));
     }
 
-    disable(): void {
-        throw new Error("Method not implemented.");
+    enable(...args: any[]): void {
+        this.checkAndGet(args[0]).forEach(pl => this.runCatch(pl, 'enable'));
+    }
+
+    disable(...args: any[]): void {
+        this.checkAndGet(args[0]).forEach(pl => {
+            this.runCatch(pl, 'disable');
+            this.EventManager.disable(pl);
+        });
+
+    }
+
+    reload(...args: any[]): void {
+        this.checkAndGet(arguments[0]).forEach((pl: interfaces.Plugin) => {
+            this.disable(pl);
+            this.EventManager.disable(pl);
+            this.loadPlugin(pl.description.source);
+            pl = this.buildPlugin(getPlugin(pl.description.name));
+            this.load(pl);
+            this.enable(pl);
+        })
     }
 
     private runCatch(pl: any, func: string) {
@@ -57,13 +80,22 @@ export class PluginManagerImpl implements plugin.PluginManager {
         }
     }
 
+    private checkAndGet(name: string | interfaces.Plugin | undefined): Map<string, interfaces.Plugin> | interfaces.Plugin[] {
+        if (name == undefined) {
+            return this.pluginMap;
+        }
+        if (!(name instanceof interfaces.Plugin) && !this.pluginMap.has(name)) {
+            throw new Error(`Plugin ${name} not exist!`);
+        }
+        // 如果是插件 则直接返回
+        return [name as interfaces.Plugin];
+    }
+
     private scanFloder(plugin: any): string[] {
         var files = [];
-        console.info(`Start Scan Plugins in ${plugin} ...`);
+        console.info(`Scanning Plugins in ${plugin} ...`);
         this.checkUpdateFolder(plugin);
-        fs.list(plugin).forEach(function searchPlugin(file) {
-            files.push(file.toFile());
-        });
+        fs.list(plugin).forEach((file: any) => files.push(file.toFile()));
         return files;
     }
 
@@ -86,19 +118,17 @@ export class PluginManagerImpl implements plugin.PluginManager {
     * JS类型插件预加载
     */
     private loadJsPlugins(files: any[]) {
-        files.filter(file => file.name.endsWith(".js")).forEach(file => {
-            try {
-                this.loadPlugin(file)
-            } catch (ex) {
-                console.console(`§6插件 §b${file.name} §6初始化时发生错误 §4${ex.message}`);
-                console.ex(ex);
-            }
-        })
+        files.filter(file => file.name.endsWith(".js")).forEach(file => this.loadPlugin(file))
     }
 
     private loadPlugin(file: any) {
-        this.updatePlugin(file);
-        this.createPlugin(file);
+        try {
+            this.updatePlugin(file);
+            this.createPlugin(file);
+        } catch (ex) {
+            console.console(`§6插件 §b${file.name} §6初始化时发生错误 §4${ex.message}`);
+            console.ex(ex);
+        }
     }
 
     private updatePlugin(file: any) {
@@ -127,13 +157,48 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
     private buildPlugins(container: Container) {
         let pluginMetadatas = getPluginMetadatas();
-        for (const metadata of pluginMetadatas) {
+        pluginMetadatas.forEach(metadata => {
+            this.buildPlugin(metadata);
+        });
+    }
+
+    private buildPlugin(metadata: interfaces.PluginMetadata) {
+        try {
+            let pluginInstance = container.getNamed<interfaces.Plugin>(plugin.Plugin, metadata.name)
+            if (pluginInstance.description.source + '' !== metadata.source + '') {
+                console.warn(`find duplicate plugin ${pluginInstance.description.source} and ${metadata.source}. the first plugin will be ignore!`)
+            }
+            container.rebind(plugin.Plugin).to(metadata.target).inSingletonScope().whenTargetNamed(metadata.name);
+        } catch{
             container.bind(plugin.Plugin).to(metadata.target).inSingletonScope().whenTargetNamed(metadata.name);
-            this.pluginMap.set(metadata.name, container.getNamed(plugin.Plugin, metadata.name));
-            let pluginInstance = this.pluginMap.get(metadata.name)
-            pluginInstance.description = metadata;
-            // @ts-ignore
-            pluginInstance.logger = new this.Console(metadata.name);
+        }
+        let pluginInstance = container.getNamed<interfaces.Plugin>(plugin.Plugin, metadata.name)
+        this.pluginMap.set(metadata.name, pluginInstance);
+        pluginInstance.description = metadata;
+        // @ts-ignore
+        pluginInstance.logger = new this.Console(metadata.name);
+        this.registryCommand(pluginInstance);
+        this.registryListener(pluginInstance);
+        return pluginInstance;
+    }
+
+    private registryCommand(pluginInstance: interfaces.Plugin) {
+        let cmds = getPluginCommandMetadata(pluginInstance);
+        let tabs = getPluginTabCompleterMetadata(pluginInstance);
+        cmds.forEach(cmd => {
+            let tab = tabs.get(cmd.name);
+            this.CommandManager.on(pluginInstance, cmd.name, {
+                cmd: pluginInstance[cmd.executor].bind(pluginInstance),
+                tab: tab ? pluginInstance[tab.executor].bind(pluginInstance) : undefined
+            });
+        })
+    }
+
+    private registryListener(pluginInstance: interfaces.Plugin) {
+        let events = getPluginListenerMetadata(pluginInstance)
+        for (const event of events) {
+            // here must bind this to pluginInstance
+            this.EventManager.listen(pluginInstance, event.name, pluginInstance[event.executor].bind(pluginInstance));
         }
     }
 }
