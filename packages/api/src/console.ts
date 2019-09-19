@@ -67,7 +67,6 @@ export class MiaoScriptConsole implements Console {
             if (trace.className.startsWith('<')) {
                 var fileName = trace.fileName
                 if (fileName.startsWith(root)) { fileName = fileName.split(root)[1] }
-                if (fileName.startsWith('/runtime')) { fileName = fileName.split('/runtime')[1] }
                 cache.push(`    §e->§c ${fileName} => §4${trace.methodName}:${trace.lineNumber}`)
             } else {
                 var className = trace.className;

@@ -1,4 +1,4 @@
-import { Container } from "inversify";
+import { Container } from "@ms/container";
 
 export namespace plugin {
     /**
@@ -18,8 +18,10 @@ export namespace plugin {
      */
     export interface PluginManager {
         scan(folder: string): void;
-        load(container: Container): void;
-        enable(): void;
-        disable(): void;
+        build(container: Container): void;
+        load(...args: any[]): void;
+        enable(...args: any[]): void;
+        disable(...args: any[]): void;
+        reload(...args: any[]): void;
     }
 }
