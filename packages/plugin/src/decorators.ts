@@ -1,7 +1,7 @@
 import { interfaces } from './interfaces'
 import { METADATA_KEY } from './constants'
 import { injectable, decorate } from "inversify";
-import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata } from './utils'
+import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPluginTabCompleterMetadata } from './utils'
 
 /**
  * MiaoScript plugin
@@ -43,7 +43,7 @@ export function tab(metadata: interfaces.TabCompleterMetadata = {}) {
         metadata.name = metadata.name || key;
         metadata.executor = key;
         metadata.paramtypes = Reflect.getMetadata("design:paramtypes", target, key)
-        const previousMetadata: Map<string, interfaces.TabCompleterMetadata> = getPluginCommandMetadata(target)
+        const previousMetadata: Map<string, interfaces.TabCompleterMetadata> = getPluginTabCompleterMetadata(target)
         previousMetadata.set(metadata.name, metadata)
         Reflect.defineMetadata(METADATA_KEY.tab, previousMetadata, target.constructor);
     };
