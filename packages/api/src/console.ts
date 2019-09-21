@@ -57,9 +57,10 @@ export class MiaoScriptConsole implements Console {
     ex(ex: Error) {
         this.stack(ex).forEach(line => this.console(line))
     };
-    stack(ex: Error | any): string[] {
+    stack(ex: Error): string[] {
         var stack = ex.getStackTrace();
         var cache = ['§4' + ex];
+        //@ts-ignore
         if (stack.class) {
             stack = Arrays.asList(stack)
         }
@@ -70,8 +71,10 @@ export class MiaoScriptConsole implements Console {
                 cache.push(`    §e->§c ${fileName} => §4${trace.methodName}:${trace.lineNumber}`)
             } else {
                 var className = trace.className;
+                var fileName = trace.fileName
                 if (className.startsWith('jdk.nashorn.internal.scripts')) {
                     className = className.substr(className.lastIndexOf('$') + 1)
+                    if (fileName.startsWith(root)) { fileName = fileName.split(root)[1] }
                 } else {
                     for (var prefix in ignoreLogPrefix) {
                         if (className.startsWith(ignoreLogPrefix[prefix])) {
@@ -79,7 +82,7 @@ export class MiaoScriptConsole implements Console {
                         }
                     }
                 }
-                cache.push(`    §e->§c ${className}.${trace.methodName}(§4${trace.fileName}:${trace.lineNumber}§c)`);
+                cache.push(`    §e->§c ${className}.${trace.methodName}(§4${fileName}:${trace.lineNumber}§c)`);
             }
         });
         return cache;
