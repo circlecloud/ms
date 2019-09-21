@@ -11,7 +11,7 @@ export class SpongeConsole extends MiaoScriptConsole {
             this.error('第一个参数未实现 org.spongepowered.api.command.CommandSource 无法发送消息!')
             return
         }
-        if (args[0].toString() === '[object Array]') {
+        if (Object.prototype.toString.call(args[0]) === '[object Array]') {
             args[0].forEach(line => sender.sendMessage(Text.of(this.prefix + line)))
         } else {
             sender.sendMessage(Text.of(this.prefix + args.join(' ')));
