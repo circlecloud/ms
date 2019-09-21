@@ -1,11 +1,12 @@
 import './typings'
 
-import { server, plugin, command, event } from '@ms/api'
+import { server, plugin, command, event, task } from '@ms/api'
 import { DefaultContainer as container } from '@ms/container'
 
-import { BukkitEvent } from './event';
 import { BukkitConsole } from './console';
+import { BukkitEvent } from './event';
 import { BukkitCommand } from './command';
+import { BukkitTaskManager } from './task';
 
 let BukkitServerType = 'bukkit';
 let Bukkit = Java.type("org.bukkit.Bukkit");
@@ -16,5 +17,6 @@ container.bind(plugin.PluginInstance).toConstantValue(Bukkit.pluginManager.getPl
 
 container.bind(event.Event).to(BukkitEvent).inSingletonScope();
 container.bind(command.Command).to(BukkitCommand).inSingletonScope();
+container.bind(task.TaskManager).to(BukkitTaskManager).inSingletonScope();
 
-console.debug(`Detect Sponge Compatible set ServerType to ${BukkitServerType} ...`)
+console.debug(`Detect Bukkit Compatible set ServerType to ${BukkitServerType} ...`)
