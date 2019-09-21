@@ -30,6 +30,7 @@ export namespace interfaces {
     export interface ListenerMetadata {
         name?: string;
         executor?: string;
+        servertype?: string;
     }
     export type PluginLike = Plugin | string;
 }

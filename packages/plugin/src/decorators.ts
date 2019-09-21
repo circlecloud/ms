@@ -1,6 +1,6 @@
+import { injectable, decorate } from "@ms/container";
 import { interfaces } from './interfaces'
 import { METADATA_KEY } from './constants'
-import { injectable, decorate } from "inversify";
 import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPluginTabCompleterMetadata } from './utils'
 
 /**
@@ -40,7 +40,7 @@ export function cmd(metadata: interfaces.CommandMetadata = {}) {
  */
 export function tab(metadata: interfaces.TabCompleterMetadata = {}) {
     return function(target: any, key: string, value: any) {
-        metadata.name = metadata.name || key;
+        metadata.name = metadata.name || key.startsWith('tab') ? key.split('tab', 2)[0] : key;
         metadata.executor = key;
         metadata.paramtypes = Reflect.getMetadata("design:paramtypes", target, key)
         const previousMetadata: Map<string, interfaces.TabCompleterMetadata> = getPluginTabCompleterMetadata(target)
