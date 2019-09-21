@@ -8,7 +8,7 @@ export class BukkitConsole extends MiaoScriptConsole {
             this.error("第一个参数未实现 org.bukkit.command.CommandSender 无法发送消息!")
             return;
         }
-        if (''.toString.call(args[0]) === "[object Array]") {
+        if (Object.prototype.toString.call(args[0]) === "[object Array]") {
             args[0].forEach(line => sender.sendMessage(this.prefix + line))
         } else {
             sender.sendMessage(this.prefix + args.join(' '));
