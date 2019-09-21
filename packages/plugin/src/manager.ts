@@ -45,25 +45,30 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     load(...args: any[]): void {
-        this.checkAndGet(args[0]).forEach(pl => this.runCatch(pl, 'load'));
+        this.checkAndGet(args[0]).forEach(pl => {
+            this.runCatch(pl, 'load');
+            this.runCatch(pl, `${this.serverType}load`);
+        });
     }
 
     enable(...args: any[]): void {
-        this.checkAndGet(args[0]).forEach(pl => this.runCatch(pl, 'enable'));
+        this.checkAndGet(args[0]).forEach(pl => {
+            this.runCatch(pl, 'enable')
+            this.runCatch(pl, `${this.serverType}enable`);
+        });
     }
 
     disable(...args: any[]): void {
         this.checkAndGet(args[0]).forEach(pl => {
             this.runCatch(pl, 'disable');
+            this.runCatch(pl, `${this.serverType}disable`);
             this.EventManager.disable(pl);
         });
-
     }
 
     reload(...args: any[]): void {
-        this.checkAndGet(arguments[0]).forEach((pl: interfaces.Plugin) => {
+        this.checkAndGet(args[0]).forEach((pl: interfaces.Plugin) => {
             this.disable(pl);
-            this.EventManager.disable(pl);
             this.loadPlugin(pl.description.source);
             pl = this.buildPlugin(getPlugin(pl.description.name));
             this.load(pl);
@@ -73,7 +78,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
     private runCatch(pl: any, func: string) {
         try {
-            pl[func].call(pl);
+            if (pl[func]) pl[func].call(pl);
         } catch (ex) {
             console.console(`§6插件 §b${pl.description.name} §6执行 §d${func} §6方法时发生错误 §4${ex}`);
             console.ex(ex);
@@ -146,15 +151,6 @@ export class PluginManagerImpl implements plugin.PluginManager {
         });
     }
 
-    private beforeLoadHook(origin) {
-        var result = origin;
-        // // 注入 console 对象         // 给插件注入单独的 console
-        // result += '\nvar console = new Console(); module.exports.console = console;';
-        // // 插件注入 self 对象
-        // result += '\nvar self = {}; module.exports.self = self;';
-        return result;
-    }
-
     private buildPlugins(container: Container) {
         let pluginMetadatas = getPluginMetadatas();
         pluginMetadatas.forEach(metadata => {
@@ -197,6 +193,8 @@ export class PluginManagerImpl implements plugin.PluginManager {
     private registryListener(pluginInstance: interfaces.Plugin) {
         let events = getPluginListenerMetadata(pluginInstance)
         for (const event of events) {
+            // ignore space listener
+            if (event.servertype && event.servertype != this.serverType) { continue; }
             // here must bind this to pluginInstance
             this.EventManager.listen(pluginInstance, event.name, pluginInstance[event.executor].bind(pluginInstance));
         }
