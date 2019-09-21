@@ -7,6 +7,7 @@
         "sourceMap": false,
         "declaration": true,
         "noImplicitAny": false,
+        "downlevelIteration": true,
         "allowUnreachableCode": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,

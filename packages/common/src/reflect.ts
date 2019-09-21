@@ -18,7 +18,9 @@ class Reflect {
             this.class = obj;
         } else {
             this.obj = obj;
-            this.class = obj.class;
+            if (obj !== null && obj !== undefined && obj.class) {
+                this.class = obj.class;
+            }
         }
     }
 
@@ -30,7 +32,7 @@ class Reflect {
         return Java.from(declaredMethods(this.class));
     }
 
-    field(name) {
+    field(name): Reflect {
         try {
             // Try getting a public field
             var field = this.class.field(name);
@@ -41,36 +43,34 @@ class Reflect {
         }
     };
 
-    fields(declared) {
+    fields(declared = false) {
         return Java.from(declared ? this.class.declaredFields : this.class.fields);
     }
 
-    values(declared) {
+    values(declared = false) {
         var cache = {};
-        var feds = declared ? this.class.declaredFields : this.class.fields;
-        Java.from(feds).forEach(function(fed) {
-            cache[fed.name] = this.field(fed.name).get();
-        }.bind(this))
+        this.fields(declared).forEach(fed => cache[fed.name] = this.field(fed.name).get())
         return cache;
     }
 
-    call(...args) {
+    call(...args): Reflect {
         var params = args.slice(1);
-        var method = declaredMethod(this.class, args[0], types(params));
-        return on(method.invoke(this.get(), params));
+        var method = accessible(declaredMethod(this.class, args[0], types(params)));
+        let result = method.invoke(this.get(), params);
+        return result && on(result);
     };
 
-    get(...args) {
+    get(...args): Reflect | any {
         return args.length === 1 ? this.field(args[0]) : this.obj;
     };
 
     // noinspection JSUnusedGlobalSymbols
-    set(name, value) {
+    set(name, value): Reflect {
         accessible(declaredField(this.class, name)).set(this.obj, value);
         return this;
     };
 
-    create(...args) {
+    create(...args): Reflect {
         return on(declaredConstructor(this.class, args).newInstance(args));
     };
 }
@@ -112,16 +112,17 @@ function declaredConstructor(clazz, param) {
 }
 
 function declaredField(clazz, name) {
+    var clazzt = clazz;
     var field = null;
     // noinspection JSUnresolvedVariable
-    while (clazz !== JavaObject.class) {
+    while (clazzt !== JavaObject.class) {
         try {
-            field = clazz.getDeclaredField(name);
+            field = clazzt.getDeclaredField(name);
             if (field !== null) {
                 break;
             }
         } catch (e) {
-            clazz = clazz.getSuperclass();
+            clazzt = clazzt.getSuperclass();
         }
     }
     if (field === null) {
@@ -136,7 +137,16 @@ function declaredMethod(clazz, name, clazzs) {
         try {
             methodCache[key] = clazz.getMethod(name, clazzs);
         } catch (ex) {
-            methodCache[key] = clazz.getDeclaredMethod(name, clazzs);
+            try {
+                methodCache[key] = clazz.getDeclaredMethod(name, clazzs);
+            } catch (ex) {
+                for (const m of Java.from(declaredMethods(clazz))) {
+                    if (m.name == name) {
+                        methodCache[key] = m;
+                        break;
+                    }
+                }
+            }
         }
     }
     return methodCache[key];
@@ -179,7 +189,7 @@ function mapMethod(target, source, name) {
 }
 
 function on(obj) {
-    if (!obj || !obj.class) { throw new TypeError(`参数 ${obj} 不是一个Java对象!`) }
+    // if (!obj || !obj.class) { throw new TypeError(`参数 ${obj} 不是一个Java对象!`) }
     return new Reflect(obj);
 }
 
