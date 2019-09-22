@@ -27,6 +27,8 @@
         "typescript": "^3.6.2"
     },
     "dependencies": {
-        "inversify": "^5.0.1"
+        "@ms/api": "^0.0.0",
+        "@ms/common": "^0.0.0",
+        "@ms/container": "^0.0.0"
     }
 }
