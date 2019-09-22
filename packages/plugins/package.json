@@ -14,7 +14,7 @@
     "license": "ISC",
     "main": "dist/index.js",
     "publishConfig": {
-        "registry": "https://repo.yumc.pw/repository/npm/"
+        "registry": "https://repo.yumc.pw/repository/npm-hosted/"
     },
     "scripts": {
         "clean": "rimraf dist",

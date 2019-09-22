@@ -14,7 +14,7 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "publishConfig": {
-        "registry": "https://repo.yumc.pw/repository/npm/"
+        "registry": "https://repo.yumc.pw/repository/npm-hosted/"
     },
     "scripts": {
         "clean": "rimraf dist",
