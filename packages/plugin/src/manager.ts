@@ -52,9 +52,11 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     enable(...args: any[]): void {
-        this.checkAndGet(args[0]).forEach(pl => {
-            this.runCatch(pl, 'enable')
-            this.runCatch(pl, `${this.serverType}enable`);
+        this.checkAndGet(args[0]).forEach(plugin => {
+            this.runCatch(plugin, 'enable')
+            this.runCatch(plugin, `${this.serverType}enable`);
+            this.registryCommand(plugin);
+            this.registryListener(plugin);
         });
     }
 
@@ -62,7 +64,8 @@ export class PluginManagerImpl implements plugin.PluginManager {
         this.checkAndGet(args[0]).forEach(pl => {
             this.runCatch(pl, 'disable');
             this.runCatch(pl, `${this.serverType}disable`);
-            this.EventManager.disable(pl);
+            this.unregistryCommand(pl);
+            this.unregistryListener(pl);
         });
     }
 
@@ -74,6 +77,10 @@ export class PluginManagerImpl implements plugin.PluginManager {
             this.load(pl);
             this.enable(pl);
         })
+    }
+
+    getPlugins() {
+        return this.pluginMap;
     }
 
     private runCatch(pl: any, func: string) {
@@ -172,9 +179,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
         this.pluginMap.set(metadata.name, pluginInstance);
         pluginInstance.description = metadata;
         // @ts-ignore
-        pluginInstance.logger = new this.Console(metadata.name);
-        this.registryCommand(pluginInstance);
-        this.registryListener(pluginInstance);
+        pluginInstance.logger = new this.Console(metadata.prefix || metadata.name);
         return pluginInstance;
     }
 
@@ -198,5 +203,16 @@ export class PluginManagerImpl implements plugin.PluginManager {
             // here must bind this to pluginInstance
             this.EventManager.listen(pluginInstance, event.name, pluginInstance[event.executor].bind(pluginInstance));
         }
+    }
+
+    private unregistryCommand(pluginInstance: interfaces.Plugin) {
+        let cmds = getPluginCommandMetadata(pluginInstance);
+        cmds.forEach(cmd => {
+            this.CommandManager.off(pluginInstance, cmd.name);
+        })
+    }
+
+    private unregistryListener(pluginInstance: interfaces.Plugin) {
+        this.EventManager.disable(pluginInstance);
     }
 }

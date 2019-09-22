@@ -16,16 +16,18 @@ export namespace command {
             }
         }
         off(plugin: any, name: string) {
-
+            console.debug(`插件 ${plugin.description.name} 注销命令 ${name}...`)
+            this.remove(plugin, name);
         }
         /**
          * Create Server Command Object
          */
-        abstract create(plugin: any, command: string);
-        abstract onCommand(plugin: any, command: any, executor: Function);
-        abstract onTabComplete(plugin: any, command: any, tabCompleter: Function);
+        protected abstract create(plugin: any, command: string);
+        protected abstract remove(plugin: any, command: string);
+        protected abstract onCommand(plugin: any, command: any, executor: Function);
+        protected abstract onTabComplete(plugin: any, command: any, tabCompleter: Function);
 
-        setExecutor(plugin: any, command: any, executor: Function) {
+        protected setExecutor(plugin: any, command: any, executor: Function) {
             return (sender: any, _, command: string, args: string[]) => {
                 try {
                     return executor(sender, command, Java.from(args));
@@ -38,7 +40,7 @@ export namespace command {
             }
         }
 
-        setTabCompleter(plugin: any, command: any, tabCompleter: Function) {
+        protected setTabCompleter(plugin: any, command: any, tabCompleter: Function) {
             return (sender: any, _, command: string, args: string[]) => {
                 try {
                     var token = args[args.length - 1];
