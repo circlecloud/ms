@@ -22,10 +22,8 @@ export class BukkitTask extends task.Task {
         let funcName = `runTask${this.interval ? 'Timer' : 'Later'}${this.isAsync ? 'Asynchronously' : ''}`
         if (this.interval) {
             return run[funcName](this.plugin, this.laterTime, this.interval)
-        } else if (this.laterTime) {
-            return run[funcName](this.plugin, this.laterTime)
         } else {
-            return run[funcName](this.plugin)
+            return run[funcName](this.plugin, this.laterTime)
         }
     }
 }
