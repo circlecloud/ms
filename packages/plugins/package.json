@@ -28,7 +28,7 @@
         "typescript": "^3.6.2"
     },
     "dependencies": {
-        "@ms/plugins": "^0.0.0",
+        "@ms/plugin": "^0.0.0",
         "es6-map": "^0.1.5",
         "inversify": "^5.0.1"
     }

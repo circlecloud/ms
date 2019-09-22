@@ -27,7 +27,11 @@
         "typescript": "^3.6.2"
     },
     "dependencies": {
-        "@ms/container": "^0.0.0",
-        "@ms/plugin": "^0.0.0"
+        "@ms/api": "^0.0.0",
+        "@ms/common": "^0.0.0",
+        "@ms/bukkit": "^0.0.0",
+        "@ms/sponge": "^0.0.0",
+        "@ms/plugin": "^0.0.0",
+        "@ms/container": "^0.0.0"
     }
 }
