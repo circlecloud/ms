@@ -1,6 +1,6 @@
 {
     "name": "@ms/core",
-    "version": "0.0.0",
+    "version": "0.1.0",
     "description": "MiaoScript api package",
     "keywords": [
         "miaoscript",
@@ -27,11 +27,11 @@
         "typescript": "^3.6.2"
     },
     "dependencies": {
-        "@ms/api": "^0.0.0",
-        "@ms/common": "^0.0.0",
-        "@ms/bukkit": "^0.0.0",
-        "@ms/sponge": "^0.0.0",
-        "@ms/plugin": "^0.0.0",
-        "@ms/container": "^0.0.0"
+        "@ms/api": "^0.1.0",
+        "@ms/bukkit": "^0.1.0",
+        "@ms/common": "^0.1.0",
+        "@ms/container": "^0.1.0",
+        "@ms/plugin": "^0.1.0",
+        "@ms/sponge": "^0.1.0"
     }
 }
