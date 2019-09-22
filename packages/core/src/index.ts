@@ -1,8 +1,10 @@
 import '@ms/nashorn'
 
 import { plugin, server, task } from '@ms/api'
-import { DefaultContainer as container, injectable, inject, postConstruct } from '@ms/container'
 import { PluginManagerImpl } from '@ms/plugin'
+import { DefaultContainer as container, injectable, inject, postConstruct } from '@ms/container'
+
+let startTime = new Date().getTime();
 
 @injectable()
 class MiaoScriptCore {
@@ -22,6 +24,7 @@ class MiaoScriptCore {
             console.console(`§cMiaoScript start error please contact plugin author!`);
             console.ex(error);
         }
+        console.log('MiaoScript engine loading completed... Done (' + (new Date().getTime() - startTime) / 1000 + 's)!');
         return () => this.disable();
     }
 
