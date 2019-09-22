@@ -11,10 +11,29 @@ export namespace interfaces {
         public disable() { }
     }
     export interface PluginMetadata {
+        /**
+         * 插件名称
+         */
         name: string;
+        /**
+         * 前缀
+         */
+        prefix?: string;
+        /**
+         * 插件版本
+         */
         version: string;
+        /**
+         * 插件版本
+         */
         author: string | string[];
+        /**
+         * 插件源文件 必须指定为 __filename
+         */
         source: string;
+        /**
+         * 插件本体
+         */
         target?: any;
     }
     export interface CommandMetadata {
