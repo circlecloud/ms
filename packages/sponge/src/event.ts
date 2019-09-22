@@ -23,6 +23,7 @@ let priorityMap = {
 export class SpongeEvent extends event.Event {
     @inject(plugin.PluginInstance)
     private pluginInstance: any;
+    private eventManager: any = Sponge.getEventManager();
 
     constructor() {
         super('org/spongepowered/api/event');
@@ -37,16 +38,16 @@ export class SpongeEvent extends event.Event {
             Modifier.isAbstract(clazz.getModifiers());
     }
     class2Name(clazz: any) {
-        return clazz.canonicalName.substring(clazz.name.lastIndexOf(".") + 1);
+        return clazz.name.substring(clazz.name.lastIndexOf(".") + 1);
     }
     register(eventCls: any, exec: Function, priority: any = 'NORMAL', ignoreCancel: boolean = true) {
         var listener = new EventListener({
             handle: exec
         });
-        Sponge.getEventManager().registerListener(this.pluginInstance, eventCls, Order[priorityMap[priority]], listener);
+        this.eventManager.registerListener(this.pluginInstance, eventCls, Order[priorityMap[priority]], listener);
         return listener;
     }
     unregister(event: any, listener: any): void {
-        Sponge.getEventManager().unregisterListeners(listener);
+        this.eventManager.unregisterListeners(listener);
     }
 }
