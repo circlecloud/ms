@@ -1,4 +1,4 @@
-import './typings/global'
+/// <reference path="./typings/global.ts" />
 
 export * from './task'
 export * from './event'

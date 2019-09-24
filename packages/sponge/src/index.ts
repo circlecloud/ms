@@ -1,4 +1,4 @@
-import './typings'
+/// <reference path="./typings/index.ts" />
 
 import { server, plugin, command, event, task } from '@ms/api'
 import { DefaultContainer as container } from '@ms/container'
