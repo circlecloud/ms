@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class EntityType {
+            // @ts-ignore
+             class EntityType implements org.bukkit.Keyed {
                 public static DROPPED_ITEM: org.bukkit.entity.EntityType;
                 public static EXPERIENCE_ORB: org.bukkit.entity.EntityType;
                 public static AREA_EFFECT_CLOUD: org.bukkit.entity.EntityType;

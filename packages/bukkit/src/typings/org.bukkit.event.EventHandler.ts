@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace event {
-            class EventHandler {
+            // @ts-ignore
+            interface EventHandler {
                 /**
                  * Define the priority of the event.
                  * <p>
@@ -15,14 +16,14 @@ declare namespace org {
                  * <li>MONITOR
                  * </ol>
                  */
-                public priority(): org.bukkit.event.EventPriority;
+                 priority(): org.bukkit.event.EventPriority;
                 /**
                  * Define if the handler ignores a cancelled event.
                  * <p>
                  * If ignoreCancelled is true and the event is cancelled, the method is
                  * not called. Otherwise, the method is always called.
                  */
-                public ignoreCancelled(): boolean;
+                 ignoreCancelled(): boolean;
             }
         }
     }

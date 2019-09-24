@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace entity {
             namespace TropicalFish {
-                class Pattern {
+                // @ts-ignore
+                 class Pattern {
                     public static KOB: org.bukkit.entity.TropicalFish.Pattern;
                     public static SUNSTREAK: org.bukkit.entity.TropicalFish.Pattern;
                     public static SNOOPER: org.bukkit.entity.TropicalFish.Pattern;

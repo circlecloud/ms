@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerLocaleChangeEvent {
+                // @ts-ignore
+                 class PlayerLocaleChangeEvent {
                     constructor(who: org.bukkit.entity.Player, locale: string)
                     public getLocale(): string;
                     public getHandlers(): org.bukkit.event.HandlerList;

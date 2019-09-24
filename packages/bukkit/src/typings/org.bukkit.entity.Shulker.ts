@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Shulker {
+            // @ts-ignore
+            interface Shulker extends org.bukkit.entity.Golem, org.bukkit.material.Colorable {
             }
         }
     }

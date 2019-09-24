@@ -2,17 +2,18 @@ declare namespace org {
     namespace bukkit {
         namespace block {
             namespace data {
-                class BlockData {
+                // @ts-ignore
+                interface BlockData {
                     /**
                      * Get the Material represented by this block data.
                      */
-                    public getMaterial(): org.bukkit.Material;
+                     getMaterial(): org.bukkit.Material;
                     /**
                      * Gets a string, which when passed into a method such as
                      * {@link Server#createBlockData(java.lang.String)} will unambiguously
                      * recreate this instance.
                      */
-                    public getAsString(): string;
+                     getAsString(): string;
                     /**
                      * Gets a string, which when passed into a method such as
                      * {@link Server#createBlockData(java.lang.String)} will recreate this or a
@@ -34,7 +35,7 @@ declare namespace org {
                      * dataString.equals(data.getAsString()); // This is equivalent to the above, "getAsString(false)"
                      * }</pre>
                      */
-                    public getAsString(hideUnspecified: boolean): string;
+                     getAsString(hideUnspecified: boolean): string;
                     /**
                      * Merges all explicitly set states from the given data with this BlockData.
                      * <br>
@@ -44,7 +45,7 @@ declare namespace org {
                      * <br>
                      * Note also that the block types must match identically.
                      */
-                    public merge(data: org.bukkit.block.data.BlockData): org.bukkit.block.data.BlockData;
+                     merge(data: org.bukkit.block.data.BlockData): org.bukkit.block.data.BlockData;
                     /**
                      * Checks if the specified BlockData matches this block data.
                      * <br>
@@ -57,11 +58,11 @@ declare namespace org {
                      * <b>Note that these semantics mean that a.matches(b) may not be the same
                      * as b.matches(a)</b>
                      */
-                    public matches(data: org.bukkit.block.data.BlockData): boolean;
+                     matches(data: org.bukkit.block.data.BlockData): boolean;
                     /**
                      * Returns a copy of this BlockData.
                      */
-                    public clone(): org.bukkit.block.data.BlockData;
+                     clone(): org.bukkit.block.data.BlockData;
                 }
             }
         }

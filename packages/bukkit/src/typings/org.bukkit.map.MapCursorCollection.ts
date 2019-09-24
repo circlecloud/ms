@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace map {
-            class MapCursorCollection {
+            // @ts-ignore
+             class MapCursorCollection {
                 constructor()
                 /**
                  * Get the amount of cursors in this collection.

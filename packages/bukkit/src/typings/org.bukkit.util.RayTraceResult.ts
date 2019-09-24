@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace util {
-            class RayTraceResult {
+            // @ts-ignore
+             class RayTraceResult {
                 /**
                  * Creates a RayTraceResult.
                  */

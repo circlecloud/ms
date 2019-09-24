@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class Bed {
+            // @ts-ignore
+             class Bed implements org.bukkit.material.Directional {
                 /**
                  * Default constructor for a bed.
                  */

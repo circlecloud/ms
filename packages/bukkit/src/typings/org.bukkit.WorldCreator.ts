@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class WorldCreator {
+        // @ts-ignore
+         class WorldCreator {
             /**
              * Creates an empty WorldCreationOptions for the given world name
              */

@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace permissions {
-            class PermissionAttachment {
+            // @ts-ignore
+             class PermissionAttachment {
                 constructor(plugin: org.bukkit.plugin.Plugin, permissible: org.bukkit.permissions.Permissible)
                 /**
                  * Gets the plugin responsible for this attachment

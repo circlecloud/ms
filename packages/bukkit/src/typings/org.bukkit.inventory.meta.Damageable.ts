@@ -2,20 +2,21 @@ declare namespace org {
     namespace bukkit {
         namespace inventory {
             namespace meta {
-                class Damageable {
+                // @ts-ignore
+                interface Damageable {
                     /**
                      * Checks to see if this item has damage
                      */
-                    public hasDamage(): boolean;
+                     hasDamage(): boolean;
                     /**
                      * Gets the damage
                      */
-                    public getDamage(): number;
+                     getDamage(): number;
                     /**
                      * Sets the damage
                      */
-                    public setDamage(damage: number): void;
-                    public clone(): org.bukkit.inventory.meta.Damageable;
+                     setDamage(damage: number): void;
+                     clone(): org.bukkit.inventory.meta.Damageable;
                 }
             }
         }

@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace plugin {
             namespace java {
-                class JavaPluginLoader {
+                // @ts-ignore
+                 class JavaPluginLoader implements org.bukkit.plugin.PluginLoader {
                     /**
                      * This class was not meant to be constructed explicitly
                      */

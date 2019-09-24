@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace entity {
                 namespace CreatureSpawnEvent {
-                    class SpawnReason {
+                    // @ts-ignore
+                     class SpawnReason {
                         public static NATURAL: org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
                         public static JOCKEY: org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
                         public static CHUNK_GEN: org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;

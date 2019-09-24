@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace util {
-            class NumberConversions {
+            // @ts-ignore
+             class NumberConversions {
                 public static floor(num: number): number;
                 public static ceil(num: number): number;
                 public static round(num: number): number;

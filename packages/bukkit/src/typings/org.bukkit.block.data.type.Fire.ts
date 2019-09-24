@@ -3,7 +3,8 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Fire {
+                    // @ts-ignore
+                    interface Fire extends org.bukkit.block.data.Ageable, org.bukkit.block.data.MultipleFacing {
                     }
                 }
             }

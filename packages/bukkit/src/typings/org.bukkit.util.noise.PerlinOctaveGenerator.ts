@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace util {
             namespace noise {
-                class PerlinOctaveGenerator {
+                // @ts-ignore
+                 class PerlinOctaveGenerator {
                     /**
                      * Creates a perlin octave generator for the given world
                      */

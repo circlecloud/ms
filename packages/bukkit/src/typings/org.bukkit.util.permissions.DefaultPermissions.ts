@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace util {
             namespace permissions {
-                class DefaultPermissions {
+                // @ts-ignore
+                 class DefaultPermissions {
                     public static registerPermission(perm: org.bukkit.permissions.Permission): org.bukkit.permissions.Permission;
                     public static registerPermission(perm: org.bukkit.permissions.Permission, withLegacy: boolean): org.bukkit.permissions.Permission;
                     public static registerPermission(perm: org.bukkit.permissions.Permission, parent: org.bukkit.permissions.Permission): org.bukkit.permissions.Permission;

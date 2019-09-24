@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace util {
-            class ChatPaginator {
+            // @ts-ignore
+             class ChatPaginator {
                 constructor()
                 public static GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH: number;
                 public static AVERAGE_CHAT_PAGE_WIDTH: number;

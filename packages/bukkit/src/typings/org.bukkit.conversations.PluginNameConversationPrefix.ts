@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace conversations {
-            class PluginNameConversationPrefix {
+            // @ts-ignore
+             class PluginNameConversationPrefix implements org.bukkit.conversations.ConversationPrefix {
                 constructor(plugin: org.bukkit.plugin.Plugin)
                 constructor(plugin: org.bukkit.plugin.Plugin, separator: string, prefixColor: org.bukkit.ChatColor)
                 protected separator: string;

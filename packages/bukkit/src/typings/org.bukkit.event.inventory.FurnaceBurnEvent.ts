@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace inventory {
-                class FurnaceBurnEvent {
+                // @ts-ignore
+                 class FurnaceBurnEvent implements org.bukkit.event.Cancellable {
                     constructor(furnace: org.bukkit.block.Block, fuel: org.bukkit.inventory.ItemStack, burnTime: number)
                     /**
                      * Gets the fuel ItemStack for this event

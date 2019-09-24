@@ -3,7 +3,8 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace Bisected {
-                    class Half {
+                    // @ts-ignore
+                     class Half {
                         public static TOP: org.bukkit.block.data.Bisected.Half;
                         public static BOTTOM: org.bukkit.block.data.Bisected.Half;
                         public static values(): org.bukkit.block.data.Bisected.Half[];

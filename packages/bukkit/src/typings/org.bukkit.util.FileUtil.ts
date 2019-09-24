@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace util {
-            class FileUtil {
+            // @ts-ignore
+             class FileUtil {
                 constructor()
                 /**
                  * This method copies one file to another location

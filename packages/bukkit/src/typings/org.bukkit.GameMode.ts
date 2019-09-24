@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class GameMode {
+        // @ts-ignore
+         class GameMode {
             public static CREATIVE: org.bukkit.GameMode;
             public static SURVIVAL: org.bukkit.GameMode;
             public static ADVENTURE: org.bukkit.GameMode;

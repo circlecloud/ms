@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class GrassSpecies {
+        // @ts-ignore
+         class GrassSpecies {
             public static DEAD: org.bukkit.GrassSpecies;
             public static NORMAL: org.bukkit.GrassSpecies;
             public static FERN_LIKE: org.bukkit.GrassSpecies;

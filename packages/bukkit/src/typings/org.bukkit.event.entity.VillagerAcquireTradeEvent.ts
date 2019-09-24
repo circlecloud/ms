@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class VillagerAcquireTradeEvent {
+                // @ts-ignore
+                 class VillagerAcquireTradeEvent implements org.bukkit.event.Cancellable {
                     constructor(what: org.bukkit.entity.AbstractVillager, recipe: org.bukkit.inventory.MerchantRecipe)
                     /**
                      * Get the recipe to be acquired.

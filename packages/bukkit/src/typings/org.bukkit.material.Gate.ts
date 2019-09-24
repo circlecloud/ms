@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class Gate {
+            // @ts-ignore
+             class Gate implements org.bukkit.material.Directional, org.bukkit.material.Openable {
                 constructor()
                 constructor(type: org.bukkit.Material, data: number)
                 constructor(data: number)

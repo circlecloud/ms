@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace metadata {
-            class FixedMetadataValue {
+            // @ts-ignore
+             class FixedMetadataValue {
                 /**
                  * Initializes a FixedMetadataValue with an Object
                  */

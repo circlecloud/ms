@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace block {
-                class BlockCookEvent {
+                // @ts-ignore
+                 class BlockCookEvent implements org.bukkit.event.Cancellable {
                     constructor(block: org.bukkit.block.Block, source: org.bukkit.inventory.ItemStack, result: org.bukkit.inventory.ItemStack)
                     /**
                      * Gets the smelted ItemStack for this event

@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerFishEvent {
+                // @ts-ignore
+                 class PlayerFishEvent implements org.bukkit.event.Cancellable {
                     constructor(player: org.bukkit.entity.Player, entity: org.bukkit.entity.Entity, hookEntity: org.bukkit.entity.FishHook, state: org.bukkit.event.player.PlayerFishEvent.State)
                     /**
                      * Gets the entity caught by the player.

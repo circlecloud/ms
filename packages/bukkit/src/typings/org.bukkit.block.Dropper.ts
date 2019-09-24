@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace block {
-            class Dropper {
+            // @ts-ignore
+            interface Dropper extends org.bukkit.block.Container, org.bukkit.loot.Lootable {
                 /**
                  * Tries to drop a randomly selected item from the dropper's inventory,
                  * following the normal behavior of a dropper.
@@ -20,7 +21,7 @@ declare namespace org {
                  * If the block represented by this state is no longer a dropper, this will
                  * do nothing.
                  */
-                public drop(): void;
+                 drop(): void;
             }
         }
     }

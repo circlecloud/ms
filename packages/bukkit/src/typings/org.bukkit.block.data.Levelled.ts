@@ -2,19 +2,20 @@ declare namespace org {
     namespace bukkit {
         namespace block {
             namespace data {
-                class Levelled {
+                // @ts-ignore
+                interface Levelled extends org.bukkit.block.data.BlockData {
                     /**
                      * Gets the value of the 'level' property.
                      */
-                    public getLevel(): number;
+                     getLevel(): number;
                     /**
                      * Sets the value of the 'level' property.
                      */
-                    public setLevel(level: number): void;
+                     setLevel(level: number): void;
                     /**
                      * Gets the maximum allowed value of the 'level' property.
                      */
-                    public getMaximumLevel(): number;
+                     getMaximumLevel(): number;
                 }
             }
         }

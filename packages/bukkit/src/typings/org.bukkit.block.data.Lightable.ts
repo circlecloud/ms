@@ -2,15 +2,16 @@ declare namespace org {
     namespace bukkit {
         namespace block {
             namespace data {
-                class Lightable {
+                // @ts-ignore
+                interface Lightable extends org.bukkit.block.data.BlockData {
                     /**
                      * Gets the value of the 'lit' property.
                      */
-                    public isLit(): boolean;
+                     isLit(): boolean;
                     /**
                      * Sets the value of the 'lit' property.
                      */
-                    public setLit(lit: boolean): void;
+                     setLit(lit: boolean): void;
                 }
             }
         }

@@ -4,7 +4,8 @@ declare namespace org {
             namespace data {
                 namespace type {
                     namespace Comparator {
-                        class Mode {
+                        // @ts-ignore
+                         class Mode {
                             public static COMPARE: org.bukkit.block.data.type.Comparator.Mode;
                             public static SUBTRACT: org.bukkit.block.data.type.Comparator.Mode;
                             public static values(): org.bukkit.block.data.type.Comparator.Mode[];

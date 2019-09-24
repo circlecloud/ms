@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace configuration {
             namespace file {
-                class YamlConfiguration {
+                // @ts-ignore
+                 class YamlConfiguration {
                     constructor()
                     protected static COMMENT_PREFIX: string;
                     protected static BLANK_CONFIG: string;

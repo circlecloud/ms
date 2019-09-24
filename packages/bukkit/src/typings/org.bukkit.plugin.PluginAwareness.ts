@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace plugin {
-            class PluginAwareness {
+            // @ts-ignore
+            interface PluginAwareness {
             }
         }
     }

@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class Wool {
+            // @ts-ignore
+             class Wool implements org.bukkit.material.Colorable {
                 constructor()
                 constructor(color: org.bukkit.DyeColor)
                 constructor(type: org.bukkit.Material)

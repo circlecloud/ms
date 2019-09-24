@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class TripwireHook {
+            // @ts-ignore
+             class TripwireHook implements org.bukkit.material.Redstone {
                 constructor()
                 constructor(type: org.bukkit.Material, data: number)
                 constructor(dir: org.bukkit.block.BlockFace)

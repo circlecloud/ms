@@ -1,11 +1,12 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Boss {
+            // @ts-ignore
+            interface Boss extends org.bukkit.entity.Entity {
                 /**
                  * Returns the {@link BossBar} of the {@link Boss}
                  */
-                public getBossBar(): org.bukkit.boss.BossBar;
+                 getBossBar(): org.bukkit.boss.BossBar;
             }
         }
     }

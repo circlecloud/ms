@@ -3,7 +3,8 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace Rail {
-                    class Shape {
+                    // @ts-ignore
+                     class Shape {
                         public static NORTH_SOUTH: org.bukkit.block.data.Rail.Shape;
                         public static EAST_WEST: org.bukkit.block.data.Rail.Shape;
                         public static ASCENDING_EAST: org.bukkit.block.data.Rail.Shape;

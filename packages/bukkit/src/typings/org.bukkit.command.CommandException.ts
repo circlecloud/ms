@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace command {
-            class CommandException {
+            // @ts-ignore
+             class CommandException {
                 /**
                  * Creates a new instance of <code>CommandException</code> without detail
                  * message.

@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class Difficulty {
+        // @ts-ignore
+         class Difficulty {
             public static PEACEFUL: org.bukkit.Difficulty;
             public static EASY: org.bukkit.Difficulty;
             public static NORMAL: org.bukkit.Difficulty;

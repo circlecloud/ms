@@ -2,15 +2,16 @@ declare namespace org {
     namespace bukkit {
         namespace block {
             namespace data {
-                class Waterlogged {
+                // @ts-ignore
+                interface Waterlogged extends org.bukkit.block.data.BlockData {
                     /**
                      * Gets the value of the 'waterlogged' property.
                      */
-                    public isWaterlogged(): boolean;
+                     isWaterlogged(): boolean;
                     /**
                      * Sets the value of the 'waterlogged' property.
                      */
-                    public setWaterlogged(waterlogged: boolean): void;
+                     setWaterlogged(waterlogged: boolean): void;
                 }
             }
         }

@@ -1,15 +1,16 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Ocelot {
+            // @ts-ignore
+            interface Ocelot extends org.bukkit.entity.Animals {
                 /**
                  * Gets the current type of this cat.
                  */
-                public getCatType(): org.bukkit.entity.Ocelot.Type;
+                 getCatType(): org.bukkit.entity.Ocelot.Type;
                 /**
                  * Sets the current type of this cat.
                  */
-                public setCatType(type: org.bukkit.entity.Ocelot.Type): void;
+                 setCatType(type: org.bukkit.entity.Ocelot.Type): void;
             }
         }
     }

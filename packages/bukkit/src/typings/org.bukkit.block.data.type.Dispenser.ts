@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Dispenser {
+                    // @ts-ignore
+                    interface Dispenser extends org.bukkit.block.data.Directional {
                         /**
                          * Gets the value of the 'triggered' property.
                          */
-                        public isTriggered(): boolean;
+                         isTriggered(): boolean;
                         /**
                          * Sets the value of the 'triggered' property.
                          */
-                        public setTriggered(triggered: boolean): void;
+                         setTriggered(triggered: boolean): void;
                     }
                 }
             }

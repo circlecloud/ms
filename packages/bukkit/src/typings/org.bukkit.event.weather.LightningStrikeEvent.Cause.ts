@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace weather {
                 namespace LightningStrikeEvent {
-                    class Cause {
+                    // @ts-ignore
+                     class Cause {
                         public static COMMAND: org.bukkit.event.weather.LightningStrikeEvent.Cause;
                         public static TRIDENT: org.bukkit.event.weather.LightningStrikeEvent.Cause;
                         public static TRAP: org.bukkit.event.weather.LightningStrikeEvent.Cause;

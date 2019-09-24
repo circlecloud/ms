@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace map {
-            class MapPalette {
+            // @ts-ignore
+             class MapPalette {
                 public static TRANSPARENT: number;
                 public static LIGHT_GREEN: number;
                 public static LIGHT_BROWN: number;

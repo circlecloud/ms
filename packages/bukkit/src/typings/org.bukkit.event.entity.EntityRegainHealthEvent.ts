@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class EntityRegainHealthEvent {
+                // @ts-ignore
+                 class EntityRegainHealthEvent implements org.bukkit.event.Cancellable {
                     constructor(entity: org.bukkit.entity.Entity, amount: number, regainReason: org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason)
                     /**
                      * Gets the amount of regained health

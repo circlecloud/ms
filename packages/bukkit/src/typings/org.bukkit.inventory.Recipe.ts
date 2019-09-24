@@ -1,11 +1,12 @@
 declare namespace org {
     namespace bukkit {
         namespace inventory {
-            class Recipe {
+            // @ts-ignore
+            interface Recipe {
                 /**
                  * Get the result of this recipe.
                  */
-                public getResult(): org.bukkit.inventory.ItemStack;
+                 getResult(): org.bukkit.inventory.ItemStack;
             }
         }
     }

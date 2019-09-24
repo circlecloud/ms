@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace conversations {
-            class ConversationAbandonedEvent {
+            // @ts-ignore
+             class ConversationAbandonedEvent {
                 constructor(conversation: org.bukkit.conversations.Conversation)
                 constructor(conversation: org.bukkit.conversations.Conversation, canceller: org.bukkit.conversations.ConversationCanceller)
                 /**

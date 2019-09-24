@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace boss {
-            class BarStyle {
+            // @ts-ignore
+             class BarStyle {
                 public static SOLID: org.bukkit.boss.BarStyle;
                 public static SEGMENTED_6: org.bukkit.boss.BarStyle;
                 public static SEGMENTED_10: org.bukkit.boss.BarStyle;

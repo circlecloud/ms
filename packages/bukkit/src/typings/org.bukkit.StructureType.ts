@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class StructureType {
+        // @ts-ignore
+         class StructureType {
             public static MINESHAFT: org.bukkit.StructureType;
             public static VILLAGE: org.bukkit.StructureType;
             public static NETHER_FORTRESS: org.bukkit.StructureType;

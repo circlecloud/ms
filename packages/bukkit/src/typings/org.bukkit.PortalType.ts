@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class PortalType {
+        // @ts-ignore
+         class PortalType {
             public static NETHER: org.bukkit.PortalType;
             public static ENDER: org.bukkit.PortalType;
             public static CUSTOM: org.bukkit.PortalType;

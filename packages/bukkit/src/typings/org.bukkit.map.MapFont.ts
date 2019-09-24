@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace map {
-            class MapFont {
+            // @ts-ignore
+             class MapFont {
                 constructor()
                 protected malleable: boolean;
                 /**

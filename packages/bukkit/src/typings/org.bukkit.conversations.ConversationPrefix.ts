@@ -1,11 +1,12 @@
 declare namespace org {
     namespace bukkit {
         namespace conversations {
-            class ConversationPrefix {
+            // @ts-ignore
+            interface ConversationPrefix {
                 /**
                  * Gets the prefix to use before each message to the player.
                  */
-                public getPrefix(context: org.bukkit.conversations.ConversationContext): string;
+                 getPrefix(context: org.bukkit.conversations.ConversationContext): string;
             }
         }
     }

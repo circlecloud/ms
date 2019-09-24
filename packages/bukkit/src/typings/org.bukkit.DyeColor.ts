@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class DyeColor {
+        // @ts-ignore
+         class DyeColor {
             public static WHITE: org.bukkit.DyeColor;
             public static ORANGE: org.bukkit.DyeColor;
             public static MAGENTA: org.bukkit.DyeColor;

@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class Particle {
+        // @ts-ignore
+         class Particle {
             public static EXPLOSION_NORMAL: org.bukkit.Particle;
             public static EXPLOSION_LARGE: org.bukkit.Particle;
             public static EXPLOSION_HUGE: org.bukkit.Particle;

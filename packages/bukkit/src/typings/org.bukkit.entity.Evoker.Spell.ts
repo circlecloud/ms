@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace entity {
             namespace Evoker {
-                class Spell {
+                // @ts-ignore
+                 class Spell {
                     public static NONE: org.bukkit.entity.Evoker.Spell;
                     public static SUMMON: org.bukkit.entity.Evoker.Spell;
                     public static FANGS: org.bukkit.entity.Evoker.Spell;

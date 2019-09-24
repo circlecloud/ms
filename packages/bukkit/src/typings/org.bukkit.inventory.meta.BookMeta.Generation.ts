@@ -3,7 +3,8 @@ declare namespace org {
         namespace inventory {
             namespace meta {
                 namespace BookMeta {
-                    class Generation {
+                    // @ts-ignore
+                     class Generation {
                         public static ORIGINAL: org.bukkit.inventory.meta.BookMeta.Generation;
                         public static COPY_OF_ORIGINAL: org.bukkit.inventory.meta.BookMeta.Generation;
                         public static COPY_OF_COPY: org.bukkit.inventory.meta.BookMeta.Generation;

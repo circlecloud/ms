@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace event {
-            class EventPriority {
+            // @ts-ignore
+             class EventPriority {
                 public static LOWEST: org.bukkit.event.EventPriority;
                 public static LOW: org.bukkit.event.EventPriority;
                 public static NORMAL: org.bukkit.event.EventPriority;

@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class Rotation {
+        // @ts-ignore
+         class Rotation {
             public static NONE: org.bukkit.Rotation;
             public static CLOCKWISE_45: org.bukkit.Rotation;
             public static CLOCKWISE: org.bukkit.Rotation;

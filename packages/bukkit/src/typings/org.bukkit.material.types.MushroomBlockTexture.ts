@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace material {
             namespace types {
-                class MushroomBlockTexture {
+                // @ts-ignore
+                 class MushroomBlockTexture {
                     public static ALL_PORES: org.bukkit.material.types.MushroomBlockTexture;
                     public static CAP_NORTH_WEST: org.bukkit.material.types.MushroomBlockTexture;
                     public static CAP_NORTH: org.bukkit.material.types.MushroomBlockTexture;

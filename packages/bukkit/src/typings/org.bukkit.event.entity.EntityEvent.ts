@@ -2,6 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
+                // @ts-ignore
                 abstract class EntityEvent {
                     constructor(what: org.bukkit.entity.Entity)
                     protected entity: org.bukkit.entity.Entity;

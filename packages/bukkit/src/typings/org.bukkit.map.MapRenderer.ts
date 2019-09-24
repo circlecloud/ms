@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
         namespace map {
+            // @ts-ignore
             abstract class MapRenderer {
                 /**
                  * Initialize the map renderer base to be non-contextual. See {@link

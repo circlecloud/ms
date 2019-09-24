@@ -1,15 +1,16 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class PufferFish {
+            // @ts-ignore
+            interface PufferFish extends org.bukkit.entity.Fish {
                 /**
                  * Returns the current puff state of this fish (i.e. how inflated it is).
                  */
-                public getPuffState(): number;
+                 getPuffState(): number;
                 /**
                  * Sets the current puff state of this fish (i.e. how inflated it is).
                  */
-                public setPuffState(state: number): void;
+                 setPuffState(state: number): void;
             }
         }
     }

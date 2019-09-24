@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class Achievement {
+        // @ts-ignore
+         class Achievement {
             public static OPEN_INVENTORY: org.bukkit.Achievement;
             public static MINE_WOOD: org.bukkit.Achievement;
             public static BUILD_WORKBENCH: org.bukkit.Achievement;

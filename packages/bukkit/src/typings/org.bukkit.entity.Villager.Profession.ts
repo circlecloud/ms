@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace entity {
             namespace Villager {
-                class Profession {
+                // @ts-ignore
+                 class Profession implements org.bukkit.Keyed {
                     public static NONE: org.bukkit.entity.Villager.Profession;
                     public static ARMORER: org.bukkit.entity.Villager.Profession;
                     public static BUTCHER: org.bukkit.entity.Villager.Profession;

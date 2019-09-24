@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class BubbleColumn {
+                    // @ts-ignore
+                    interface BubbleColumn extends org.bukkit.block.data.BlockData {
                         /**
                          * Gets the value of the 'drag' property.
                          */
-                        public isDrag(): boolean;
+                         isDrag(): boolean;
                         /**
                          * Sets the value of the 'drag' property.
                          */
-                        public setDrag(drag: boolean): void;
+                         setDrag(drag: boolean): void;
                     }
                 }
             }

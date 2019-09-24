@@ -2,6 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace util {
             namespace noise {
+                // @ts-ignore
                 abstract class OctaveGenerator {
                     constructor(octaves: org.bukkit.util.noise.NoiseGenerator)
                     protected octaves: org.bukkit.util.noise.NoiseGenerator[];

@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace entity {
             namespace Panda {
-                class Gene {
+                // @ts-ignore
+                 class Gene {
                     public static NORMAL: org.bukkit.entity.Panda.Gene;
                     public static LAZY: org.bukkit.entity.Panda.Gene;
                     public static WORRIED: org.bukkit.entity.Panda.Gene;

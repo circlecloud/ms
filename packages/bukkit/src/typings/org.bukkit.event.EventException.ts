@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace event {
-            class EventException {
+            // @ts-ignore
+             class EventException {
                 /**
                  * Constructs a new EventException based on the given Exception
                  */

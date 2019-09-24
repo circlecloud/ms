@@ -3,7 +3,8 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Cocoa {
+                    // @ts-ignore
+                    interface Cocoa extends org.bukkit.block.data.Ageable, org.bukkit.block.data.Directional {
                     }
                 }
             }

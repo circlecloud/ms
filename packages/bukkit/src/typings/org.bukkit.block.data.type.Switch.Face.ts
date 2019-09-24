@@ -4,7 +4,8 @@ declare namespace org {
             namespace data {
                 namespace type {
                     namespace Switch {
-                        class Face {
+                        // @ts-ignore
+                         class Face {
                             public static FLOOR: org.bukkit.block.data.type.Switch.Face;
                             public static WALL: org.bukkit.block.data.type.Switch.Face;
                             public static CEILING: org.bukkit.block.data.type.Switch.Face;

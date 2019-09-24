@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class EntityChangeBlockEvent {
+                // @ts-ignore
+                 class EntityChangeBlockEvent implements org.bukkit.event.Cancellable {
                     constructor(what: org.bukkit.entity.Entity, block: org.bukkit.block.Block, to: org.bukkit.block.data.BlockData)
                     /**
                      * Gets the block the entity is changing

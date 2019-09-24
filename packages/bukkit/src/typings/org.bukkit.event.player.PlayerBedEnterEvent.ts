@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerBedEnterEvent {
+                // @ts-ignore
+                 class PlayerBedEnterEvent implements org.bukkit.event.Cancellable {
                     constructor(who: org.bukkit.entity.Player, bed: org.bukkit.block.Block, bedEnterResult: org.bukkit.event.player.PlayerBedEnterEvent.BedEnterResult)
                     constructor(who: org.bukkit.entity.Player, bed: org.bukkit.block.Block)
                     /**

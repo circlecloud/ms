@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class AbstractVillager {
+            // @ts-ignore
+            interface AbstractVillager extends org.bukkit.entity.Ageable, org.bukkit.entity.NPC, org.bukkit.inventory.InventoryHolder, org.bukkit.inventory.Merchant {
                 /**
                  * Gets this villager's inventory.
                  * <br>
@@ -9,7 +10,7 @@ declare namespace org {
                  * items that a villager might have collected (from harvesting crops, etc.)
                  * {@inheritDoc}
                  */
-                public getInventory(): org.bukkit.inventory.Inventory;
+                 getInventory(): org.bukkit.inventory.Inventory;
             }
         }
     }

@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace plugin {
-            abstract class PluginBase {
+            // @ts-ignore
+            abstract class PluginBase implements org.bukkit.plugin.Plugin {
                 constructor()
                 public hashCode(): number;
                 public equals(obj: any): boolean;

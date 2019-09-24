@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class Statistic {
+        // @ts-ignore
+         class Statistic implements org.bukkit.Keyed {
             public static DAMAGE_DEALT: org.bukkit.Statistic;
             public static DAMAGE_TAKEN: org.bukkit.Statistic;
             public static DEATHS: org.bukkit.Statistic;

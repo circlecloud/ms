@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Hopper {
+                    // @ts-ignore
+                    interface Hopper extends org.bukkit.block.data.Directional {
                         /**
                          * Gets the value of the 'enabled' property.
                          */
-                        public isEnabled(): boolean;
+                         isEnabled(): boolean;
                         /**
                          * Sets the value of the 'enabled' property.
                          */
-                        public setEnabled(enabled: boolean): void;
+                         setEnabled(enabled: boolean): void;
                     }
                 }
             }

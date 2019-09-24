@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace map {
             namespace MapFont {
-                class CharacterSprite {
+                // @ts-ignore
+                 class CharacterSprite {
                     constructor(width: number, height: number, data: boolean)
                     /**
                      * Get the value of a pixel of the character.

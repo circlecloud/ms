@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class Tripwire {
+            // @ts-ignore
+             class Tripwire {
                 constructor()
                 constructor(type: org.bukkit.Material, data: number)
                 /**

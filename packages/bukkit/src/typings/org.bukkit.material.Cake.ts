@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class Cake {
+            // @ts-ignore
+             class Cake {
                 constructor()
                 constructor(type: org.bukkit.Material)
                 constructor(type: org.bukkit.Material, data: number)

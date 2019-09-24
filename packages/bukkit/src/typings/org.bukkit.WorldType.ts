@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class WorldType {
+        // @ts-ignore
+         class WorldType {
             public static NORMAL: org.bukkit.WorldType;
             public static FLAT: org.bukkit.WorldType;
             public static VERSION_1_1: org.bukkit.WorldType;

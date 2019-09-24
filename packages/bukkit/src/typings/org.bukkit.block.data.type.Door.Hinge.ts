@@ -4,7 +4,8 @@ declare namespace org {
             namespace data {
                 namespace type {
                     namespace Door {
-                        class Hinge {
+                        // @ts-ignore
+                         class Hinge {
                             public static LEFT: org.bukkit.block.data.type.Door.Hinge;
                             public static RIGHT: org.bukkit.block.data.type.Door.Hinge;
                             public static values(): org.bukkit.block.data.type.Door.Hinge[];

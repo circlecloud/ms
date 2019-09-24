@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Bell {
+                    // @ts-ignore
+                    interface Bell extends org.bukkit.block.data.Directional {
                         /**
                          * Gets the value of the 'attachment' property.
                          */
-                        public getAttachment(): org.bukkit.block.data.type.Bell.Attachment;
+                         getAttachment(): org.bukkit.block.data.type.Bell.Attachment;
                         /**
                          * Sets the value of the 'attachment' property.
                          */
-                        public setAttachment(attachment: org.bukkit.block.data.type.Bell.Attachment): void;
+                         setAttachment(attachment: org.bukkit.block.data.type.Bell.Attachment): void;
                     }
                 }
             }

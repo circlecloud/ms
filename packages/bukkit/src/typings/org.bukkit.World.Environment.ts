@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace World {
-            class Environment {
+            // @ts-ignore
+             class Environment {
                 public static NORMAL: org.bukkit.World.Environment;
                 public static NETHER: org.bukkit.World.Environment;
                 public static THE_END: org.bukkit.World.Environment;

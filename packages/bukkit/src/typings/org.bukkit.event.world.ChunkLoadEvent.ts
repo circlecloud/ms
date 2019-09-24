@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace world {
-                class ChunkLoadEvent {
+                // @ts-ignore
+                 class ChunkLoadEvent {
                     constructor(chunk: org.bukkit.Chunk, newChunk: boolean)
                     /**
                      * Gets if this chunk was newly created or not.

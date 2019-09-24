@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Trident {
+            // @ts-ignore
+            interface Trident extends org.bukkit.entity.AbstractArrow {
             }
         }
     }

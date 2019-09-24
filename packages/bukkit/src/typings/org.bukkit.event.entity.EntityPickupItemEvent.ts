@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class EntityPickupItemEvent {
+                // @ts-ignore
+                 class EntityPickupItemEvent implements org.bukkit.event.Cancellable {
                     constructor(entity: org.bukkit.entity.LivingEntity, item: org.bukkit.entity.Item, remaining: number)
                     public getEntity(): org.bukkit.entity.LivingEntity;
                     /**

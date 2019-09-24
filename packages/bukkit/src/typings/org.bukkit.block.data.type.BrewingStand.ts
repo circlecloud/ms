@@ -3,23 +3,24 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class BrewingStand {
+                    // @ts-ignore
+                    interface BrewingStand extends org.bukkit.block.data.BlockData {
                         /**
                          * Checks if the stand has the following bottle
                          */
-                        public hasBottle(bottle: number): boolean;
+                         hasBottle(bottle: number): boolean;
                         /**
                          * Set whether the stand has this bottle present.
                          */
-                        public setBottle(bottle: number, has: boolean): void;
+                         setBottle(bottle: number, has: boolean): void;
                         /**
                          * Get the indexes of all the bottles present on this block.
                          */
-                        public getBottles(): any[] /*java.util.Set*/;
+                         getBottles(): any[] /*java.util.Set*/;
                         /**
                          * Get the maximum amount of bottles present on this stand.
                          */
-                        public getMaximumBottles(): number;
+                         getMaximumBottles(): number;
                     }
                 }
             }

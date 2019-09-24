@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerToggleFlightEvent {
+                // @ts-ignore
+                 class PlayerToggleFlightEvent implements org.bukkit.event.Cancellable {
                     constructor(player: org.bukkit.entity.Player, isFlying: boolean)
                     /**
                      * Returns whether the player is trying to start or stop flying.

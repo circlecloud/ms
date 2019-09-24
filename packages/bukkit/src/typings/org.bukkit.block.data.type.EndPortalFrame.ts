@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class EndPortalFrame {
+                    // @ts-ignore
+                    interface EndPortalFrame extends org.bukkit.block.data.Directional {
                         /**
                          * Gets the value of the 'eye' property.
                          */
-                        public hasEye(): boolean;
+                         hasEye(): boolean;
                         /**
                          * Sets the value of the 'eye' property.
                          */
-                        public setEye(eye: boolean): void;
+                         setEye(eye: boolean): void;
                     }
                 }
             }

@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Chest {
+                    // @ts-ignore
+                    interface Chest extends org.bukkit.block.data.Directional, org.bukkit.block.data.Waterlogged {
                         /**
                          * Gets the value of the 'type' property.
                          */
-                        public getType(): org.bukkit.block.data.type.Chest.Type;
+                         getType(): org.bukkit.block.data.type.Chest.Type;
                         /**
                          * Sets the value of the 'type' property.
                          */
-                        public setType(type: org.bukkit.block.data.type.Chest.Type): void;
+                         setType(type: org.bukkit.block.data.type.Chest.Type): void;
                     }
                 }
             }

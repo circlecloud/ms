@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace FireworkEffect {
-            class Type {
+            // @ts-ignore
+             class Type {
                 public static BALL: org.bukkit.FireworkEffect.Type;
                 public static BALL_LARGE: org.bukkit.FireworkEffect.Type;
                 public static STAR: org.bukkit.FireworkEffect.Type;

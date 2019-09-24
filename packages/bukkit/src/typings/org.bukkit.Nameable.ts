@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class Nameable {
+        // @ts-ignore
+        interface Nameable {
             /**
              * Gets the custom name on a mob or block. If there is no name this method
              * will return null.
@@ -8,7 +9,7 @@ declare namespace org {
              * This value has no effect on players, they will always use their real
              * name.
              */
-            public getCustomName(): string;
+             getCustomName(): string;
             /**
              * Sets a custom name on a mob or block. This name will be used in death
              * messages and can be sent to the client as a nameplate over the mob.
@@ -18,7 +19,7 @@ declare namespace org {
              * This value has no effect on players, they will always use their real
              * name.
              */
-            public setCustomName(name: string): void;
+             setCustomName(name: string): void;
         }
     }
 }

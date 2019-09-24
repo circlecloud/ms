@@ -1,24 +1,25 @@
 declare namespace org {
     namespace bukkit {
         namespace block {
-            class Sign {
+            // @ts-ignore
+            interface Sign extends org.bukkit.block.TileState, org.bukkit.material.Colorable {
                 /**
                  * Gets all the lines of text currently on this sign.
                  */
-                public getLines(): any;
+                 getLines(): any;
                 /**
                  * Gets the line of text at the specified index.
                  * <p>
                  * For example, getLine(0) will return the first line of text.
                  */
-                public getLine(index: number): string;
+                 getLine(index: number): string;
                 /**
                  * Sets the line of text at the specified index.
                  * <p>
                  * For example, setLine(0, "Line One") will set the first line of text to
                  * "Line One".
                  */
-                public setLine(index: number, line: string): void;
+                 setLine(index: number, line: string): void;
                 /**
                  * Marks whether this sign can be edited by players.
                  * <br>
@@ -26,7 +27,7 @@ declare namespace org {
                  * a placed sign is manipulated during the BlockPlaceEvent. Behaviour
                  * outside of this event is undefined.
                  */
-                public isEditable(): boolean;
+                 isEditable(): boolean;
                 /**
                  * Marks whether this sign can be edited by players.
                  * <br>
@@ -34,7 +35,7 @@ declare namespace org {
                  * a placed sign is manipulated during the BlockPlaceEvent. Behaviour
                  * outside of this event is undefined.
                  */
-                public setEditable(editable: boolean): void;
+                 setEditable(editable: boolean): void;
             }
         }
     }

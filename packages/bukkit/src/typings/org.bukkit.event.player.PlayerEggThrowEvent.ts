@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerEggThrowEvent {
+                // @ts-ignore
+                 class PlayerEggThrowEvent {
                     constructor(player: org.bukkit.entity.Player, egg: org.bukkit.entity.Egg, hatching: boolean, numHatches: number, hatchingType: org.bukkit.entity.EntityType)
                     /**
                      * Gets the egg involved in this event.

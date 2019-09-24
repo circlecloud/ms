@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class LongGrass {
+            // @ts-ignore
+             class LongGrass {
                 constructor()
                 constructor(species: org.bukkit.GrassSpecies)
                 constructor(type: org.bukkit.Material)

@@ -3,19 +3,20 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Farmland {
+                    // @ts-ignore
+                    interface Farmland extends org.bukkit.block.data.BlockData {
                         /**
                          * Gets the value of the 'moisture' property.
                          */
-                        public getMoisture(): number;
+                         getMoisture(): number;
                         /**
                          * Sets the value of the 'moisture' property.
                          */
-                        public setMoisture(moisture: number): void;
+                         setMoisture(moisture: number): void;
                         /**
                          * Gets the maximum allowed value of the 'moisture' property.
                          */
-                        public getMaximumMoisture(): number;
+                         getMaximumMoisture(): number;
                     }
                 }
             }

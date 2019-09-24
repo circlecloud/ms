@@ -1,8 +1,9 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class EnderDragonPart {
-                public getParent(): org.bukkit.entity.EnderDragon;
+            // @ts-ignore
+            interface EnderDragonPart extends org.bukkit.entity.ComplexEntityPart, org.bukkit.entity.Damageable {
+                 getParent(): org.bukkit.entity.EnderDragon;
             }
         }
     }

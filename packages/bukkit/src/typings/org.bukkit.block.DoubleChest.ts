@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace block {
-            class DoubleChest {
+            // @ts-ignore
+             class DoubleChest implements org.bukkit.inventory.InventoryHolder {
                 constructor(chest: org.bukkit.inventory.DoubleChestInventory)
                 public getInventory(): org.bukkit.inventory.Inventory;
                 public getLeftSide(): org.bukkit.inventory.InventoryHolder;

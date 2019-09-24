@@ -1,11 +1,12 @@
 declare namespace org {
     namespace bukkit {
         namespace inventory {
-            class MerchantInventory {
+            // @ts-ignore
+            interface MerchantInventory extends org.bukkit.inventory.Inventory {
                 /**
                  * Get the index of the currently selected recipe.
                  */
-                public getSelectedRecipeIndex(): number;
+                 getSelectedRecipeIndex(): number;
                 /**
                  * Get the currently active recipe.
                  * <p>
@@ -15,11 +16,11 @@ declare namespace org {
                  * selected the first recipe, the merchant will search all of its offers
                  * for a matching recipe to activate.
                  */
-                public getSelectedRecipe(): org.bukkit.inventory.MerchantRecipe;
+                 getSelectedRecipe(): org.bukkit.inventory.MerchantRecipe;
                 /**
                  * Gets the Merchant associated with this inventory.
                  */
-                public getMerchant(): org.bukkit.inventory.Merchant;
+                 getMerchant(): org.bukkit.inventory.Merchant;
             }
         }
     }

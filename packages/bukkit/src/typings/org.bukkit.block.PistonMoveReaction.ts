@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace block {
-            class PistonMoveReaction {
+            // @ts-ignore
+             class PistonMoveReaction {
                 public static MOVE: org.bukkit.block.PistonMoveReaction;
                 public static BREAK: org.bukkit.block.PistonMoveReaction;
                 public static BLOCK: org.bukkit.block.PistonMoveReaction;

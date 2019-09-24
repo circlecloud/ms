@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace plugin {
-            class ServicePriority {
+            // @ts-ignore
+             class ServicePriority {
                 public static Lowest: org.bukkit.plugin.ServicePriority;
                 public static Low: org.bukkit.plugin.ServicePriority;
                 public static Normal: org.bukkit.plugin.ServicePriority;

@@ -1,18 +1,19 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Husk {
+            // @ts-ignore
+            interface Husk extends org.bukkit.entity.Zombie {
                 /**
                  * Get if this entity is in the process of converting to a Zombie as a
                  * result of being underwater.
                  */
-                public isConverting(): boolean;
+                 isConverting(): boolean;
                 /**
                  * Gets the amount of ticks until this entity will be converted to a Zombie
                  * as a result of being underwater.
                  * When this reaches 0, the entity will be converted.
                  */
-                public getConversionTime(): number;
+                 getConversionTime(): number;
                 /**
                  * Sets the amount of ticks until this entity will be converted to a Zombie
                  * as a result of being underwater.
@@ -20,7 +21,7 @@ declare namespace org {
                  * will stop the current conversion process without converting the current
                  * entity.
                  */
-                public setConversionTime(time: number): void;
+                 setConversionTime(time: number): void;
             }
         }
     }

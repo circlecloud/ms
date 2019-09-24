@@ -1,33 +1,34 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Zombie {
+            // @ts-ignore
+            interface Zombie extends org.bukkit.entity.Monster {
                 /**
                  * Gets whether the zombie is a baby
                  */
-                public isBaby(): boolean;
+                 isBaby(): boolean;
                 /**
                  * Sets whether the zombie is a baby
                  */
-                public setBaby(flag: boolean): void;
+                 setBaby(flag: boolean): void;
                 /**
                  * Gets whether the zombie is a villager
                  */
-                public isVillager(): boolean;
-                public setVillager(flag: boolean): void;
-                public setVillagerProfession(profession: org.bukkit.entity.Villager.Profession): void;
-                public getVillagerProfession(): org.bukkit.entity.Villager.Profession;
+                 isVillager(): boolean;
+                 setVillager(flag: boolean): void;
+                 setVillagerProfession(profession: org.bukkit.entity.Villager.Profession): void;
+                 getVillagerProfession(): org.bukkit.entity.Villager.Profession;
                 /**
                  * Get if this entity is in the process of converting to a Drowned as a
                  * result of being underwater.
                  */
-                public isConverting(): boolean;
+                 isConverting(): boolean;
                 /**
                  * Gets the amount of ticks until this entity will be converted to a Drowned
                  * as a result of being underwater.
                  * When this reaches 0, the entity will be converted.
                  */
-                public getConversionTime(): number;
+                 getConversionTime(): number;
                 /**
                  * Sets the amount of ticks until this entity will be converted to a Drowned
                  * as a result of being underwater.
@@ -35,7 +36,7 @@ declare namespace org {
                  * will stop the current conversion process without converting the current
                  * entity.
                  */
-                public setConversionTime(time: number): void;
+                 setConversionTime(time: number): void;
             }
         }
     }

@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class Color {
+        // @ts-ignore
+         class Color implements org.bukkit.configuration.serialization.ConfigurationSerializable {
             public static WHITE: org.bukkit.Color;
             public static SILVER: org.bukkit.Color;
             public static GRAY: org.bukkit.Color;

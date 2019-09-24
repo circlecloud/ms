@@ -1,56 +1,57 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Boat {
+            // @ts-ignore
+            interface Boat extends org.bukkit.entity.Vehicle {
                 /**
                  * Gets the wood type of the boat.
                  */
-                public getWoodType(): org.bukkit.TreeSpecies;
+                 getWoodType(): org.bukkit.TreeSpecies;
                 /**
                  * Sets the wood type of the boat.
                  */
-                public setWoodType(species: org.bukkit.TreeSpecies): void;
+                 setWoodType(species: org.bukkit.TreeSpecies): void;
                 /**
                  * Gets the maximum speed of a boat. The speed is unrelated to the
                  * velocity.
                  */
-                public getMaxSpeed(): number;
+                 getMaxSpeed(): number;
                 /**
                  * Sets the maximum speed of a boat. Must be nonnegative. Default is 0.4D.
                  */
-                public setMaxSpeed(speed: number): void;
+                 setMaxSpeed(speed: number): void;
                 /**
                  * Gets the deceleration rate (newSpeed = curSpeed * rate) of occupied
                  * boats. The default is 0.2.
                  */
-                public getOccupiedDeceleration(): number;
+                 getOccupiedDeceleration(): number;
                 /**
                  * Sets the deceleration rate (newSpeed = curSpeed * rate) of occupied
                  * boats. Setting this to a higher value allows for quicker acceleration.
                  * The default is 0.2.
                  */
-                public setOccupiedDeceleration(rate: number): void;
+                 setOccupiedDeceleration(rate: number): void;
                 /**
                  * Gets the deceleration rate (newSpeed = curSpeed * rate) of unoccupied
                  * boats. The default is -1. Values below 0 indicate that no additional
                  * deceleration is imposed.
                  */
-                public getUnoccupiedDeceleration(): number;
+                 getUnoccupiedDeceleration(): number;
                 /**
                  * Sets the deceleration rate (newSpeed = curSpeed * rate) of unoccupied
                  * boats. Setting this to a higher value allows for quicker deceleration
                  * of boats when a player disembarks. The default is -1. Values below 0
                  * indicate that no additional deceleration is imposed.
                  */
-                public setUnoccupiedDeceleration(rate: number): void;
+                 setUnoccupiedDeceleration(rate: number): void;
                 /**
                  * Get whether boats can work on land.
                  */
-                public getWorkOnLand(): boolean;
+                 getWorkOnLand(): boolean;
                 /**
                  * Set whether boats can work on land.
                  */
-                public setWorkOnLand(workOnLand: boolean): void;
+                 setWorkOnLand(workOnLand: boolean): void;
             }
         }
     }

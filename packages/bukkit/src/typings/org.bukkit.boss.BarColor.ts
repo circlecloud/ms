@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace boss {
-            class BarColor {
+            // @ts-ignore
+             class BarColor {
                 public static PINK: org.bukkit.boss.BarColor;
                 public static BLUE: org.bukkit.boss.BarColor;
                 public static RED: org.bukkit.boss.BarColor;

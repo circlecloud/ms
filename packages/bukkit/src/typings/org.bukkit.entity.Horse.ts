@@ -1,21 +1,22 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Horse {
+            // @ts-ignore
+            interface Horse extends org.bukkit.entity.AbstractHorse {
                 /**
                  * Gets the horse's color.
                  * <p>
                  * Colors only apply to horses, not to donkeys, mules, skeleton horses
                  * or undead horses.
                  */
-                public getColor(): org.bukkit.entity.Horse.Color;
+                 getColor(): org.bukkit.entity.Horse.Color;
                 /**
                  * Sets the horse's color.
                  * <p>
                  * Attempting to set a color for any donkey, mule, skeleton horse or
                  * undead horse will not result in a change.
                  */
-                public setColor(color: org.bukkit.entity.Horse.Color): void;
+                 setColor(color: org.bukkit.entity.Horse.Color): void;
                 /**
                  * Gets the horse's style.
                  * Styles determine what kind of markings or patterns a horse has.
@@ -23,7 +24,7 @@ declare namespace org {
                  * Styles only apply to horses, not to donkeys, mules, skeleton horses
                  * or undead horses.
                  */
-                public getStyle(): org.bukkit.entity.Horse.Style;
+                 getStyle(): org.bukkit.entity.Horse.Style;
                 /**
                  * Sets the style of this horse.
                  * Styles determine what kind of markings or patterns a horse has.
@@ -31,10 +32,10 @@ declare namespace org {
                  * Attempting to set a style for any donkey, mule, skeleton horse or
                  * undead horse will not result in a change.
                  */
-                public setStyle(style: org.bukkit.entity.Horse.Style): void;
-                public isCarryingChest(): boolean;
-                public setCarryingChest(chest: boolean): void;
-                public getInventory(): org.bukkit.inventory.HorseInventory;
+                 setStyle(style: org.bukkit.entity.Horse.Style): void;
+                 isCarryingChest(): boolean;
+                 setCarryingChest(chest: boolean): void;
+                 getInventory(): org.bukkit.inventory.HorseInventory;
             }
         }
     }

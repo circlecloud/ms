@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerEditBookEvent {
+                // @ts-ignore
+                 class PlayerEditBookEvent implements org.bukkit.event.Cancellable {
                     constructor(who: org.bukkit.entity.Player, slot: number, previousBookMeta: org.bukkit.inventory.meta.BookMeta, newBookMeta: org.bukkit.inventory.meta.BookMeta, isSigning: boolean)
                     /**
                      * Gets the book meta currently on the book.

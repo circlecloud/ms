@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace loot {
-            class LootTables {
+            // @ts-ignore
+             class LootTables implements org.bukkit.Keyed {
                 public static EMPTY: org.bukkit.loot.LootTables;
                 public static ABANDONED_MINESHAFT: org.bukkit.loot.LootTables;
                 public static BURIED_TREASURE: org.bukkit.loot.LootTables;

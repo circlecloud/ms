@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace persistence {
-            class PersistentDataContainer {
+            // @ts-ignore
+            interface PersistentDataContainer {
                 /**
                  * Stores a metadata value on the {@link PersistentDataHolder} instance.
                  * <p>
@@ -10,7 +11,7 @@ declare namespace org {
                  * value the {@link PersistentDataHolder} may have stored under the provided
                  * key.
                  */
-                public set(key: org.bukkit.NamespacedKey, type: org.bukkit.persistence.PersistentDataType, value: any): void;
+                 set(key: org.bukkit.NamespacedKey, type: org.bukkit.persistence.PersistentDataType, value: any): void;
                 /**
                  * Returns if the persistent metadata provider has metadata registered
                  * matching the provided parameters.
@@ -29,31 +30,31 @@ declare namespace org {
                  * tags, like the the display name, will not work as the values are stored
                  * using your namespace.
                  */
-                public has(key: org.bukkit.NamespacedKey, type: org.bukkit.persistence.PersistentDataType): boolean;
+                 has(key: org.bukkit.NamespacedKey, type: org.bukkit.persistence.PersistentDataType): boolean;
                 /**
                  * Returns the metadata value that is stored on the
                  * {@link PersistentDataHolder} instance.
                  */
-                public get(key: org.bukkit.NamespacedKey, type: org.bukkit.persistence.PersistentDataType): any;
+                 get(key: org.bukkit.NamespacedKey, type: org.bukkit.persistence.PersistentDataType): any;
                 /**
                  * Returns the metadata value that is stored on the
                  * {@link PersistentDataHolder} instance. If the value does not exist in the
                  * container, the default value provided is returned.
                  */
-                public getOrDefault(key: org.bukkit.NamespacedKey, type: org.bukkit.persistence.PersistentDataType, defaultValue: any): any;
+                 getOrDefault(key: org.bukkit.NamespacedKey, type: org.bukkit.persistence.PersistentDataType, defaultValue: any): any;
                 /**
                  * Removes a custom key from the {@link PersistentDataHolder} instance.
                  */
-                public remove(key: org.bukkit.NamespacedKey): void;
+                 remove(key: org.bukkit.NamespacedKey): void;
                 /**
                  * Returns if the container instance is empty, therefore has no entries
                  * inside it.
                  */
-                public isEmpty(): boolean;
+                 isEmpty(): boolean;
                 /**
                  * Returns the adapter context this tag container uses.
                  */
-                public getAdapterContext(): org.bukkit.persistence.PersistentDataAdapterContext;
+                 getAdapterContext(): org.bukkit.persistence.PersistentDataAdapterContext;
             }
         }
     }

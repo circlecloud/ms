@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace metadata {
-            abstract class MetadataValueAdapter {
+            // @ts-ignore
+            abstract class MetadataValueAdapter implements org.bukkit.metadata.MetadataValue {
                 constructor(owningPlugin: org.bukkit.plugin.Plugin)
                 protected owningPlugin: any;
                 public getOwningPlugin(): org.bukkit.plugin.Plugin;

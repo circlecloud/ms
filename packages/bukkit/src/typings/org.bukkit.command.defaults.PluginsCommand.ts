@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace command {
             namespace defaults {
-                class PluginsCommand {
+                // @ts-ignore
+                 class PluginsCommand {
                     constructor(name: string)
                     public execute(sender: org.bukkit.command.CommandSender, currentAlias: string, args: string): boolean;
                     public tabComplete(sender: org.bukkit.command.CommandSender, alias: string, args: string): any[] /*java.util.List*/;

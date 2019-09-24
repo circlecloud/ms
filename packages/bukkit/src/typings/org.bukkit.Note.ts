@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class Note {
+        // @ts-ignore
+         class Note {
             /**
              * Creates a new note.
              */

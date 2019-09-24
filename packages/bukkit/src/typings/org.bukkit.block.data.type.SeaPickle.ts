@@ -3,23 +3,24 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class SeaPickle {
+                    // @ts-ignore
+                    interface SeaPickle extends org.bukkit.block.data.Waterlogged {
                         /**
                          * Gets the value of the 'pickles' property.
                          */
-                        public getPickles(): number;
+                         getPickles(): number;
                         /**
                          * Sets the value of the 'pickles' property.
                          */
-                        public setPickles(pickles: number): void;
+                         setPickles(pickles: number): void;
                         /**
                          * Gets the minimum allowed value of the 'pickles' property.
                          */
-                        public getMinimumPickles(): number;
+                         getMinimumPickles(): number;
                         /**
                          * Gets the maximum allowed value of the 'pickles' property.
                          */
-                        public getMaximumPickles(): number;
+                         getMaximumPickles(): number;
                     }
                 }
             }

@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace util {
             namespace noise {
-                class SimplexNoiseGenerator {
+                // @ts-ignore
+                 class SimplexNoiseGenerator {
                     constructor()
                     /**
                      * Creates a seeded simplex noise generator for the given world

@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
+            // @ts-ignore
             abstract class TexturedMaterial {
                 constructor(m: org.bukkit.Material)
                 constructor(type: org.bukkit.Material, data: number)

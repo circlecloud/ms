@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace plugin {
-            class SimplePluginManager {
+            // @ts-ignore
+             class SimplePluginManager implements org.bukkit.plugin.PluginManager {
                 constructor(instance: org.bukkit.Server, commandMap: org.bukkit.command.SimpleCommandMap)
                 /**
                  * Registers the specified plugin loader

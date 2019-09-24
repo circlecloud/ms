@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Door {
+                    // @ts-ignore
+                    interface Door extends org.bukkit.block.data.Bisected, org.bukkit.block.data.Directional, org.bukkit.block.data.Openable, org.bukkit.block.data.Powerable {
                         /**
                          * Gets the value of the 'hinge' property.
                          */
-                        public getHinge(): org.bukkit.block.data.type.Door.Hinge;
+                         getHinge(): org.bukkit.block.data.type.Door.Hinge;
                         /**
                          * Sets the value of the 'hinge' property.
                          */
-                        public setHinge(hinge: org.bukkit.block.data.type.Door.Hinge): void;
+                         setHinge(hinge: org.bukkit.block.data.type.Door.Hinge): void;
                     }
                 }
             }

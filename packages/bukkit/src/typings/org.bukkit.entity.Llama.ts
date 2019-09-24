@@ -1,27 +1,28 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Llama {
+            // @ts-ignore
+            interface Llama extends org.bukkit.entity.ChestedHorse {
                 /**
                  * Gets the llama's color.
                  */
-                public getColor(): org.bukkit.entity.Llama.Color;
+                 getColor(): org.bukkit.entity.Llama.Color;
                 /**
                  * Sets the llama's color.
                  */
-                public setColor(color: org.bukkit.entity.Llama.Color): void;
+                 setColor(color: org.bukkit.entity.Llama.Color): void;
                 /**
                  * Gets the llama's strength. A higher strength llama will have more
                  * inventory slots and be more threatening to entities.
                  */
-                public getStrength(): number;
+                 getStrength(): number;
                 /**
                  * Sets the llama's strength. A higher strength llama will have more
                  * inventory slots and be more threatening to entities. Inventory slots are
                  * equal to strength * 3.
                  */
-                public setStrength(strength: number): void;
-                public getInventory(): org.bukkit.inventory.LlamaInventory;
+                 setStrength(strength: number): void;
+                 getInventory(): org.bukkit.inventory.LlamaInventory;
             }
         }
     }

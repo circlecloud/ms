@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class EntityShootBowEvent {
+                // @ts-ignore
+                 class EntityShootBowEvent implements org.bukkit.event.Cancellable {
                     constructor(shooter: org.bukkit.entity.LivingEntity, bow: org.bukkit.inventory.ItemStack, projectile: org.bukkit.entity.Entity, force: number)
                     public getEntity(): org.bukkit.entity.LivingEntity;
                     /**

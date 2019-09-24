@@ -3,14 +3,15 @@ declare namespace org {
         namespace inventory {
             namespace meta {
                 namespace tags {
-                    class CustomItemTagContainer {
+                    // @ts-ignore
+                    interface CustomItemTagContainer {
                         /**
                          * Stores a custom value on the {@link ItemMeta}.
                          * This API cannot be used to manipulate minecraft tags, as the values will
                          * be stored using your namespace. This method will override any existing
                          * value the meta may have stored under the provided key.
                          */
-                        public setCustomTag(key: org.bukkit.NamespacedKey, type: org.bukkit.inventory.meta.tags.ItemTagType, value: any): void;
+                         setCustomTag(key: org.bukkit.NamespacedKey, type: org.bukkit.inventory.meta.tags.ItemTagType, value: any): void;
                         /**
                          * Returns if the item meta has a custom tag registered matching the
                          * provided parameters.
@@ -25,24 +26,24 @@ declare namespace org {
                          * tags, like the the display name, will not work as the values are stored
                          * using your namespace.
                          */
-                        public hasCustomTag(key: org.bukkit.NamespacedKey, type: org.bukkit.inventory.meta.tags.ItemTagType): boolean;
+                         hasCustomTag(key: org.bukkit.NamespacedKey, type: org.bukkit.inventory.meta.tags.ItemTagType): boolean;
                         /**
                          * Returns the custom tag's value that is stored on the item.
                          */
-                        public getCustomTag(key: org.bukkit.NamespacedKey, type: org.bukkit.inventory.meta.tags.ItemTagType): any;
+                         getCustomTag(key: org.bukkit.NamespacedKey, type: org.bukkit.inventory.meta.tags.ItemTagType): any;
                         /**
                          * Removes a custom key from the item meta.
                          */
-                        public removeCustomTag(key: org.bukkit.NamespacedKey): void;
+                         removeCustomTag(key: org.bukkit.NamespacedKey): void;
                         /**
                          * Returns if the container instance is empty, therefore has no entries
                          * inside it.
                          */
-                        public isEmpty(): boolean;
+                         isEmpty(): boolean;
                         /**
                          * Returns the adapter context this tag container uses.
                          */
-                        public getAdapterContext(): org.bukkit.inventory.meta.tags.ItemTagAdapterContext;
+                         getAdapterContext(): org.bukkit.inventory.meta.tags.ItemTagAdapterContext;
                     }
                 }
             }

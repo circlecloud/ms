@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace inventory {
-                class PrepareAnvilEvent {
+                // @ts-ignore
+                 class PrepareAnvilEvent {
                     constructor(inventory: org.bukkit.inventory.InventoryView, result: org.bukkit.inventory.ItemStack)
                     public getInventory(): org.bukkit.inventory.AnvilInventory;
                     /**

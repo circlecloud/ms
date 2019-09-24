@@ -4,7 +4,8 @@ declare namespace org {
             namespace data {
                 namespace type {
                     namespace StructureBlock {
-                        class Mode {
+                        // @ts-ignore
+                         class Mode {
                             public static SAVE: org.bukkit.block.data.type.StructureBlock.Mode;
                             public static LOAD: org.bukkit.block.data.type.StructureBlock.Mode;
                             public static CORNER: org.bukkit.block.data.type.StructureBlock.Mode;

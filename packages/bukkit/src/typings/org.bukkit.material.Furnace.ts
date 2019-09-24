@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class Furnace {
+            // @ts-ignore
+             class Furnace {
                 constructor()
                 /**
                  * Instantiate a furnace facing in a particular direction.

@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class EntityCreatePortalEvent {
+                // @ts-ignore
+                 class EntityCreatePortalEvent implements org.bukkit.event.Cancellable {
                     constructor(what: org.bukkit.entity.LivingEntity, blocks: any[] /*java.util.List*/, type: org.bukkit.PortalType)
                     public getEntity(): org.bukkit.entity.LivingEntity;
                     /**

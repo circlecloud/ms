@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace player {
                 namespace PlayerResourcePackStatusEvent {
-                    class Status {
+                    // @ts-ignore
+                     class Status {
                         public static SUCCESSFULLY_LOADED: org.bukkit.event.player.PlayerResourcePackStatusEvent.Status;
                         public static DECLINED: org.bukkit.event.player.PlayerResourcePackStatusEvent.Status;
                         public static FAILED_DOWNLOAD: org.bukkit.event.player.PlayerResourcePackStatusEvent.Status;

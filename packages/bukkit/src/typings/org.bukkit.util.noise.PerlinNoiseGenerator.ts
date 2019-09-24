@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace util {
             namespace noise {
-                class PerlinNoiseGenerator {
+                // @ts-ignore
+                 class PerlinNoiseGenerator {
                     constructor()
                     /**
                      * Creates a seeded perlin noise generator for the given world

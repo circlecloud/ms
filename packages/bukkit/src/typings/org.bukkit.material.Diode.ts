@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class Diode {
+            // @ts-ignore
+             class Diode implements org.bukkit.material.Directional, org.bukkit.material.Redstone {
                 /**
                  * Constructs a diode switched on, with a delay of 1 and facing the default
                  * direction (north).

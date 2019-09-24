@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace enchantments {
-            class EnchantmentTarget {
+            // @ts-ignore
+             class EnchantmentTarget {
                 public static ALL: org.bukkit.enchantments.EnchantmentTarget;
                 public static ARMOR: org.bukkit.enchantments.EnchantmentTarget;
                 public static ARMOR_FEET: org.bukkit.enchantments.EnchantmentTarget;

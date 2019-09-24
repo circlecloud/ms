@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace inventory {
-            class StonecuttingRecipe {
+            // @ts-ignore
+             class StonecuttingRecipe implements org.bukkit.inventory.Recipe, org.bukkit.Keyed {
                 /**
                  * Create a Stonecutting recipe to craft the specified ItemStack.
                  */

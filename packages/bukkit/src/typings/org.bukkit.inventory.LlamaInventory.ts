@@ -1,15 +1,16 @@
 declare namespace org {
     namespace bukkit {
         namespace inventory {
-            class LlamaInventory {
+            // @ts-ignore
+            interface LlamaInventory extends org.bukkit.inventory.AbstractHorseInventory {
                 /**
                  * Gets the item in the llama's decor slot.
                  */
-                public getDecor(): org.bukkit.inventory.ItemStack;
+                 getDecor(): org.bukkit.inventory.ItemStack;
                 /**
                  * Sets the item in the llama's decor slot.
                  */
-                public setDecor(stack: org.bukkit.inventory.ItemStack): void;
+                 setDecor(stack: org.bukkit.inventory.ItemStack): void;
             }
         }
     }

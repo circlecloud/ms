@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace command {
-            class SimpleCommandMap {
+            // @ts-ignore
+             class SimpleCommandMap implements org.bukkit.command.CommandMap {
                 constructor(server: org.bukkit.Server)
                 protected knownCommands: Map<any, any> /*java.util.Map*/;
                 public setFallbackCommands(): void;

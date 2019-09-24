@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class VillagerCareerChangeEvent {
+                // @ts-ignore
+                 class VillagerCareerChangeEvent implements org.bukkit.event.Cancellable {
                     constructor(what: org.bukkit.entity.Villager, profession: org.bukkit.entity.Villager.Profession, reason: org.bukkit.event.entity.VillagerCareerChangeEvent.ChangeReason)
                     public getEntity(): org.bukkit.entity.Villager;
                     /**

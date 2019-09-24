@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
         namespace conversations {
+            // @ts-ignore
             abstract class FixedSetPrompt {
                 /**
                  * Creates a FixedSetPrompt from a set of strings.

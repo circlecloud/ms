@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class CommandBlock {
+                    // @ts-ignore
+                    interface CommandBlock extends org.bukkit.block.data.Directional {
                         /**
                          * Gets the value of the 'conditional' property.
                          */
-                        public isConditional(): boolean;
+                         isConditional(): boolean;
                         /**
                          * Sets the value of the 'conditional' property.
                          */
-                        public setConditional(conditional: boolean): void;
+                         setConditional(conditional: boolean): void;
                     }
                 }
             }

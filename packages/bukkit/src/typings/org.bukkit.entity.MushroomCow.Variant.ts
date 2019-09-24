@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace entity {
             namespace MushroomCow {
-                class Variant {
+                // @ts-ignore
+                 class Variant {
                     public static RED: org.bukkit.entity.MushroomCow.Variant;
                     public static BROWN: org.bukkit.entity.MushroomCow.Variant;
                     public static values(): org.bukkit.entity.MushroomCow.Variant[];

@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace event {
-            class HandlerList {
+            // @ts-ignore
+             class HandlerList {
                 /**
                  * Create a new handler list and initialize using EventPriority.
                  * <p>

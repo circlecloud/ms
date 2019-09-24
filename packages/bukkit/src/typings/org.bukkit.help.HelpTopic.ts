@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
         namespace help {
+            // @ts-ignore
             abstract class HelpTopic {
                 constructor()
                 protected name: string;

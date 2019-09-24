@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace loot {
             namespace LootContext {
-                class Builder {
+                // @ts-ignore
+                 class Builder {
                     /**
                      * Creates a new LootContext.Builder instance to facilitate easy
                      * creation of {@link LootContext}s.

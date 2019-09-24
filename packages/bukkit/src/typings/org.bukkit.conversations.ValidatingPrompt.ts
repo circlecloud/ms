@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace conversations {
-            abstract class ValidatingPrompt {
+            // @ts-ignore
+            abstract class ValidatingPrompt implements org.bukkit.conversations.Prompt {
                 constructor()
                 /**
                  * Accepts and processes input from the user and validates it. If

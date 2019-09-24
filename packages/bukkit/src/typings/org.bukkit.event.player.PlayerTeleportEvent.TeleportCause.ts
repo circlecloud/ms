@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace player {
                 namespace PlayerTeleportEvent {
-                    class TeleportCause {
+                    // @ts-ignore
+                     class TeleportCause {
                         public static ENDER_PEARL: org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
                         public static COMMAND: org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
                         public static PLUGIN: org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;

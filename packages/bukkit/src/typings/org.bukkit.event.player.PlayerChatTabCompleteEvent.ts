@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerChatTabCompleteEvent {
+                // @ts-ignore
+                 class PlayerChatTabCompleteEvent {
                     constructor(who: org.bukkit.entity.Player, message: string, completions: any[] /*java.util.Collection*/)
                     /**
                      * Gets the chat message being tab-completed.

@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace entity {
                 namespace EntityPotionEffectEvent {
-                    class Cause {
+                    // @ts-ignore
+                     class Cause {
                         public static AREA_EFFECT_CLOUD: org.bukkit.event.entity.EntityPotionEffectEvent.Cause;
                         public static ARROW: org.bukkit.event.entity.EntityPotionEffectEvent.Cause;
                         public static ATTACK: org.bukkit.event.entity.EntityPotionEffectEvent.Cause;

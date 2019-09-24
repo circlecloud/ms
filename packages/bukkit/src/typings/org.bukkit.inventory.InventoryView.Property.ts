@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace inventory {
             namespace InventoryView {
-                class Property {
+                // @ts-ignore
+                 class Property {
                     public static BREW_TIME: org.bukkit.inventory.InventoryView.Property;
                     public static BURN_TIME: org.bukkit.inventory.InventoryView.Property;
                     public static TICKS_FOR_CURRENT_FUEL: org.bukkit.inventory.InventoryView.Property;

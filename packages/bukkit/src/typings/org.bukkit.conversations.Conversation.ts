@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace conversations {
-            class Conversation {
+            // @ts-ignore
+             class Conversation {
                 /**
                  * Initializes a new Conversation.
                  */

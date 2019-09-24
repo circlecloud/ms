@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class LargeFireball {
+            // @ts-ignore
+            interface LargeFireball extends org.bukkit.entity.Fireball {
             }
         }
     }

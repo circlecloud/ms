@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace map {
             namespace MapView {
-                class Scale {
+                // @ts-ignore
+                 class Scale {
                     public static CLOSEST: org.bukkit.map.MapView.Scale;
                     public static CLOSE: org.bukkit.map.MapView.Scale;
                     public static NORMAL: org.bukkit.map.MapView.Scale;

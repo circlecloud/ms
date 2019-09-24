@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class EnderDragonChangePhaseEvent {
+                // @ts-ignore
+                 class EnderDragonChangePhaseEvent implements org.bukkit.event.Cancellable {
                     constructor(enderDragon: org.bukkit.entity.EnderDragon, currentPhase: org.bukkit.entity.EnderDragon.Phase, newPhase: org.bukkit.entity.EnderDragon.Phase)
                     public getEntity(): org.bukkit.entity.EnderDragon;
                     /**

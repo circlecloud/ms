@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace world {
-                class ChunkUnloadEvent {
+                // @ts-ignore
+                 class ChunkUnloadEvent {
                     constructor(chunk: org.bukkit.Chunk)
                     constructor(chunk: org.bukkit.Chunk, save: boolean)
                     /**

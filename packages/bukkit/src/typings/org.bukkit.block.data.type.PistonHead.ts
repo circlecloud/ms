@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class PistonHead {
+                    // @ts-ignore
+                    interface PistonHead extends org.bukkit.block.data.type.TechnicalPiston {
                         /**
                          * Gets the value of the 'short' property.
                          */
-                        public isShort(): boolean;
+                         isShort(): boolean;
                         /**
                          * Sets the value of the 'short' property.
                          */
-                        public setShort(_short: boolean): void;
+                         setShort(_short: boolean): void;
                     }
                 }
             }

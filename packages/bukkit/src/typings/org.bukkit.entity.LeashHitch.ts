@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class LeashHitch {
+            // @ts-ignore
+            interface LeashHitch extends org.bukkit.entity.Hanging {
             }
         }
     }

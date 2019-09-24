@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class AbstractHorse {
+            // @ts-ignore
+            interface AbstractHorse extends org.bukkit.entity.Animals, org.bukkit.entity.Vehicle, org.bukkit.inventory.InventoryHolder, org.bukkit.entity.Tameable {
                 /**
                  * Gets the horse's variant.
                  * <p>
@@ -9,8 +10,8 @@ declare namespace org {
                  * Whether a horse is a regular horse, donkey, mule, or other kind of horse
                  * is determined using the variant.
                  */
-                public getVariant(): org.bukkit.entity.Horse.Variant;
-                public setVariant(variant: org.bukkit.entity.Horse.Variant): void;
+                 getVariant(): org.bukkit.entity.Horse.Variant;
+                 setVariant(variant: org.bukkit.entity.Horse.Variant): void;
                 /**
                  * Gets the domestication level of this horse.
                  * <p>
@@ -18,7 +19,7 @@ declare namespace org {
                  * becoming tame. As the domestication level gets closer to the max
                  * domestication level, the chance of the horse becoming tame increases.
                  */
-                public getDomestication(): number;
+                 getDomestication(): number;
                 /**
                  * Sets the domestication level of this horse.
                  * <p>
@@ -29,14 +30,14 @@ declare namespace org {
                  * the max domestication level of the horse, determined with
                  * {@link #getMaxDomestication()}
                  */
-                public setDomestication(level: number): void;
+                 setDomestication(level: number): void;
                 /**
                  * Gets the maximum domestication level of this horse.
                  * <p>
                  * The higher this level is, the longer it will likely take
                  * for the horse to be tamed.
                  */
-                public getMaxDomestication(): number;
+                 getMaxDomestication(): number;
                 /**
                  * Sets the maximum domestication level of this horse.
                  * <p>
@@ -46,14 +47,14 @@ declare namespace org {
                  * <p>
                  * Maximum domestication must be greater than zero.
                  */
-                public setMaxDomestication(level: number): void;
+                 setMaxDomestication(level: number): void;
                 /**
                  * Gets the jump strength of this horse.
                  * <p>
                  * Jump strength defines how high the horse can jump. A higher jump strength
                  * increases how high a jump will go.
                  */
-                public getJumpStrength(): number;
+                 getJumpStrength(): number;
                 /**
                  * Sets the jump strength of this horse.
                  * <p>
@@ -62,8 +63,8 @@ declare namespace org {
                  * You cannot set a jump strength to a value below 0 or
                  * above 2.
                  */
-                public setJumpStrength(strength: number): void;
-                public getInventory(): org.bukkit.inventory.AbstractHorseInventory;
+                 setJumpStrength(strength: number): void;
+                 getInventory(): org.bukkit.inventory.AbstractHorseInventory;
             }
         }
     }

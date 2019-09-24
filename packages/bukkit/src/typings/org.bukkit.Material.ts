@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class Material {
+        // @ts-ignore
+         class Material implements org.bukkit.Keyed {
             public static ACACIA_BOAT: org.bukkit.Material;
             public static ACACIA_BUTTON: org.bukkit.Material;
             public static ACACIA_DOOR: org.bukkit.Material;

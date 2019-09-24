@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace server {
-                class ServerLoadEvent {
+                // @ts-ignore
+                 class ServerLoadEvent {
                     /**
                      * Creates a {@code ServerLoadEvent} with a given loading type.
                      */

@@ -1,25 +1,26 @@
 declare namespace org {
     namespace bukkit {
         namespace block {
-            class Block {
+            // @ts-ignore
+            interface Block extends org.bukkit.metadata.Metadatable {
                 /**
                  * Gets the metadata for this block
                  */
-                public getData(): number;
+                 getData(): number;
                 /**
                  * Gets the complete block data for this block
                  */
-                public getBlockData(): org.bukkit.block.data.BlockData;
+                 getBlockData(): org.bukkit.block.data.BlockData;
                 /**
                  * Gets the block at the given offsets
                  */
-                public getRelative(modX: number, modY: number, modZ: number): org.bukkit.block.Block;
+                 getRelative(modX: number, modY: number, modZ: number): org.bukkit.block.Block;
                 /**
                  * Gets the block at the given face
                  * <p>
                  * This method is equal to getRelative(face, 1)
                  */
-                public getRelative(face: org.bukkit.block.BlockFace): org.bukkit.block.Block;
+                 getRelative(face: org.bukkit.block.BlockFace): org.bukkit.block.Block;
                 /**
                  * Gets the block at the given distance of the given face
                  * <p>
@@ -31,63 +32,63 @@ declare namespace org {
                  * shower.setType(Material.WATER);
                  * </pre>
                  */
-                public getRelative(face: org.bukkit.block.BlockFace, distance: number): org.bukkit.block.Block;
+                 getRelative(face: org.bukkit.block.BlockFace, distance: number): org.bukkit.block.Block;
                 /**
                  * Gets the type of this block
                  */
-                public getType(): org.bukkit.Material;
+                 getType(): org.bukkit.Material;
                 /**
                  * Gets the light level between 0-15
                  */
-                public getLightLevel(): number;
+                 getLightLevel(): number;
                 /**
                  * Get the amount of light at this block from the sky.
                  * <p>
                  * Any light given from other sources (such as blocks like torches) will
                  * be ignored.
                  */
-                public getLightFromSky(): number;
+                 getLightFromSky(): number;
                 /**
                  * Get the amount of light at this block from nearby blocks.
                  * <p>
                  * Any light given from other sources (such as the sun) will be ignored.
                  */
-                public getLightFromBlocks(): number;
+                 getLightFromBlocks(): number;
                 /**
                  * Gets the world which contains this Block
                  */
-                public getWorld(): org.bukkit.World;
+                 getWorld(): org.bukkit.World;
                 /**
                  * Gets the x-coordinate of this block
                  */
-                public getX(): number;
+                 getX(): number;
                 /**
                  * Gets the y-coordinate of this block
                  */
-                public getY(): number;
+                 getY(): number;
                 /**
                  * Gets the z-coordinate of this block
                  */
-                public getZ(): number;
+                 getZ(): number;
                 /**
                  * Gets the Location of the block
                  */
-                public getLocation(): org.bukkit.Location;
+                 getLocation(): org.bukkit.Location;
                 /**
                  * Stores the location of the block in the provided Location object.
                  * <p>
                  * If the provided Location is null this method does nothing and returns
                  * null.
                  */
-                public getLocation(loc: org.bukkit.Location): org.bukkit.Location;
+                 getLocation(loc: org.bukkit.Location): org.bukkit.Location;
                 /**
                  * Gets the chunk which contains this block
                  */
-                public getChunk(): org.bukkit.Chunk;
+                 getChunk(): org.bukkit.Chunk;
                 /**
                  * Sets the complete data for this block
                  */
-                public setBlockData(data: org.bukkit.block.data.BlockData): void;
+                 setBlockData(data: org.bukkit.block.data.BlockData): void;
                 /**
                  * Sets the complete data for this block
                  * <br>
@@ -103,11 +104,11 @@ declare namespace org {
                  * triggered at a later point. If this occurs, the resulting behavior is
                  * undefined.
                  */
-                public setBlockData(data: org.bukkit.block.data.BlockData, applyPhysics: boolean): void;
+                 setBlockData(data: org.bukkit.block.data.BlockData, applyPhysics: boolean): void;
                 /**
                  * Sets the type of this block
                  */
-                public setType(type: org.bukkit.Material): void;
+                 setType(type: org.bukkit.Material): void;
                 /**
                  * Sets the type of this block
                  * <br>
@@ -123,7 +124,7 @@ declare namespace org {
                  * triggered at a later point. If this occurs, the resulting behavior is
                  * undefined.
                  */
-                public setType(type: org.bukkit.Material, applyPhysics: boolean): void;
+                 setType(type: org.bukkit.Material, applyPhysics: boolean): void;
                 /**
                  * Gets the face relation of this block compared to the given block.
                  * <p>
@@ -136,7 +137,7 @@ declare namespace org {
                  * <br>
                  * If the given block is not connected to this block, null may be returned
                  */
-                public getFace(block: org.bukkit.block.Block): org.bukkit.block.BlockFace;
+                 getFace(block: org.bukkit.block.Block): org.bukkit.block.BlockFace;
                 /**
                  * Captures the current state of this block. You may then cast that state
                  * into any accepted type, such as Furnace or Sign.
@@ -144,86 +145,86 @@ declare namespace org {
                  * The returned object will never be updated, and you are not guaranteed
                  * that (for example) a sign is still a sign after you capture its state.
                  */
-                public getState(): org.bukkit.block.BlockState;
+                 getState(): org.bukkit.block.BlockState;
                 /**
                  * Returns the biome that this block resides in
                  */
-                public getBiome(): org.bukkit.block.Biome;
+                 getBiome(): org.bukkit.block.Biome;
                 /**
                  * Sets the biome that this block resides in
                  */
-                public setBiome(bio: org.bukkit.block.Biome): void;
+                 setBiome(bio: org.bukkit.block.Biome): void;
                 /**
                  * Returns true if the block is being powered by Redstone.
                  */
-                public isBlockPowered(): boolean;
+                 isBlockPowered(): boolean;
                 /**
                  * Returns true if the block is being indirectly powered by Redstone.
                  */
-                public isBlockIndirectlyPowered(): boolean;
+                 isBlockIndirectlyPowered(): boolean;
                 /**
                  * Returns true if the block face is being powered by Redstone.
                  */
-                public isBlockFacePowered(face: org.bukkit.block.BlockFace): boolean;
+                 isBlockFacePowered(face: org.bukkit.block.BlockFace): boolean;
                 /**
                  * Returns true if the block face is being indirectly powered by Redstone.
                  */
-                public isBlockFaceIndirectlyPowered(face: org.bukkit.block.BlockFace): boolean;
+                 isBlockFaceIndirectlyPowered(face: org.bukkit.block.BlockFace): boolean;
                 /**
                  * Returns the redstone power being provided to this block face
                  */
-                public getBlockPower(face: org.bukkit.block.BlockFace): number;
+                 getBlockPower(face: org.bukkit.block.BlockFace): number;
                 /**
                  * Returns the redstone power being provided to this block
                  */
-                public getBlockPower(): number;
+                 getBlockPower(): number;
                 /**
                  * Checks if this block is empty.
                  * <p>
                  * A block is considered empty when {@link #getType()} returns {@link
                  * Material#AIR}.
                  */
-                public isEmpty(): boolean;
+                 isEmpty(): boolean;
                 /**
                  * Checks if this block is liquid.
                  * <p>
                  * A block is considered liquid when {@link #getType()} returns {@link
                  * Material#WATER} or {@link Material#LAVA}.
                  */
-                public isLiquid(): boolean;
+                 isLiquid(): boolean;
                 /**
                  * Gets the temperature of this block.
                  * <p>
                  * If the raw biome temperature without adjusting for height effects is
                  * required then please use {@link World#getTemperature(int, int)}.
                  */
-                public getTemperature(): number;
+                 getTemperature(): number;
                 /**
                  * Gets the humidity of the biome of this block
                  */
-                public getHumidity(): number;
+                 getHumidity(): number;
                 /**
                  * Returns the reaction of the block when moved by a piston
                  */
-                public getPistonMoveReaction(): org.bukkit.block.PistonMoveReaction;
+                 getPistonMoveReaction(): org.bukkit.block.PistonMoveReaction;
                 /**
                  * Breaks the block and spawns items as if a player had digged it
                  */
-                public breakNaturally(): boolean;
+                 breakNaturally(): boolean;
                 /**
                  * Breaks the block and spawns items as if a player had digged it with a
                  * specific tool
                  */
-                public breakNaturally(tool: org.bukkit.inventory.ItemStack): boolean;
+                 breakNaturally(tool: org.bukkit.inventory.ItemStack): boolean;
                 /**
                  * Returns a list of items which would drop by destroying this block
                  */
-                public getDrops(): any[] /*java.util.Collection*/;
+                 getDrops(): any[] /*java.util.Collection*/;
                 /**
                  * Returns a list of items which would drop by destroying this block with
                  * a specific tool
                  */
-                public getDrops(tool: org.bukkit.inventory.ItemStack): any[] /*java.util.Collection*/;
+                 getDrops(tool: org.bukkit.inventory.ItemStack): any[] /*java.util.Collection*/;
                 /**
                  * Checks if this block is passable.
                  * <p>
@@ -234,12 +235,12 @@ declare namespace org {
                  * fence gates, trap doors, etc. are not because they still have parts that
                  * can be collided with.
                  */
-                public isPassable(): boolean;
+                 isPassable(): boolean;
                 /**
                  * Performs a ray trace that checks for collision with this specific block
                  * in its current state using its precise collision shape.
                  */
-                public rayTrace(start: org.bukkit.Location, direction: org.bukkit.util.Vector, maxDistance: number, fluidCollisionMode: org.bukkit.FluidCollisionMode): org.bukkit.util.RayTraceResult;
+                 rayTrace(start: org.bukkit.Location, direction: org.bukkit.util.Vector, maxDistance: number, fluidCollisionMode: org.bukkit.FluidCollisionMode): org.bukkit.util.RayTraceResult;
                 /**
                  * Gets the approximate bounding box for this block.
                  * <p>
@@ -250,7 +251,7 @@ declare namespace org {
                  * This method will return an empty bounding box if the geometric shape of
                  * the block is empty (such as air blocks).
                  */
-                public getBoundingBox(): org.bukkit.util.BoundingBox;
+                 getBoundingBox(): org.bukkit.util.BoundingBox;
             }
         }
     }

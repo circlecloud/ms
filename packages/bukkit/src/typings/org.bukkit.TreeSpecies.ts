@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class TreeSpecies {
+        // @ts-ignore
+         class TreeSpecies {
             public static GENERIC: org.bukkit.TreeSpecies;
             public static REDWOOD: org.bukkit.TreeSpecies;
             public static BIRCH: org.bukkit.TreeSpecies;

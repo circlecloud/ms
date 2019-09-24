@@ -3,31 +3,32 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Repeater {
+                    // @ts-ignore
+                    interface Repeater extends org.bukkit.block.data.Directional, org.bukkit.block.data.Powerable {
                         /**
                          * Gets the value of the 'delay' property.
                          */
-                        public getDelay(): number;
+                         getDelay(): number;
                         /**
                          * Sets the value of the 'delay' property.
                          */
-                        public setDelay(delay: number): void;
+                         setDelay(delay: number): void;
                         /**
                          * Gets the minimum allowed value of the 'delay' property.
                          */
-                        public getMinimumDelay(): number;
+                         getMinimumDelay(): number;
                         /**
                          * Gets the maximum allowed value of the 'delay' property.
                          */
-                        public getMaximumDelay(): number;
+                         getMaximumDelay(): number;
                         /**
                          * Gets the value of the 'locked' property.
                          */
-                        public isLocked(): boolean;
+                         isLocked(): boolean;
                         /**
                          * Sets the value of the 'locked' property.
                          */
-                        public setLocked(locked: boolean): void;
+                         setLocked(locked: boolean): void;
                     }
                 }
             }

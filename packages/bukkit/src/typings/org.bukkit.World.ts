@@ -1,55 +1,56 @@
 declare namespace org {
     namespace bukkit {
-        class World {
+        // @ts-ignore
+        interface World extends org.bukkit.plugin.messaging.PluginMessageRecipient, org.bukkit.metadata.Metadatable {
             /**
              * Gets the {@link Block} at the given coordinates
              */
-            public getBlockAt(x: number, y: number, z: number): org.bukkit.block.Block;
+             getBlockAt(x: number, y: number, z: number): org.bukkit.block.Block;
             /**
              * Gets the {@link Block} at the given {@link Location}
              */
-            public getBlockAt(location: org.bukkit.Location): org.bukkit.block.Block;
+             getBlockAt(location: org.bukkit.Location): org.bukkit.block.Block;
             /**
              * Gets the y coordinate of the lowest block at this position such that the
              * block and all blocks above it are transparent for lighting purposes.
              */
-            public getHighestBlockYAt(x: number, z: number): number;
+             getHighestBlockYAt(x: number, z: number): number;
             /**
              * Gets the y coordinate of the lowest block at the given {@link Location}
              * such that the block and all blocks above it are transparent for lighting
              * purposes.
              */
-            public getHighestBlockYAt(location: org.bukkit.Location): number;
+             getHighestBlockYAt(location: org.bukkit.Location): number;
             /**
              * Gets the lowest block at the given coordinates such that the block and
              * all blocks above it are transparent for lighting purposes.
              */
-            public getHighestBlockAt(x: number, z: number): org.bukkit.block.Block;
+             getHighestBlockAt(x: number, z: number): org.bukkit.block.Block;
             /**
              * Gets the lowest block at the given {@link Location} such that the block
              * and all blocks above it are transparent for lighting purposes.
              */
-            public getHighestBlockAt(location: org.bukkit.Location): org.bukkit.block.Block;
+             getHighestBlockAt(location: org.bukkit.Location): org.bukkit.block.Block;
             /**
              * Gets the {@link Chunk} at the given coordinates
              */
-            public getChunkAt(x: number, z: number): org.bukkit.Chunk;
+             getChunkAt(x: number, z: number): org.bukkit.Chunk;
             /**
              * Gets the {@link Chunk} at the given {@link Location}
              */
-            public getChunkAt(location: org.bukkit.Location): org.bukkit.Chunk;
+             getChunkAt(location: org.bukkit.Location): org.bukkit.Chunk;
             /**
              * Gets the {@link Chunk} that contains the given {@link Block}
              */
-            public getChunkAt(block: org.bukkit.block.Block): org.bukkit.Chunk;
+             getChunkAt(block: org.bukkit.block.Block): org.bukkit.Chunk;
             /**
              * Checks if the specified {@link Chunk} is loaded
              */
-            public isChunkLoaded(chunk: org.bukkit.Chunk): boolean;
+             isChunkLoaded(chunk: org.bukkit.Chunk): boolean;
             /**
              * Gets an array of all loaded {@link Chunk}s
              */
-            public getLoadedChunks(): org.bukkit.Chunk[];
+             getLoadedChunks(): org.bukkit.Chunk[];
             /**
              * Loads the specified {@link Chunk}.
              * <p>
@@ -57,20 +58,20 @@ declare namespace org {
              * unload methods is manually called. Callers are advised to instead use
              * getChunkAt which will only temporarily load the requested chunk.</b>
              */
-            public loadChunk(chunk: org.bukkit.Chunk): void;
+             loadChunk(chunk: org.bukkit.Chunk): void;
             /**
              * Checks if the {@link Chunk} at the specified coordinates is loaded
              */
-            public isChunkLoaded(x: number, z: number): boolean;
+             isChunkLoaded(x: number, z: number): boolean;
             /**
              * Checks if the {@link Chunk} at the specified coordinates is generated
              */
-            public isChunkGenerated(x: number, z: number): boolean;
+             isChunkGenerated(x: number, z: number): boolean;
             /**
              * Checks if the {@link Chunk} at the specified coordinates is loaded and
              * in use by one or more players
              */
-            public isChunkInUse(x: number, z: number): boolean;
+             isChunkInUse(x: number, z: number): boolean;
             /**
              * Loads the {@link Chunk} at the specified coordinates.
              * <p>
@@ -83,7 +84,7 @@ declare namespace org {
              * This method is analogous to {@link #loadChunk(int, int, boolean)} where
              * generate is true.
              */
-            public loadChunk(x: number, z: number): void;
+             loadChunk(x: number, z: number): void;
             /**
              * Loads the {@link Chunk} at the specified coordinates.
              * <p>
@@ -91,59 +92,59 @@ declare namespace org {
              * unload methods is manually called. Callers are advised to instead use
              * getChunkAt which will only temporarily load the requested chunk.</b>
              */
-            public loadChunk(x: number, z: number, generate: boolean): boolean;
+             loadChunk(x: number, z: number, generate: boolean): boolean;
             /**
              * Safely unloads and saves the {@link Chunk} at the specified coordinates
              * <p>
              * This method is analogous to {@link #unloadChunk(int, int, boolean)}
              * where save is true.
              */
-            public unloadChunk(chunk: org.bukkit.Chunk): boolean;
+             unloadChunk(chunk: org.bukkit.Chunk): boolean;
             /**
              * Safely unloads and saves the {@link Chunk} at the specified coordinates
              * <p>
              * This method is analogous to {@link #unloadChunk(int, int, boolean)}
              * where save is true.
              */
-            public unloadChunk(x: number, z: number): boolean;
+             unloadChunk(x: number, z: number): boolean;
             /**
              * Safely unloads and optionally saves the {@link Chunk} at the specified
              * coordinates.
              */
-            public unloadChunk(x: number, z: number, save: boolean): boolean;
+             unloadChunk(x: number, z: number, save: boolean): boolean;
             /**
              * Safely queues the {@link Chunk} at the specified coordinates for
              * unloading.
              */
-            public unloadChunkRequest(x: number, z: number): boolean;
+             unloadChunkRequest(x: number, z: number): boolean;
             /**
              * Regenerates the {@link Chunk} at the specified coordinates
              */
-            public regenerateChunk(x: number, z: number): boolean;
+             regenerateChunk(x: number, z: number): boolean;
             /**
              * Resends the {@link Chunk} to all clients
              */
-            public refreshChunk(x: number, z: number): boolean;
+             refreshChunk(x: number, z: number): boolean;
             /**
              * Gets whether the chunk at the specified chunk coordinates is force
              * loaded.
              * <p>
              * A force loaded chunk will not be unloaded due to lack of player activity.
              */
-            public isChunkForceLoaded(x: number, z: number): boolean;
+             isChunkForceLoaded(x: number, z: number): boolean;
             /**
              * Sets whether the chunk at the specified chunk coordinates is force
              * loaded.
              * <p>
              * A force loaded chunk will not be unloaded due to lack of player activity.
              */
-            public setChunkForceLoaded(x: number, z: number, forced: boolean): void;
+             setChunkForceLoaded(x: number, z: number, forced: boolean): void;
             /**
              * Returns all force loaded chunks in this world.
              * <p>
              * A force loaded chunk will not be unloaded due to lack of player activity.
              */
-            public getForceLoadedChunks(): any[] /*java.util.Collection*/;
+             getForceLoadedChunks(): any[] /*java.util.Collection*/;
             /**
              * Adds a plugin ticket for the specified chunk, loading the chunk if it is
              * not already loaded.
@@ -153,7 +154,7 @@ declare namespace org {
              * but each chunk can have multiple plugin tickets.
              * </p>
              */
-            public addPluginChunkTicket(x: number, z: number, plugin: org.bukkit.plugin.Plugin): boolean;
+             addPluginChunkTicket(x: number, z: number, plugin: org.bukkit.plugin.Plugin): boolean;
             /**
              * Removes the specified plugin's ticket for the specified chunk
              * <p>
@@ -162,7 +163,7 @@ declare namespace org {
              * but each chunk can have multiple plugin tickets.
              * </p>
              */
-            public removePluginChunkTicket(x: number, z: number, plugin: org.bukkit.plugin.Plugin): boolean;
+             removePluginChunkTicket(x: number, z: number, plugin: org.bukkit.plugin.Plugin): boolean;
             /**
              * Removes all plugin tickets for the specified plugin
              * <p>
@@ -171,7 +172,7 @@ declare namespace org {
              * but each chunk can have multiple plugin tickets.
              * </p>
              */
-            public removePluginChunkTickets(plugin: org.bukkit.plugin.Plugin): void;
+             removePluginChunkTickets(plugin: org.bukkit.plugin.Plugin): void;
             /**
              * Retrieves a collection specifying which plugins have tickets for the
              * specified chunk. This collection is not updated when plugin tickets are
@@ -182,7 +183,7 @@ declare namespace org {
              * but each chunk can have multiple plugin tickets.
              * </p>
              */
-            public getPluginChunkTickets(x: number, z: number): any[] /*java.util.Collection*/;
+             getPluginChunkTickets(x: number, z: number): any[] /*java.util.Collection*/;
             /**
              * Returns a map of which plugins have tickets for what chunks. The returned
              * map is not updated when plugin tickets are added or removed to chunks. If
@@ -193,70 +194,70 @@ declare namespace org {
              * but each chunk can have multiple plugin tickets.
              * </p>
              */
-            public getPluginChunkTickets(): Map<any, any> /*java.util.Map*/;
+             getPluginChunkTickets(): Map<any, any> /*java.util.Map*/;
             /**
              * Drops an item at the specified {@link Location}
              */
-            public dropItem(location: org.bukkit.Location, item: org.bukkit.inventory.ItemStack): org.bukkit.entity.Item;
+             dropItem(location: org.bukkit.Location, item: org.bukkit.inventory.ItemStack): org.bukkit.entity.Item;
             /**
              * Drops an item at the specified {@link Location} with a random offset
              */
-            public dropItemNaturally(location: org.bukkit.Location, item: org.bukkit.inventory.ItemStack): org.bukkit.entity.Item;
+             dropItemNaturally(location: org.bukkit.Location, item: org.bukkit.inventory.ItemStack): org.bukkit.entity.Item;
             /**
              * Creates an {@link Arrow} entity at the given {@link Location}
              */
-            public spawnArrow(location: org.bukkit.Location, direction: org.bukkit.util.Vector, speed: number, spread: number): org.bukkit.entity.Arrow;
+             spawnArrow(location: org.bukkit.Location, direction: org.bukkit.util.Vector, speed: number, spread: number): org.bukkit.entity.Arrow;
             /**
              * Creates an arrow entity of the given class at the given {@link Location}
              */
-            public spawnArrow(location: org.bukkit.Location, direction: org.bukkit.util.Vector, speed: number, spread: number, clazz: any): org.bukkit.entity.AbstractArrow;
+             spawnArrow(location: org.bukkit.Location, direction: org.bukkit.util.Vector, speed: number, spread: number, clazz: any): org.bukkit.entity.AbstractArrow;
             /**
              * Creates a tree at the given {@link Location}
              */
-            public generateTree(location: org.bukkit.Location, type: org.bukkit.TreeType): boolean;
+             generateTree(location: org.bukkit.Location, type: org.bukkit.TreeType): boolean;
             /**
              * Creates a tree at the given {@link Location}
              */
-            public generateTree(loc: org.bukkit.Location, type: org.bukkit.TreeType, delegate: org.bukkit.BlockChangeDelegate): boolean;
+             generateTree(loc: org.bukkit.Location, type: org.bukkit.TreeType, delegate: org.bukkit.BlockChangeDelegate): boolean;
             /**
              * Creates a entity at the given {@link Location}
              */
-            public spawnEntity(loc: org.bukkit.Location, type: org.bukkit.entity.EntityType): org.bukkit.entity.Entity;
+             spawnEntity(loc: org.bukkit.Location, type: org.bukkit.entity.EntityType): org.bukkit.entity.Entity;
             /**
              * Strikes lightning at the given {@link Location}
              */
-            public strikeLightning(loc: org.bukkit.Location): org.bukkit.entity.LightningStrike;
+             strikeLightning(loc: org.bukkit.Location): org.bukkit.entity.LightningStrike;
             /**
              * Strikes lightning at the given {@link Location} without doing damage
              */
-            public strikeLightningEffect(loc: org.bukkit.Location): org.bukkit.entity.LightningStrike;
+             strikeLightningEffect(loc: org.bukkit.Location): org.bukkit.entity.LightningStrike;
             /**
              * Get a list of all entities in this World
              */
-            public getEntities(): any[] /*java.util.List*/;
+             getEntities(): any[] /*java.util.List*/;
             /**
              * Get a list of all living entities in this World
              */
-            public getLivingEntities(): any[] /*java.util.List*/;
+             getLivingEntities(): any[] /*java.util.List*/;
             /**
              * Get a collection of all entities in this World matching the given
              * class/interface
              */
-            public getEntitiesByClass(classes: any): any[] /*java.util.Collection*/;
+             getEntitiesByClass(classes: any): any[] /*java.util.Collection*/;
             /**
              * Get a collection of all entities in this World matching the given
              * class/interface
              */
-            public getEntitiesByClass(cls: any): any[] /*java.util.Collection*/;
+             getEntitiesByClass(cls: any): any[] /*java.util.Collection*/;
             /**
              * Get a collection of all entities in this World matching any of the
              * given classes/interfaces
              */
-            public getEntitiesByClasses(classes: any): any[] /*java.util.Collection*/;
+             getEntitiesByClasses(classes: any): any[] /*java.util.Collection*/;
             /**
              * Get a list of all players in this World
              */
-            public getPlayers(): any[] /*java.util.List*/;
+             getPlayers(): any[] /*java.util.List*/;
             /**
              * Returns a list of entities within a bounding box centered around a
              * Location.
@@ -265,7 +266,7 @@ declare namespace org {
              * implementations may impose artificial restrictions on the size of the
              * search bounding box.
              */
-            public getNearbyEntities(location: org.bukkit.Location, x: number, y: number, z: number): any[] /*java.util.Collection*/;
+             getNearbyEntities(location: org.bukkit.Location, x: number, y: number, z: number): any[] /*java.util.Collection*/;
             /**
              * Returns a list of entities within a bounding box centered around a
              * Location.
@@ -274,7 +275,7 @@ declare namespace org {
              * implementations may impose artificial restrictions on the size of the
              * search bounding box.
              */
-            public getNearbyEntities(location: org.bukkit.Location, x: number, y: number, z: number, filter: any): any[] /*java.util.Collection*/;
+             getNearbyEntities(location: org.bukkit.Location, x: number, y: number, z: number, filter: any): any[] /*java.util.Collection*/;
             /**
              * Returns a list of entities within the given bounding box.
              * <p>
@@ -282,7 +283,7 @@ declare namespace org {
              * implementations may impose artificial restrictions on the size of the
              * search bounding box.
              */
-            public getNearbyEntities(boundingBox: org.bukkit.util.BoundingBox): any[] /*java.util.Collection*/;
+             getNearbyEntities(boundingBox: org.bukkit.util.BoundingBox): any[] /*java.util.Collection*/;
             /**
              * Returns a list of entities within the given bounding box.
              * <p>
@@ -290,7 +291,7 @@ declare namespace org {
              * implementations may impose artificial restrictions on the size of the
              * search bounding box.
              */
-            public getNearbyEntities(boundingBox: org.bukkit.util.BoundingBox, filter: any): any[] /*java.util.Collection*/;
+             getNearbyEntities(boundingBox: org.bukkit.util.BoundingBox, filter: any): any[] /*java.util.Collection*/;
             /**
              * Performs a ray trace that checks for entity collisions.
              * <p>
@@ -298,7 +299,7 @@ declare namespace org {
              * implementations may impose artificial restrictions on the maximum
              * distance.
              */
-            public rayTraceEntities(start: org.bukkit.Location, direction: org.bukkit.util.Vector, maxDistance: number): org.bukkit.util.RayTraceResult;
+             rayTraceEntities(start: org.bukkit.Location, direction: org.bukkit.util.Vector, maxDistance: number): org.bukkit.util.RayTraceResult;
             /**
              * Performs a ray trace that checks for entity collisions.
              * <p>
@@ -306,7 +307,7 @@ declare namespace org {
              * implementations may impose artificial restrictions on the maximum
              * distance.
              */
-            public rayTraceEntities(start: org.bukkit.Location, direction: org.bukkit.util.Vector, maxDistance: number, raySize: number): org.bukkit.util.RayTraceResult;
+             rayTraceEntities(start: org.bukkit.Location, direction: org.bukkit.util.Vector, maxDistance: number, raySize: number): org.bukkit.util.RayTraceResult;
             /**
              * Performs a ray trace that checks for entity collisions.
              * <p>
@@ -314,7 +315,7 @@ declare namespace org {
              * implementations may impose artificial restrictions on the maximum
              * distance.
              */
-            public rayTraceEntities(start: org.bukkit.Location, direction: org.bukkit.util.Vector, maxDistance: number, filter: any): org.bukkit.util.RayTraceResult;
+             rayTraceEntities(start: org.bukkit.Location, direction: org.bukkit.util.Vector, maxDistance: number, filter: any): org.bukkit.util.RayTraceResult;
             /**
              * Performs a ray trace that checks for entity collisions.
              * <p>
@@ -322,7 +323,7 @@ declare namespace org {
              * implementations may impose artificial restrictions on the maximum
              * distance.
              */
-            public rayTraceEntities(start: org.bukkit.Location, direction: org.bukkit.util.Vector, maxDistance: number, raySize: number, filter: any): org.bukkit.util.RayTraceResult;
+             rayTraceEntities(start: org.bukkit.Location, direction: org.bukkit.util.Vector, maxDistance: number, raySize: number, filter: any): org.bukkit.util.RayTraceResult;
             /**
              * Performs a ray trace that checks for block collisions using the blocks'
              * precise collision shapes.
@@ -333,7 +334,7 @@ declare namespace org {
              * This may cause loading of chunks! Some implementations may impose
              * artificial restrictions on the maximum distance.
              */
-            public rayTraceBlocks(start: org.bukkit.Location, direction: org.bukkit.util.Vector, maxDistance: number): org.bukkit.util.RayTraceResult;
+             rayTraceBlocks(start: org.bukkit.Location, direction: org.bukkit.util.Vector, maxDistance: number): org.bukkit.util.RayTraceResult;
             /**
              * Performs a ray trace that checks for block collisions using the blocks'
              * precise collision shapes.
@@ -343,7 +344,7 @@ declare namespace org {
              * This may cause loading of chunks! Some implementations may impose
              * artificial restrictions on the maximum distance.
              */
-            public rayTraceBlocks(start: org.bukkit.Location, direction: org.bukkit.util.Vector, maxDistance: number, fluidCollisionMode: org.bukkit.FluidCollisionMode): org.bukkit.util.RayTraceResult;
+             rayTraceBlocks(start: org.bukkit.Location, direction: org.bukkit.util.Vector, maxDistance: number, fluidCollisionMode: org.bukkit.FluidCollisionMode): org.bukkit.util.RayTraceResult;
             /**
              * Performs a ray trace that checks for block collisions using the blocks'
              * precise collision shapes.
@@ -358,7 +359,7 @@ declare namespace org {
              * This may cause loading of chunks! Some implementations may impose
              * artificial restrictions on the maximum distance.
              */
-            public rayTraceBlocks(start: org.bukkit.Location, direction: org.bukkit.util.Vector, maxDistance: number, fluidCollisionMode: org.bukkit.FluidCollisionMode, ignorePassableBlocks: boolean): org.bukkit.util.RayTraceResult;
+             rayTraceBlocks(start: org.bukkit.Location, direction: org.bukkit.util.Vector, maxDistance: number, fluidCollisionMode: org.bukkit.FluidCollisionMode, ignorePassableBlocks: boolean): org.bukkit.util.RayTraceResult;
             /**
              * Performs a ray trace that checks for both block and entity collisions.
              * <p>
@@ -376,35 +377,35 @@ declare namespace org {
              * This may cause loading of chunks! Some implementations may impose
              * artificial restrictions on the maximum distance.
              */
-            public rayTrace(start: org.bukkit.Location, direction: org.bukkit.util.Vector, maxDistance: number, fluidCollisionMode: org.bukkit.FluidCollisionMode, ignorePassableBlocks: boolean, raySize: number, filter: any): org.bukkit.util.RayTraceResult;
+             rayTrace(start: org.bukkit.Location, direction: org.bukkit.util.Vector, maxDistance: number, fluidCollisionMode: org.bukkit.FluidCollisionMode, ignorePassableBlocks: boolean, raySize: number, filter: any): org.bukkit.util.RayTraceResult;
             /**
              * Gets the unique name of this world
              */
-            public getName(): string;
+             getName(): string;
             /**
              * Gets the Unique ID of this world
              */
-            public getUID(): any;
+             getUID(): any;
             /**
              * Gets the default spawn {@link Location} of this world
              */
-            public getSpawnLocation(): org.bukkit.Location;
+             getSpawnLocation(): org.bukkit.Location;
             /**
              * Sets the spawn location of the world.
              * <br>
              * The location provided must be equal to this world.
              */
-            public setSpawnLocation(location: org.bukkit.Location): boolean;
+             setSpawnLocation(location: org.bukkit.Location): boolean;
             /**
              * Sets the spawn location of the world
              */
-            public setSpawnLocation(x: number, y: number, z: number): boolean;
+             setSpawnLocation(x: number, y: number, z: number): boolean;
             /**
              * Gets the relative in-game time of this world.
              * <p>
              * The relative time is analogous to hours * 1000
              */
-            public getTime(): number;
+             getTime(): number;
             /**
              * Sets the relative in-game time on the server.
              * <p>
@@ -414,106 +415,106 @@ declare namespace org {
              * will actually move the clock forward a day. If you require to rewind
              * time, please see {@link #setFullTime(long)}
              */
-            public setTime(time: number): void;
+             setTime(time: number): void;
             /**
              * Gets the full in-game time on this world
              */
-            public getFullTime(): number;
+             getFullTime(): number;
             /**
              * Sets the in-game time on the server
              * <p>
              * Note that this sets the full time of the world, which may cause adverse
              * effects such as breaking redstone clocks and any scheduled events
              */
-            public setFullTime(time: number): void;
+             setFullTime(time: number): void;
             /**
              * Returns whether the world has an ongoing storm.
              */
-            public hasStorm(): boolean;
+             hasStorm(): boolean;
             /**
              * Set whether there is a storm. A duration will be set for the new
              * current conditions.
              */
-            public setStorm(hasStorm: boolean): void;
+             setStorm(hasStorm: boolean): void;
             /**
              * Get the remaining time in ticks of the current conditions.
              */
-            public getWeatherDuration(): number;
+             getWeatherDuration(): number;
             /**
              * Set the remaining time in ticks of the current conditions.
              */
-            public setWeatherDuration(duration: number): void;
+             setWeatherDuration(duration: number): void;
             /**
              * Returns whether there is thunder.
              */
-            public isThundering(): boolean;
+             isThundering(): boolean;
             /**
              * Set whether it is thundering.
              */
-            public setThundering(thundering: boolean): void;
+             setThundering(thundering: boolean): void;
             /**
              * Get the thundering duration.
              */
-            public getThunderDuration(): number;
+             getThunderDuration(): number;
             /**
              * Set the thundering duration.
              */
-            public setThunderDuration(duration: number): void;
+             setThunderDuration(duration: number): void;
             /**
              * Creates explosion at given coordinates with given power
              */
-            public createExplosion(x: number, y: number, z: number, power: number): boolean;
+             createExplosion(x: number, y: number, z: number, power: number): boolean;
             /**
              * Creates explosion at given coordinates with given power and optionally
              * setting blocks on fire.
              */
-            public createExplosion(x: number, y: number, z: number, power: number, setFire: boolean): boolean;
+             createExplosion(x: number, y: number, z: number, power: number, setFire: boolean): boolean;
             /**
              * Creates explosion at given coordinates with given power and optionally
              * setting blocks on fire or breaking blocks.
              */
-            public createExplosion(x: number, y: number, z: number, power: number, setFire: boolean, breakBlocks: boolean): boolean;
+             createExplosion(x: number, y: number, z: number, power: number, setFire: boolean, breakBlocks: boolean): boolean;
             /**
              * Creates explosion at given coordinates with given power
              */
-            public createExplosion(loc: org.bukkit.Location, power: number): boolean;
+             createExplosion(loc: org.bukkit.Location, power: number): boolean;
             /**
              * Creates explosion at given coordinates with given power and optionally
              * setting blocks on fire.
              */
-            public createExplosion(loc: org.bukkit.Location, power: number, setFire: boolean): boolean;
+             createExplosion(loc: org.bukkit.Location, power: number, setFire: boolean): boolean;
             /**
              * Gets the {@link Environment} type of this world
              */
-            public getEnvironment(): org.bukkit.World.Environment;
+             getEnvironment(): org.bukkit.World.Environment;
             /**
              * Gets the Seed for this world.
              */
-            public getSeed(): number;
+             getSeed(): number;
             /**
              * Gets the current PVP setting for this world.
              */
-            public getPVP(): boolean;
+             getPVP(): boolean;
             /**
              * Sets the PVP setting for this world.
              */
-            public setPVP(pvp: boolean): void;
+             setPVP(pvp: boolean): void;
             /**
              * Gets the chunk generator for this world
              */
-            public getGenerator(): org.bukkit.generator.ChunkGenerator;
+             getGenerator(): org.bukkit.generator.ChunkGenerator;
             /**
              * Saves world to disk
              */
-            public save(): void;
+             save(): void;
             /**
              * Gets a list of all applied {@link BlockPopulator}s for this World
              */
-            public getPopulators(): any[] /*java.util.List*/;
+             getPopulators(): any[] /*java.util.List*/;
             /**
              * Spawn an entity of a specific class at the given {@link Location}
              */
-            public spawn(location: org.bukkit.Location, clazz: any): org.bukkit.entity.Entity;
+             spawn(location: org.bukkit.Location, clazz: any): org.bukkit.entity.Entity;
             /**
              * Spawn an entity of a specific class at the given {@link Location}, with
              * the supplied function run before the entity is added to the world.
@@ -522,7 +523,7 @@ declare namespace org {
              * the world. Any operation involving such as teleporting the entity is undefined
              * until after this function returns.
              */
-            public spawn(location: org.bukkit.Location, clazz: any, func: org.bukkit.util.Consumer): org.bukkit.entity.Entity;
+             spawn(location: org.bukkit.Location, clazz: any, func: org.bukkit.util.Consumer): org.bukkit.entity.Entity;
             /**
              * Spawn a {@link FallingBlock} entity at the given {@link Location} of
              * the specified {@link Material}. The material dictates what is falling.
@@ -531,7 +532,7 @@ declare namespace org {
              * The Material must be a block type, check with {@link Material#isBlock()
              * material.isBlock()}. The Material may not be air.
              */
-            public spawnFallingBlock(location: org.bukkit.Location, data: org.bukkit.material.MaterialData): org.bukkit.entity.FallingBlock;
+             spawnFallingBlock(location: org.bukkit.Location, data: org.bukkit.material.MaterialData): org.bukkit.entity.FallingBlock;
             /**
              * Spawn a {@link FallingBlock} entity at the given {@link Location} of
              * the specified {@link Material}. The material dictates what is falling.
@@ -540,7 +541,7 @@ declare namespace org {
              * The Material must be a block type, check with {@link Material#isBlock()
              * material.isBlock()}. The Material may not be air.
              */
-            public spawnFallingBlock(location: org.bukkit.Location, data: org.bukkit.block.data.BlockData): org.bukkit.entity.FallingBlock;
+             spawnFallingBlock(location: org.bukkit.Location, data: org.bukkit.block.data.BlockData): org.bukkit.entity.FallingBlock;
             /**
              * Spawn a {@link FallingBlock} entity at the given {@link Location} of the
              * specified {@link Material}. The material dictates what is falling.
@@ -549,51 +550,51 @@ declare namespace org {
              * The Material must be a block type, check with {@link Material#isBlock()
              * material.isBlock()}. The Material may not be air.
              */
-            public spawnFallingBlock(location: org.bukkit.Location, material: org.bukkit.Material, data: number): org.bukkit.entity.FallingBlock;
+             spawnFallingBlock(location: org.bukkit.Location, material: org.bukkit.Material, data: number): org.bukkit.entity.FallingBlock;
             /**
              * Plays an effect to all players within a default radius around a given
              * location.
              */
-            public playEffect(location: org.bukkit.Location, effect: org.bukkit.Effect, data: number): void;
+             playEffect(location: org.bukkit.Location, effect: org.bukkit.Effect, data: number): void;
             /**
              * Plays an effect to all players within a given radius around a location.
              */
-            public playEffect(location: org.bukkit.Location, effect: org.bukkit.Effect, data: number, radius: number): void;
+             playEffect(location: org.bukkit.Location, effect: org.bukkit.Effect, data: number, radius: number): void;
             /**
              * Plays an effect to all players within a default radius around a given
              * location.
              */
-            public playEffect(location: org.bukkit.Location, effect: org.bukkit.Effect, data: any): void;
+             playEffect(location: org.bukkit.Location, effect: org.bukkit.Effect, data: any): void;
             /**
              * Plays an effect to all players within a given radius around a location.
              */
-            public playEffect(location: org.bukkit.Location, effect: org.bukkit.Effect, data: any, radius: number): void;
+             playEffect(location: org.bukkit.Location, effect: org.bukkit.Effect, data: any, radius: number): void;
             /**
              * Get empty chunk snapshot (equivalent to all air blocks), optionally
              * including valid biome data. Used for representing an ungenerated chunk,
              * or for fetching only biome data without loading a chunk.
              */
-            public getEmptyChunkSnapshot(x: number, z: number, includeBiome: boolean, includeBiomeTemp: boolean): org.bukkit.ChunkSnapshot;
+             getEmptyChunkSnapshot(x: number, z: number, includeBiome: boolean, includeBiomeTemp: boolean): org.bukkit.ChunkSnapshot;
             /**
              * Sets the spawn flags for this.
              */
-            public setSpawnFlags(allowMonsters: boolean, allowAnimals: boolean): void;
+             setSpawnFlags(allowMonsters: boolean, allowAnimals: boolean): void;
             /**
              * Gets whether animals can spawn in this world.
              */
-            public getAllowAnimals(): boolean;
+             getAllowAnimals(): boolean;
             /**
              * Gets whether monsters can spawn in this world.
              */
-            public getAllowMonsters(): boolean;
+             getAllowMonsters(): boolean;
             /**
              * Gets the biome for the given block coordinates.
              */
-            public getBiome(x: number, z: number): org.bukkit.block.Biome;
+             getBiome(x: number, z: number): org.bukkit.block.Biome;
             /**
              * Sets the biome for the given block coordinates
              */
-            public setBiome(x: number, z: number, bio: org.bukkit.block.Biome): void;
+             setBiome(x: number, z: number, bio: org.bukkit.block.Biome): void;
             /**
              * Gets the temperature for the given block coordinates.
              * <p>
@@ -603,64 +604,64 @@ declare namespace org {
              * This method will return the raw temperature without adjusting for block
              * height effects.
              */
-            public getTemperature(x: number, z: number): number;
+             getTemperature(x: number, z: number): number;
             /**
              * Gets the humidity for the given block coordinates.
              * <p>
              * It is safe to run this method when the block does not exist, it will
              * not create the block.
              */
-            public getHumidity(x: number, z: number): number;
+             getHumidity(x: number, z: number): number;
             /**
              * Gets the maximum height of this world.
              * <p>
              * If the max height is 100, there are only blocks from y=0 to y=99.
              */
-            public getMaxHeight(): number;
+             getMaxHeight(): number;
             /**
              * Gets the sea level for this world.
              * <p>
              * This is often half of {@link #getMaxHeight()}
              */
-            public getSeaLevel(): number;
+             getSeaLevel(): number;
             /**
              * Gets whether the world's spawn area should be kept loaded into memory
              * or not.
              */
-            public getKeepSpawnInMemory(): boolean;
+             getKeepSpawnInMemory(): boolean;
             /**
              * Sets whether the world's spawn area should be kept loaded into memory
              * or not.
              */
-            public setKeepSpawnInMemory(keepLoaded: boolean): void;
+             setKeepSpawnInMemory(keepLoaded: boolean): void;
             /**
              * Gets whether or not the world will automatically save
              */
-            public isAutoSave(): boolean;
+             isAutoSave(): boolean;
             /**
              * Sets whether or not the world will automatically save
              */
-            public setAutoSave(value: boolean): void;
+             setAutoSave(value: boolean): void;
             /**
              * Sets the Difficulty of the world.
              */
-            public setDifficulty(difficulty: org.bukkit.Difficulty): void;
+             setDifficulty(difficulty: org.bukkit.Difficulty): void;
             /**
              * Gets the Difficulty of the world.
              */
-            public getDifficulty(): org.bukkit.Difficulty;
+             getDifficulty(): org.bukkit.Difficulty;
             /**
              * Gets the folder of this world on disk.
              */
-            public getWorldFolder(): any;
+             getWorldFolder(): any;
             /**
              * Gets the type of this world.
              */
-            public getWorldType(): org.bukkit.WorldType;
+             getWorldType(): org.bukkit.WorldType;
             /**
              * Gets whether or not structures are being generated.
              */
-            public canGenerateStructures(): boolean;
+             canGenerateStructures(): boolean;
             /**
              * Gets the world's ticks per animal spawns value
              * <p>
@@ -683,7 +684,7 @@ declare namespace org {
              * <p>
              * Minecraft default: 400.
              */
-            public getTicksPerAnimalSpawns(): number;
+             getTicksPerAnimalSpawns(): number;
             /**
              * Sets the world's ticks per animal spawns value
              * <p>
@@ -706,7 +707,7 @@ declare namespace org {
              * <p>
              * Minecraft default: 400.
              */
-            public setTicksPerAnimalSpawns(ticksPerAnimalSpawns: number): void;
+             setTicksPerAnimalSpawns(ticksPerAnimalSpawns: number): void;
             /**
              * Gets the world's ticks per monster spawns value
              * <p>
@@ -729,7 +730,7 @@ declare namespace org {
              * <p>
              * Minecraft default: 1.
              */
-            public getTicksPerMonsterSpawns(): number;
+             getTicksPerMonsterSpawns(): number;
             /**
              * Sets the world's ticks per monster spawns value
              * <p>
@@ -752,12 +753,12 @@ declare namespace org {
              * <p>
              * Minecraft default: 1.
              */
-            public setTicksPerMonsterSpawns(ticksPerMonsterSpawns: number): void;
+             setTicksPerMonsterSpawns(ticksPerMonsterSpawns: number): void;
             /**
              * Gets limit for number of monsters that can spawn in a chunk in this
              * world
              */
-            public getMonsterSpawnLimit(): number;
+             getMonsterSpawnLimit(): number;
             /**
              * Sets the limit for number of monsters that can spawn in a chunk in this
              * world
@@ -765,12 +766,12 @@ declare namespace org {
              * <b>Note:</b> If set to a negative number the world will use the
              * server-wide spawn limit instead.
              */
-            public setMonsterSpawnLimit(limit: number): void;
+             setMonsterSpawnLimit(limit: number): void;
             /**
              * Gets the limit for number of animals that can spawn in a chunk in this
              * world
              */
-            public getAnimalSpawnLimit(): number;
+             getAnimalSpawnLimit(): number;
             /**
              * Sets the limit for number of animals that can spawn in a chunk in this
              * world
@@ -778,12 +779,12 @@ declare namespace org {
              * <b>Note:</b> If set to a negative number the world will use the
              * server-wide spawn limit instead.
              */
-            public setAnimalSpawnLimit(limit: number): void;
+             setAnimalSpawnLimit(limit: number): void;
             /**
              * Gets the limit for number of water animals that can spawn in a chunk in
              * this world
              */
-            public getWaterAnimalSpawnLimit(): number;
+             getWaterAnimalSpawnLimit(): number;
             /**
              * Sets the limit for number of water animals that can spawn in a chunk in
              * this world
@@ -791,12 +792,12 @@ declare namespace org {
              * <b>Note:</b> If set to a negative number the world will use the
              * server-wide spawn limit instead.
              */
-            public setWaterAnimalSpawnLimit(limit: number): void;
+             setWaterAnimalSpawnLimit(limit: number): void;
             /**
              * Gets the limit for number of ambient mobs that can spawn in a chunk in
              * this world
              */
-            public getAmbientSpawnLimit(): number;
+             getAmbientSpawnLimit(): number;
             /**
              * Sets the limit for number of ambient mobs that can spawn in a chunk in
              * this world
@@ -804,13 +805,13 @@ declare namespace org {
              * <b>Note:</b> If set to a negative number the world will use the
              * server-wide spawn limit instead.
              */
-            public setAmbientSpawnLimit(limit: number): void;
+             setAmbientSpawnLimit(limit: number): void;
             /**
              * Play a Sound at the provided Location in the World
              * <p>
              * This function will fail silently if Location or Sound are null.
              */
-            public playSound(location: org.bukkit.Location, sound: org.bukkit.Sound, volume: number, pitch: number): void;
+             playSound(location: org.bukkit.Location, sound: org.bukkit.Sound, volume: number, pitch: number): void;
             /**
              * Play a Sound at the provided Location in the World.
              * <p>
@@ -818,13 +819,13 @@ declare namespace org {
              * sound will be heard by the players if their clients do not have the
              * respective sound for the value passed.
              */
-            public playSound(location: org.bukkit.Location, sound: string, volume: number, pitch: number): void;
+             playSound(location: org.bukkit.Location, sound: string, volume: number, pitch: number): void;
             /**
              * Play a Sound at the provided Location in the World.
              * <p>
              * This function will fail silently if Location or Sound are null.
              */
-            public playSound(location: org.bukkit.Location, sound: org.bukkit.Sound, category: org.bukkit.SoundCategory, volume: number, pitch: number): void;
+             playSound(location: org.bukkit.Location, sound: org.bukkit.Sound, category: org.bukkit.SoundCategory, volume: number, pitch: number): void;
             /**
              * Play a Sound at the provided Location in the World.
              * <p>
@@ -832,17 +833,17 @@ declare namespace org {
              * will be heard by the players if their clients do not have the respective
              * sound for the value passed.
              */
-            public playSound(location: org.bukkit.Location, sound: string, category: org.bukkit.SoundCategory, volume: number, pitch: number): void;
+             playSound(location: org.bukkit.Location, sound: string, category: org.bukkit.SoundCategory, volume: number, pitch: number): void;
             /**
              * Get an array containing the names of all the {@link GameRule}s.
              */
-            public getGameRules(): any;
+             getGameRules(): any;
             /**
              * Gets the current state of the specified rule
              * <p>
              * Will return null if rule passed is null
              */
-            public getGameRuleValue(rule: string): string;
+             getGameRuleValue(rule: string): string;
             /**
              * Set the specified gamerule to specified value.
              * <p>
@@ -851,118 +852,118 @@ declare namespace org {
              * <p>
              * If rule is null, the function will return false.
              */
-            public setGameRuleValue(rule: string, value: string): boolean;
+             setGameRuleValue(rule: string, value: string): boolean;
             /**
              * Checks if string is a valid game rule
              */
-            public isGameRule(rule: string): boolean;
+             isGameRule(rule: string): boolean;
             /**
              * Get the current value for a given {@link GameRule}.
              */
-            public getGameRuleValue(rule: org.bukkit.GameRule): any;
+             getGameRuleValue(rule: org.bukkit.GameRule): any;
             /**
              * Get the default value for a given {@link GameRule}. This value is not
              * guaranteed to match the current value.
              */
-            public getGameRuleDefault(rule: org.bukkit.GameRule): any;
+             getGameRuleDefault(rule: org.bukkit.GameRule): any;
             /**
              * Set the given {@link GameRule}'s new value.
              */
-            public setGameRule(rule: org.bukkit.GameRule, newValue: any): boolean;
+             setGameRule(rule: org.bukkit.GameRule, newValue: any): boolean;
             /**
              * Gets the world border for this world.
              */
-            public getWorldBorder(): org.bukkit.WorldBorder;
+             getWorldBorder(): org.bukkit.WorldBorder;
             /**
              * Spawns the particle (the number of times specified by count)
              * at the target location.
              */
-            public spawnParticle(particle: org.bukkit.Particle, location: org.bukkit.Location, count: number): void;
+             spawnParticle(particle: org.bukkit.Particle, location: org.bukkit.Location, count: number): void;
             /**
              * Spawns the particle (the number of times specified by count)
              * at the target location.
              */
-            public spawnParticle(particle: org.bukkit.Particle, x: number, y: number, z: number, count: number): void;
+             spawnParticle(particle: org.bukkit.Particle, x: number, y: number, z: number, count: number): void;
             /**
              * Spawns the particle (the number of times specified by count)
              * at the target location.
              */
-            public spawnParticle(particle: org.bukkit.Particle, location: org.bukkit.Location, count: number, data: any): void;
+             spawnParticle(particle: org.bukkit.Particle, location: org.bukkit.Location, count: number, data: any): void;
             /**
              * Spawns the particle (the number of times specified by count)
              * at the target location.
              */
-            public spawnParticle(particle: org.bukkit.Particle, x: number, y: number, z: number, count: number, data: any): void;
+             spawnParticle(particle: org.bukkit.Particle, x: number, y: number, z: number, count: number, data: any): void;
             /**
              * Spawns the particle (the number of times specified by count)
              * at the target location. The position of each particle will be
              * randomized positively and negatively by the offset parameters
              * on each axis.
              */
-            public spawnParticle(particle: org.bukkit.Particle, location: org.bukkit.Location, count: number, offsetX: number, offsetY: number, offsetZ: number): void;
+             spawnParticle(particle: org.bukkit.Particle, location: org.bukkit.Location, count: number, offsetX: number, offsetY: number, offsetZ: number): void;
             /**
              * Spawns the particle (the number of times specified by count)
              * at the target location. The position of each particle will be
              * randomized positively and negatively by the offset parameters
              * on each axis.
              */
-            public spawnParticle(particle: org.bukkit.Particle, x: number, y: number, z: number, count: number, offsetX: number, offsetY: number, offsetZ: number): void;
+             spawnParticle(particle: org.bukkit.Particle, x: number, y: number, z: number, count: number, offsetX: number, offsetY: number, offsetZ: number): void;
             /**
              * Spawns the particle (the number of times specified by count)
              * at the target location. The position of each particle will be
              * randomized positively and negatively by the offset parameters
              * on each axis.
              */
-            public spawnParticle(particle: org.bukkit.Particle, location: org.bukkit.Location, count: number, offsetX: number, offsetY: number, offsetZ: number, data: any): void;
+             spawnParticle(particle: org.bukkit.Particle, location: org.bukkit.Location, count: number, offsetX: number, offsetY: number, offsetZ: number, data: any): void;
             /**
              * Spawns the particle (the number of times specified by count)
              * at the target location. The position of each particle will be
              * randomized positively and negatively by the offset parameters
              * on each axis.
              */
-            public spawnParticle(particle: org.bukkit.Particle, x: number, y: number, z: number, count: number, offsetX: number, offsetY: number, offsetZ: number, data: any): void;
+             spawnParticle(particle: org.bukkit.Particle, x: number, y: number, z: number, count: number, offsetX: number, offsetY: number, offsetZ: number, data: any): void;
             /**
              * Spawns the particle (the number of times specified by count)
              * at the target location. The position of each particle will be
              * randomized positively and negatively by the offset parameters
              * on each axis.
              */
-            public spawnParticle(particle: org.bukkit.Particle, location: org.bukkit.Location, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number): void;
+             spawnParticle(particle: org.bukkit.Particle, location: org.bukkit.Location, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number): void;
             /**
              * Spawns the particle (the number of times specified by count)
              * at the target location. The position of each particle will be
              * randomized positively and negatively by the offset parameters
              * on each axis.
              */
-            public spawnParticle(particle: org.bukkit.Particle, x: number, y: number, z: number, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number): void;
+             spawnParticle(particle: org.bukkit.Particle, x: number, y: number, z: number, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number): void;
             /**
              * Spawns the particle (the number of times specified by count)
              * at the target location. The position of each particle will be
              * randomized positively and negatively by the offset parameters
              * on each axis.
              */
-            public spawnParticle(particle: org.bukkit.Particle, location: org.bukkit.Location, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number, data: any): void;
+             spawnParticle(particle: org.bukkit.Particle, location: org.bukkit.Location, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number, data: any): void;
             /**
              * Spawns the particle (the number of times specified by count)
              * at the target location. The position of each particle will be
              * randomized positively and negatively by the offset parameters
              * on each axis.
              */
-            public spawnParticle(particle: org.bukkit.Particle, x: number, y: number, z: number, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number, data: any): void;
+             spawnParticle(particle: org.bukkit.Particle, x: number, y: number, z: number, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number, data: any): void;
             /**
              * Spawns the particle (the number of times specified by count)
              * at the target location. The position of each particle will be
              * randomized positively and negatively by the offset parameters
              * on each axis.
              */
-            public spawnParticle(particle: org.bukkit.Particle, location: org.bukkit.Location, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number, data: any, force: boolean): void;
+             spawnParticle(particle: org.bukkit.Particle, location: org.bukkit.Location, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number, data: any, force: boolean): void;
             /**
              * Spawns the particle (the number of times specified by count)
              * at the target location. The position of each particle will be
              * randomized positively and negatively by the offset parameters
              * on each axis.
              */
-            public spawnParticle(particle: org.bukkit.Particle, x: number, y: number, z: number, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number, data: any, force: boolean): void;
+             spawnParticle(particle: org.bukkit.Particle, x: number, y: number, z: number, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number, data: any, force: boolean): void;
             /**
              * Find the closest nearby structure of a given {@link StructureType}.
              * Finding unexplored structures can, and will, block if the world is
@@ -980,7 +981,7 @@ declare namespace org {
              * unexplored structures. This is because it will keep looking further and
              * further out in order to find the structure.
              */
-            public locateNearestStructure(origin: org.bukkit.Location, structureType: org.bukkit.StructureType, radius: number, findUnexplored: boolean): org.bukkit.Location;
+             locateNearestStructure(origin: org.bukkit.Location, structureType: org.bukkit.StructureType, radius: number, findUnexplored: boolean): org.bukkit.Location;
         }
     }
 }

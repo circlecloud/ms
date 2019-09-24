@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class FluidCollisionMode {
+        // @ts-ignore
+         class FluidCollisionMode {
             public static NEVER: org.bukkit.FluidCollisionMode;
             public static SOURCE_ONLY: org.bukkit.FluidCollisionMode;
             public static ALWAYS: org.bukkit.FluidCollisionMode;

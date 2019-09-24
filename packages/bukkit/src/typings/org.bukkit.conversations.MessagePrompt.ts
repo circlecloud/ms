@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace conversations {
-            abstract class MessagePrompt {
+            // @ts-ignore
+            abstract class MessagePrompt implements org.bukkit.conversations.Prompt {
                 constructor()
                 /**
                  * Message prompts never wait for user input before continuing.

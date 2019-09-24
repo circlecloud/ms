@@ -3,7 +3,8 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Observer {
+                    // @ts-ignore
+                    interface Observer extends org.bukkit.block.data.Directional, org.bukkit.block.data.Powerable {
                     }
                 }
             }

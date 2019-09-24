@@ -1,11 +1,12 @@
 declare namespace org {
     namespace bukkit {
         namespace block {
-            class ShulkerBox {
+            // @ts-ignore
+            interface ShulkerBox extends org.bukkit.block.Container, org.bukkit.loot.Lootable {
                 /**
                  * Get the {@link DyeColor} corresponding to this ShulkerBox
                  */
-                public getColor(): org.bukkit.DyeColor;
+                 getColor(): org.bukkit.DyeColor;
             }
         }
     }

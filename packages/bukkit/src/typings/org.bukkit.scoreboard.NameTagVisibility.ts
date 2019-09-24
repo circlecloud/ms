@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace scoreboard {
-            class NameTagVisibility {
+            // @ts-ignore
+             class NameTagVisibility {
                 public static ALWAYS: org.bukkit.scoreboard.NameTagVisibility;
                 public static NEVER: org.bukkit.scoreboard.NameTagVisibility;
                 public static HIDE_FOR_OTHER_TEAMS: org.bukkit.scoreboard.NameTagVisibility;

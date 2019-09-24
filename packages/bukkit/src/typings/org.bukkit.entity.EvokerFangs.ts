@@ -1,15 +1,16 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class EvokerFangs {
+            // @ts-ignore
+            interface EvokerFangs extends org.bukkit.entity.Entity {
                 /**
                  * Gets the {@link LivingEntity} which summoned the fangs.
                  */
-                public getOwner(): org.bukkit.entity.LivingEntity;
+                 getOwner(): org.bukkit.entity.LivingEntity;
                 /**
                  * Sets the {@link LivingEntity} which summoned the fangs.
                  */
-                public setOwner(owner: org.bukkit.entity.LivingEntity): void;
+                 setOwner(owner: org.bukkit.entity.LivingEntity): void;
             }
         }
     }

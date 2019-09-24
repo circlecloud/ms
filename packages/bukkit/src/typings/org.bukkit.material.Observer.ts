@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class Observer {
+            // @ts-ignore
+             class Observer implements org.bukkit.material.Directional, org.bukkit.material.Redstone {
                 constructor()
                 constructor(direction: org.bukkit.block.BlockFace)
                 constructor(type: org.bukkit.Material)

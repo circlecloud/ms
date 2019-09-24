@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace block {
-                class BlockGrowEvent {
+                // @ts-ignore
+                 class BlockGrowEvent implements org.bukkit.event.Cancellable {
                     constructor(block: org.bukkit.block.Block, newState: org.bukkit.block.BlockState)
                     /**
                      * Gets the state of the block where it will form or spread to.

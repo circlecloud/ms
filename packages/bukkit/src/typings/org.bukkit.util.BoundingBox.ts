@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace util {
-            class BoundingBox {
+            // @ts-ignore
+             class BoundingBox implements org.bukkit.configuration.serialization.ConfigurationSerializable {
                 /**
                  * Creates a new (degenerate) bounding box with all corner coordinates at
                  * <code>0</code>.

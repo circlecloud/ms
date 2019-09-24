@@ -2,49 +2,50 @@ declare namespace org {
     namespace bukkit {
         namespace inventory {
             namespace meta {
-                class FireworkMeta {
+                // @ts-ignore
+                interface FireworkMeta extends org.bukkit.inventory.meta.ItemMeta {
                     /**
                      * Add another effect to this firework.
                      */
-                    public addEffect(effect: org.bukkit.FireworkEffect): void;
+                     addEffect(effect: org.bukkit.FireworkEffect): void;
                     /**
                      * Add several effects to this firework.
                      */
-                    public addEffects(effects: org.bukkit.FireworkEffect): void;
+                     addEffects(effects: org.bukkit.FireworkEffect): void;
                     /**
                      * Add several firework effects to this firework.
                      */
-                    public addEffects(effects: any): void;
+                     addEffects(effects: any): void;
                     /**
                      * Get the effects in this firework.
                      */
-                    public getEffects(): any[] /*java.util.List*/;
+                     getEffects(): any[] /*java.util.List*/;
                     /**
                      * Get the number of effects in this firework.
                      */
-                    public getEffectsSize(): number;
+                     getEffectsSize(): number;
                     /**
                      * Remove an effect from this firework.
                      */
-                    public removeEffect(index: number): void;
+                     removeEffect(index: number): void;
                     /**
                      * Remove all effects from this firework.
                      */
-                    public clearEffects(): void;
+                     clearEffects(): void;
                     /**
                      * Get whether this firework has any effects.
                      */
-                    public hasEffects(): boolean;
+                     hasEffects(): boolean;
                     /**
                      * Gets the approximate height the firework will fly.
                      */
-                    public getPower(): number;
+                     getPower(): number;
                     /**
                      * Sets the approximate power of the firework. Each level of power is half
                      * a second of flight time.
                      */
-                    public setPower(power: number): void;
-                    public clone(): org.bukkit.inventory.meta.FireworkMeta;
+                     setPower(power: number): void;
+                     clone(): org.bukkit.inventory.meta.FireworkMeta;
                 }
             }
         }

@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace loot {
-            class LootContext {
+            // @ts-ignore
+             class LootContext {
                 public static DEFAULT_LOOT_MODIFIER: number;
                 /**
                  * The {@link Location} to store where the loot will be generated.

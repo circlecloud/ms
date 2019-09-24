@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Slab {
+                    // @ts-ignore
+                    interface Slab extends org.bukkit.block.data.Waterlogged {
                         /**
                          * Gets the value of the 'type' property.
                          */
-                        public getType(): org.bukkit.block.data.type.Slab.Type;
+                         getType(): org.bukkit.block.data.type.Slab.Type;
                         /**
                          * Sets the value of the 'type' property.
                          */
-                        public setType(type: org.bukkit.block.data.type.Slab.Type): void;
+                         setType(type: org.bukkit.block.data.type.Slab.Type): void;
                     }
                 }
             }

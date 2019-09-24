@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class ExpBottleEvent {
+                // @ts-ignore
+                 class ExpBottleEvent {
                     constructor(bottle: org.bukkit.entity.ThrownExpBottle, exp: number)
                     public getEntity(): org.bukkit.entity.ThrownExpBottle;
                     /**

@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace block {
-            class Barrel {
+            // @ts-ignore
+            interface Barrel extends org.bukkit.block.Container, org.bukkit.loot.Lootable {
             }
         }
     }

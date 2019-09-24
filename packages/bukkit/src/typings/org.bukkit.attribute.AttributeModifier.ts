@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace attribute {
-            class AttributeModifier {
+            // @ts-ignore
+             class AttributeModifier implements org.bukkit.configuration.serialization.ConfigurationSerializable {
                 constructor(name: string, amount: number, operation: org.bukkit.attribute.AttributeModifier.Operation)
                 constructor(uuid: any, name: string, amount: number, operation: org.bukkit.attribute.AttributeModifier.Operation)
                 constructor(uuid: any, name: string, amount: number, operation: org.bukkit.attribute.AttributeModifier.Operation, slot: org.bukkit.inventory.EquipmentSlot)

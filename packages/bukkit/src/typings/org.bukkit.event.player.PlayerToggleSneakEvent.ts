@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerToggleSneakEvent {
+                // @ts-ignore
+                 class PlayerToggleSneakEvent implements org.bukkit.event.Cancellable {
                     constructor(player: org.bukkit.entity.Player, isSneaking: boolean)
                     /**
                      * Returns whether the player is now sneaking or not.

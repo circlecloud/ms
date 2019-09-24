@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class DaylightDetector {
+                    // @ts-ignore
+                    interface DaylightDetector extends org.bukkit.block.data.AnaloguePowerable {
                         /**
                          * Gets the value of the 'inverted' property.
                          */
-                        public isInverted(): boolean;
+                         isInverted(): boolean;
                         /**
                          * Sets the value of the 'inverted' property.
                          */
-                        public setInverted(inverted: boolean): void;
+                         setInverted(inverted: boolean): void;
                     }
                 }
             }

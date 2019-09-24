@@ -2,15 +2,16 @@ declare namespace org {
     namespace bukkit {
         namespace block {
             namespace data {
-                class Powerable {
+                // @ts-ignore
+                interface Powerable extends org.bukkit.block.data.BlockData {
                     /**
                      * Gets the value of the 'powered' property.
                      */
-                    public isPowered(): boolean;
+                     isPowered(): boolean;
                     /**
                      * Sets the value of the 'powered' property.
                      */
-                    public setPowered(powered: boolean): void;
+                     setPowered(powered: boolean): void;
                 }
             }
         }

@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class DetectorRail {
+            // @ts-ignore
+             class DetectorRail implements org.bukkit.material.PressureSensor {
                 constructor()
                 constructor(type: org.bukkit.Material)
                 constructor(type: org.bukkit.Material, data: number)

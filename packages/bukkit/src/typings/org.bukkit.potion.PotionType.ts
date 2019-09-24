@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace potion {
-            class PotionType {
+            // @ts-ignore
+             class PotionType {
                 public static UNCRAFTABLE: org.bukkit.potion.PotionType;
                 public static WATER: org.bukkit.potion.PotionType;
                 public static MUNDANE: org.bukkit.potion.PotionType;

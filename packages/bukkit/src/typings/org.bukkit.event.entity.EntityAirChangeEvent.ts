@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class EntityAirChangeEvent {
+                // @ts-ignore
+                 class EntityAirChangeEvent implements org.bukkit.event.Cancellable {
                     constructor(what: org.bukkit.entity.Entity, amount: number)
                     /**
                      * Gets the amount of air the entity has left (measured in ticks).

@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace inventory {
-            abstract class CookingRecipe {
+            // @ts-ignore
+            abstract class CookingRecipe implements org.bukkit.inventory.Recipe, org.bukkit.Keyed {
                 /**
                  * Create a cooking recipe to craft the specified ItemStack.
                  */

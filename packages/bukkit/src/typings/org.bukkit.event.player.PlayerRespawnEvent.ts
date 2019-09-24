@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerRespawnEvent {
+                // @ts-ignore
+                 class PlayerRespawnEvent {
                     constructor(respawnPlayer: org.bukkit.entity.Player, respawnLocation: org.bukkit.Location, isBedSpawn: boolean)
                     /**
                      * Gets the current respawn location

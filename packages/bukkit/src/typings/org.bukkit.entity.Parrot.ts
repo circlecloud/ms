@@ -1,15 +1,16 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Parrot {
+            // @ts-ignore
+            interface Parrot extends org.bukkit.entity.Animals, org.bukkit.entity.Tameable, org.bukkit.entity.Sittable {
                 /**
                  * Get the variant of this parrot.
                  */
-                public getVariant(): org.bukkit.entity.Parrot.Variant;
+                 getVariant(): org.bukkit.entity.Parrot.Variant;
                 /**
                  * Set the variant of this parrot.
                  */
-                public setVariant(variant: org.bukkit.entity.Parrot.Variant): void;
+                 setVariant(variant: org.bukkit.entity.Parrot.Variant): void;
             }
         }
     }

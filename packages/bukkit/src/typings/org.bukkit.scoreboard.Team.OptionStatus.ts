@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace scoreboard {
             namespace Team {
-                class OptionStatus {
+                // @ts-ignore
+                 class OptionStatus {
                     public static ALWAYS: org.bukkit.scoreboard.Team.OptionStatus;
                     public static NEVER: org.bukkit.scoreboard.Team.OptionStatus;
                     public static FOR_OTHER_TEAMS: org.bukkit.scoreboard.Team.OptionStatus;

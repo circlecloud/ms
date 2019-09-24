@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Switch {
+                    // @ts-ignore
+                    interface Switch extends org.bukkit.block.data.Directional, org.bukkit.block.data.Powerable {
                         /**
                          * Gets the value of the 'face' property.
                          */
-                        public getFace(): org.bukkit.block.data.type.Switch.Face;
+                         getFace(): org.bukkit.block.data.type.Switch.Face;
                         /**
                          * Sets the value of the 'face' property.
                          */
-                        public setFace(face: org.bukkit.block.data.type.Switch.Face): void;
+                         setFace(face: org.bukkit.block.data.type.Switch.Face): void;
                     }
                 }
             }

@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace vehicle {
-                class VehicleExitEvent {
+                // @ts-ignore
+                 class VehicleExitEvent implements org.bukkit.event.Cancellable {
                     constructor(vehicle: org.bukkit.entity.Vehicle, exited: org.bukkit.entity.LivingEntity)
                     /**
                      * Get the living entity that exited the vehicle.

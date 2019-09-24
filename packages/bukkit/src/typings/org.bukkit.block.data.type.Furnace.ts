@@ -3,7 +3,8 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Furnace {
+                    // @ts-ignore
+                    interface Furnace extends org.bukkit.block.data.Directional, org.bukkit.block.data.Lightable {
                     }
                 }
             }

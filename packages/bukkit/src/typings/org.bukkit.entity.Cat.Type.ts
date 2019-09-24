@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace entity {
             namespace Cat {
-                class Type {
+                // @ts-ignore
+                 class Type {
                     public static TABBY: org.bukkit.entity.Cat.Type;
                     public static BLACK: org.bukkit.entity.Cat.Type;
                     public static RED: org.bukkit.entity.Cat.Type;

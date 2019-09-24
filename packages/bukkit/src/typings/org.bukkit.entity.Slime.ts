@@ -1,9 +1,10 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Slime {
-                public getSize(): number;
-                public setSize(sz: number): void;
+            // @ts-ignore
+            interface Slime extends org.bukkit.entity.Mob {
+                 getSize(): number;
+                 setSize(sz: number): void;
             }
         }
     }

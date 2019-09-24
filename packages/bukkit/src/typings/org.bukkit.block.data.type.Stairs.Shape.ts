@@ -4,7 +4,8 @@ declare namespace org {
             namespace data {
                 namespace type {
                     namespace Stairs {
-                        class Shape {
+                        // @ts-ignore
+                         class Shape {
                             public static STRAIGHT: org.bukkit.block.data.type.Stairs.Shape;
                             public static INNER_LEFT: org.bukkit.block.data.type.Stairs.Shape;
                             public static INNER_RIGHT: org.bukkit.block.data.type.Stairs.Shape;

@@ -4,7 +4,8 @@ declare namespace org {
             namespace data {
                 namespace type {
                     namespace Bed {
-                        class Part {
+                        // @ts-ignore
+                         class Part {
                             public static HEAD: org.bukkit.block.data.type.Bed.Part;
                             public static FOOT: org.bukkit.block.data.type.Bed.Part;
                             public static values(): org.bukkit.block.data.type.Bed.Part[];

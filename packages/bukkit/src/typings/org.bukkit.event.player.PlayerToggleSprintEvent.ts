@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerToggleSprintEvent {
+                // @ts-ignore
+                 class PlayerToggleSprintEvent implements org.bukkit.event.Cancellable {
                     constructor(player: org.bukkit.entity.Player, isSprinting: boolean)
                     /**
                      * Gets whether the player is now sprinting or not.

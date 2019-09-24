@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class CocoaPlant {
+            // @ts-ignore
+             class CocoaPlant implements org.bukkit.material.Directional, org.bukkit.material.Attachable {
                 constructor()
                 constructor(type: org.bukkit.Material, data: number)
                 constructor(sz: org.bukkit.material.CocoaPlant.CocoaPlantSize)

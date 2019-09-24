@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace block {
-            class Comparator {
+            // @ts-ignore
+            interface Comparator extends org.bukkit.block.TileState {
             }
         }
     }

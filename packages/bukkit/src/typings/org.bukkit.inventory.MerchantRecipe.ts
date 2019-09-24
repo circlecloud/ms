@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace inventory {
-            class MerchantRecipe {
+            // @ts-ignore
+             class MerchantRecipe implements org.bukkit.inventory.Recipe {
                 constructor(result: org.bukkit.inventory.ItemStack, maxUses: number)
                 constructor(result: org.bukkit.inventory.ItemStack, uses: number, maxUses: number, experienceReward: boolean)
                 constructor(result: org.bukkit.inventory.ItemStack, uses: number, maxUses: number, experienceReward: boolean, villagerExperience: number, priceMultiplier: number)

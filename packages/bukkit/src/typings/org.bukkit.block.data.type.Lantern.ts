@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Lantern {
+                    // @ts-ignore
+                    interface Lantern {
                         /**
                          * Gets the value of the 'hanging' property.
                          */
-                        public isHanging(): boolean;
+                         isHanging(): boolean;
                         /**
                          * Sets the value of the 'hanging' property.
                          */
-                        public setHanging(hanging: boolean): void;
+                         setHanging(hanging: boolean): void;
                     }
                 }
             }

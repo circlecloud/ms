@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class CreatureSpawnEvent {
+                // @ts-ignore
+                 class CreatureSpawnEvent {
                     constructor(spawnee: org.bukkit.entity.LivingEntity, spawnReason: org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason)
                     public getEntity(): org.bukkit.entity.LivingEntity;
                     /**

@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace plugin {
             namespace messaging {
-                class ChannelNameTooLongException {
+                // @ts-ignore
+                 class ChannelNameTooLongException {
                     constructor()
                     constructor(channel: string)
                 }

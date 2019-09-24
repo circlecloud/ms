@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class EntityPortalExitEvent {
+                // @ts-ignore
+                 class EntityPortalExitEvent {
                     constructor(entity: org.bukkit.entity.Entity, from: org.bukkit.Location, to: org.bukkit.Location, before: org.bukkit.util.Vector, after: org.bukkit.util.Vector)
                     /**
                      * Gets a copy of the velocity that the entity has before entering the

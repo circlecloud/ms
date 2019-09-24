@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace conversations {
-            class InactivityConversationCanceller {
+            // @ts-ignore
+             class InactivityConversationCanceller implements org.bukkit.conversations.ConversationCanceller {
                 /**
                  * Creates an InactivityConversationCanceller.
                  */

@@ -3,11 +3,12 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Jukebox {
+                    // @ts-ignore
+                    interface Jukebox extends org.bukkit.block.data.BlockData {
                         /**
                          * Gets the value of the 'has_record' property.
                          */
-                        public hasRecord(): boolean;
+                         hasRecord(): boolean;
                     }
                 }
             }

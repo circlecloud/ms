@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace inventory {
-                class BrewEvent {
+                // @ts-ignore
+                 class BrewEvent implements org.bukkit.event.Cancellable {
                     constructor(brewer: org.bukkit.block.Block, contents: org.bukkit.inventory.BrewerInventory, fuelLevel: number)
                     /**
                      * Gets the contents of the Brewing Stand.

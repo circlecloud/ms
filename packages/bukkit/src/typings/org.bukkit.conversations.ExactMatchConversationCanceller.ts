@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace conversations {
-            class ExactMatchConversationCanceller {
+            // @ts-ignore
+             class ExactMatchConversationCanceller implements org.bukkit.conversations.ConversationCanceller {
                 /**
                  * Builds an ExactMatchConversationCanceller.
                  */

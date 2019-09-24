@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class SandstoneType {
+        // @ts-ignore
+         class SandstoneType {
             public static CRACKED: org.bukkit.SandstoneType;
             public static GLYPHED: org.bukkit.SandstoneType;
             public static SMOOTH: org.bukkit.SandstoneType;

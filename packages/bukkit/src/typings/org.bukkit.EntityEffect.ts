@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class EntityEffect {
+        // @ts-ignore
+         class EntityEffect {
             public static ARROW_PARTICLES: org.bukkit.EntityEffect;
             public static RABBIT_JUMP: org.bukkit.EntityEffect;
             public static HURT: org.bukkit.EntityEffect;

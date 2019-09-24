@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace inventory {
-                class ClickType {
+                // @ts-ignore
+                 class ClickType {
                     public static LEFT: org.bukkit.event.inventory.ClickType;
                     public static SHIFT_LEFT: org.bukkit.event.inventory.ClickType;
                     public static RIGHT: org.bukkit.event.inventory.ClickType;

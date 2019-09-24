@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace entity {
                 namespace EntityDamageEvent {
-                    class DamageModifier {
+                    // @ts-ignore
+                     class DamageModifier {
                         public static BASE: org.bukkit.event.entity.EntityDamageEvent.DamageModifier;
                         public static HARD_HAT: org.bukkit.event.entity.EntityDamageEvent.DamageModifier;
                         public static BLOCKING: org.bukkit.event.entity.EntityDamageEvent.DamageModifier;

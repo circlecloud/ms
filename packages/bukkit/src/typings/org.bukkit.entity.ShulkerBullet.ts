@@ -1,15 +1,16 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class ShulkerBullet {
+            // @ts-ignore
+            interface ShulkerBullet extends org.bukkit.entity.Projectile {
                 /**
                  * Retrieve the target of this bullet.
                  */
-                public getTarget(): org.bukkit.entity.Entity;
+                 getTarget(): org.bukkit.entity.Entity;
                 /**
                  * Sets the target of this bullet
                  */
-                public setTarget(target: org.bukkit.entity.Entity): void;
+                 setTarget(target: org.bukkit.entity.Entity): void;
             }
         }
     }

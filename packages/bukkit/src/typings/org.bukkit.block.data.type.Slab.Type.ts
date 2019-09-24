@@ -4,7 +4,8 @@ declare namespace org {
             namespace data {
                 namespace type {
                     namespace Slab {
-                        class Type {
+                        // @ts-ignore
+                         class Type {
                             public static TOP: org.bukkit.block.data.type.Slab.Type;
                             public static BOTTOM: org.bukkit.block.data.type.Slab.Type;
                             public static DOUBLE: org.bukkit.block.data.type.Slab.Type;

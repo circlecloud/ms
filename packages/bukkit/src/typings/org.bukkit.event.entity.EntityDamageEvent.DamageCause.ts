@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace entity {
                 namespace EntityDamageEvent {
-                    class DamageCause {
+                    // @ts-ignore
+                     class DamageCause {
                         public static CONTACT: org.bukkit.event.entity.EntityDamageEvent.DamageCause;
                         public static ENTITY_ATTACK: org.bukkit.event.entity.EntityDamageEvent.DamageCause;
                         public static ENTITY_SWEEP_ATTACK: org.bukkit.event.entity.EntityDamageEvent.DamageCause;

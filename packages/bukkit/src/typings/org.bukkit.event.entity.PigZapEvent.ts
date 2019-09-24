@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class PigZapEvent {
+                // @ts-ignore
+                 class PigZapEvent implements org.bukkit.event.Cancellable {
                     constructor(pig: org.bukkit.entity.Pig, bolt: org.bukkit.entity.LightningStrike, pigzombie: org.bukkit.entity.PigZombie)
                     public isCancelled(): boolean;
                     public setCancelled(cancel: boolean): void;

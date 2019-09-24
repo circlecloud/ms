@@ -2,16 +2,17 @@ declare namespace org {
     namespace bukkit {
         namespace entity {
             namespace minecart {
-                class HopperMinecart {
+                // @ts-ignore
+                interface HopperMinecart extends org.bukkit.entity.Minecart, org.bukkit.inventory.InventoryHolder, org.bukkit.loot.Lootable {
                     /**
                      * Checks whether or not this Minecart will pick up
                      * items into its inventory.
                      */
-                    public isEnabled(): boolean;
+                     isEnabled(): boolean;
                     /**
                      * Sets whether this Minecart will pick up items.
                      */
-                    public setEnabled(enabled: boolean): void;
+                     setEnabled(enabled: boolean): void;
                 }
             }
         }

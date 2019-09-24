@@ -1,15 +1,16 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class IronGolem {
+            // @ts-ignore
+            interface IronGolem extends org.bukkit.entity.Golem {
                 /**
                  * Gets whether this iron golem was built by a player.
                  */
-                public isPlayerCreated(): boolean;
+                 isPlayerCreated(): boolean;
                 /**
                  * Sets whether this iron golem was built by a player or not.
                  */
-                public setPlayerCreated(playerCreated: boolean): void;
+                 setPlayerCreated(playerCreated: boolean): void;
             }
         }
     }

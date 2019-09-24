@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
         namespace potion {
+            // @ts-ignore
             abstract class PotionEffectType {
                 constructor(id: number)
                 public static SPEED: org.bukkit.potion.PotionEffectType;

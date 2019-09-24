@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace permissions {
-            class PermissionDefault {
+            // @ts-ignore
+             class PermissionDefault {
                 public static TRUE: org.bukkit.permissions.PermissionDefault;
                 public static FALSE: org.bukkit.permissions.PermissionDefault;
                 public static OP: org.bukkit.permissions.PermissionDefault;

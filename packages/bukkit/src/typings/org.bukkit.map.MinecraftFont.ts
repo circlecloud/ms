@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace map {
-            class MinecraftFont {
+            // @ts-ignore
+             class MinecraftFont {
                 /**
                  * Initialize a new MinecraftFont.
                  */

@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace inventory {
-            class FurnaceRecipe {
+            // @ts-ignore
+             class FurnaceRecipe {
                 constructor(result: org.bukkit.inventory.ItemStack, source: org.bukkit.Material)
                 constructor(result: org.bukkit.inventory.ItemStack, source: org.bukkit.material.MaterialData)
                 constructor(result: org.bukkit.inventory.ItemStack, source: org.bukkit.material.MaterialData, experience: number)

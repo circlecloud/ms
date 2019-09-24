@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace configuration {
-            class ConfigurationSection {
+            // @ts-ignore
+            interface ConfigurationSection {
                 /**
                  * Gets a set containing all keys in this section.
                  * <p>
@@ -12,7 +13,7 @@ declare namespace org {
                  * If deep is set to false, then this will contain only the keys of any
                  * direct children, and not their own children.
                  */
-                public getKeys(deep: boolean): any[] /*java.util.Set*/;
+                 getKeys(deep: boolean): any[] /*java.util.Set*/;
                 /**
                  * Gets a Map containing all keys and their values for this section.
                  * <p>
@@ -23,14 +24,14 @@ declare namespace org {
                  * If deep is set to false, then this will contain only the keys and
                  * values of any direct children, and not their own children.
                  */
-                public getValues(deep: boolean): Map<any, any> /*java.util.Map*/;
+                 getValues(deep: boolean): Map<any, any> /*java.util.Map*/;
                 /**
                  * Checks if this {@link ConfigurationSection} contains the given path.
                  * <p>
                  * If the value for the requested path does not exist but a default value
                  * has been specified, this will return true.
                  */
-                public contains(path: string): boolean;
+                 contains(path: string): boolean;
                 /**
                  * Checks if this {@link ConfigurationSection} contains the given path.
                  * <p>
@@ -41,7 +42,7 @@ declare namespace org {
                  * If a boolean parameter of false has been specified, true will only be
                  * returned if there is a set value for the specified path.
                  */
-                public contains(path: string, ignoreDefault: boolean): boolean;
+                 contains(path: string, ignoreDefault: boolean): boolean;
                 /**
                  * Checks if this {@link ConfigurationSection} has a value set for the
                  * given path.
@@ -49,7 +50,7 @@ declare namespace org {
                  * If the value for the requested path does not exist but a default value
                  * has been specified, this will still return false.
                  */
-                public isSet(path: string): boolean;
+                 isSet(path: string): boolean;
                 /**
                  * Gets the path of this {@link ConfigurationSection} from its root {@link
                  * Configuration}
@@ -63,7 +64,7 @@ declare namespace org {
                  * To retrieve the single name of this section, that is, the final part of
                  * the path returned by this method, you may use {@link #getName()}.
                  */
-                public getCurrentPath(): string;
+                 getCurrentPath(): string;
                 /**
                  * Gets the name of this individual {@link ConfigurationSection}, in the
                  * path.
@@ -71,7 +72,7 @@ declare namespace org {
                  * This will always be the final part of {@link #getCurrentPath()}, unless
                  * the section is orphaned.
                  */
-                public getName(): string;
+                 getName(): string;
                 /**
                  * Gets the root {@link Configuration} that contains this {@link
                  * ConfigurationSection}
@@ -82,7 +83,7 @@ declare namespace org {
                  * If the section is no longer contained within its root for any reason,
                  * such as being replaced with a different value, this may return null.
                  */
-                public getRoot(): org.bukkit.configuration.Configuration;
+                 getRoot(): org.bukkit.configuration.Configuration;
                 /**
                  * Gets the parent {@link ConfigurationSection} that directly contains
                  * this {@link ConfigurationSection}.
@@ -92,7 +93,7 @@ declare namespace org {
                  * If the section is no longer contained within its parent for any reason,
                  * such as being replaced with a different value, this may return null.
                  */
-                public getParent(): org.bukkit.configuration.ConfigurationSection;
+                 getParent(): org.bukkit.configuration.ConfigurationSection;
                 /**
                  * Gets the requested Object by path.
                  * <p>
@@ -100,7 +101,7 @@ declare namespace org {
                  * this will return the default value. If the Object does not exist and no
                  * default value was specified, this will return null.
                  */
-                public get(path: string): any;
+                 get(path: string): any;
                 /**
                  * Gets the requested Object by path, returning a default value if not
                  * found.
@@ -109,7 +110,7 @@ declare namespace org {
                  * returned regardless of if a default has been identified in the root
                  * {@link Configuration}.
                  */
-                public get(path: string, def: any): any;
+                 get(path: string, def: any): any;
                 /**
                  * Sets the specified path to the given value.
                  * <p>
@@ -121,7 +122,7 @@ declare namespace org {
                  * you to store {@link Configuration}s or {@link ConfigurationSection}s,
                  * please use {@link #createSection(java.lang.String)} for that.
                  */
-                public set(path: string, value: any): void;
+                 set(path: string, value: any): void;
                 /**
                  * Creates an empty {@link ConfigurationSection} at the specified path.
                  * <p>
@@ -129,7 +130,7 @@ declare namespace org {
                  * the previous value was itself a {@link ConfigurationSection}, it will
                  * be orphaned.
                  */
-                public createSection(path: string): org.bukkit.configuration.ConfigurationSection;
+                 createSection(path: string): org.bukkit.configuration.ConfigurationSection;
                 /**
                  * Creates a {@link ConfigurationSection} at the specified path, with
                  * specified values.
@@ -138,7 +139,7 @@ declare namespace org {
                  * the previous value was itself a {@link ConfigurationSection}, it will
                  * be orphaned.
                  */
-                public createSection(path: string, map: Map<any, any> /*java.util.Map*/): org.bukkit.configuration.ConfigurationSection;
+                 createSection(path: string, map: Map<any, any> /*java.util.Map*/): org.bukkit.configuration.ConfigurationSection;
                 /**
                  * Gets the requested String by path.
                  * <p>
@@ -146,7 +147,7 @@ declare namespace org {
                  * this will return the default value. If the String does not exist and no
                  * default value was specified, this will return null.
                  */
-                public getString(path: string): string;
+                 getString(path: string): string;
                 /**
                  * Gets the requested String by path, returning a default value if not
                  * found.
@@ -155,7 +156,7 @@ declare namespace org {
                  * returned regardless of if a default has been identified in the root
                  * {@link Configuration}.
                  */
-                public getString(path: string, def: string): string;
+                 getString(path: string, def: string): string;
                 /**
                  * Checks if the specified path is a String.
                  * <p>
@@ -164,7 +165,7 @@ declare namespace org {
                  * but a default value has been specified, this will check if that default
                  * value is a String and return appropriately.
                  */
-                public isString(path: string): boolean;
+                 isString(path: string): boolean;
                 /**
                  * Gets the requested int by path.
                  * <p>
@@ -172,7 +173,7 @@ declare namespace org {
                  * will return the default value. If the int does not exist and no default
                  * value was specified, this will return 0.
                  */
-                public getInt(path: string): number;
+                 getInt(path: string): number;
                 /**
                  * Gets the requested int by path, returning a default value if not found.
                  * <p>
@@ -180,7 +181,7 @@ declare namespace org {
                  * returned regardless of if a default has been identified in the root
                  * {@link Configuration}.
                  */
-                public getInt(path: string, def: number): number;
+                 getInt(path: string, def: number): number;
                 /**
                  * Checks if the specified path is an int.
                  * <p>
@@ -189,7 +190,7 @@ declare namespace org {
                  * but a default value has been specified, this will check if that default
                  * value is a int and return appropriately.
                  */
-                public isInt(path: string): boolean;
+                 isInt(path: string): boolean;
                 /**
                  * Gets the requested boolean by path.
                  * <p>
@@ -197,7 +198,7 @@ declare namespace org {
                  * this will return the default value. If the boolean does not exist and
                  * no default value was specified, this will return false.
                  */
-                public getBoolean(path: string): boolean;
+                 getBoolean(path: string): boolean;
                 /**
                  * Gets the requested boolean by path, returning a default value if not
                  * found.
@@ -206,7 +207,7 @@ declare namespace org {
                  * returned regardless of if a default has been identified in the root
                  * {@link Configuration}.
                  */
-                public getBoolean(path: string, def: boolean): boolean;
+                 getBoolean(path: string, def: boolean): boolean;
                 /**
                  * Checks if the specified path is a boolean.
                  * <p>
@@ -215,7 +216,7 @@ declare namespace org {
                  * but a default value has been specified, this will check if that default
                  * value is a boolean and return appropriately.
                  */
-                public isBoolean(path: string): boolean;
+                 isBoolean(path: string): boolean;
                 /**
                  * Gets the requested double by path.
                  * <p>
@@ -223,7 +224,7 @@ declare namespace org {
                  * this will return the default value. If the double does not exist and no
                  * default value was specified, this will return 0.
                  */
-                public getDouble(path: string): number;
+                 getDouble(path: string): number;
                 /**
                  * Gets the requested double by path, returning a default value if not
                  * found.
@@ -232,7 +233,7 @@ declare namespace org {
                  * returned regardless of if a default has been identified in the root
                  * {@link Configuration}.
                  */
-                public getDouble(path: string, def: number): number;
+                 getDouble(path: string, def: number): number;
                 /**
                  * Checks if the specified path is a double.
                  * <p>
@@ -241,7 +242,7 @@ declare namespace org {
                  * but a default value has been specified, this will check if that default
                  * value is a double and return appropriately.
                  */
-                public isDouble(path: string): boolean;
+                 isDouble(path: string): boolean;
                 /**
                  * Gets the requested long by path.
                  * <p>
@@ -249,7 +250,7 @@ declare namespace org {
                  * will return the default value. If the long does not exist and no
                  * default value was specified, this will return 0.
                  */
-                public getLong(path: string): number;
+                 getLong(path: string): number;
                 /**
                  * Gets the requested long by path, returning a default value if not
                  * found.
@@ -258,7 +259,7 @@ declare namespace org {
                  * returned regardless of if a default has been identified in the root
                  * {@link Configuration}.
                  */
-                public getLong(path: string, def: number): number;
+                 getLong(path: string, def: number): number;
                 /**
                  * Checks if the specified path is a long.
                  * <p>
@@ -267,7 +268,7 @@ declare namespace org {
                  * but a default value has been specified, this will check if that default
                  * value is a long and return appropriately.
                  */
-                public isLong(path: string): boolean;
+                 isLong(path: string): boolean;
                 /**
                  * Gets the requested List by path.
                  * <p>
@@ -275,7 +276,7 @@ declare namespace org {
                  * will return the default value. If the List does not exist and no
                  * default value was specified, this will return null.
                  */
-                public getList(path: string): any[] /*java.util.List*/;
+                 getList(path: string): any[] /*java.util.List*/;
                 /**
                  * Gets the requested List by path, returning a default value if not
                  * found.
@@ -284,7 +285,7 @@ declare namespace org {
                  * returned regardless of if a default has been identified in the root
                  * {@link Configuration}.
                  */
-                public getList(path: string, def: any[] /*java.util.List*/): any[] /*java.util.List*/;
+                 getList(path: string, def: any[] /*java.util.List*/): any[] /*java.util.List*/;
                 /**
                  * Checks if the specified path is a List.
                  * <p>
@@ -293,7 +294,7 @@ declare namespace org {
                  * but a default value has been specified, this will check if that default
                  * value is a List and return appropriately.
                  */
-                public isList(path: string): boolean;
+                 isList(path: string): boolean;
                 /**
                  * Gets the requested List of String by path.
                  * <p>
@@ -304,7 +305,7 @@ declare namespace org {
                  * This method will attempt to cast any values into a String if possible,
                  * but may miss any values out if they are not compatible.
                  */
-                public getStringList(path: string): any[] /*java.util.List*/;
+                 getStringList(path: string): any[] /*java.util.List*/;
                 /**
                  * Gets the requested List of Integer by path.
                  * <p>
@@ -315,7 +316,7 @@ declare namespace org {
                  * This method will attempt to cast any values into a Integer if possible,
                  * but may miss any values out if they are not compatible.
                  */
-                public getIntegerList(path: string): any[] /*java.util.List*/;
+                 getIntegerList(path: string): any[] /*java.util.List*/;
                 /**
                  * Gets the requested List of Boolean by path.
                  * <p>
@@ -326,7 +327,7 @@ declare namespace org {
                  * This method will attempt to cast any values into a Boolean if possible,
                  * but may miss any values out if they are not compatible.
                  */
-                public getBooleanList(path: string): any[] /*java.util.List*/;
+                 getBooleanList(path: string): any[] /*java.util.List*/;
                 /**
                  * Gets the requested List of Double by path.
                  * <p>
@@ -337,7 +338,7 @@ declare namespace org {
                  * This method will attempt to cast any values into a Double if possible,
                  * but may miss any values out if they are not compatible.
                  */
-                public getDoubleList(path: string): any[] /*java.util.List*/;
+                 getDoubleList(path: string): any[] /*java.util.List*/;
                 /**
                  * Gets the requested List of Float by path.
                  * <p>
@@ -348,7 +349,7 @@ declare namespace org {
                  * This method will attempt to cast any values into a Float if possible,
                  * but may miss any values out if they are not compatible.
                  */
-                public getFloatList(path: string): any[] /*java.util.List*/;
+                 getFloatList(path: string): any[] /*java.util.List*/;
                 /**
                  * Gets the requested List of Long by path.
                  * <p>
@@ -359,7 +360,7 @@ declare namespace org {
                  * This method will attempt to cast any values into a Long if possible,
                  * but may miss any values out if they are not compatible.
                  */
-                public getLongList(path: string): any[] /*java.util.List*/;
+                 getLongList(path: string): any[] /*java.util.List*/;
                 /**
                  * Gets the requested List of Byte by path.
                  * <p>
@@ -370,7 +371,7 @@ declare namespace org {
                  * This method will attempt to cast any values into a Byte if possible,
                  * but may miss any values out if they are not compatible.
                  */
-                public getByteList(path: string): any[] /*java.util.List*/;
+                 getByteList(path: string): any[] /*java.util.List*/;
                 /**
                  * Gets the requested List of Character by path.
                  * <p>
@@ -381,7 +382,7 @@ declare namespace org {
                  * This method will attempt to cast any values into a Character if
                  * possible, but may miss any values out if they are not compatible.
                  */
-                public getCharacterList(path: string): any[] /*java.util.List*/;
+                 getCharacterList(path: string): any[] /*java.util.List*/;
                 /**
                  * Gets the requested List of Short by path.
                  * <p>
@@ -392,7 +393,7 @@ declare namespace org {
                  * This method will attempt to cast any values into a Short if possible,
                  * but may miss any values out if they are not compatible.
                  */
-                public getShortList(path: string): any[] /*java.util.List*/;
+                 getShortList(path: string): any[] /*java.util.List*/;
                 /**
                  * Gets the requested List of Maps by path.
                  * <p>
@@ -403,7 +404,7 @@ declare namespace org {
                  * This method will attempt to cast any values into a Map if possible, but
                  * may miss any values out if they are not compatible.
                  */
-                public getMapList(path: string): any[] /*java.util.List*/;
+                 getMapList(path: string): any[] /*java.util.List*/;
                 /**
                  * Gets the requested object at the given path.
                  * If the Object does not exist but a default value has been specified, this
@@ -415,7 +416,7 @@ declare namespace org {
                  * Objects to Strings. However, #getObject(path, Boolean.class) is
                  * equivalent to {@link #getBoolean(String) #getBoolean(path)} for example.
                  */
-                public getObject(path: string, clazz: any): any;
+                 getObject(path: string, clazz: any): any;
                 /**
                  * Gets the requested object at the given path, returning a default value if
                  * not found
@@ -430,7 +431,7 @@ declare namespace org {
                  * Boolean.class, def) is equivalent to {@link #getBoolean(String, boolean) #getBoolean(path,
                  * def)} for example.
                  */
-                public getObject(path: string, clazz: any, def: any): any;
+                 getObject(path: string, clazz: any, def: any): any;
                 /**
                  * Gets the requested {@link ConfigurationSerializable} object at the given
                  * path.
@@ -438,7 +439,7 @@ declare namespace org {
                  * will return the default value. If the Object does not exist and no
                  * default value was specified, this will return null.
                  */
-                public getSerializable(path: string, clazz: any): org.bukkit.configuration.serialization.ConfigurationSerializable;
+                 getSerializable(path: string, clazz: any): org.bukkit.configuration.serialization.ConfigurationSerializable;
                 /**
                  * Gets the requested {@link ConfigurationSerializable} object at the given
                  * path, returning a default value if not found
@@ -446,7 +447,7 @@ declare namespace org {
                  * returned regardless of if a default has been identified in the root
                  * {@link Configuration}.
                  */
-                public getSerializable(path: string, clazz: any, def: org.bukkit.configuration.serialization.ConfigurationSerializable): org.bukkit.configuration.serialization.ConfigurationSerializable;
+                 getSerializable(path: string, clazz: any, def: org.bukkit.configuration.serialization.ConfigurationSerializable): org.bukkit.configuration.serialization.ConfigurationSerializable;
                 /**
                  * Gets the requested Vector by path.
                  * <p>
@@ -454,7 +455,7 @@ declare namespace org {
                  * this will return the default value. If the Vector does not exist and no
                  * default value was specified, this will return null.
                  */
-                public getVector(path: string): org.bukkit.util.Vector;
+                 getVector(path: string): org.bukkit.util.Vector;
                 /**
                  * Gets the requested {@link Vector} by path, returning a default value if
                  * not found.
@@ -463,7 +464,7 @@ declare namespace org {
                  * returned regardless of if a default has been identified in the root
                  * {@link Configuration}.
                  */
-                public getVector(path: string, def: org.bukkit.util.Vector): org.bukkit.util.Vector;
+                 getVector(path: string, def: org.bukkit.util.Vector): org.bukkit.util.Vector;
                 /**
                  * Checks if the specified path is a Vector.
                  * <p>
@@ -472,7 +473,7 @@ declare namespace org {
                  * but a default value has been specified, this will check if that default
                  * value is a Vector and return appropriately.
                  */
-                public isVector(path: string): boolean;
+                 isVector(path: string): boolean;
                 /**
                  * Gets the requested OfflinePlayer by path.
                  * <p>
@@ -481,7 +482,7 @@ declare namespace org {
                  * does not exist and no default value was specified, this will return
                  * null.
                  */
-                public getOfflinePlayer(path: string): org.bukkit.OfflinePlayer;
+                 getOfflinePlayer(path: string): org.bukkit.OfflinePlayer;
                 /**
                  * Gets the requested {@link OfflinePlayer} by path, returning a default
                  * value if not found.
@@ -490,7 +491,7 @@ declare namespace org {
                  * will returned regardless of if a default has been identified in the
                  * root {@link Configuration}.
                  */
-                public getOfflinePlayer(path: string, def: org.bukkit.OfflinePlayer): org.bukkit.OfflinePlayer;
+                 getOfflinePlayer(path: string, def: org.bukkit.OfflinePlayer): org.bukkit.OfflinePlayer;
                 /**
                  * Checks if the specified path is an OfflinePlayer.
                  * <p>
@@ -499,7 +500,7 @@ declare namespace org {
                  * not exist but a default value has been specified, this will check if
                  * that default value is a OfflinePlayer and return appropriately.
                  */
-                public isOfflinePlayer(path: string): boolean;
+                 isOfflinePlayer(path: string): boolean;
                 /**
                  * Gets the requested ItemStack by path.
                  * <p>
@@ -507,7 +508,7 @@ declare namespace org {
                  * this will return the default value. If the ItemStack does not exist and
                  * no default value was specified, this will return null.
                  */
-                public getItemStack(path: string): org.bukkit.inventory.ItemStack;
+                 getItemStack(path: string): org.bukkit.inventory.ItemStack;
                 /**
                  * Gets the requested {@link ItemStack} by path, returning a default value
                  * if not found.
@@ -516,7 +517,7 @@ declare namespace org {
                  * returned regardless of if a default has been identified in the root
                  * {@link Configuration}.
                  */
-                public getItemStack(path: string, def: org.bukkit.inventory.ItemStack): org.bukkit.inventory.ItemStack;
+                 getItemStack(path: string, def: org.bukkit.inventory.ItemStack): org.bukkit.inventory.ItemStack;
                 /**
                  * Checks if the specified path is an ItemStack.
                  * <p>
@@ -525,7 +526,7 @@ declare namespace org {
                  * exist but a default value has been specified, this will check if that
                  * default value is a ItemStack and return appropriately.
                  */
-                public isItemStack(path: string): boolean;
+                 isItemStack(path: string): boolean;
                 /**
                  * Gets the requested Color by path.
                  * <p>
@@ -533,7 +534,7 @@ declare namespace org {
                  * this will return the default value. If the Color does not exist and no
                  * default value was specified, this will return null.
                  */
-                public getColor(path: string): org.bukkit.Color;
+                 getColor(path: string): org.bukkit.Color;
                 /**
                  * Gets the requested {@link Color} by path, returning a default value if
                  * not found.
@@ -542,7 +543,7 @@ declare namespace org {
                  * returned regardless of if a default has been identified in the root
                  * {@link Configuration}.
                  */
-                public getColor(path: string, def: org.bukkit.Color): org.bukkit.Color;
+                 getColor(path: string, def: org.bukkit.Color): org.bukkit.Color;
                 /**
                  * Checks if the specified path is a Color.
                  * <p>
@@ -551,7 +552,7 @@ declare namespace org {
                  * but a default value has been specified, this will check if that default
                  * value is a Color and return appropriately.
                  */
-                public isColor(path: string): boolean;
+                 isColor(path: string): boolean;
                 /**
                  * Gets the requested ConfigurationSection by path.
                  * <p>
@@ -560,7 +561,7 @@ declare namespace org {
                  * ConfigurationSection does not exist and no default value was specified,
                  * this will return null.
                  */
-                public getConfigurationSection(path: string): org.bukkit.configuration.ConfigurationSection;
+                 getConfigurationSection(path: string): org.bukkit.configuration.ConfigurationSection;
                 /**
                  * Checks if the specified path is a ConfigurationSection.
                  * <p>
@@ -570,7 +571,7 @@ declare namespace org {
                  * if that default value is a ConfigurationSection and return
                  * appropriately.
                  */
-                public isConfigurationSection(path: string): boolean;
+                 isConfigurationSection(path: string): boolean;
                 /**
                  * Gets the equivalent {@link ConfigurationSection} from the default
                  * {@link Configuration} defined in {@link #getRoot()}.
@@ -579,7 +580,7 @@ declare namespace org {
                  * value for this path, or the value at this path is not a {@link
                  * ConfigurationSection} then this will return null.
                  */
-                public getDefaultSection(): org.bukkit.configuration.ConfigurationSection;
+                 getDefaultSection(): org.bukkit.configuration.ConfigurationSection;
                 /**
                  * Sets the default value in the root at the given path as provided.
                  * <p>
@@ -594,7 +595,7 @@ declare namespace org {
                  * this will create a new section at the path, replacing anything that may
                  * have existed there previously.
                  */
-                public addDefault(path: string, value: any): void;
+                 addDefault(path: string, value: any): void;
             }
         }
     }

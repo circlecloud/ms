@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace plugin {
             namespace messaging {
-                class ChannelNotRegisteredException {
+                // @ts-ignore
+                 class ChannelNotRegisteredException {
                     constructor()
                     constructor(channel: string)
                 }
