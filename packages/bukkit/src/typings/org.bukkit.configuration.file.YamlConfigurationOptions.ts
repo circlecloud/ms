@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace configuration {
             namespace file {
-                class YamlConfigurationOptions {
+                // @ts-ignore
+                 class YamlConfigurationOptions {
                     constructor(configuration: org.bukkit.configuration.file.YamlConfiguration)
                     public configuration(): org.bukkit.configuration.file.YamlConfiguration;
                     public copyDefaults(value: boolean): org.bukkit.configuration.file.YamlConfigurationOptions;

@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Stairs {
+                    // @ts-ignore
+                    interface Stairs extends org.bukkit.block.data.Bisected, org.bukkit.block.data.Directional, org.bukkit.block.data.Waterlogged {
                         /**
                          * Gets the value of the 'shape' property.
                          */
-                        public getShape(): org.bukkit.block.data.type.Stairs.Shape;
+                         getShape(): org.bukkit.block.data.type.Stairs.Shape;
                         /**
                          * Sets the value of the 'shape' property.
                          */
-                        public setShape(shape: org.bukkit.block.data.type.Stairs.Shape): void;
+                         setShape(shape: org.bukkit.block.data.type.Stairs.Shape): void;
                     }
                 }
             }

@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerLoginEvent {
+                // @ts-ignore
+                 class PlayerLoginEvent {
                     /**
                      * This constructor defaults message to an empty string, and result to
                      * ALLOWED

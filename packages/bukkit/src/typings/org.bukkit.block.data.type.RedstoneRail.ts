@@ -3,7 +3,8 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class RedstoneRail {
+                    // @ts-ignore
+                    interface RedstoneRail extends org.bukkit.block.data.Powerable, org.bukkit.block.data.Rail {
                     }
                 }
             }

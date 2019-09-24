@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace block {
                 namespace CauldronLevelChangeEvent {
-                    class ChangeReason {
+                    // @ts-ignore
+                     class ChangeReason {
                         public static BUCKET_FILL: org.bukkit.event.block.CauldronLevelChangeEvent.ChangeReason;
                         public static BUCKET_EMPTY: org.bukkit.event.block.CauldronLevelChangeEvent.ChangeReason;
                         public static BOTTLE_FILL: org.bukkit.event.block.CauldronLevelChangeEvent.ChangeReason;

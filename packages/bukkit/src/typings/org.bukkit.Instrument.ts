@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class Instrument {
+        // @ts-ignore
+         class Instrument {
             public static PIANO: org.bukkit.Instrument;
             public static BASS_DRUM: org.bukkit.Instrument;
             public static SNARE_DRUM: org.bukkit.Instrument;

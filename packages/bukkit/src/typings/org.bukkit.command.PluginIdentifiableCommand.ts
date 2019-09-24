@@ -1,11 +1,12 @@
 declare namespace org {
     namespace bukkit {
         namespace command {
-            class PluginIdentifiableCommand {
+            // @ts-ignore
+            interface PluginIdentifiableCommand {
                 /**
                  * Gets the owner of this PluginIdentifiableCommand.
                  */
-                public getPlugin(): org.bukkit.plugin.Plugin;
+                 getPlugin(): org.bukkit.plugin.Plugin;
             }
         }
     }

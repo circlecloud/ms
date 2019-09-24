@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace player {
                 namespace AsyncPlayerPreLoginEvent {
-                    class Result {
+                    // @ts-ignore
+                     class Result {
                         public static ALLOWED: org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
                         public static KICK_FULL: org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
                         public static KICK_BANNED: org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;

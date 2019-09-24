@@ -1,15 +1,16 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class ExperienceOrb {
+            // @ts-ignore
+            interface ExperienceOrb extends org.bukkit.entity.Entity {
                 /**
                  * Gets how much experience is contained within this orb
                  */
-                public getExperience(): number;
+                 getExperience(): number;
                 /**
                  * Sets how much experience is contained within this orb
                  */
-                public setExperience(value: number): void;
+                 setExperience(value: number): void;
             }
         }
     }

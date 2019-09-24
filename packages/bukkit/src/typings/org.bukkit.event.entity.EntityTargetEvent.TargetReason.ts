@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace entity {
                 namespace EntityTargetEvent {
-                    class TargetReason {
+                    // @ts-ignore
+                     class TargetReason {
                         public static TARGET_DIED: org.bukkit.event.entity.EntityTargetEvent.TargetReason;
                         public static CLOSEST_PLAYER: org.bukkit.event.entity.EntityTargetEvent.TargetReason;
                         public static TARGET_ATTACKED_ENTITY: org.bukkit.event.entity.EntityTargetEvent.TargetReason;

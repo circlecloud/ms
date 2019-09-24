@@ -2,6 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace world {
+                // @ts-ignore
                 abstract class WorldEvent {
                     constructor(world: org.bukkit.World)
                     /**

@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
         namespace scheduler {
+            // @ts-ignore
             abstract class BukkitRunnable {
                 constructor()
                 /**

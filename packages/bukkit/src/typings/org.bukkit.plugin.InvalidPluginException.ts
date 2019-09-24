@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace plugin {
-            class InvalidPluginException {
+            // @ts-ignore
+             class InvalidPluginException {
                 /**
                  * Constructs a new InvalidPluginException based on the given Exception
                  */

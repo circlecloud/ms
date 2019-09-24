@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace map {
-            class MapCursor {
+            // @ts-ignore
+             class MapCursor {
                 /**
                  * Initialize the map cursor.
                  */

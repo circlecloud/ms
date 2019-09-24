@@ -1,8 +1,9 @@
 declare namespace org {
     namespace bukkit {
         namespace inventory {
-            class LecternInventory {
-                public getHolder(): org.bukkit.block.Lectern;
+            // @ts-ignore
+            interface LecternInventory extends org.bukkit.inventory.Inventory {
+                 getHolder(): org.bukkit.block.Lectern;
             }
         }
     }

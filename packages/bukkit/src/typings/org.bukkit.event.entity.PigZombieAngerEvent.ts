@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class PigZombieAngerEvent {
+                // @ts-ignore
+                 class PigZombieAngerEvent implements org.bukkit.event.Cancellable {
                     constructor(pigZombie: org.bukkit.entity.PigZombie, target: org.bukkit.entity.Entity, newAnger: number)
                     /**
                      * Gets the entity (if any) which triggered this anger update.

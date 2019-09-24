@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace event {
-            class Listener {
+            // @ts-ignore
+            interface Listener {
             }
         }
     }

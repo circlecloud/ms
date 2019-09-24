@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerSwapHandItemsEvent {
+                // @ts-ignore
+                 class PlayerSwapHandItemsEvent implements org.bukkit.event.Cancellable {
                     constructor(player: org.bukkit.entity.Player, mainHandItem: org.bukkit.inventory.ItemStack, offHandItem: org.bukkit.inventory.ItemStack)
                     /**
                      * Gets the item switched to the main hand.

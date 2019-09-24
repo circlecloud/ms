@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class RedstoneWire {
+            // @ts-ignore
+             class RedstoneWire implements org.bukkit.material.Redstone {
                 constructor()
                 constructor(type: org.bukkit.Material)
                 constructor(type: org.bukkit.Material, data: number)

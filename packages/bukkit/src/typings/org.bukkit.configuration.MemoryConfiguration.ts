@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace configuration {
-            class MemoryConfiguration {
+            // @ts-ignore
+             class MemoryConfiguration implements org.bukkit.configuration.Configuration {
                 /**
                  * Creates an empty {@link MemoryConfiguration} with no default values.
                  */
@@ -18,7 +19,6 @@ declare namespace org {
                 public setDefaults(defaults: org.bukkit.configuration.Configuration): void;
                 public getDefaults(): org.bukkit.configuration.Configuration;
                 public getParent(): org.bukkit.configuration.ConfigurationSection;
-                public options(): org.bukkit.configuration.MemoryConfigurationOptions;
             }
         }
     }

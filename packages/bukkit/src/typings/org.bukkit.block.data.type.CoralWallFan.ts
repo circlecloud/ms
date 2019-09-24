@@ -3,7 +3,8 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class CoralWallFan {
+                    // @ts-ignore
+                    interface CoralWallFan extends org.bukkit.block.data.Directional, org.bukkit.block.data.Waterlogged {
                     }
                 }
             }

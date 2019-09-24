@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class EntityBreedEvent {
+                // @ts-ignore
+                 class EntityBreedEvent implements org.bukkit.event.Cancellable {
                     constructor(child: org.bukkit.entity.LivingEntity, mother: org.bukkit.entity.LivingEntity, father: org.bukkit.entity.LivingEntity, breeder: org.bukkit.entity.LivingEntity, bredWith: org.bukkit.inventory.ItemStack, experience: number)
                     public getEntity(): org.bukkit.entity.LivingEntity;
                     /**

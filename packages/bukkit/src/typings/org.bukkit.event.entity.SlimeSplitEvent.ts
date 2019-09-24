@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class SlimeSplitEvent {
+                // @ts-ignore
+                 class SlimeSplitEvent implements org.bukkit.event.Cancellable {
                     constructor(slime: org.bukkit.entity.Slime, count: number)
                     public isCancelled(): boolean;
                     public setCancelled(cancel: boolean): void;

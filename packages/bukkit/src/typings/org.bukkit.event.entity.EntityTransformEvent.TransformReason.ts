@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace entity {
                 namespace EntityTransformEvent {
-                    class TransformReason {
+                    // @ts-ignore
+                     class TransformReason {
                         public static CURED: org.bukkit.event.entity.EntityTransformEvent.TransformReason;
                         public static INFECTION: org.bukkit.event.entity.EntityTransformEvent.TransformReason;
                         public static DROWNED: org.bukkit.event.entity.EntityTransformEvent.TransformReason;

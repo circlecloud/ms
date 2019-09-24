@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class EntityUnleashEvent {
+                // @ts-ignore
+                 class EntityUnleashEvent {
                     constructor(entity: org.bukkit.entity.Entity, reason: org.bukkit.event.entity.EntityUnleashEvent.UnleashReason)
                     /**
                      * Returns the reason for the unleashing.

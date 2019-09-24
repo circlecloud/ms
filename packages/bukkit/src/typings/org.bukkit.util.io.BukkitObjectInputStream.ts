@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace util {
             namespace io {
-                class BukkitObjectInputStream {
+                // @ts-ignore
+                 class BukkitObjectInputStream {
                     /**
                      * Constructor provided to mirror super functionality.
                      */

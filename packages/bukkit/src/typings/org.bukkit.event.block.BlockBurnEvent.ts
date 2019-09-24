@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace block {
-                class BlockBurnEvent {
+                // @ts-ignore
+                 class BlockBurnEvent implements org.bukkit.event.Cancellable {
                     constructor(block: org.bukkit.block.Block)
                     constructor(block: org.bukkit.block.Block, ignitingBlock: org.bukkit.block.Block)
                     /**

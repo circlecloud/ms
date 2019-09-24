@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerQuitEvent {
+                // @ts-ignore
+                 class PlayerQuitEvent {
                     constructor(who: org.bukkit.entity.Player, quitMessage: string)
                     /**
                      * Gets the quit message to send to all online players

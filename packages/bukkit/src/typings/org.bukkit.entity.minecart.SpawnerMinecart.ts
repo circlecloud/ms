@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace entity {
             namespace minecart {
-                class SpawnerMinecart {
+                // @ts-ignore
+                interface SpawnerMinecart extends org.bukkit.entity.Minecart {
                 }
             }
         }

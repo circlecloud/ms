@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class CoalType {
+        // @ts-ignore
+         class CoalType {
             public static COAL: org.bukkit.CoalType;
             public static CHARCOAL: org.bukkit.CoalType;
             public static values(): org.bukkit.CoalType[];

@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class Art {
+        // @ts-ignore
+         class Art implements org.bukkit.Keyed {
             public static KEBAB: org.bukkit.Art;
             public static AZTEC: org.bukkit.Art;
             public static ALBAN: org.bukkit.Art;

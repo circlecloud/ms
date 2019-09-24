@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Gate {
+                    // @ts-ignore
+                    interface Gate extends org.bukkit.block.data.Directional, org.bukkit.block.data.Openable, org.bukkit.block.data.Powerable {
                         /**
                          * Gets the value of the 'in_wall' property.
                          */
-                        public isInWall(): boolean;
+                         isInWall(): boolean;
                         /**
                          * Sets the value of the 'in_wall' property.
                          */
-                        public setInWall(inWall: boolean): void;
+                         setInWall(inWall: boolean): void;
                     }
                 }
             }

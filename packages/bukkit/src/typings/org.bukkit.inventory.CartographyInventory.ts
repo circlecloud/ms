@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace inventory {
-            class CartographyInventory {
+            // @ts-ignore
+            interface CartographyInventory extends org.bukkit.inventory.Inventory {
             }
         }
     }

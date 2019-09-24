@@ -4,7 +4,8 @@ declare namespace org {
             namespace meta {
                 namespace tags {
                     namespace ItemTagType {
-                        class PrimitiveTagType {
+                        // @ts-ignore
+                         class PrimitiveTagType implements org.bukkit.inventory.meta.tags.ItemTagType {
                             public getPrimitiveType(): any;
                             public getComplexType(): any;
                             public toPrimitive(complex: any, context: org.bukkit.inventory.meta.tags.ItemTagAdapterContext): any;

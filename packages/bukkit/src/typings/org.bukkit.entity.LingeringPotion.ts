@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class LingeringPotion {
+            // @ts-ignore
+            interface LingeringPotion extends org.bukkit.entity.ThrownPotion {
             }
         }
     }

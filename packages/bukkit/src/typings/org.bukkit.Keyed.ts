@@ -1,10 +1,11 @@
 declare namespace org {
     namespace bukkit {
-        class Keyed {
+        // @ts-ignore
+        interface Keyed {
             /**
              * Return the namespaced identifier for this object.
              */
-            public getKey(): org.bukkit.NamespacedKey;
+             getKey(): org.bukkit.NamespacedKey;
         }
     }
 }

@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace util {
-            class BlockIterator {
+            // @ts-ignore
+             class BlockIterator {
                 /**
                  * Constructs the BlockIterator.
                  * <p>

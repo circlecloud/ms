@@ -1,11 +1,12 @@
 declare namespace org {
     namespace bukkit {
         namespace inventory {
-            class BlockInventoryHolder {
+            // @ts-ignore
+            interface BlockInventoryHolder extends org.bukkit.inventory.InventoryHolder {
                 /**
                  * Gets the block associated with this holder.
                  */
-                public getBlock(): org.bukkit.block.Block;
+                 getBlock(): org.bukkit.block.Block;
             }
         }
     }

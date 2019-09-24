@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class NPC {
+            // @ts-ignore
+            interface NPC extends org.bukkit.entity.Creature {
             }
         }
     }

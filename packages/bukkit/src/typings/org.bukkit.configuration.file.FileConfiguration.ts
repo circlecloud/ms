@@ -2,6 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace configuration {
             namespace file {
+                // @ts-ignore
                 abstract class FileConfiguration {
                     /**
                      * Creates an empty {@link FileConfiguration} with no default values.

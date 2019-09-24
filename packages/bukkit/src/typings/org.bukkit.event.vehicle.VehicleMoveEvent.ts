@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace vehicle {
-                class VehicleMoveEvent {
+                // @ts-ignore
+                 class VehicleMoveEvent {
                     constructor(vehicle: org.bukkit.entity.Vehicle, from: org.bukkit.Location, to: org.bukkit.Location)
                     /**
                      * Get the previous position.

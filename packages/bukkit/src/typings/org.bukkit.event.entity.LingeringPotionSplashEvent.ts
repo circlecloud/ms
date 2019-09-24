@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class LingeringPotionSplashEvent {
+                // @ts-ignore
+                 class LingeringPotionSplashEvent implements org.bukkit.event.Cancellable {
                     constructor(potion: org.bukkit.entity.ThrownPotion, entity: org.bukkit.entity.AreaEffectCloud)
                     public getEntity(): org.bukkit.entity.ThrownPotion;
                     /**

@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace hanging {
                 namespace HangingBreakEvent {
-                    class RemoveCause {
+                    // @ts-ignore
+                     class RemoveCause {
                         public static ENTITY: org.bukkit.event.hanging.HangingBreakEvent.RemoveCause;
                         public static EXPLOSION: org.bukkit.event.hanging.HangingBreakEvent.RemoveCause;
                         public static OBSTRUCTION: org.bukkit.event.hanging.HangingBreakEvent.RemoveCause;

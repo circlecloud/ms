@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class AreaEffectCloudApplyEvent {
+                // @ts-ignore
+                 class AreaEffectCloudApplyEvent implements org.bukkit.event.Cancellable {
                     constructor(entity: org.bukkit.entity.AreaEffectCloud, affectedEntities: any[] /*java.util.List*/)
                     public isCancelled(): boolean;
                     public setCancelled(cancel: boolean): void;

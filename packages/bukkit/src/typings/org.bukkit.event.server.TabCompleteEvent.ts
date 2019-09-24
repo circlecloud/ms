@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace server {
-                class TabCompleteEvent {
+                // @ts-ignore
+                 class TabCompleteEvent implements org.bukkit.event.Cancellable {
                     constructor(sender: org.bukkit.command.CommandSender, buffer: string, completions: any[] /*java.util.List*/)
                     /**
                      * Get the sender completing this command.

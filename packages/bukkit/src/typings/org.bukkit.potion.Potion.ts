@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace potion {
-            class Potion {
+            // @ts-ignore
+             class Potion {
                 /**
                  * Construct a new potion of the given type. Unless the type is {@link
                  * PotionType#WATER}, it will be level one, without extended duration.

@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class SoundCategory {
+        // @ts-ignore
+         class SoundCategory {
             public static MASTER: org.bukkit.SoundCategory;
             public static MUSIC: org.bukkit.SoundCategory;
             public static RECORDS: org.bukkit.SoundCategory;

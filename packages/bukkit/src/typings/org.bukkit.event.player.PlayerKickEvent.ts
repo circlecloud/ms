@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerKickEvent {
+                // @ts-ignore
+                 class PlayerKickEvent implements org.bukkit.event.Cancellable {
                     constructor(playerKicked: org.bukkit.entity.Player, kickReason: string, leaveMessage: string)
                     /**
                      * Gets the reason why the player is getting kicked

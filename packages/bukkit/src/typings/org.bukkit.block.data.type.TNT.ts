@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class TNT {
+                    // @ts-ignore
+                    interface TNT extends org.bukkit.block.data.BlockData {
                         /**
                          * Gets the value of the 'unstable' property.
                          */
-                        public isUnstable(): boolean;
+                         isUnstable(): boolean;
                         /**
                          * Sets the value of the 'unstable' property.
                          */
-                        public setUnstable(unstable: boolean): void;
+                         setUnstable(unstable: boolean): void;
                     }
                 }
             }

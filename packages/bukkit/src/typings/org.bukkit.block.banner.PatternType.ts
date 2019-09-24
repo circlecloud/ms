@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace block {
             namespace banner {
-                class PatternType {
+                // @ts-ignore
+                 class PatternType {
                     public static BASE: org.bukkit.block.banner.PatternType;
                     public static SQUARE_BOTTOM_LEFT: org.bukkit.block.banner.PatternType;
                     public static SQUARE_BOTTOM_RIGHT: org.bukkit.block.banner.PatternType;

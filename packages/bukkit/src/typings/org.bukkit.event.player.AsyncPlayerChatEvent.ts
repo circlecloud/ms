@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class AsyncPlayerChatEvent {
+                // @ts-ignore
+                 class AsyncPlayerChatEvent implements org.bukkit.event.Cancellable {
                     constructor(async: boolean, who: org.bukkit.entity.Player, message: string, players: any[] /*java.util.Set*/)
                     /**
                      * Gets the message that the player is attempting to send. This message

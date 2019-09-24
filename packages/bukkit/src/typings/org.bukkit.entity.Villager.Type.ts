@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace entity {
             namespace Villager {
-                class Type {
+                // @ts-ignore
+                 class Type implements org.bukkit.Keyed {
                     public static DESERT: org.bukkit.entity.Villager.Type;
                     public static JUNGLE: org.bukkit.entity.Villager.Type;
                     public static PLAINS: org.bukkit.entity.Villager.Type;

@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace Statistic {
-            class Type {
+            // @ts-ignore
+             class Type {
                 public static UNTYPED: org.bukkit.Statistic.Type;
                 public static ITEM: org.bukkit.Statistic.Type;
                 public static BLOCK: org.bukkit.Statistic.Type;

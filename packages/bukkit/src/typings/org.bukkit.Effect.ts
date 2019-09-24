@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class Effect {
+        // @ts-ignore
+         class Effect {
             public static CLICK2: org.bukkit.Effect;
             public static CLICK1: org.bukkit.Effect;
             public static BOW_FIRE: org.bukkit.Effect;

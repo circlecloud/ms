@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class WoodenStep {
+            // @ts-ignore
+             class WoodenStep {
                 /**
                  * Constructs a wooden step.
                  */

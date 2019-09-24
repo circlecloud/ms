@@ -3,11 +3,12 @@ declare namespace org {
         namespace inventory {
             namespace meta {
                 namespace tags {
-                    class ItemTagAdapterContext {
+                    // @ts-ignore
+                    interface ItemTagAdapterContext {
                         /**
                          * Creates a new and empty tag container instance.
                          */
-                        public newTagContainer(): org.bukkit.inventory.meta.tags.CustomItemTagContainer;
+                         newTagContainer(): org.bukkit.inventory.meta.tags.CustomItemTagContainer;
                     }
                 }
             }

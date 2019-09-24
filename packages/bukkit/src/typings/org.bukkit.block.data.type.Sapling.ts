@@ -3,19 +3,20 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Sapling {
+                    // @ts-ignore
+                    interface Sapling extends org.bukkit.block.data.BlockData {
                         /**
                          * Gets the value of the 'stage' property.
                          */
-                        public getStage(): number;
+                         getStage(): number;
                         /**
                          * Sets the value of the 'stage' property.
                          */
-                        public setStage(stage: number): void;
+                         setStage(stage: number): void;
                         /**
                          * Gets the maximum allowed value of the 'stage' property.
                          */
-                        public getMaximumStage(): number;
+                         getMaximumStage(): number;
                     }
                 }
             }

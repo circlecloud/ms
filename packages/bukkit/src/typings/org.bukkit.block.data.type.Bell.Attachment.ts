@@ -4,7 +4,8 @@ declare namespace org {
             namespace data {
                 namespace type {
                     namespace Bell {
-                        class Attachment {
+                        // @ts-ignore
+                         class Attachment {
                             public static FLOOR: org.bukkit.block.data.type.Bell.Attachment;
                             public static CEILING: org.bukkit.block.data.type.Bell.Attachment;
                             public static SINGLE_WALL: org.bukkit.block.data.type.Bell.Attachment;

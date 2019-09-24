@@ -1,15 +1,16 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Spellcaster {
+            // @ts-ignore
+            interface Spellcaster extends org.bukkit.entity.Illager {
                 /**
                  * Gets the {@link Spell} the entity is currently using.
                  */
-                public getSpell(): org.bukkit.entity.Spellcaster.Spell;
+                 getSpell(): org.bukkit.entity.Spellcaster.Spell;
                 /**
                  * Sets the {@link Spell} the entity is currently using.
                  */
-                public setSpell(spell: org.bukkit.entity.Spellcaster.Spell): void;
+                 setSpell(spell: org.bukkit.entity.Spellcaster.Spell): void;
             }
         }
     }

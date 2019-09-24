@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
         namespace metadata {
+            // @ts-ignore
             abstract class MetadataStoreBase {
                 constructor()
                 /**

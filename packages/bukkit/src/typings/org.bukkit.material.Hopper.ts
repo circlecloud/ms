@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class Hopper {
+            // @ts-ignore
+             class Hopper implements org.bukkit.material.Directional, org.bukkit.material.Redstone {
                 /**
                  * Constructs a hopper facing the default direction (down) and initially
                  * active.

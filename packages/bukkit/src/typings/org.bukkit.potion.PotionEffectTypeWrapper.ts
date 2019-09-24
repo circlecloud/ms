@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace potion {
-            class PotionEffectTypeWrapper {
+            // @ts-ignore
+             class PotionEffectTypeWrapper {
                 constructor(id: number)
                 public getDurationModifier(): number;
                 public getName(): string;

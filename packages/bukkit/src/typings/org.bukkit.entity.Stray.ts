@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Stray {
+            // @ts-ignore
+            interface Stray extends org.bukkit.entity.Skeleton {
             }
         }
     }

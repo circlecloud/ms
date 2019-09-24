@@ -3,19 +3,20 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Cake {
+                    // @ts-ignore
+                    interface Cake extends org.bukkit.block.data.BlockData {
                         /**
                          * Gets the value of the 'bites' property.
                          */
-                        public getBites(): number;
+                         getBites(): number;
                         /**
                          * Sets the value of the 'bites' property.
                          */
-                        public setBites(bites: number): void;
+                         setBites(bites: number): void;
                         /**
                          * Gets the maximum allowed value of the 'bites' property.
                          */
-                        public getMaximumBites(): number;
+                         getMaximumBites(): number;
                     }
                 }
             }

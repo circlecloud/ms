@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class EntityTransformEvent {
+                // @ts-ignore
+                 class EntityTransformEvent implements org.bukkit.event.Cancellable {
                     constructor(original: org.bukkit.entity.Entity, convertedList: any[] /*java.util.List*/, transformReason: org.bukkit.event.entity.EntityTransformEvent.TransformReason)
                     /**
                      * Gets the entity that the original entity was transformed to.

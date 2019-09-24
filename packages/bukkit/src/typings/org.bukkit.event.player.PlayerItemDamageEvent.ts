@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerItemDamageEvent {
+                // @ts-ignore
+                 class PlayerItemDamageEvent implements org.bukkit.event.Cancellable {
                     constructor(player: org.bukkit.entity.Player, what: org.bukkit.inventory.ItemStack, damage: number)
                     /**
                      * Gets the item being damaged.

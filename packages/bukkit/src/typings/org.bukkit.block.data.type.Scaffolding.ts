@@ -3,27 +3,28 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Scaffolding {
+                    // @ts-ignore
+                    interface Scaffolding extends org.bukkit.block.data.Waterlogged {
                         /**
                          * Gets the value of the 'bottom' property.
                          */
-                        public isBottom(): boolean;
+                         isBottom(): boolean;
                         /**
                          * Sets the value of the 'bottom' property.
                          */
-                        public setBottom(bottom: boolean): void;
+                         setBottom(bottom: boolean): void;
                         /**
                          * Gets the value of the 'distance' property.
                          */
-                        public getDistance(): number;
+                         getDistance(): number;
                         /**
                          * Sets the value of the 'distance' property.
                          */
-                        public setDistance(distance: number): void;
+                         setDistance(distance: number): void;
                         /**
                          * Gets the maximum allowed value of the 'distance' property.
                          */
-                        public getMaximumDistance(): number;
+                         getMaximumDistance(): number;
                     }
                 }
             }

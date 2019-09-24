@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class CropState {
+        // @ts-ignore
+         class CropState {
             public static SEEDED: org.bukkit.CropState;
             public static GERMINATED: org.bukkit.CropState;
             public static VERY_SMALL: org.bukkit.CropState;

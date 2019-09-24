@@ -1,11 +1,12 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class ComplexEntityPart {
+            // @ts-ignore
+            interface ComplexEntityPart extends org.bukkit.entity.Entity {
                 /**
                  * Gets the parent {@link ComplexLivingEntity} of this part.
                  */
-                public getParent(): org.bukkit.entity.ComplexLivingEntity;
+                 getParent(): org.bukkit.entity.ComplexLivingEntity;
             }
         }
     }

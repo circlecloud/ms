@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class Mushroom {
+            // @ts-ignore
+             class Mushroom {
                 /**
                  * Constructs a brown/red mushroom block with all sides set to pores.
                  */

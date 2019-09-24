@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerJoinEvent {
+                // @ts-ignore
+                 class PlayerJoinEvent {
                     constructor(playerJoined: org.bukkit.entity.Player, joinMessage: string)
                     /**
                      * Gets the join message to send to all online players

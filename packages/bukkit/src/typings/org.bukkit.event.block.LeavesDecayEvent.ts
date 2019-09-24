@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace block {
-                class LeavesDecayEvent {
+                // @ts-ignore
+                 class LeavesDecayEvent implements org.bukkit.event.Cancellable {
                     constructor(block: org.bukkit.block.Block)
                     public isCancelled(): boolean;
                     public setCancelled(cancel: boolean): void;

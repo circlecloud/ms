@@ -3,11 +3,12 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Lectern {
+                    // @ts-ignore
+                    interface Lectern extends org.bukkit.block.data.Directional, org.bukkit.block.data.Powerable {
                         /**
                          * Gets the value of the 'has_book' property.
                          */
-                        public hasBook(): boolean;
+                         hasBook(): boolean;
                     }
                 }
             }

@@ -1,11 +1,12 @@
 declare namespace org {
     namespace bukkit {
         namespace persistence {
-            class PersistentDataAdapterContext {
+            // @ts-ignore
+            interface PersistentDataAdapterContext {
                 /**
                  * Creates a new and empty meta container instance.
                  */
-                public newPersistentDataContainer(): org.bukkit.persistence.PersistentDataContainer;
+                 newPersistentDataContainer(): org.bukkit.persistence.PersistentDataContainer;
             }
         }
     }

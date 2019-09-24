@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class ChatColor {
+        // @ts-ignore
+         class ChatColor {
             public static BLACK: org.bukkit.ChatColor;
             public static DARK_BLUE: org.bukkit.ChatColor;
             public static DARK_GREEN: org.bukkit.ChatColor;

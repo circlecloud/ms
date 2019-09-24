@@ -1,28 +1,29 @@
 declare namespace org {
     namespace bukkit {
         namespace scheduler {
-            class BukkitScheduler {
+            // @ts-ignore
+            interface BukkitScheduler {
                 /**
                  * Schedules a once off task to occur after a delay.
                  * <p>
                  * This task will be executed by the main server thread.
                  */
-                public scheduleSyncDelayedTask(plugin: org.bukkit.plugin.Plugin, task: any, delay: number): number;
-                public scheduleSyncDelayedTask(plugin: org.bukkit.plugin.Plugin, task: org.bukkit.scheduler.BukkitRunnable, delay: number): number;
+                 scheduleSyncDelayedTask(plugin: org.bukkit.plugin.Plugin, task: any, delay: number): number;
+                 scheduleSyncDelayedTask(plugin: org.bukkit.plugin.Plugin, task: org.bukkit.scheduler.BukkitRunnable, delay: number): number;
                 /**
                  * Schedules a once off task to occur as soon as possible.
                  * <p>
                  * This task will be executed by the main server thread.
                  */
-                public scheduleSyncDelayedTask(plugin: org.bukkit.plugin.Plugin, task: any): number;
-                public scheduleSyncDelayedTask(plugin: org.bukkit.plugin.Plugin, task: org.bukkit.scheduler.BukkitRunnable): number;
+                 scheduleSyncDelayedTask(plugin: org.bukkit.plugin.Plugin, task: any): number;
+                 scheduleSyncDelayedTask(plugin: org.bukkit.plugin.Plugin, task: org.bukkit.scheduler.BukkitRunnable): number;
                 /**
                  * Schedules a repeating task.
                  * <p>
                  * This task will be executed by the main server thread.
                  */
-                public scheduleSyncRepeatingTask(plugin: org.bukkit.plugin.Plugin, task: any, delay: number, period: number): number;
-                public scheduleSyncRepeatingTask(plugin: org.bukkit.plugin.Plugin, task: org.bukkit.scheduler.BukkitRunnable, delay: number, period: number): number;
+                 scheduleSyncRepeatingTask(plugin: org.bukkit.plugin.Plugin, task: any, delay: number, period: number): number;
+                 scheduleSyncRepeatingTask(plugin: org.bukkit.plugin.Plugin, task: org.bukkit.scheduler.BukkitRunnable, delay: number, period: number): number;
                 /**
                  * <b>Asynchronous tasks should never access any API in Bukkit. Great care
                  * should be taken to assure the thread-safety of asynchronous tasks.</b>
@@ -30,7 +31,7 @@ declare namespace org {
                  * Schedules a once off task to occur after a delay. This task will be
                  * executed by a thread managed by the scheduler.
                  */
-                public scheduleAsyncDelayedTask(plugin: org.bukkit.plugin.Plugin, task: any, delay: number): number;
+                 scheduleAsyncDelayedTask(plugin: org.bukkit.plugin.Plugin, task: any, delay: number): number;
                 /**
                  * <b>Asynchronous tasks should never access any API in Bukkit. Great care
                  * should be taken to assure the thread-safety of asynchronous tasks.</b>
@@ -38,7 +39,7 @@ declare namespace org {
                  * Schedules a once off task to occur as soon as possible. This task will
                  * be executed by a thread managed by the scheduler.
                  */
-                public scheduleAsyncDelayedTask(plugin: org.bukkit.plugin.Plugin, task: any): number;
+                 scheduleAsyncDelayedTask(plugin: org.bukkit.plugin.Plugin, task: any): number;
                 /**
                  * <b>Asynchronous tasks should never access any API in Bukkit. Great care
                  * should be taken to assure the thread-safety of asynchronous tasks.</b>
@@ -46,7 +47,7 @@ declare namespace org {
                  * Schedules a repeating task. This task will be executed by a thread
                  * managed by the scheduler.
                  */
-                public scheduleAsyncRepeatingTask(plugin: org.bukkit.plugin.Plugin, task: any, delay: number, period: number): number;
+                 scheduleAsyncRepeatingTask(plugin: org.bukkit.plugin.Plugin, task: any, delay: number, period: number): number;
                 /**
                  * Calls a method on the main thread and returns a Future object. This
                  * task will be executed by the main server thread.
@@ -57,16 +58,16 @@ declare namespace org {
                  * isDone() method returns true.
                  * </ul>
                  */
-                public callSyncMethod(plugin: org.bukkit.plugin.Plugin, task: any): any;
+                 callSyncMethod(plugin: org.bukkit.plugin.Plugin, task: any): any;
                 /**
                  * Removes task from scheduler.
                  */
-                public cancelTask(taskId: number): void;
+                 cancelTask(taskId: number): void;
                 /**
                  * Removes all tasks associated with a particular plugin from the
                  * scheduler.
                  */
-                public cancelTasks(plugin: org.bukkit.plugin.Plugin): void;
+                 cancelTasks(plugin: org.bukkit.plugin.Plugin): void;
                 /**
                  * Check if the task currently running.
                  * <p>
@@ -77,7 +78,7 @@ declare namespace org {
                  * Explicitly, a task is running if there exists a thread for it, and that
                  * thread is alive.
                  */
-                public isCurrentlyRunning(taskId: number): boolean;
+                 isCurrentlyRunning(taskId: number): boolean;
                 /**
                  * Check if the task queued to be run later.
                  * <p>
@@ -85,54 +86,54 @@ declare namespace org {
                  * but could be in the future. A task that is not queued, and not running,
                  * will not be queued again.
                  */
-                public isQueued(taskId: number): boolean;
+                 isQueued(taskId: number): boolean;
                 /**
                  * Returns a list of all active workers.
                  * <p>
                  * This list contains asynch tasks that are being executed by separate
                  * threads.
                  */
-                public getActiveWorkers(): any[] /*java.util.List*/;
+                 getActiveWorkers(): any[] /*java.util.List*/;
                 /**
                  * Returns a list of all pending tasks. The ordering of the tasks is not
                  * related to their order of execution.
                  */
-                public getPendingTasks(): any[] /*java.util.List*/;
+                 getPendingTasks(): any[] /*java.util.List*/;
                 /**
                  * Returns a task that will run on the next server tick.
                  */
-                public runTask(plugin: org.bukkit.plugin.Plugin, task: any): org.bukkit.scheduler.BukkitTask;
+                 runTask(plugin: org.bukkit.plugin.Plugin, task: any): org.bukkit.scheduler.BukkitTask;
                 /**
                  * Returns a task that will run on the next server tick.
                  */
-                public runTask(plugin: org.bukkit.plugin.Plugin, task: any): void;
-                public runTask(plugin: org.bukkit.plugin.Plugin, task: org.bukkit.scheduler.BukkitRunnable): org.bukkit.scheduler.BukkitTask;
+                 runTask(plugin: org.bukkit.plugin.Plugin, task: any): void;
+                 runTask(plugin: org.bukkit.plugin.Plugin, task: org.bukkit.scheduler.BukkitRunnable): org.bukkit.scheduler.BukkitTask;
                 /**
                  * <b>Asynchronous tasks should never access any API in Bukkit. Great care
                  * should be taken to assure the thread-safety of asynchronous tasks.</b>
                  * <p>
                  * Returns a task that will run asynchronously.
                  */
-                public runTaskAsynchronously(plugin: org.bukkit.plugin.Plugin, task: any): org.bukkit.scheduler.BukkitTask;
+                 runTaskAsynchronously(plugin: org.bukkit.plugin.Plugin, task: any): org.bukkit.scheduler.BukkitTask;
                 /**
                  * <b>Asynchronous tasks should never access any API in Bukkit. Great care
                  * should be taken to assure the thread-safety of asynchronous tasks.</b>
                  * <p>
                  * Returns a task that will run asynchronously.
                  */
-                public runTaskAsynchronously(plugin: org.bukkit.plugin.Plugin, task: any): void;
-                public runTaskAsynchronously(plugin: org.bukkit.plugin.Plugin, task: org.bukkit.scheduler.BukkitRunnable): org.bukkit.scheduler.BukkitTask;
+                 runTaskAsynchronously(plugin: org.bukkit.plugin.Plugin, task: any): void;
+                 runTaskAsynchronously(plugin: org.bukkit.plugin.Plugin, task: org.bukkit.scheduler.BukkitRunnable): org.bukkit.scheduler.BukkitTask;
                 /**
                  * Returns a task that will run after the specified number of server
                  * ticks.
                  */
-                public runTaskLater(plugin: org.bukkit.plugin.Plugin, task: any, delay: number): org.bukkit.scheduler.BukkitTask;
+                 runTaskLater(plugin: org.bukkit.plugin.Plugin, task: any, delay: number): org.bukkit.scheduler.BukkitTask;
                 /**
                  * Returns a task that will run after the specified number of server
                  * ticks.
                  */
-                public runTaskLater(plugin: org.bukkit.plugin.Plugin, task: any, delay: number): void;
-                public runTaskLater(plugin: org.bukkit.plugin.Plugin, task: org.bukkit.scheduler.BukkitRunnable, delay: number): org.bukkit.scheduler.BukkitTask;
+                 runTaskLater(plugin: org.bukkit.plugin.Plugin, task: any, delay: number): void;
+                 runTaskLater(plugin: org.bukkit.plugin.Plugin, task: org.bukkit.scheduler.BukkitRunnable, delay: number): org.bukkit.scheduler.BukkitTask;
                 /**
                  * <b>Asynchronous tasks should never access any API in Bukkit. Great care
                  * should be taken to assure the thread-safety of asynchronous tasks.</b>
@@ -140,7 +141,7 @@ declare namespace org {
                  * Returns a task that will run asynchronously after the specified number
                  * of server ticks.
                  */
-                public runTaskLaterAsynchronously(plugin: org.bukkit.plugin.Plugin, task: any, delay: number): org.bukkit.scheduler.BukkitTask;
+                 runTaskLaterAsynchronously(plugin: org.bukkit.plugin.Plugin, task: any, delay: number): org.bukkit.scheduler.BukkitTask;
                 /**
                  * <b>Asynchronous tasks should never access any API in Bukkit. Great care
                  * should be taken to assure the thread-safety of asynchronous tasks.</b>
@@ -148,19 +149,19 @@ declare namespace org {
                  * Returns a task that will run asynchronously after the specified number
                  * of server ticks.
                  */
-                public runTaskLaterAsynchronously(plugin: org.bukkit.plugin.Plugin, task: any, delay: number): void;
-                public runTaskLaterAsynchronously(plugin: org.bukkit.plugin.Plugin, task: org.bukkit.scheduler.BukkitRunnable, delay: number): org.bukkit.scheduler.BukkitTask;
+                 runTaskLaterAsynchronously(plugin: org.bukkit.plugin.Plugin, task: any, delay: number): void;
+                 runTaskLaterAsynchronously(plugin: org.bukkit.plugin.Plugin, task: org.bukkit.scheduler.BukkitRunnable, delay: number): org.bukkit.scheduler.BukkitTask;
                 /**
                  * Returns a task that will repeatedly run until cancelled, starting after
                  * the specified number of server ticks.
                  */
-                public runTaskTimer(plugin: org.bukkit.plugin.Plugin, task: any, delay: number, period: number): org.bukkit.scheduler.BukkitTask;
+                 runTaskTimer(plugin: org.bukkit.plugin.Plugin, task: any, delay: number, period: number): org.bukkit.scheduler.BukkitTask;
                 /**
                  * Returns a task that will repeatedly run until cancelled, starting after
                  * the specified number of server ticks.
                  */
-                public runTaskTimer(plugin: org.bukkit.plugin.Plugin, task: any, delay: number, period: number): void;
-                public runTaskTimer(plugin: org.bukkit.plugin.Plugin, task: org.bukkit.scheduler.BukkitRunnable, delay: number, period: number): org.bukkit.scheduler.BukkitTask;
+                 runTaskTimer(plugin: org.bukkit.plugin.Plugin, task: any, delay: number, period: number): void;
+                 runTaskTimer(plugin: org.bukkit.plugin.Plugin, task: org.bukkit.scheduler.BukkitRunnable, delay: number, period: number): org.bukkit.scheduler.BukkitTask;
                 /**
                  * <b>Asynchronous tasks should never access any API in Bukkit. Great care
                  * should be taken to assure the thread-safety of asynchronous tasks.</b>
@@ -168,7 +169,7 @@ declare namespace org {
                  * Returns a task that will repeatedly run asynchronously until cancelled,
                  * starting after the specified number of server ticks.
                  */
-                public runTaskTimerAsynchronously(plugin: org.bukkit.plugin.Plugin, task: any, delay: number, period: number): org.bukkit.scheduler.BukkitTask;
+                 runTaskTimerAsynchronously(plugin: org.bukkit.plugin.Plugin, task: any, delay: number, period: number): org.bukkit.scheduler.BukkitTask;
                 /**
                  * <b>Asynchronous tasks should never access any API in Bukkit. Great care
                  * should be taken to assure the thread-safety of asynchronous tasks.</b>
@@ -176,8 +177,8 @@ declare namespace org {
                  * Returns a task that will repeatedly run asynchronously until cancelled,
                  * starting after the specified number of server ticks.
                  */
-                public runTaskTimerAsynchronously(plugin: org.bukkit.plugin.Plugin, task: any, delay: number, period: number): void;
-                public runTaskTimerAsynchronously(plugin: org.bukkit.plugin.Plugin, task: org.bukkit.scheduler.BukkitRunnable, delay: number, period: number): org.bukkit.scheduler.BukkitTask;
+                 runTaskTimerAsynchronously(plugin: org.bukkit.plugin.Plugin, task: any, delay: number, period: number): void;
+                 runTaskTimerAsynchronously(plugin: org.bukkit.plugin.Plugin, task: org.bukkit.scheduler.BukkitRunnable, delay: number, period: number): org.bukkit.scheduler.BukkitTask;
             }
         }
     }

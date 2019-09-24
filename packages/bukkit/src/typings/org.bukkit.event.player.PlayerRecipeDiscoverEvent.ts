@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerRecipeDiscoverEvent {
+                // @ts-ignore
+                 class PlayerRecipeDiscoverEvent implements org.bukkit.event.Cancellable {
                     constructor(who: org.bukkit.entity.Player, recipe: org.bukkit.NamespacedKey)
                     /**
                      * Get the namespaced key of the discovered recipe.

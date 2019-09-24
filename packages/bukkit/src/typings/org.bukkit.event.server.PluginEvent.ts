@@ -2,6 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace server {
+                // @ts-ignore
                 abstract class PluginEvent {
                     constructor(plugin: org.bukkit.plugin.Plugin)
                     /**

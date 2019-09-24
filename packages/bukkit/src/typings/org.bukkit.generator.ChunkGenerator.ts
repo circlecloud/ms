@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
         namespace generator {
+            // @ts-ignore
             abstract class ChunkGenerator {
                 constructor()
                 /**

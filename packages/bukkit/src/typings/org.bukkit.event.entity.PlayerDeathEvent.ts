@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class PlayerDeathEvent {
+                // @ts-ignore
+                 class PlayerDeathEvent {
                     constructor(player: org.bukkit.entity.Player, drops: any[] /*java.util.List*/, droppedExp: number, deathMessage: string)
                     constructor(player: org.bukkit.entity.Player, drops: any[] /*java.util.List*/, droppedExp: number, newExp: number, deathMessage: string)
                     constructor(player: org.bukkit.entity.Player, drops: any[] /*java.util.List*/, droppedExp: number, newExp: number, newTotalExp: number, newLevel: number, deathMessage: string)

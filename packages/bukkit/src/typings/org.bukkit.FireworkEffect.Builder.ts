@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace FireworkEffect {
-            class Builder {
+            // @ts-ignore
+             class Builder {
                 /**
                  * Specify the type of the firework effect.
                  */

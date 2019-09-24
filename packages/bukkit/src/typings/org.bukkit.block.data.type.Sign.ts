@@ -3,7 +3,8 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Sign {
+                    // @ts-ignore
+                    interface Sign extends org.bukkit.block.data.Rotatable, org.bukkit.block.data.Waterlogged {
                     }
                 }
             }

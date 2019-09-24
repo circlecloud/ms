@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class Crops {
+            // @ts-ignore
+             class Crops {
                 /**
                  * Constructs a wheat crop block in the seeded state.
                  */

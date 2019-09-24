@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace block {
                 namespace BlockIgniteEvent {
-                    class IgniteCause {
+                    // @ts-ignore
+                     class IgniteCause {
                         public static LAVA: org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
                         public static FLINT_AND_STEEL: org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
                         public static SPREAD: org.bukkit.event.block.BlockIgniteEvent.IgniteCause;

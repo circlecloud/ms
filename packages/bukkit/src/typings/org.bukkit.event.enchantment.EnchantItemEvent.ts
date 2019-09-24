@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace enchantment {
-                class EnchantItemEvent {
+                // @ts-ignore
+                 class EnchantItemEvent implements org.bukkit.event.Cancellable {
                     constructor(enchanter: org.bukkit.entity.Player, view: org.bukkit.inventory.InventoryView, table: org.bukkit.block.Block, item: org.bukkit.inventory.ItemStack, level: number, enchants: Map<any, any> /*java.util.Map*/, i: number)
                     /**
                      * Gets the player enchanting the item

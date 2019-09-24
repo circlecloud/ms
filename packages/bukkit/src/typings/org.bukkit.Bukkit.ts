@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class Bukkit {
+        // @ts-ignore
+         class Bukkit {
             /**
              * Gets the current {@link Server} singleton
              */

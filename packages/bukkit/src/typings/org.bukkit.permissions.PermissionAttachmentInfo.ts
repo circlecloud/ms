@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace permissions {
-            class PermissionAttachmentInfo {
+            // @ts-ignore
+             class PermissionAttachmentInfo {
                 constructor(permissible: org.bukkit.permissions.Permissible, permission: string, attachment: org.bukkit.permissions.PermissionAttachment, value: boolean)
                 /**
                  * Gets the permissible this is attached to

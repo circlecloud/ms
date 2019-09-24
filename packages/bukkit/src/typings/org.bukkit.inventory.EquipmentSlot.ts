@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace inventory {
-            class EquipmentSlot {
+            // @ts-ignore
+             class EquipmentSlot {
                 public static HAND: org.bukkit.inventory.EquipmentSlot;
                 public static OFF_HAND: org.bukkit.inventory.EquipmentSlot;
                 public static FEET: org.bukkit.inventory.EquipmentSlot;

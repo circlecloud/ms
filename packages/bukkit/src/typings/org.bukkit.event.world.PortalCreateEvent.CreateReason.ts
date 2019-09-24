@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace world {
                 namespace PortalCreateEvent {
-                    class CreateReason {
+                    // @ts-ignore
+                     class CreateReason {
                         public static FIRE: org.bukkit.event.world.PortalCreateEvent.CreateReason;
                         public static NETHER_PAIR: org.bukkit.event.world.PortalCreateEvent.CreateReason;
                         public static END_PLATFORM: org.bukkit.event.world.PortalCreateEvent.CreateReason;

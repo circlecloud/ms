@@ -1,11 +1,12 @@
 declare namespace org {
     namespace bukkit {
-        class UndefinedNullability {
+        // @ts-ignore
+        interface UndefinedNullability {
             /**
              * Human readable description of the circumstances, in which the type is
              * nullable.
              */
-            public value(): string;
+             value(): string;
         }
     }
 }

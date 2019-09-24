@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace permissions {
-            class PermissibleBase {
+            // @ts-ignore
+             class PermissibleBase implements org.bukkit.permissions.Permissible {
                 constructor(opable: org.bukkit.permissions.ServerOperator)
                 public isOp(): boolean;
                 public setOp(value: boolean): void;

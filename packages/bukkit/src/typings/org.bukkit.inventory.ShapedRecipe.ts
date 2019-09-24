@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace inventory {
-            class ShapedRecipe {
+            // @ts-ignore
+             class ShapedRecipe implements org.bukkit.inventory.Recipe, org.bukkit.Keyed {
                 constructor(result: org.bukkit.inventory.ItemStack)
                 /**
                  * Create a shaped recipe to craft the specified ItemStack. The

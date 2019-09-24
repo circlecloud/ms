@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace inventory {
-                class InventoryType {
+                // @ts-ignore
+                 class InventoryType {
                     public static CHEST: org.bukkit.event.inventory.InventoryType;
                     public static DISPENSER: org.bukkit.event.inventory.InventoryType;
                     public static DROPPER: org.bukkit.event.inventory.InventoryType;

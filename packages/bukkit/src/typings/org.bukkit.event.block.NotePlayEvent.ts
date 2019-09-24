@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace block {
-                class NotePlayEvent {
+                // @ts-ignore
+                 class NotePlayEvent implements org.bukkit.event.Cancellable {
                     constructor(block: org.bukkit.block.Block, instrument: org.bukkit.Instrument, note: org.bukkit.Note)
                     public isCancelled(): boolean;
                     public setCancelled(cancel: boolean): void;

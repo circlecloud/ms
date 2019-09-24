@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class Sound {
+        // @ts-ignore
+         class Sound {
             public static AMBIENT_CAVE: any;
             public static AMBIENT_UNDERWATER_ENTER: any;
             public static AMBIENT_UNDERWATER_EXIT: any;

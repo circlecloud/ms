@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
         namespace inventory {
+            // @ts-ignore
             abstract class InventoryView {
                 constructor()
                 public static OUTSIDE: number;

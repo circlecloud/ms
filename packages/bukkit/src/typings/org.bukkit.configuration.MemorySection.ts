@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace configuration {
-            class MemorySection {
+            // @ts-ignore
+             class MemorySection implements org.bukkit.configuration.ConfigurationSection {
                 /**
                  * Creates an empty MemorySection for use as a root {@link Configuration}
                  * section.

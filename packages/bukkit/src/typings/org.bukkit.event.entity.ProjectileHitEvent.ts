@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class ProjectileHitEvent {
+                // @ts-ignore
+                 class ProjectileHitEvent {
                     constructor(projectile: org.bukkit.entity.Projectile)
                     constructor(projectile: org.bukkit.entity.Projectile, hitEntity: org.bukkit.entity.Entity)
                     constructor(projectile: org.bukkit.entity.Projectile, hitBlock: org.bukkit.block.Block)

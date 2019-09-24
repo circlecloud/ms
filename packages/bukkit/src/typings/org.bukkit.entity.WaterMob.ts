@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class WaterMob {
+            // @ts-ignore
+            interface WaterMob extends org.bukkit.entity.Creature {
             }
         }
     }

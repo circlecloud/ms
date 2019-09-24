@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class EntityExplodeEvent {
+                // @ts-ignore
+                 class EntityExplodeEvent implements org.bukkit.event.Cancellable {
                     constructor(what: org.bukkit.entity.Entity, location: org.bukkit.Location, blocks: any[] /*java.util.List*/, yield: number)
                     public isCancelled(): boolean;
                     public setCancelled(cancel: boolean): void;

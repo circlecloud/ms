@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace block {
             namespace banner {
-                class Pattern {
+                // @ts-ignore
+                 class Pattern implements org.bukkit.configuration.serialization.ConfigurationSerializable {
                     /**
                      * Creates a new pattern from the specified color and
                      * pattern type

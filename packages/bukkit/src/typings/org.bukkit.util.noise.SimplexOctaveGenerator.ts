@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace util {
             namespace noise {
-                class SimplexOctaveGenerator {
+                // @ts-ignore
+                 class SimplexOctaveGenerator {
                     /**
                      * Creates a simplex octave generator for the given world
                      */

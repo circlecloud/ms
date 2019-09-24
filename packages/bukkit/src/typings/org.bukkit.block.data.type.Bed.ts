@@ -3,19 +3,20 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Bed {
+                    // @ts-ignore
+                    interface Bed extends org.bukkit.block.data.Directional {
                         /**
                          * Gets the value of the 'part' property.
                          */
-                        public getPart(): org.bukkit.block.data.type.Bed.Part;
+                         getPart(): org.bukkit.block.data.type.Bed.Part;
                         /**
                          * Sets the value of the 'part' property.
                          */
-                        public setPart(part: org.bukkit.block.data.type.Bed.Part): void;
+                         setPart(part: org.bukkit.block.data.type.Bed.Part): void;
                         /**
                          * Gets the value of the 'occupied' property.
                          */
-                        public isOccupied(): boolean;
+                         isOccupied(): boolean;
                     }
                 }
             }

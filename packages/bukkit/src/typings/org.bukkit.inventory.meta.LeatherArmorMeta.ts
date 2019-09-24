@@ -2,17 +2,18 @@ declare namespace org {
     namespace bukkit {
         namespace inventory {
             namespace meta {
-                class LeatherArmorMeta {
+                // @ts-ignore
+                interface LeatherArmorMeta extends org.bukkit.inventory.meta.ItemMeta {
                     /**
                      * Gets the color of the armor. If it has not been set otherwise, it will
                      * be {@link ItemFactory#getDefaultLeatherColor()}.
                      */
-                    public getColor(): org.bukkit.Color;
+                     getColor(): org.bukkit.Color;
                     /**
                      * Sets the color of the armor.
                      */
-                    public setColor(color: org.bukkit.Color): void;
-                    public clone(): org.bukkit.inventory.meta.LeatherArmorMeta;
+                     setColor(color: org.bukkit.Color): void;
+                     clone(): org.bukkit.inventory.meta.LeatherArmorMeta;
                 }
             }
         }

@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class EntityInteractEvent {
+                // @ts-ignore
+                 class EntityInteractEvent implements org.bukkit.event.Cancellable {
                     constructor(entity: org.bukkit.entity.Entity, block: org.bukkit.block.Block)
                     protected block: org.bukkit.block.Block;
                     public isCancelled(): boolean;

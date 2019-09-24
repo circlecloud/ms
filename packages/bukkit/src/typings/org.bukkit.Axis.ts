@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class Axis {
+        // @ts-ignore
+         class Axis {
             public static X: org.bukkit.Axis;
             public static Y: org.bukkit.Axis;
             public static Z: org.bukkit.Axis;

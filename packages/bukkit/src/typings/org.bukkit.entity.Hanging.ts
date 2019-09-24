@@ -1,13 +1,14 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Hanging {
+            // @ts-ignore
+            interface Hanging extends org.bukkit.entity.Entity, org.bukkit.material.Attachable {
                 /**
                  * Sets the direction of the hanging entity, potentially overriding rules
                  * of placement. Note that if the result is not valid the object would
                  * normally drop as an item.
                  */
-                public setFacingDirection(face: org.bukkit.block.BlockFace, force: boolean): boolean;
+                 setFacingDirection(face: org.bukkit.block.BlockFace, force: boolean): boolean;
             }
         }
     }

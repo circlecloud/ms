@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerVelocityEvent {
+                // @ts-ignore
+                 class PlayerVelocityEvent implements org.bukkit.event.Cancellable {
                     constructor(player: org.bukkit.entity.Player, velocity: org.bukkit.util.Vector)
                     public isCancelled(): boolean;
                     public setCancelled(cancel: boolean): void;

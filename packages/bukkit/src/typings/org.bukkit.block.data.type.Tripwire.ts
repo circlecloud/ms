@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Tripwire {
+                    // @ts-ignore
+                    interface Tripwire extends org.bukkit.block.data.Attachable, org.bukkit.block.data.MultipleFacing, org.bukkit.block.data.Powerable {
                         /**
                          * Gets the value of the 'disarmed' property.
                          */
-                        public isDisarmed(): boolean;
+                         isDisarmed(): boolean;
                         /**
                          * Sets the value of the 'disarmed' property.
                          */
-                        public setDisarmed(disarmed: boolean): void;
+                         setDisarmed(disarmed: boolean): void;
                     }
                 }
             }

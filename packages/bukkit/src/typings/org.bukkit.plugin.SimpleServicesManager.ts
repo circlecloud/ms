@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace plugin {
-            class SimpleServicesManager {
+            // @ts-ignore
+             class SimpleServicesManager implements org.bukkit.plugin.ServicesManager {
                 constructor()
                 /**
                  * Register a provider of a service.

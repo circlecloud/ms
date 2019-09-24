@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace conversations {
-            class ConversationFactory {
+            // @ts-ignore
+             class ConversationFactory {
                 /**
                  * Constructs a ConversationFactory.
                  */

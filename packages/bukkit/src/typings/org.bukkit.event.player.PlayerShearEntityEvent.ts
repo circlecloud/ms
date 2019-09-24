@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerShearEntityEvent {
+                // @ts-ignore
+                 class PlayerShearEntityEvent implements org.bukkit.event.Cancellable {
                     constructor(who: org.bukkit.entity.Player, what: org.bukkit.entity.Entity)
                     public isCancelled(): boolean;
                     public setCancelled(cancel: boolean): void;

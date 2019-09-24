@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class SheepRegrowWoolEvent {
+                // @ts-ignore
+                 class SheepRegrowWoolEvent implements org.bukkit.event.Cancellable {
                     constructor(sheep: org.bukkit.entity.Sheep)
                     public isCancelled(): boolean;
                     public setCancelled(cancel: boolean): void;

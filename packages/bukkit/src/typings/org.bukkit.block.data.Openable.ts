@@ -2,15 +2,16 @@ declare namespace org {
     namespace bukkit {
         namespace block {
             namespace data {
-                class Openable {
+                // @ts-ignore
+                interface Openable extends org.bukkit.block.data.BlockData {
                     /**
                      * Gets the value of the 'open' property.
                      */
-                    public isOpen(): boolean;
+                     isOpen(): boolean;
                     /**
                      * Sets the value of the 'open' property.
                      */
-                    public setOpen(open: boolean): void;
+                     setOpen(open: boolean): void;
                 }
             }
         }

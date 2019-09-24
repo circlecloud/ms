@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class DirectionalContainer {
+            // @ts-ignore
+             class DirectionalContainer implements org.bukkit.material.Directional {
                 constructor(type: org.bukkit.Material)
                 constructor(type: org.bukkit.Material, data: number)
                 public setFacingDirection(face: org.bukkit.block.BlockFace): void;

@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerResourcePackStatusEvent {
+                // @ts-ignore
+                 class PlayerResourcePackStatusEvent {
                     constructor(who: org.bukkit.entity.Player, resourcePackStatus: org.bukkit.event.player.PlayerResourcePackStatusEvent.Status)
                     /**
                      * Gets the status of this pack.

@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace player {
                 namespace PlayerFishEvent {
-                    class State {
+                    // @ts-ignore
+                     class State {
                         public static FISHING: org.bukkit.event.player.PlayerFishEvent.State;
                         public static CAUGHT_FISH: org.bukkit.event.player.PlayerFishEvent.State;
                         public static CAUGHT_ENTITY: org.bukkit.event.player.PlayerFishEvent.State;

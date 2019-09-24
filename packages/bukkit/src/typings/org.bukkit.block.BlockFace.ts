@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace block {
-            class BlockFace {
+            // @ts-ignore
+             class BlockFace {
                 public static NORTH: org.bukkit.block.BlockFace;
                 public static EAST: org.bukkit.block.BlockFace;
                 public static SOUTH: org.bukkit.block.BlockFace;

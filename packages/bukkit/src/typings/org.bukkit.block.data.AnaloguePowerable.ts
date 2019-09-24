@@ -2,19 +2,20 @@ declare namespace org {
     namespace bukkit {
         namespace block {
             namespace data {
-                class AnaloguePowerable {
+                // @ts-ignore
+                interface AnaloguePowerable extends org.bukkit.block.data.BlockData {
                     /**
                      * Gets the value of the 'power' property.
                      */
-                    public getPower(): number;
+                     getPower(): number;
                     /**
                      * Sets the value of the 'power' property.
                      */
-                    public setPower(power: number): void;
+                     setPower(power: number): void;
                     /**
                      * Gets the maximum allowed value of the 'power' property.
                      */
-                    public getMaximumPower(): number;
+                     getMaximumPower(): number;
                 }
             }
         }

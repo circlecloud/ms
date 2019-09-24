@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace configuration {
-            class ConfigurationOptions {
+            // @ts-ignore
+             class ConfigurationOptions {
                 constructor(configuration: org.bukkit.configuration.Configuration)
                 /**
                  * Returns the {@link Configuration} that this object is responsible for.

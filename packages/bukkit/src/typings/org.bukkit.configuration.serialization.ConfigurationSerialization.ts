@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace configuration {
             namespace serialization {
-                class ConfigurationSerialization {
+                // @ts-ignore
+                 class ConfigurationSerialization {
                     constructor(clazz: any)
                     public static SERIALIZED_TYPE_KEY: string;
                     protected getMethod(name: string, isStatic: boolean): any;

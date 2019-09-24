@@ -2,19 +2,20 @@ declare namespace org {
     namespace bukkit {
         namespace block {
             namespace data {
-                class Rail {
+                // @ts-ignore
+                interface Rail extends org.bukkit.block.data.BlockData {
                     /**
                      * Gets the value of the 'shape' property.
                      */
-                    public getShape(): org.bukkit.block.data.Rail.Shape;
+                     getShape(): org.bukkit.block.data.Rail.Shape;
                     /**
                      * Sets the value of the 'shape' property.
                      */
-                    public setShape(shape: org.bukkit.block.data.Rail.Shape): void;
+                     setShape(shape: org.bukkit.block.data.Rail.Shape): void;
                     /**
                      * Gets the shapes which are applicable to this block.
                      */
-                    public getShapes(): any[] /*java.util.Set*/;
+                     getShapes(): any[] /*java.util.Set*/;
                 }
             }
         }

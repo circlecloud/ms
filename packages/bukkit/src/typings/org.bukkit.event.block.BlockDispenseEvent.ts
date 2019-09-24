@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace block {
-                class BlockDispenseEvent {
+                // @ts-ignore
+                 class BlockDispenseEvent implements org.bukkit.event.Cancellable {
                     constructor(block: org.bukkit.block.Block, dispensed: org.bukkit.inventory.ItemStack, velocity: org.bukkit.util.Vector)
                     /**
                      * Gets the item that is being dispensed. Modifying the returned item will

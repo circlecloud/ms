@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace enchantments {
-            class EnchantmentOffer {
+            // @ts-ignore
+             class EnchantmentOffer {
                 constructor(enchantment: org.bukkit.enchantments.Enchantment, enchantmentLevel: number, cost: number)
                 /**
                  * Get the type of the enchantment.

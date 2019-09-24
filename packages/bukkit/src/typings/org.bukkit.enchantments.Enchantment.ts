@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace enchantments {
-            abstract class Enchantment {
+            // @ts-ignore
+            abstract class Enchantment implements org.bukkit.Keyed {
                 constructor(key: org.bukkit.NamespacedKey)
                 public static PROTECTION_ENVIRONMENTAL: org.bukkit.enchantments.Enchantment;
                 public static PROTECTION_FIRE: org.bukkit.enchantments.Enchantment;

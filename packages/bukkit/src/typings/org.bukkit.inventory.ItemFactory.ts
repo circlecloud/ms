@@ -1,11 +1,12 @@
 declare namespace org {
     namespace bukkit {
         namespace inventory {
-            class ItemFactory {
+            // @ts-ignore
+            interface ItemFactory {
                 /**
                  * This creates a new item meta for the material.
                  */
-                public getItemMeta(material: org.bukkit.Material): org.bukkit.inventory.meta.ItemMeta;
+                 getItemMeta(material: org.bukkit.Material): org.bukkit.inventory.meta.ItemMeta;
                 /**
                  * This method checks the item meta to confirm that it is applicable (no
                  * data lost if applied) to the specified ItemStack.
@@ -13,7 +14,7 @@ declare namespace org {
                  * A {@link SkullMeta} would not be valid for a sword, but a normal {@link
                  * ItemMeta} from an enchanted dirt block would.
                  */
-                public isApplicable(meta: org.bukkit.inventory.meta.ItemMeta, stack: org.bukkit.inventory.ItemStack): boolean;
+                 isApplicable(meta: org.bukkit.inventory.meta.ItemMeta, stack: org.bukkit.inventory.ItemStack): boolean;
                 /**
                  * This method checks the item meta to confirm that it is applicable (no
                  * data lost if applied) to the specified Material.
@@ -21,11 +22,11 @@ declare namespace org {
                  * A {@link SkullMeta} would not be valid for a sword, but a normal {@link
                  * ItemMeta} from an enchanted dirt block would.
                  */
-                public isApplicable(meta: org.bukkit.inventory.meta.ItemMeta, material: org.bukkit.Material): boolean;
+                 isApplicable(meta: org.bukkit.inventory.meta.ItemMeta, material: org.bukkit.Material): boolean;
                 /**
                  * This method is used to compare two item meta data objects.
                  */
-                public equals(meta1: org.bukkit.inventory.meta.ItemMeta, meta2: org.bukkit.inventory.meta.ItemMeta): boolean;
+                 equals(meta1: org.bukkit.inventory.meta.ItemMeta, meta2: org.bukkit.inventory.meta.ItemMeta): boolean;
                 /**
                  * Returns an appropriate item meta for the specified stack.
                  * <p>
@@ -39,7 +40,7 @@ declare namespace org {
                  * specified meta that is applicable to an {@link ItemMeta}, the highest
                  * common interface.
                  */
-                public asMetaFor(meta: org.bukkit.inventory.meta.ItemMeta, stack: org.bukkit.inventory.ItemStack): org.bukkit.inventory.meta.ItemMeta;
+                 asMetaFor(meta: org.bukkit.inventory.meta.ItemMeta, stack: org.bukkit.inventory.ItemStack): org.bukkit.inventory.meta.ItemMeta;
                 /**
                  * Returns an appropriate item meta for the specified material.
                  * <p>
@@ -53,16 +54,16 @@ declare namespace org {
                  * specified meta that is applicable to an {@link ItemMeta}, the highest
                  * common interface.
                  */
-                public asMetaFor(meta: org.bukkit.inventory.meta.ItemMeta, material: org.bukkit.Material): org.bukkit.inventory.meta.ItemMeta;
+                 asMetaFor(meta: org.bukkit.inventory.meta.ItemMeta, material: org.bukkit.Material): org.bukkit.inventory.meta.ItemMeta;
                 /**
                  * Returns the default color for all leather armor.
                  */
-                public getDefaultLeatherColor(): org.bukkit.Color;
+                 getDefaultLeatherColor(): org.bukkit.Color;
                 /**
                  * Apply a material change for an item meta. Do not use under any
                  * circumstances.
                  */
-                public updateMaterial(meta: org.bukkit.inventory.meta.ItemMeta, material: org.bukkit.Material): org.bukkit.Material;
+                 updateMaterial(meta: org.bukkit.inventory.meta.ItemMeta, material: org.bukkit.Material): org.bukkit.Material;
             }
         }
     }

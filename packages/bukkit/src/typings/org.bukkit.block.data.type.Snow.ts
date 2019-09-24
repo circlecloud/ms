@@ -3,23 +3,24 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Snow {
+                    // @ts-ignore
+                    interface Snow extends org.bukkit.block.data.BlockData {
                         /**
                          * Gets the value of the 'layers' property.
                          */
-                        public getLayers(): number;
+                         getLayers(): number;
                         /**
                          * Sets the value of the 'layers' property.
                          */
-                        public setLayers(layers: number): void;
+                         setLayers(layers: number): void;
                         /**
                          * Gets the minimum allowed value of the 'layers' property.
                          */
-                        public getMinimumLayers(): number;
+                         getMinimumLayers(): number;
                         /**
                          * Gets the maximum allowed value of the 'layers' property.
                          */
-                        public getMaximumLayers(): number;
+                         getMaximumLayers(): number;
                     }
                 }
             }

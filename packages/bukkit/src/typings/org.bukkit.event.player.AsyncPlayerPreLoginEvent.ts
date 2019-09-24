@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class AsyncPlayerPreLoginEvent {
+                // @ts-ignore
+                 class AsyncPlayerPreLoginEvent {
                     constructor(name: string, ipAddress: any)
                     constructor(name: string, ipAddress: any, uniqueId: any)
                     /**

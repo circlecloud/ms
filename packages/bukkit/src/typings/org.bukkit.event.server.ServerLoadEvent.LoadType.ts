@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace server {
                 namespace ServerLoadEvent {
-                    class LoadType {
+                    // @ts-ignore
+                     class LoadType {
                         public static STARTUP: org.bukkit.event.server.ServerLoadEvent.LoadType;
                         public static RELOAD: org.bukkit.event.server.ServerLoadEvent.LoadType;
                         public static values(): org.bukkit.event.server.ServerLoadEvent.LoadType[];

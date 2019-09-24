@@ -1,23 +1,24 @@
 declare namespace org {
     namespace bukkit {
         namespace inventory {
-            class EnchantingInventory {
+            // @ts-ignore
+            interface EnchantingInventory extends org.bukkit.inventory.Inventory {
                 /**
                  * Set the item being enchanted.
                  */
-                public setItem(item: org.bukkit.inventory.ItemStack): void;
+                 setItem(item: org.bukkit.inventory.ItemStack): void;
                 /**
                  * Get the item being enchanted.
                  */
-                public getItem(): org.bukkit.inventory.ItemStack;
+                 getItem(): org.bukkit.inventory.ItemStack;
                 /**
                  * Set the secondary item being used for the enchant.
                  */
-                public setSecondary(item: org.bukkit.inventory.ItemStack): void;
+                 setSecondary(item: org.bukkit.inventory.ItemStack): void;
                 /**
                  * Get the secondary item being used for the enchant.
                  */
-                public getSecondary(): org.bukkit.inventory.ItemStack;
+                 getSecondary(): org.bukkit.inventory.ItemStack;
             }
         }
     }

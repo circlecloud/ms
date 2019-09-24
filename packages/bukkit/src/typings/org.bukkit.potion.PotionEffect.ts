@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace potion {
-            class PotionEffect {
+            // @ts-ignore
+             class PotionEffect implements org.bukkit.configuration.serialization.ConfigurationSerializable {
                 /**
                  * Creates a potion effect.
                  */

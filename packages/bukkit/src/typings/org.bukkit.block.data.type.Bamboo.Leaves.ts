@@ -4,7 +4,8 @@ declare namespace org {
             namespace data {
                 namespace type {
                     namespace Bamboo {
-                        class Leaves {
+                        // @ts-ignore
+                         class Leaves {
                             public static NONE: org.bukkit.block.data.type.Bamboo.Leaves;
                             public static SMALL: org.bukkit.block.data.type.Bamboo.Leaves;
                             public static LARGE: org.bukkit.block.data.type.Bamboo.Leaves;

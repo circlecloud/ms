@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace entity {
             namespace Llama {
-                class Color {
+                // @ts-ignore
+                 class Color {
                     public static CREAMY: org.bukkit.entity.Llama.Color;
                     public static WHITE: org.bukkit.entity.Llama.Color;
                     public static BROWN: org.bukkit.entity.Llama.Color;

@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace block {
-            class Chest {
+            // @ts-ignore
+            interface Chest extends org.bukkit.block.Container, org.bukkit.loot.Lootable {
                 /**
                  * Gets the inventory of the chest block represented by this block state.
                  * <p>
@@ -14,7 +15,7 @@ declare namespace org {
                  * If this block state is not placed this will return the captured
                  * inventory snapshot instead.
                  */
-                public getBlockInventory(): org.bukkit.inventory.Inventory;
+                 getBlockInventory(): org.bukkit.inventory.Inventory;
             }
         }
     }

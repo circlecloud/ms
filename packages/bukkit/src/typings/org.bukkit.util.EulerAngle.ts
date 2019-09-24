@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace util {
-            class EulerAngle {
+            // @ts-ignore
+             class EulerAngle {
                 /**
                  * Creates a EularAngle with each axis set to the
                  * passed angle in radians

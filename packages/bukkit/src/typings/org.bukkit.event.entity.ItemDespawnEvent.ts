@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class ItemDespawnEvent {
+                // @ts-ignore
+                 class ItemDespawnEvent implements org.bukkit.event.Cancellable {
                     constructor(despawnee: org.bukkit.entity.Item, loc: org.bukkit.Location)
                     public isCancelled(): boolean;
                     public setCancelled(cancel: boolean): void;

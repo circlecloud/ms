@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace block {
-            class Smoker {
+            // @ts-ignore
+            interface Smoker extends org.bukkit.block.Furnace {
             }
         }
     }

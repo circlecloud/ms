@@ -1,11 +1,12 @@
 declare namespace org {
     namespace bukkit {
         namespace inventory {
-            class InventoryHolder {
+            // @ts-ignore
+            interface InventoryHolder {
                 /**
                  * Get the object's inventory.
                  */
-                public getInventory(): org.bukkit.inventory.Inventory;
+                 getInventory(): org.bukkit.inventory.Inventory;
             }
         }
     }

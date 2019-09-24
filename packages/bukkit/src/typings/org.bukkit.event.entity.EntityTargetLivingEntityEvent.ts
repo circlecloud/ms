@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class EntityTargetLivingEntityEvent {
+                // @ts-ignore
+                 class EntityTargetLivingEntityEvent {
                     constructor(entity: org.bukkit.entity.Entity, target: org.bukkit.entity.LivingEntity, reason: org.bukkit.event.entity.EntityTargetEvent.TargetReason)
                     public getTarget(): org.bukkit.entity.LivingEntity;
                     /**

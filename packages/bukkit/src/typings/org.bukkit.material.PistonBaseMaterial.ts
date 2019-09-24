@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class PistonBaseMaterial {
+            // @ts-ignore
+             class PistonBaseMaterial implements org.bukkit.material.Directional, org.bukkit.material.Redstone {
                 constructor(type: org.bukkit.Material)
                 /**
                  * Constructs a PistonBaseMaterial.

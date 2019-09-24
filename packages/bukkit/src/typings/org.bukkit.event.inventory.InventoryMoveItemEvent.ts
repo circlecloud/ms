@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace inventory {
-                class InventoryMoveItemEvent {
+                // @ts-ignore
+                 class InventoryMoveItemEvent implements org.bukkit.event.Cancellable {
                     constructor(sourceInventory: org.bukkit.inventory.Inventory, itemStack: org.bukkit.inventory.ItemStack, destinationInventory: org.bukkit.inventory.Inventory, didSourceInitiate: boolean)
                     /**
                      * Gets the Inventory that the ItemStack is being taken from

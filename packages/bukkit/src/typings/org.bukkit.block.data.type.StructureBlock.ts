@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class StructureBlock {
+                    // @ts-ignore
+                    interface StructureBlock extends org.bukkit.block.data.BlockData {
                         /**
                          * Gets the value of the 'mode' property.
                          */
-                        public getMode(): org.bukkit.block.data.type.StructureBlock.Mode;
+                         getMode(): org.bukkit.block.data.type.StructureBlock.Mode;
                         /**
                          * Sets the value of the 'mode' property.
                          */
-                        public setMode(mode: org.bukkit.block.data.type.StructureBlock.Mode): void;
+                         setMode(mode: org.bukkit.block.data.type.StructureBlock.Mode): void;
                     }
                 }
             }

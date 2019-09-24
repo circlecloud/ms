@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace inventory {
-            class ItemStack {
+            // @ts-ignore
+             class ItemStack implements org.bukkit.configuration.serialization.ConfigurationSerializable {
                 constructor()
                 /**
                  * Defaults stack size to 1, with no extra data

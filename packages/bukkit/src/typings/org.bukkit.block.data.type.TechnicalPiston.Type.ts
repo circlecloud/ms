@@ -4,7 +4,8 @@ declare namespace org {
             namespace data {
                 namespace type {
                     namespace TechnicalPiston {
-                        class Type {
+                        // @ts-ignore
+                         class Type {
                             public static NORMAL: org.bukkit.block.data.type.TechnicalPiston.Type;
                             public static STICKY: org.bukkit.block.data.type.TechnicalPiston.Type;
                             public static values(): org.bukkit.block.data.type.TechnicalPiston.Type[];

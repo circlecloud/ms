@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace plugin {
             namespace messaging {
-                class MessageTooLargeException {
+                // @ts-ignore
+                 class MessageTooLargeException {
                     constructor()
                     constructor(message: number)
                     constructor(length: number)

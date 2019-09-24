@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class PlayerLeashEntityEvent {
+                // @ts-ignore
+                 class PlayerLeashEntityEvent implements org.bukkit.event.Cancellable {
                     constructor(what: org.bukkit.entity.Entity, leashHolder: org.bukkit.entity.Entity, leasher: org.bukkit.entity.Player)
                     /**
                      * Returns the entity that is holding the leash.

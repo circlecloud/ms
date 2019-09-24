@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class NetherWartsState {
+        // @ts-ignore
+         class NetherWartsState {
             public static SEEDED: org.bukkit.NetherWartsState;
             public static STAGE_ONE: org.bukkit.NetherWartsState;
             public static STAGE_TWO: org.bukkit.NetherWartsState;

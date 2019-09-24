@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace entity {
                 namespace EntityPotionEffectEvent {
-                    class Action {
+                    // @ts-ignore
+                     class Action {
                         public static ADDED: org.bukkit.event.entity.EntityPotionEffectEvent.Action;
                         public static CHANGED: org.bukkit.event.entity.EntityPotionEffectEvent.Action;
                         public static CLEARED: org.bukkit.event.entity.EntityPotionEffectEvent.Action;

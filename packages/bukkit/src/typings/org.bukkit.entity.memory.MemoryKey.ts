@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace entity {
             namespace memory {
-                class MemoryKey {
+                // @ts-ignore
+                 class MemoryKey implements org.bukkit.Keyed {
                     public static HOME: org.bukkit.entity.memory.MemoryKey;
                     public static MEETING_POINT: org.bukkit.entity.memory.MemoryKey;
                     public static JOB_SITE: org.bukkit.entity.memory.MemoryKey;

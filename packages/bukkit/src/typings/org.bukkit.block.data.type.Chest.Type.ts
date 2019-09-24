@@ -4,7 +4,8 @@ declare namespace org {
             namespace data {
                 namespace type {
                     namespace Chest {
-                        class Type {
+                        // @ts-ignore
+                         class Type {
                             public static SINGLE: org.bukkit.block.data.type.Chest.Type;
                             public static LEFT: org.bukkit.block.data.type.Chest.Type;
                             public static RIGHT: org.bukkit.block.data.type.Chest.Type;

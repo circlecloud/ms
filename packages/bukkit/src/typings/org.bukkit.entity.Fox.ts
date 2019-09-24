@@ -1,27 +1,28 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Fox {
+            // @ts-ignore
+            interface Fox extends org.bukkit.entity.Animals, org.bukkit.entity.Sittable {
                 /**
                  * Gets the current type of this fox.
                  */
-                public getFoxType(): org.bukkit.entity.Fox.Type;
+                 getFoxType(): org.bukkit.entity.Fox.Type;
                 /**
                  * Sets the current type of this fox.
                  */
-                public setFoxType(type: org.bukkit.entity.Fox.Type): void;
+                 setFoxType(type: org.bukkit.entity.Fox.Type): void;
                 /**
                  * Checks if this animal is crouching
                  */
-                public isCrouching(): boolean;
+                 isCrouching(): boolean;
                 /**
                  * Sets if this animal is crouching.
                  */
-                public setCrouching(crouching: boolean): void;
+                 setCrouching(crouching: boolean): void;
                 /**
                  * Sets if this animal is sleeping.
                  */
-                public setSleeping(sleeping: boolean): void;
+                 setSleeping(sleeping: boolean): void;
             }
         }
     }

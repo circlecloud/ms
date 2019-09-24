@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class Skull {
+            // @ts-ignore
+             class Skull implements org.bukkit.material.Directional {
                 constructor()
                 /**
                  * Instantiate a skull facing in a particular direction.

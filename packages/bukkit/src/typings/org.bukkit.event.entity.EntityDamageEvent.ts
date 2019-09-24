@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class EntityDamageEvent {
+                // @ts-ignore
+                 class EntityDamageEvent implements org.bukkit.event.Cancellable {
                     constructor(damagee: org.bukkit.entity.Entity, cause: org.bukkit.event.entity.EntityDamageEvent.DamageCause, damage: number)
                     constructor(damagee: org.bukkit.entity.Entity, cause: org.bukkit.event.entity.EntityDamageEvent.DamageCause, modifiers: Map<any, any> /*java.util.Map*/, modifierFunctions: Map<any, any> /*java.util.Map*/)
                     public isCancelled(): boolean;

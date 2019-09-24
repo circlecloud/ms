@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class GameRule {
+        // @ts-ignore
+         class GameRule {
             public static ANNOUNCE_ADVANCEMENTS: org.bukkit.GameRule;
             public static COMMAND_BLOCK_OUTPUT: org.bukkit.GameRule;
             public static DISABLE_ELYTRA_MOVEMENT_CHECK: org.bukkit.GameRule;

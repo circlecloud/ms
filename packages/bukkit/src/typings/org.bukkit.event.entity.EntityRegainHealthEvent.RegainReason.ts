@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace entity {
                 namespace EntityRegainHealthEvent {
-                    class RegainReason {
+                    // @ts-ignore
+                     class RegainReason {
                         public static REGEN: org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
                         public static SATIATED: org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
                         public static EATING: org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;

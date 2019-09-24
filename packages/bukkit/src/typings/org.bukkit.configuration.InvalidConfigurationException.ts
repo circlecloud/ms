@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace configuration {
-            class InvalidConfigurationException {
+            // @ts-ignore
+             class InvalidConfigurationException {
                 /**
                  * Creates a new instance of InvalidConfigurationException without a
                  * message or cause.

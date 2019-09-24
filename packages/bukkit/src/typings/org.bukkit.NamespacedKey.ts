@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class NamespacedKey {
+        // @ts-ignore
+         class NamespacedKey {
             /**
              * Create a key in a specific namespace.
              */

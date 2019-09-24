@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class Leaves {
+            // @ts-ignore
+             class Leaves {
                 /**
                  * Constructs a leaf block.
                  */

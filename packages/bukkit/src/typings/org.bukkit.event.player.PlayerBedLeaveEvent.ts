@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerBedLeaveEvent {
+                // @ts-ignore
+                 class PlayerBedLeaveEvent {
                     constructor(who: org.bukkit.entity.Player, bed: org.bukkit.block.Block, setBedSpawn: boolean)
                     /**
                      * Returns the bed block involved in this event.

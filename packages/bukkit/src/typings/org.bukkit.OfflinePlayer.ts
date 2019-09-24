@@ -1,40 +1,41 @@
 declare namespace org {
     namespace bukkit {
-        class OfflinePlayer {
+        // @ts-ignore
+        interface OfflinePlayer extends org.bukkit.permissions.ServerOperator, org.bukkit.entity.AnimalTamer, org.bukkit.configuration.serialization.ConfigurationSerializable {
             /**
              * Checks if this player is currently online
              */
-            public isOnline(): boolean;
+             isOnline(): boolean;
             /**
              * Returns the name of this player
              * <p>
              * Names are no longer unique past a single game session. For persistent storage
              * it is recommended that you use {@link #getUniqueId()} instead.
              */
-            public getName(): string;
+             getName(): string;
             /**
              * Returns the UUID of this player
              */
-            public getUniqueId(): any;
+             getUniqueId(): any;
             /**
              * Checks if this player is banned or not
              */
-            public isBanned(): boolean;
+             isBanned(): boolean;
             /**
              * Checks if this player is whitelisted or not
              */
-            public isWhitelisted(): boolean;
+             isWhitelisted(): boolean;
             /**
              * Sets if this player is whitelisted or not
              */
-            public setWhitelisted(value: boolean): void;
+             setWhitelisted(value: boolean): void;
             /**
              * Gets a {@link Player} object that this represents, if there is one
              * <p>
              * If the player is online, this will return that player. Otherwise,
              * it will return null.
              */
-            public getPlayer(): org.bukkit.entity.Player;
+             getPlayer(): org.bukkit.entity.Player;
             /**
              * Gets the first date and time that this player was witnessed on this
              * server.
@@ -43,7 +44,7 @@ declare namespace org {
              * it will be the amount of milliseconds since midnight, January 1, 1970
              * UTC.
              */
-            public getFirstPlayed(): number;
+             getFirstPlayed(): number;
             /**
              * Gets the last date and time that this player was witnessed on this
              * server.
@@ -52,16 +53,16 @@ declare namespace org {
              * it will be the amount of milliseconds since midnight, January 1, 1970
              * UTC.
              */
-            public getLastPlayed(): number;
+             getLastPlayed(): number;
             /**
              * Checks if this player has played on this server before.
              */
-            public hasPlayedBefore(): boolean;
+             hasPlayedBefore(): boolean;
             /**
              * Gets the Location where the player will spawn at their bed, null if
              * they have not slept in one or their current bed spawn is invalid.
              */
-            public getBedSpawnLocation(): org.bukkit.Location;
+             getBedSpawnLocation(): org.bukkit.Location;
         }
     }
 }

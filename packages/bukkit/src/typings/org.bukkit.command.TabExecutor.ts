@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace command {
-            class TabExecutor {
+            // @ts-ignore
+            interface TabExecutor extends org.bukkit.command.TabCompleter, org.bukkit.command.CommandExecutor {
             }
         }
     }

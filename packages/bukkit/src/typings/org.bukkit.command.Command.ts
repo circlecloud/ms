@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
         namespace command {
+            // @ts-ignore
             abstract class Command {
                 constructor(name: string)
                 constructor(name: string, description: string, usageMessage: string, aliases: any[] /*java.util.List*/)

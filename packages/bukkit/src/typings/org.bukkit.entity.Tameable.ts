@@ -1,14 +1,15 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Tameable {
+            // @ts-ignore
+            interface Tameable extends org.bukkit.entity.Entity {
                 /**
                  * Check if this is tamed
                  * <p>
                  * If something is tamed then a player can not tame it through normal
                  * methods, even if it does not belong to anyone in particular.
                  */
-                public isTamed(): boolean;
+                 isTamed(): boolean;
                 /**
                  * Sets if this has been tamed. Not necessary if the method setOwner has
                  * been used, as it tames automatically.
@@ -16,11 +17,11 @@ declare namespace org {
                  * If something is tamed then a player can not tame it through normal
                  * methods, even if it does not belong to anyone in particular.
                  */
-                public setTamed(tame: boolean): void;
+                 setTamed(tame: boolean): void;
                 /**
                  * Gets the current owning AnimalTamer
                  */
-                public getOwner(): org.bukkit.entity.AnimalTamer;
+                 getOwner(): org.bukkit.entity.AnimalTamer;
                 /**
                  * Set this to be owned by given AnimalTamer.
                  * <p>
@@ -28,7 +29,7 @@ declare namespace org {
                  * path it is following removed. If the owner is set to null, this will be
                  * untamed, and the current owner removed.
                  */
-                public setOwner(tamer: org.bukkit.entity.AnimalTamer): void;
+                 setOwner(tamer: org.bukkit.entity.AnimalTamer): void;
             }
         }
     }

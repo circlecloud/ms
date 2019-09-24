@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace potion {
-            class PotionData {
+            // @ts-ignore
+             class PotionData {
                 /**
                  * Instantiates a final PotionData object to contain information about a
                  * Potion

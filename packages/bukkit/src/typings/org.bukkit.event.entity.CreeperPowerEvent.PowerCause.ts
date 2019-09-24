@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace entity {
                 namespace CreeperPowerEvent {
-                    class PowerCause {
+                    // @ts-ignore
+                     class PowerCause {
                         public static LIGHTNING: org.bukkit.event.entity.CreeperPowerEvent.PowerCause;
                         public static SET_ON: org.bukkit.event.entity.CreeperPowerEvent.PowerCause;
                         public static SET_OFF: org.bukkit.event.entity.CreeperPowerEvent.PowerCause;

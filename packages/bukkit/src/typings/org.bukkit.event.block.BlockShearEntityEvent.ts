@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace block {
-                class BlockShearEntityEvent {
+                // @ts-ignore
+                 class BlockShearEntityEvent implements org.bukkit.event.Cancellable {
                     constructor(dispenser: org.bukkit.block.Block, sheared: org.bukkit.entity.Entity, tool: org.bukkit.inventory.ItemStack)
                     /**
                      * Gets the entity that was sheared.

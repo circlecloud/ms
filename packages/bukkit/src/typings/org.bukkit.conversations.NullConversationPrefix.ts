@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace conversations {
-            class NullConversationPrefix {
+            // @ts-ignore
+             class NullConversationPrefix implements org.bukkit.conversations.ConversationPrefix {
                 constructor()
                 /**
                  * Prepends each conversation message with an empty string.

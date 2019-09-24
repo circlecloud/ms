@@ -1,11 +1,12 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class Attachable {
+            // @ts-ignore
+            interface Attachable extends org.bukkit.material.Directional {
                 /**
                  * Gets the face that this block is attached on
                  */
-                public getAttachedFace(): org.bukkit.block.BlockFace;
+                 getAttachedFace(): org.bukkit.block.BlockFace;
             }
         }
     }

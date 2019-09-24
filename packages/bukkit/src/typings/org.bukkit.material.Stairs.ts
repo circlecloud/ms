@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class Stairs {
+            // @ts-ignore
+             class Stairs implements org.bukkit.material.Directional {
                 constructor(type: org.bukkit.Material)
                 constructor(type: org.bukkit.Material, data: number)
                 public getAscendingDirection(): org.bukkit.block.BlockFace;

@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace inventory {
             namespace RecipeChoice {
-                class MaterialChoice {
+                // @ts-ignore
+                 class MaterialChoice implements org.bukkit.inventory.RecipeChoice {
                     constructor(choice: org.bukkit.Material)
                     constructor(choices: org.bukkit.Material)
                     /**

@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace Warning {
-            class WarningState {
+            // @ts-ignore
+             class WarningState {
                 public static ON: org.bukkit.Warning.WarningState;
                 public static OFF: org.bukkit.Warning.WarningState;
                 public static DEFAULT: org.bukkit.Warning.WarningState;

@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace map {
             namespace MapCursor {
-                class Type {
+                // @ts-ignore
+                 class Type {
                     public static WHITE_POINTER: org.bukkit.map.MapCursor.Type;
                     public static GREEN_POINTER: org.bukkit.map.MapCursor.Type;
                     public static RED_POINTER: org.bukkit.map.MapCursor.Type;

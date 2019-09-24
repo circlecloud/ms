@@ -1,117 +1,118 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Entity {
+            // @ts-ignore
+            interface Entity extends org.bukkit.metadata.Metadatable, org.bukkit.command.CommandSender, org.bukkit.Nameable, org.bukkit.persistence.PersistentDataHolder {
                 /**
                  * Gets the entity's current position
                  */
-                public getLocation(): org.bukkit.Location;
+                 getLocation(): org.bukkit.Location;
                 /**
                  * Stores the entity's current position in the provided Location object.
                  * <p>
                  * If the provided Location is null this method does nothing and returns
                  * null.
                  */
-                public getLocation(loc: org.bukkit.Location): org.bukkit.Location;
+                 getLocation(loc: org.bukkit.Location): org.bukkit.Location;
                 /**
                  * Sets this entity's velocity
                  */
-                public setVelocity(velocity: org.bukkit.util.Vector): void;
+                 setVelocity(velocity: org.bukkit.util.Vector): void;
                 /**
                  * Gets this entity's current velocity
                  */
-                public getVelocity(): org.bukkit.util.Vector;
+                 getVelocity(): org.bukkit.util.Vector;
                 /**
                  * Gets the entity's height
                  */
-                public getHeight(): number;
+                 getHeight(): number;
                 /**
                  * Gets the entity's width
                  */
-                public getWidth(): number;
+                 getWidth(): number;
                 /**
                  * Gets the entity's current bounding box.
                  * <p>
                  * The returned bounding box reflects the entity's current location and
                  * size.
                  */
-                public getBoundingBox(): org.bukkit.util.BoundingBox;
+                 getBoundingBox(): org.bukkit.util.BoundingBox;
                 /**
                  * Returns true if the entity is supported by a block. This value is a
                  * state updated by the server and is not recalculated unless the entity
                  * moves.
                  */
-                public isOnGround(): boolean;
+                 isOnGround(): boolean;
                 /**
                  * Gets the current world this entity resides in
                  */
-                public getWorld(): org.bukkit.World;
+                 getWorld(): org.bukkit.World;
                 /**
                  * Sets the entity's rotation.
                  * <p>
                  * Note that if the entity is affected by AI, it may override this rotation.
                  */
-                public setRotation(yaw: number, pitch: number): void;
+                 setRotation(yaw: number, pitch: number): void;
                 /**
                  * Teleports this entity to the given location. If this entity is riding a
                  * vehicle, it will be dismounted prior to teleportation.
                  */
-                public teleport(location: org.bukkit.Location): boolean;
+                 teleport(location: org.bukkit.Location): boolean;
                 /**
                  * Teleports this entity to the given location. If this entity is riding a
                  * vehicle, it will be dismounted prior to teleportation.
                  */
-                public teleport(location: org.bukkit.Location, cause: org.bukkit.event.player.PlayerTeleportEvent.TeleportCause): boolean;
+                 teleport(location: org.bukkit.Location, cause: org.bukkit.event.player.PlayerTeleportEvent.TeleportCause): boolean;
                 /**
                  * Teleports this entity to the target Entity. If this entity is riding a
                  * vehicle, it will be dismounted prior to teleportation.
                  */
-                public teleport(destination: org.bukkit.entity.Entity): boolean;
+                 teleport(destination: org.bukkit.entity.Entity): boolean;
                 /**
                  * Teleports this entity to the target Entity. If this entity is riding a
                  * vehicle, it will be dismounted prior to teleportation.
                  */
-                public teleport(destination: org.bukkit.entity.Entity, cause: org.bukkit.event.player.PlayerTeleportEvent.TeleportCause): boolean;
+                 teleport(destination: org.bukkit.entity.Entity, cause: org.bukkit.event.player.PlayerTeleportEvent.TeleportCause): boolean;
                 /**
                  * Returns a list of entities within a bounding box centered around this
                  * entity
                  */
-                public getNearbyEntities(x: number, y: number, z: number): any[] /*java.util.List*/;
+                 getNearbyEntities(x: number, y: number, z: number): any[] /*java.util.List*/;
                 /**
                  * Returns a unique id for this entity
                  */
-                public getEntityId(): number;
+                 getEntityId(): number;
                 /**
                  * Returns the entity's current fire ticks (ticks before the entity stops
                  * being on fire).
                  */
-                public getFireTicks(): number;
+                 getFireTicks(): number;
                 /**
                  * Returns the entity's maximum fire ticks.
                  */
-                public getMaxFireTicks(): number;
+                 getMaxFireTicks(): number;
                 /**
                  * Sets the entity's current fire ticks (ticks before the entity stops
                  * being on fire).
                  */
-                public setFireTicks(ticks: number): void;
+                 setFireTicks(ticks: number): void;
                 /**
                  * Mark the entity's removal.
                  */
-                public remove(): void;
+                 remove(): void;
                 /**
                  * Returns true if this entity has been marked for removal.
                  */
-                public isDead(): boolean;
+                 isDead(): boolean;
                 /**
                  * Returns false if the entity has died or been despawned for some other
                  * reason.
                  */
-                public isValid(): boolean;
+                 isValid(): boolean;
                 /**
                  * Gets the {@link Server} that contains this Entity
                  */
-                public getServer(): org.bukkit.Server;
+                 getServer(): org.bukkit.Server;
                 /**
                  * Returns true if the entity gets persisted.
                  * <p>
@@ -127,77 +128,77 @@ declare namespace org {
                  * {@link LivingEntity#setRemoveWhenFarAway(boolean)} which controls
                  * despawning of living entities. </b>
                  */
-                public isPersistent(): boolean;
+                 isPersistent(): boolean;
                 /**
                  * Sets whether or not the entity gets persisted.
                  */
-                public setPersistent(persistent: boolean): void;
+                 setPersistent(persistent: boolean): void;
                 /**
                  * Gets the primary passenger of a vehicle. For vehicles that could have
                  * multiple passengers, this will only return the primary passenger.
                  */
-                public getPassenger(): org.bukkit.entity.Entity;
+                 getPassenger(): org.bukkit.entity.Entity;
                 /**
                  * Set the passenger of a vehicle.
                  */
-                public setPassenger(passenger: org.bukkit.entity.Entity): boolean;
+                 setPassenger(passenger: org.bukkit.entity.Entity): boolean;
                 /**
                  * Gets a list of passengers of this vehicle.
                  * <p>
                  * The returned list will not be directly linked to the entity's current
                  * passengers, and no guarantees are made as to its mutability.
                  */
-                public getPassengers(): any[] /*java.util.List*/;
+                 getPassengers(): any[] /*java.util.List*/;
                 /**
                  * Add a passenger to the vehicle.
                  */
-                public addPassenger(passenger: org.bukkit.entity.Entity): boolean;
+                 addPassenger(passenger: org.bukkit.entity.Entity): boolean;
                 /**
                  * Remove a passenger from the vehicle.
                  */
-                public removePassenger(passenger: org.bukkit.entity.Entity): boolean;
+                 removePassenger(passenger: org.bukkit.entity.Entity): boolean;
                 /**
                  * Check if a vehicle has passengers.
                  */
-                public isEmpty(): boolean;
+                 isEmpty(): boolean;
                 /**
                  * Eject any passenger.
                  */
-                public eject(): boolean;
+                 eject(): boolean;
                 /**
                  * Returns the distance this entity has fallen
                  */
-                public getFallDistance(): number;
+                 getFallDistance(): number;
                 /**
                  * Sets the fall distance for this entity
                  */
-                public setFallDistance(distance: number): void;
+                 setFallDistance(distance: number): void;
                 /**
                  * Record the last {@link EntityDamageEvent} inflicted on this entity
                  */
-                public setLastDamageCause(event: org.bukkit.event.entity.EntityDamageEvent): void;
+                 setLastDamageCause(event: org.bukkit.event.entity.EntityDamageEvent): void;
                 /**
                  * Retrieve the last {@link EntityDamageEvent} inflicted on this entity.
                  * This event may have been cancelled.
                  */
-                public getLastDamageCause(): org.bukkit.event.entity.EntityDamageEvent;
+                 getLastDamageCause(): org.bukkit.event.entity.EntityDamageEvent;
                 /**
                  * Returns a unique and persistent id for this entity
                  */
-                public getUniqueId(): any;
+                 getUniqueId(): any;
                 /**
                  * Gets the amount of ticks this entity has lived for.
                  * <p>
                  * This is the equivalent to "age" in entities.
                  */
-                public getTicksLived(): number;
+                 getTicksLived(): number;
                 /**
                  * Sets the amount of ticks this entity has lived for.
                  * <p>
                  * This is the equivalent to "age" in entities. May not be less than one
                  * tick.
                  */
-                public setTicksLived(value: number): void;
+                 setTicksLived(value: number): void;
                 /**
                  * Performs the specified {@link EntityEffect} for this entity.
                  * <p>
@@ -205,26 +206,26 @@ declare namespace org {
                  * <p>
                  * If the effect is not applicable to this class of entity, it will not play.
                  */
-                public playEffect(type: org.bukkit.EntityEffect): void;
+                 playEffect(type: org.bukkit.EntityEffect): void;
                 /**
                  * Get the type of the entity.
                  */
-                public getType(): org.bukkit.entity.EntityType;
+                 getType(): org.bukkit.entity.EntityType;
                 /**
                  * Returns whether this entity is inside a vehicle.
                  */
-                public isInsideVehicle(): boolean;
+                 isInsideVehicle(): boolean;
                 /**
                  * Leave the current vehicle. If the entity is currently in a vehicle (and
                  * is removed from it), true will be returned, otherwise false will be
                  * returned.
                  */
-                public leaveVehicle(): boolean;
+                 leaveVehicle(): boolean;
                 /**
                  * Get the vehicle that this player is inside. If there is no vehicle,
                  * null will be returned.
                  */
-                public getVehicle(): org.bukkit.entity.Entity;
+                 getVehicle(): org.bukkit.entity.Entity;
                 /**
                  * Sets whether or not to display the mob's custom name client side. The
                  * name will be displayed above the mob similarly to a player.
@@ -232,79 +233,79 @@ declare namespace org {
                  * This value has no effect on players, they will always display their
                  * name.
                  */
-                public setCustomNameVisible(flag: boolean): void;
+                 setCustomNameVisible(flag: boolean): void;
                 /**
                  * Gets whether or not the mob's custom name is displayed client side.
                  * <p>
                  * This value has no effect on players, they will always display their
                  * name.
                  */
-                public isCustomNameVisible(): boolean;
+                 isCustomNameVisible(): boolean;
                 /**
                  * Sets whether the entity has a team colored (default: white) glow.
                  */
-                public setGlowing(flag: boolean): void;
+                 setGlowing(flag: boolean): void;
                 /**
                  * Gets whether the entity is glowing or not.
                  */
-                public isGlowing(): boolean;
+                 isGlowing(): boolean;
                 /**
                  * Sets whether the entity is invulnerable or not.
                  * <p>
                  * When an entity is invulnerable it can only be damaged by players in
                  * creative mode.
                  */
-                public setInvulnerable(flag: boolean): void;
+                 setInvulnerable(flag: boolean): void;
                 /**
                  * Gets whether the entity is invulnerable or not.
                  */
-                public isInvulnerable(): boolean;
+                 isInvulnerable(): boolean;
                 /**
                  * Gets whether the entity is silent or not.
                  */
-                public isSilent(): boolean;
+                 isSilent(): boolean;
                 /**
                  * Sets whether the entity is silent or not.
                  * <p>
                  * When an entity is silent it will not produce any sound.
                  */
-                public setSilent(flag: boolean): void;
+                 setSilent(flag: boolean): void;
                 /**
                  * Returns whether gravity applies to this entity.
                  */
-                public hasGravity(): boolean;
+                 hasGravity(): boolean;
                 /**
                  * Sets whether gravity applies to this entity.
                  */
-                public setGravity(gravity: boolean): void;
+                 setGravity(gravity: boolean): void;
                 /**
                  * Gets the period of time (in ticks) before this entity can use a portal.
                  */
-                public getPortalCooldown(): number;
+                 getPortalCooldown(): number;
                 /**
                  * Sets the period of time (in ticks) before this entity can use a portal.
                  */
-                public setPortalCooldown(cooldown: number): void;
+                 setPortalCooldown(cooldown: number): void;
                 /**
                  * Returns a set of tags for this entity.
                  * <br>
                  * Entities can have no more than 1024 tags.
                  */
-                public getScoreboardTags(): any[] /*java.util.Set*/;
+                 getScoreboardTags(): any[] /*java.util.Set*/;
                 /**
                  * Add a tag to this entity.
                  * <br>
                  * Entities can have no more than 1024 tags.
                  */
-                public addScoreboardTag(tag: string): boolean;
+                 addScoreboardTag(tag: string): boolean;
                 /**
                  * Removes a given tag from this entity.
                  */
-                public removeScoreboardTag(tag: string): boolean;
+                 removeScoreboardTag(tag: string): boolean;
                 /**
                  * Returns the reaction of the entity when moved by a piston.
                  */
-                public getPistonMoveReaction(): org.bukkit.block.PistonMoveReaction;
+                 getPistonMoveReaction(): org.bukkit.block.PistonMoveReaction;
                 /**
                  * Get the closest cardinal {@link BlockFace} direction an entity is
                  * currently facing.
@@ -315,14 +316,14 @@ declare namespace org {
                  * {@link Hanging} entities will override this call and thus their behavior
                  * may be different.
                  */
-                public getFacing(): org.bukkit.block.BlockFace;
+                 getFacing(): org.bukkit.block.BlockFace;
                 /**
                  * Gets the entity's current pose.
                  * <b>Note that the pose is only updated at the end of a tick, so may be
                  * inconsistent with other methods. eg {@link Player#isSneaking()} being
                  * true does not imply the current pose will be {@link Pose#SNEAKING}</b>
                  */
-                public getPose(): org.bukkit.entity.Pose;
+                 getPose(): org.bukkit.entity.Pose;
             }
         }
     }

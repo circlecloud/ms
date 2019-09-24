@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class EntityPoseChangeEvent {
+                // @ts-ignore
+                 class EntityPoseChangeEvent {
                     constructor(who: org.bukkit.entity.Entity, pose: org.bukkit.entity.Pose)
                     /**
                      * Gets the entity's new pose.

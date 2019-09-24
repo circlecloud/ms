@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace plugin {
-            class TimedRegisteredListener {
+            // @ts-ignore
+             class TimedRegisteredListener {
                 constructor(pluginListener: org.bukkit.event.Listener, eventExecutor: org.bukkit.plugin.EventExecutor, eventPriority: org.bukkit.event.EventPriority, registeredPlugin: org.bukkit.plugin.Plugin, listenCancelled: boolean)
                 public callEvent(event: org.bukkit.event.Event): void;
                 /**

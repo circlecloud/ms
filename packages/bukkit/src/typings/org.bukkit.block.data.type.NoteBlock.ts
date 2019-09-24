@@ -3,23 +3,24 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class NoteBlock {
+                    // @ts-ignore
+                    interface NoteBlock extends org.bukkit.block.data.Powerable {
                         /**
                          * Gets the value of the 'instrument' property.
                          */
-                        public getInstrument(): org.bukkit.Instrument;
+                         getInstrument(): org.bukkit.Instrument;
                         /**
                          * Sets the value of the 'instrument' property.
                          */
-                        public setInstrument(instrument: org.bukkit.Instrument): void;
+                         setInstrument(instrument: org.bukkit.Instrument): void;
                         /**
                          * Gets the value of the 'note' property.
                          */
-                        public getNote(): org.bukkit.Note;
+                         getNote(): org.bukkit.Note;
                         /**
                          * Sets the value of the 'note' property.
                          */
-                        public setNote(note: org.bukkit.Note): void;
+                         setNote(note: org.bukkit.Note): void;
                     }
                 }
             }

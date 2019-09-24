@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace plugin {
-            class InvalidDescriptionException {
+            // @ts-ignore
+             class InvalidDescriptionException {
                 /**
                  * Constructs a new InvalidDescriptionException based on the given
                  * Exception

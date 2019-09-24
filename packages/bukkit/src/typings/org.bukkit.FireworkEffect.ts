@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class FireworkEffect {
+        // @ts-ignore
+         class FireworkEffect implements org.bukkit.configuration.serialization.ConfigurationSerializable {
             /**
              * Construct a firework effect.
              */

@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class Sapling {
+            // @ts-ignore
+             class Sapling {
                 /**
                  * Constructs a sapling.
                  */

@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
         namespace event {
+            // @ts-ignore
             abstract class Event {
                 /**
                  * The default constructor is defined for cleaner code. This constructor

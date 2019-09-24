@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace entity {
                 namespace EntityUnleashEvent {
-                    class UnleashReason {
+                    // @ts-ignore
+                     class UnleashReason {
                         public static HOLDER_GONE: org.bukkit.event.entity.EntityUnleashEvent.UnleashReason;
                         public static PLAYER_UNLEASH: org.bukkit.event.entity.EntityUnleashEvent.UnleashReason;
                         public static DISTANCE: org.bukkit.event.entity.EntityUnleashEvent.UnleashReason;

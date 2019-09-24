@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class TreeType {
+        // @ts-ignore
+         class TreeType {
             public static TREE: org.bukkit.TreeType;
             public static BIG_TREE: org.bukkit.TreeType;
             public static REDWOOD: org.bukkit.TreeType;

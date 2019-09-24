@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace block {
-                class BlockPistonExtendEvent {
+                // @ts-ignore
+                 class BlockPistonExtendEvent {
                     constructor(block: org.bukkit.block.Block, length: number, direction: org.bukkit.block.BlockFace)
                     constructor(block: org.bukkit.block.Block, blocks: any[] /*java.util.List*/, direction: org.bukkit.block.BlockFace)
                     /**

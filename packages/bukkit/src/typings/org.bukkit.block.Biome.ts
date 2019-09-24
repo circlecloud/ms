@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace block {
-            class Biome {
+            // @ts-ignore
+             class Biome implements org.bukkit.Keyed {
                 public static OCEAN: org.bukkit.block.Biome;
                 public static PLAINS: org.bukkit.block.Biome;
                 public static DESERT: org.bukkit.block.Biome;

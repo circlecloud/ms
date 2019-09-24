@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace plugin {
             namespace messaging {
-                class StandardMessenger {
+                // @ts-ignore
+                 class StandardMessenger implements org.bukkit.plugin.messaging.Messenger {
                     constructor()
                     public isReservedChannel(channel: string): boolean;
                     public registerOutgoingPluginChannel(plugin: org.bukkit.plugin.Plugin, channel: string): void;

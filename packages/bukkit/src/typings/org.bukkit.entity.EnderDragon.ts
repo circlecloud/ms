@@ -1,15 +1,16 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class EnderDragon {
+            // @ts-ignore
+            interface EnderDragon extends org.bukkit.entity.ComplexLivingEntity, org.bukkit.entity.Boss {
                 /**
                  * Gets the current phase that the dragon is performing.
                  */
-                public getPhase(): org.bukkit.entity.EnderDragon.Phase;
+                 getPhase(): org.bukkit.entity.EnderDragon.Phase;
                 /**
                  * Sets the next phase for the dragon to perform.
                  */
-                public setPhase(phase: org.bukkit.entity.EnderDragon.Phase): void;
+                 setPhase(phase: org.bukkit.entity.EnderDragon.Phase): void;
             }
         }
     }

@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class EntityPotionEffectEvent {
+                // @ts-ignore
+                 class EntityPotionEffectEvent implements org.bukkit.event.Cancellable {
                     constructor(livingEntity: org.bukkit.entity.LivingEntity, oldEffect: org.bukkit.potion.PotionEffect, newEffect: org.bukkit.potion.PotionEffect, cause: org.bukkit.event.entity.EntityPotionEffectEvent.Cause, action: org.bukkit.event.entity.EntityPotionEffectEvent.Action, override: boolean)
                     /**
                      * Gets the old potion effect of the changed type, which will be removed.

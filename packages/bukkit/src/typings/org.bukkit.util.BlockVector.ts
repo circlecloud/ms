@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace util {
-            class BlockVector {
+            // @ts-ignore
+             class BlockVector {
                 /**
                  * Construct the vector with all components as 0.
                  */

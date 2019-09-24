@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class Location {
+        // @ts-ignore
+         class Location implements org.bukkit.configuration.serialization.ConfigurationSerializable {
             /**
              * Constructs a new Location with the given coordinates
              */

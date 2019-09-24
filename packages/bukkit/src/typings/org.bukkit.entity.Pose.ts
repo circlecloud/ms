@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Pose {
+            // @ts-ignore
+             class Pose {
                 public static STANDING: org.bukkit.entity.Pose;
                 public static FALL_FLYING: org.bukkit.entity.Pose;
                 public static SLEEPING: org.bukkit.entity.Pose;

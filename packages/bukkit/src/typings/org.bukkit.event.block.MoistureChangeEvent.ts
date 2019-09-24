@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace block {
-                class MoistureChangeEvent {
+                // @ts-ignore
+                 class MoistureChangeEvent implements org.bukkit.event.Cancellable {
                     constructor(block: org.bukkit.block.Block, newState: org.bukkit.block.BlockState)
                     /**
                      * Gets the new state of the affected block.

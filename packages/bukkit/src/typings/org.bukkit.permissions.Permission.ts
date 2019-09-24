@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace permissions {
-            class Permission {
+            // @ts-ignore
+             class Permission {
                 constructor(name: string)
                 constructor(name: string, description: string)
                 constructor(name: string, defaultValue: org.bukkit.permissions.PermissionDefault)

@@ -1,18 +1,19 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class Mob {
+            // @ts-ignore
+            interface Mob extends org.bukkit.entity.LivingEntity, org.bukkit.loot.Lootable {
                 /**
                  * Instructs this Mob to set the specified LivingEntity as its target.
                  * <p>
                  * Hostile creatures may attack their target, and friendly creatures may
                  * follow their target.
                  */
-                public setTarget(target: org.bukkit.entity.LivingEntity): void;
+                 setTarget(target: org.bukkit.entity.LivingEntity): void;
                 /**
                  * Gets the current target of this Mob
                  */
-                public getTarget(): org.bukkit.entity.LivingEntity;
+                 getTarget(): org.bukkit.entity.LivingEntity;
             }
         }
     }

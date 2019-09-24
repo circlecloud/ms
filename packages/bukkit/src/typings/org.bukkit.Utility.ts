@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class Utility {
+        // @ts-ignore
+        interface Utility {
         }
     }
 }

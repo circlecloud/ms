@@ -3,15 +3,16 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Campfire {
+                    // @ts-ignore
+                    interface Campfire extends org.bukkit.block.data.Lightable, org.bukkit.block.data.Waterlogged {
                         /**
                          * Gets the value of the 'signal_fire' property.
                          */
-                        public isSignalFire(): boolean;
+                         isSignalFire(): boolean;
                         /**
                          * Sets the value of the 'signal_fire' property.
                          */
-                        public setSignalFire(signalFire: boolean): void;
+                         setSignalFire(signalFire: boolean): void;
                     }
                 }
             }

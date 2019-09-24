@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace material {
-            class Coal {
+            // @ts-ignore
+             class Coal {
                 constructor()
                 constructor(type: org.bukkit.CoalType)
                 constructor(type: org.bukkit.Material)

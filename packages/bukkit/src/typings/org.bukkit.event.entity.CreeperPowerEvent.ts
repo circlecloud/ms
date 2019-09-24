@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace entity {
-                class CreeperPowerEvent {
+                // @ts-ignore
+                 class CreeperPowerEvent implements org.bukkit.event.Cancellable {
                     constructor(creeper: org.bukkit.entity.Creeper, bolt: org.bukkit.entity.LightningStrike, cause: org.bukkit.event.entity.CreeperPowerEvent.PowerCause)
                     constructor(creeper: org.bukkit.entity.Creeper, cause: org.bukkit.event.entity.CreeperPowerEvent.PowerCause)
                     public isCancelled(): boolean;

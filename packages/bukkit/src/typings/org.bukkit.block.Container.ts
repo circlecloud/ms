@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace block {
-            class Container {
+            // @ts-ignore
+            interface Container extends org.bukkit.block.TileState, org.bukkit.inventory.BlockInventoryHolder, org.bukkit.block.Lockable, org.bukkit.Nameable {
                 /**
                  * Gets the inventory of the block represented by this block state.
                  * <p>
@@ -11,7 +12,7 @@ declare namespace org {
                  * If this block state is not placed this will return the captured inventory
                  * snapshot instead.
                  */
-                public getInventory(): org.bukkit.inventory.Inventory;
+                 getInventory(): org.bukkit.inventory.Inventory;
                 /**
                  * Gets the captured inventory snapshot of this container.
                  * <p>
@@ -20,7 +21,7 @@ declare namespace org {
                  * this block state up until {@link #update(boolean, boolean)} has been
                  * called.
                  */
-                public getSnapshotInventory(): org.bukkit.inventory.Inventory;
+                 getSnapshotInventory(): org.bukkit.inventory.Inventory;
             }
         }
     }

@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace conversations {
-            class ConversationContext {
+            // @ts-ignore
+             class ConversationContext {
                 constructor(plugin: org.bukkit.plugin.Plugin, forWhom: org.bukkit.conversations.Conversable, initialSessionData: Map<any, any> /*java.util.Map*/)
                 /**
                  * Gets the plugin that owns this conversation.

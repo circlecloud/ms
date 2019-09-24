@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace attribute {
-            class Attribute {
+            // @ts-ignore
+             class Attribute {
                 public static GENERIC_MAX_HEALTH: org.bukkit.attribute.Attribute;
                 public static GENERIC_FOLLOW_RANGE: org.bukkit.attribute.Attribute;
                 public static GENERIC_KNOCKBACK_RESISTANCE: org.bukkit.attribute.Attribute;

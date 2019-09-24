@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace inventory {
             namespace RecipeChoice {
-                class ExactChoice {
+                // @ts-ignore
+                 class ExactChoice implements org.bukkit.inventory.RecipeChoice {
                     constructor(stack: org.bukkit.inventory.ItemStack)
                     constructor(stacks: org.bukkit.inventory.ItemStack)
                     constructor(choices: any[] /*java.util.List*/)

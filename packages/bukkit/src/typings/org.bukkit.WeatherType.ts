@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class WeatherType {
+        // @ts-ignore
+         class WeatherType {
             public static DOWNFALL: org.bukkit.WeatherType;
             public static CLEAR: org.bukkit.WeatherType;
             public static values(): org.bukkit.WeatherType[];

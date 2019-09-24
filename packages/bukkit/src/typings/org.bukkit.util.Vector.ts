@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace util {
-            class Vector {
+            // @ts-ignore
+             class Vector implements org.bukkit.configuration.serialization.ConfigurationSerializable {
                 /**
                  * Construct the vector with all components as 0.
                  */

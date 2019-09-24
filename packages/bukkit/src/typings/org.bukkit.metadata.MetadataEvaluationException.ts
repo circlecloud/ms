@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace metadata {
-            class MetadataEvaluationException {
+            // @ts-ignore
+             class MetadataEvaluationException {
             }
         }
     }

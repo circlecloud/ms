@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace Note {
-            class Tone {
+            // @ts-ignore
+             class Tone {
                 public static G: org.bukkit.Note.Tone;
                 public static A: org.bukkit.Note.Tone;
                 public static B: org.bukkit.Note.Tone;

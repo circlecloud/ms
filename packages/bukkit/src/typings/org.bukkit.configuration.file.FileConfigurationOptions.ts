@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace configuration {
             namespace file {
-                class FileConfigurationOptions {
+                // @ts-ignore
+                 class FileConfigurationOptions {
                     constructor(configuration: org.bukkit.configuration.MemoryConfiguration)
                     public configuration(): org.bukkit.configuration.file.FileConfiguration;
                     public copyDefaults(value: boolean): org.bukkit.configuration.file.FileConfigurationOptions;

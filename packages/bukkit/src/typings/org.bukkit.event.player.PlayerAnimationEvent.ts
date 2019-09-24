@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace player {
-                class PlayerAnimationEvent {
+                // @ts-ignore
+                 class PlayerAnimationEvent implements org.bukkit.event.Cancellable {
                     /**
                      * Construct a new PlayerAnimation event
                      */

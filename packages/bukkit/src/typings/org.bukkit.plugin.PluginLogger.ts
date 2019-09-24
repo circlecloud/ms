@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace plugin {
-            class PluginLogger {
+            // @ts-ignore
+             class PluginLogger {
                 /**
                  * Creates a new PluginLogger that extracts the name from a plugin.
                  */

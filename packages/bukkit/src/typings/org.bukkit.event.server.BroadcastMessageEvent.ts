@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace server {
-                class BroadcastMessageEvent {
+                // @ts-ignore
+                 class BroadcastMessageEvent implements org.bukkit.event.Cancellable {
                     constructor(message: string, recipients: any[] /*java.util.Set*/)
                     constructor(isAsync: boolean, message: string, recipients: any[] /*java.util.Set*/)
                     /**

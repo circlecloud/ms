@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace event {
             namespace inventory {
-                class InventoryAction {
+                // @ts-ignore
+                 class InventoryAction {
                     public static NOTHING: org.bukkit.event.inventory.InventoryAction;
                     public static PICKUP_ALL: org.bukkit.event.inventory.InventoryAction;
                     public static PICKUP_SOME: org.bukkit.event.inventory.InventoryAction;

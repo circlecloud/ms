@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace plugin {
-            class PluginDescriptionFile {
+            // @ts-ignore
+             class PluginDescriptionFile {
                 constructor(stream: any)
                 /**
                  * Loads a PluginDescriptionFile from the specified reader

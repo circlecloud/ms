@@ -1,16 +1,17 @@
 declare namespace org {
     namespace bukkit {
         namespace entity {
-            class TNTPrimed {
+            // @ts-ignore
+            interface TNTPrimed extends org.bukkit.entity.Explosive {
                 /**
                  * Set the number of ticks until the TNT blows up after being primed.
                  */
-                public setFuseTicks(fuseTicks: number): void;
+                 setFuseTicks(fuseTicks: number): void;
                 /**
                  * Retrieve the number of ticks until the explosion of this TNTPrimed
                  * entity
                  */
-                public getFuseTicks(): number;
+                 getFuseTicks(): number;
                 /**
                  * Gets the source of this primed TNT. The source is the entity
                  * responsible for the creation of this primed TNT. (I.E. player ignites
@@ -23,7 +24,7 @@ declare namespace org {
                  * it has since died or been unloaded. Callers should check
                  * {@link Entity#isValid()}.
                  */
-                public getSource(): org.bukkit.entity.Entity;
+                 getSource(): org.bukkit.entity.Entity;
             }
         }
     }

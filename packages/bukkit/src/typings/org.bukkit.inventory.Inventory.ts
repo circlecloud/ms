@@ -1,15 +1,16 @@
 declare namespace org {
     namespace bukkit {
         namespace inventory {
-            class Inventory {
+            // @ts-ignore
+            interface Inventory {
                 /**
                  * Returns the size of the inventory
                  */
-                public getSize(): number;
+                 getSize(): number;
                 /**
                  * Returns the maximum stack size for an ItemStack in this inventory.
                  */
-                public getMaxStackSize(): number;
+                 getMaxStackSize(): number;
                 /**
                  * This method allows you to change the maximum stack size for an
                  * inventory.
@@ -24,15 +25,15 @@ declare namespace org {
                  * may not display correctly in the client.
                  * </ul>
                  */
-                public setMaxStackSize(size: number): void;
+                 setMaxStackSize(size: number): void;
                 /**
                  * Returns the ItemStack found in the slot at the given index
                  */
-                public getItem(index: number): org.bukkit.inventory.ItemStack;
+                 getItem(index: number): org.bukkit.inventory.ItemStack;
                 /**
                  * Stores the ItemStack at the given index of the inventory.
                  */
-                public setItem(index: number, item: org.bukkit.inventory.ItemStack): void;
+                 setItem(index: number, item: org.bukkit.inventory.ItemStack): void;
                 /**
                  * Stores the given ItemStacks in the inventory. This will try to fill
                  * existing stacks and empty slots as well as it can.
@@ -53,7 +54,7 @@ declare namespace org {
                  * the inputted argument amount to the number of that item not placed in
                  * slots.
                  */
-                public addItem(items: org.bukkit.inventory.ItemStack): any;
+                 addItem(items: org.bukkit.inventory.ItemStack): any;
                 /**
                  * Removes the given ItemStacks from the inventory.
                  * <p>
@@ -69,16 +70,16 @@ declare namespace org {
                  * inputted argument amount to the number of that item not removed from
                  * slots.
                  */
-                public removeItem(items: org.bukkit.inventory.ItemStack): any;
+                 removeItem(items: org.bukkit.inventory.ItemStack): any;
                 /**
                  * Returns all ItemStacks from the inventory
                  */
-                public getContents(): org.bukkit.inventory.ItemStack[];
+                 getContents(): org.bukkit.inventory.ItemStack[];
                 /**
                  * Completely replaces the inventory's contents. Removes all existing
                  * contents and replaces it with the ItemStacks given in the array.
                  */
-                public setContents(items: org.bukkit.inventory.ItemStack): void;
+                 setContents(items: org.bukkit.inventory.ItemStack): void;
                 /**
                  * Return the contents from the section of the inventory where items can
                  * reasonably be expected to be stored. In most cases this will represent
@@ -88,16 +89,16 @@ declare namespace org {
                  * It is these contents which will be used for add / contains / remove
                  * methods which look for a specific stack.
                  */
-                public getStorageContents(): org.bukkit.inventory.ItemStack[];
+                 getStorageContents(): org.bukkit.inventory.ItemStack[];
                 /**
                  * Put the given ItemStacks into the storage slots
                  */
-                public setStorageContents(items: org.bukkit.inventory.ItemStack): void;
+                 setStorageContents(items: org.bukkit.inventory.ItemStack): void;
                 /**
                  * Checks if the inventory contains any ItemStacks with the given
                  * material.
                  */
-                public contains(material: org.bukkit.Material): boolean;
+                 contains(material: org.bukkit.Material): boolean;
                 /**
                  * Checks if the inventory contains any ItemStacks matching the given
                  * ItemStack.
@@ -105,12 +106,12 @@ declare namespace org {
                  * This will only return true if both the type and the amount of the stack
                  * match.
                  */
-                public contains(item: org.bukkit.inventory.ItemStack): boolean;
+                 contains(item: org.bukkit.inventory.ItemStack): boolean;
                 /**
                  * Checks if the inventory contains any ItemStacks with the given
                  * material, adding to at least the minimum amount specified.
                  */
-                public contains(material: org.bukkit.Material, amount: number): boolean;
+                 contains(material: org.bukkit.Material, amount: number): boolean;
                 /**
                  * Checks if the inventory contains at least the minimum amount specified
                  * of exactly matching ItemStacks.
@@ -118,12 +119,12 @@ declare namespace org {
                  * An ItemStack only counts if both the type and the amount of the stack
                  * match.
                  */
-                public contains(item: org.bukkit.inventory.ItemStack, amount: number): boolean;
+                 contains(item: org.bukkit.inventory.ItemStack, amount: number): boolean;
                 /**
                  * Checks if the inventory contains ItemStacks matching the given
                  * ItemStack whose amounts sum to at least the minimum amount specified.
                  */
-                public containsAtLeast(item: org.bukkit.inventory.ItemStack, amount: number): boolean;
+                 containsAtLeast(item: org.bukkit.inventory.ItemStack, amount: number): boolean;
                 /**
                  * Returns a HashMap with all slots and ItemStacks in the inventory with
                  * the given Material.
@@ -132,7 +133,7 @@ declare namespace org {
                  * value is the ItemStack in that slot. If no matching ItemStack with the
                  * given Material is found, an empty map is returned.
                  */
-                public all(material: org.bukkit.Material): any;
+                 all(material: org.bukkit.Material): any;
                 /**
                  * Finds all slots in the inventory containing any ItemStacks with the
                  * given ItemStack. This will only match slots if both the type and the
@@ -142,41 +143,41 @@ declare namespace org {
                  * value is the ItemStack in that slot. If no matching ItemStack with the
                  * given Material is found, an empty map is returned.
                  */
-                public all(item: org.bukkit.inventory.ItemStack): any;
+                 all(item: org.bukkit.inventory.ItemStack): any;
                 /**
                  * Finds the first slot in the inventory containing an ItemStack with the
                  * given material
                  */
-                public first(material: org.bukkit.Material): number;
+                 first(material: org.bukkit.Material): number;
                 /**
                  * Returns the first slot in the inventory containing an ItemStack with
                  * the given stack. This will only match a slot if both the type and the
                  * amount of the stack match
                  */
-                public first(item: org.bukkit.inventory.ItemStack): number;
+                 first(item: org.bukkit.inventory.ItemStack): number;
                 /**
                  * Returns the first empty Slot.
                  */
-                public firstEmpty(): number;
+                 firstEmpty(): number;
                 /**
                  * Removes all stacks in the inventory matching the given material.
                  */
-                public remove(material: org.bukkit.Material): void;
+                 remove(material: org.bukkit.Material): void;
                 /**
                  * Removes all stacks in the inventory matching the given stack.
                  * <p>
                  * This will only match a slot if both the type and the amount of the
                  * stack match
                  */
-                public remove(item: org.bukkit.inventory.ItemStack): void;
+                 remove(item: org.bukkit.inventory.ItemStack): void;
                 /**
                  * Clears out a particular slot in the index.
                  */
-                public clear(index: number): void;
+                 clear(index: number): void;
                 /**
                  * Clears out the whole Inventory.
                  */
-                public clear(): void;
+                 clear(): void;
                 /**
                  * Gets a list of players viewing the inventory. Note that a player is
                  * considered to be viewing their own inventory and internal crafting
@@ -186,28 +187,28 @@ declare namespace org {
                  * inventory screens to exclude the viewer's inventory, so this should
                  * never be assumed to be non-empty.
                  */
-                public getViewers(): any[] /*java.util.List*/;
+                 getViewers(): any[] /*java.util.List*/;
                 /**
                  * Returns what type of inventory this is.
                  */
-                public getType(): org.bukkit.event.inventory.InventoryType;
+                 getType(): org.bukkit.event.inventory.InventoryType;
                 /**
                  * Gets the block or entity belonging to the open inventory
                  */
-                public getHolder(): org.bukkit.inventory.InventoryHolder;
-                public iterator(): any;
+                 getHolder(): org.bukkit.inventory.InventoryHolder;
+                 iterator(): any;
                 /**
                  * Returns an iterator starting at the given index. If the index is
                  * positive, then the first call to next() will return the item at that
                  * index; if it is negative, the first call to previous will return the
                  * item at index (getSize() + index).
                  */
-                public iterator(index: number): any;
+                 iterator(index: number): any;
                 /**
                  * Get the location of the block or entity which corresponds to this inventory. May return null if this container
                  * was custom created or is a virtual / subcontainer.
                  */
-                public getLocation(): org.bukkit.Location;
+                 getLocation(): org.bukkit.Location;
             }
         }
     }

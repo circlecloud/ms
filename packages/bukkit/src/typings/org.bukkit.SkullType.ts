@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
-        class SkullType {
+        // @ts-ignore
+         class SkullType {
             public static SKELETON: org.bukkit.SkullType;
             public static WITHER: org.bukkit.SkullType;
             public static ZOMBIE: org.bukkit.SkullType;

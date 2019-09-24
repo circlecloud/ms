@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace util {
-            class StringUtil {
+            // @ts-ignore
+             class StringUtil {
                 constructor()
                 /**
                  * Copies all elements from the iterable collection of originals to the

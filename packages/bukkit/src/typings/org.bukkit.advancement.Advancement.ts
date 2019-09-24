@@ -1,11 +1,12 @@
 declare namespace org {
     namespace bukkit {
         namespace advancement {
-            class Advancement {
+            // @ts-ignore
+            interface Advancement extends org.bukkit.Keyed {
                 /**
                  * Get all the criteria present in this advancement.
                  */
-                public getCriteria(): any[] /*java.util.Collection*/;
+                 getCriteria(): any[] /*java.util.Collection*/;
             }
         }
     }

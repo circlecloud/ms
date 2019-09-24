@@ -3,7 +3,8 @@ declare namespace org {
         namespace event {
             namespace player {
                 namespace PlayerBedEnterEvent {
-                    class BedEnterResult {
+                    // @ts-ignore
+                     class BedEnterResult {
                         public static OK: org.bukkit.event.player.PlayerBedEnterEvent.BedEnterResult;
                         public static NOT_POSSIBLE_HERE: org.bukkit.event.player.PlayerBedEnterEvent.BedEnterResult;
                         public static NOT_POSSIBLE_NOW: org.bukkit.event.player.PlayerBedEnterEvent.BedEnterResult;

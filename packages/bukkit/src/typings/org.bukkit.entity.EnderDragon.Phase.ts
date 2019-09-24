@@ -2,7 +2,8 @@ declare namespace org {
     namespace bukkit {
         namespace entity {
             namespace EnderDragon {
-                class Phase {
+                // @ts-ignore
+                 class Phase {
                     public static CIRCLING: org.bukkit.entity.EnderDragon.Phase;
                     public static STRAFING: org.bukkit.entity.EnderDragon.Phase;
                     public static FLY_TO_PORTAL: org.bukkit.entity.EnderDragon.Phase;

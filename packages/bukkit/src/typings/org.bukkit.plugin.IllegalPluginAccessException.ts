@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace plugin {
-            class IllegalPluginAccessException {
+            // @ts-ignore
+             class IllegalPluginAccessException {
                 /**
                  * Creates a new instance of <code>IllegalPluginAccessException</code>
                  * without detail message.

@@ -1,7 +1,8 @@
 declare namespace org {
     namespace bukkit {
         namespace plugin {
-            class UnknownDependencyException {
+            // @ts-ignore
+             class UnknownDependencyException {
                 /**
                  * Constructs a new UnknownDependencyException based on the given
                  * Exception

@@ -3,23 +3,24 @@ declare namespace org {
         namespace block {
             namespace data {
                 namespace type {
-                    class Leaves {
+                    // @ts-ignore
+                    interface Leaves extends org.bukkit.block.data.BlockData {
                         /**
                          * Gets the value of the 'persistent' property.
                          */
-                        public isPersistent(): boolean;
+                         isPersistent(): boolean;
                         /**
                          * Sets the value of the 'persistent' property.
                          */
-                        public setPersistent(persistent: boolean): void;
+                         setPersistent(persistent: boolean): void;
                         /**
                          * Gets the value of the 'distance' property.
                          */
-                        public getDistance(): number;
+                         getDistance(): number;
                         /**
                          * Sets the value of the 'distance' property.
                          */
-                        public setDistance(distance: number): void;
+                         setDistance(distance: number): void;
                     }
                 }
             }
