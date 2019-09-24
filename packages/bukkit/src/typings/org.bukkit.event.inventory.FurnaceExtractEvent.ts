@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace inventory {
                 // @ts-ignore
-                 class FurnaceExtractEvent {
+                 class FurnaceExtractEvent extends org.bukkit.event.block.BlockExpEvent {
                     constructor(player: org.bukkit.entity.Player, block: org.bukkit.block.Block, itemType: org.bukkit.Material, itemAmount: number, exp: number)
                     /**
                      * Get the player that triggered the event

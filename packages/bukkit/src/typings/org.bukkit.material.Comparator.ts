@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace material {
             // @ts-ignore
-             class Comparator implements org.bukkit.material.Directional, org.bukkit.material.Redstone {
+             class Comparator extends org.bukkit.material.MaterialData implements org.bukkit.material.Directional, org.bukkit.material.Redstone {
                 /**
                  * Constructs a comparator switched off, with the default mode (normal) and facing the default direction (north).
                  */

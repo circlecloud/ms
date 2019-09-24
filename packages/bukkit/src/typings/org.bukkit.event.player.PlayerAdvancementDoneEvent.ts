@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerAdvancementDoneEvent {
+                 class PlayerAdvancementDoneEvent extends org.bukkit.event.player.PlayerEvent {
                     constructor(who: org.bukkit.entity.Player, advancement: org.bukkit.advancement.Advancement)
                     /**
                      * Get the advancement which has been completed.

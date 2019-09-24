@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace inventory {
                 // @ts-ignore
-                 class InventoryCloseEvent {
+                 class InventoryCloseEvent extends org.bukkit.event.inventory.InventoryEvent {
                     constructor(transaction: org.bukkit.inventory.InventoryView)
                     /**
                      * Returns the player involved in this event

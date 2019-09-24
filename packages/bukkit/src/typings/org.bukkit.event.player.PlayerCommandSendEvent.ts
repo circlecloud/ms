@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerCommandSendEvent {
+                 class PlayerCommandSendEvent extends org.bukkit.event.player.PlayerEvent {
                     constructor(player: org.bukkit.entity.Player, commands: any[] /*java.util.Collection*/)
                     /**
                      * Returns a mutable collection of all top level commands to be sent.

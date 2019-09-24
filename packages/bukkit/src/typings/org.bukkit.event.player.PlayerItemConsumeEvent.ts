@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerItemConsumeEvent implements org.bukkit.event.Cancellable {
+                 class PlayerItemConsumeEvent extends org.bukkit.event.player.PlayerEvent implements org.bukkit.event.Cancellable {
                     constructor(player: org.bukkit.entity.Player, item: org.bukkit.inventory.ItemStack)
                     /**
                      * Gets the item that is being consumed. Modifying the returned item will

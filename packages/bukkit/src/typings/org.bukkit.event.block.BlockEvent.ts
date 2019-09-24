@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace block {
                 // @ts-ignore
-                abstract class BlockEvent {
+                abstract class BlockEvent extends org.bukkit.event.Event {
                     constructor(theBlock: org.bukkit.block.Block)
                     protected block: org.bukkit.block.Block;
                     /**

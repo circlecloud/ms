@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace world {
                 // @ts-ignore
-                 class StructureGrowEvent implements org.bukkit.event.Cancellable {
+                 class StructureGrowEvent extends org.bukkit.event.world.WorldEvent implements org.bukkit.event.Cancellable {
                     constructor(location: org.bukkit.Location, species: org.bukkit.TreeType, bonemeal: boolean, player: org.bukkit.entity.Player, blocks: any[] /*java.util.List*/)
                     /**
                      * Gets the location of the structure.

@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace entity {
                 // @ts-ignore
-                 class EntityToggleSwimEvent implements org.bukkit.event.Cancellable {
+                 class EntityToggleSwimEvent extends org.bukkit.event.entity.EntityEvent implements org.bukkit.event.Cancellable {
                     constructor(who: org.bukkit.entity.LivingEntity, isSwimming: boolean)
                     public isCancelled(): boolean;
                     public setCancelled(cancel: boolean): void;

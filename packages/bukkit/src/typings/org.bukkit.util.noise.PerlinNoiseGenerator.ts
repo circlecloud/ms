@@ -3,7 +3,7 @@ declare namespace org {
         namespace util {
             namespace noise {
                 // @ts-ignore
-                 class PerlinNoiseGenerator {
+                 class PerlinNoiseGenerator extends org.bukkit.util.noise.NoiseGenerator {
                     constructor()
                     /**
                      * Creates a seeded perlin noise generator for the given world
@@ -37,7 +37,6 @@ declare namespace org {
                      * Gets the singleton unseeded instance of this generator
                      */
                     public static getInstance(): org.bukkit.util.noise.PerlinNoiseGenerator;
-                    public noise(x: number, y: number, z: number): number;
                     /**
                      * Generates noise for the 1D coordinates using the specified number of
                      * octaves and parameters

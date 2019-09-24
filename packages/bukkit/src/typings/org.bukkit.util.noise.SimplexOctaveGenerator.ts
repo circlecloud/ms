@@ -3,7 +3,7 @@ declare namespace org {
         namespace util {
             namespace noise {
                 // @ts-ignore
-                 class SimplexOctaveGenerator {
+                 class SimplexOctaveGenerator extends org.bukkit.util.noise.OctaveGenerator {
                     /**
                      * Creates a simplex octave generator for the given world
                      */
@@ -25,16 +25,6 @@ declare namespace org {
                      * Sets the scale used for each W-coordinates passed
                      */
                     public setWScale(scale: number): void;
-                    /**
-                     * Generates noise for the 3D coordinates using the specified number of
-                     * octaves and parameters
-                     */
-                    public noise(x: number, y: number, z: number, w: number, frequency: number, amplitude: number): number;
-                    /**
-                     * Generates noise for the 3D coordinates using the specified number of
-                     * octaves and parameters
-                     */
-                    public noise(x: number, y: number, z: number, w: number, frequency: number, amplitude: number, normalized: boolean): number;
                 }
             }
         }

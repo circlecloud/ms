@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace material {
             // @ts-ignore
-             class WoodenStep {
+             class WoodenStep extends org.bukkit.material.Wood {
                 /**
                  * Constructs a wooden step.
                  */

@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace material {
             // @ts-ignore
-             class FlowerPot {
+             class FlowerPot extends org.bukkit.material.MaterialData {
                 /**
                  * Default constructor for a flower pot.
                  */

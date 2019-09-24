@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerAchievementAwardedEvent implements org.bukkit.event.Cancellable {
+                 class PlayerAchievementAwardedEvent extends org.bukkit.event.player.PlayerEvent implements org.bukkit.event.Cancellable {
                     constructor(player: org.bukkit.entity.Player, achievement: org.bukkit.Achievement)
                     /**
                      * Gets the Achievement being awarded.

@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace entity {
                 // @ts-ignore
-                 class HorseJumpEvent implements org.bukkit.event.Cancellable {
+                 class HorseJumpEvent extends org.bukkit.event.entity.EntityEvent implements org.bukkit.event.Cancellable {
                     constructor(horse: org.bukkit.entity.AbstractHorse, power: number)
                     public isCancelled(): boolean;
                     public setCancelled(cancel: boolean): void;

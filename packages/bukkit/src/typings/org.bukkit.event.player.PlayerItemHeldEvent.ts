@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerItemHeldEvent implements org.bukkit.event.Cancellable {
+                 class PlayerItemHeldEvent extends org.bukkit.event.player.PlayerEvent implements org.bukkit.event.Cancellable {
                     constructor(player: org.bukkit.entity.Player, previous: number, current: number)
                     /**
                      * Gets the previous held slot index

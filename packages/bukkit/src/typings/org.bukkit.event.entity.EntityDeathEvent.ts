@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace entity {
                 // @ts-ignore
-                 class EntityDeathEvent {
+                 class EntityDeathEvent extends org.bukkit.event.entity.EntityEvent {
                     constructor(entity: org.bukkit.entity.LivingEntity, drops: any[] /*java.util.List*/)
                     constructor(what: org.bukkit.entity.LivingEntity, drops: any[] /*java.util.List*/, droppedExp: number)
                     public getEntity(): org.bukkit.entity.LivingEntity;

@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace material {
             // @ts-ignore
-             class Pumpkin implements org.bukkit.material.Directional {
+             class Pumpkin extends org.bukkit.material.MaterialData implements org.bukkit.material.Directional {
                 constructor()
                 /**
                  * Instantiate a pumpkin facing in a particular direction.

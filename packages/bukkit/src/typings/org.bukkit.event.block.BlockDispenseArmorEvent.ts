@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace block {
                 // @ts-ignore
-                 class BlockDispenseArmorEvent {
+                 class BlockDispenseArmorEvent extends org.bukkit.event.block.BlockDispenseEvent {
                     constructor(block: org.bukkit.block.Block, dispensed: org.bukkit.inventory.ItemStack, target: org.bukkit.entity.LivingEntity)
                     /**
                      * Get the living entity on which the armor was dispensed.

@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace block {
                 // @ts-ignore
-                 class EntityBlockFormEvent {
+                 class EntityBlockFormEvent extends org.bukkit.event.block.BlockFormEvent {
                     constructor(entity: org.bukkit.entity.Entity, block: org.bukkit.block.Block, blockstate: org.bukkit.block.BlockState)
                     /**
                      * Get the entity that formed the block.

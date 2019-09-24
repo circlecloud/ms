@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace inventory {
                 // @ts-ignore
-                 class TradeSelectEvent {
+                 class TradeSelectEvent extends org.bukkit.event.inventory.InventoryInteractEvent {
                     constructor(transaction: org.bukkit.inventory.InventoryView, newIndex: number)
                     /**
                      * Used to get the index of the trade the player clicked on.

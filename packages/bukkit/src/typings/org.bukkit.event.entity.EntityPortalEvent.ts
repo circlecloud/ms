@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace entity {
                 // @ts-ignore
-                 class EntityPortalEvent {
+                 class EntityPortalEvent extends org.bukkit.event.entity.EntityTeleportEvent {
                     constructor(entity: org.bukkit.entity.Entity, from: org.bukkit.Location, to: org.bukkit.Location)
                     public getHandlers(): org.bukkit.event.HandlerList;
                     public static getHandlerList(): org.bukkit.event.HandlerList;

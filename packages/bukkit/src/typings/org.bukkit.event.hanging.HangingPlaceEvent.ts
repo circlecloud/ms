@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace hanging {
                 // @ts-ignore
-                 class HangingPlaceEvent implements org.bukkit.event.Cancellable {
+                 class HangingPlaceEvent extends org.bukkit.event.hanging.HangingEvent implements org.bukkit.event.Cancellable {
                     constructor(hanging: org.bukkit.entity.Hanging, player: org.bukkit.entity.Player, block: org.bukkit.block.Block, blockFace: org.bukkit.block.BlockFace)
                     /**
                      * Returns the player placing the hanging entity

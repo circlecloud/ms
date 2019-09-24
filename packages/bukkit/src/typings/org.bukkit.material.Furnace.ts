@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace material {
             // @ts-ignore
-             class Furnace {
+             class Furnace extends org.bukkit.material.FurnaceAndDispenser {
                 constructor()
                 /**
                  * Instantiate a furnace facing in a particular direction.

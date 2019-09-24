@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace server {
                 // @ts-ignore
-                 class ServerListPingEvent {
+                 class ServerListPingEvent extends org.bukkit.event.server.ServerEvent {
                     constructor(address: any, motd: string, numPlayers: number, maxPlayers: number)
                     /**
                      * This constructor is intended for implementations that provide the

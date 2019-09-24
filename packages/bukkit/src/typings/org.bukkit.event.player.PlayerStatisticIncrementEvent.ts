@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerStatisticIncrementEvent implements org.bukkit.event.Cancellable {
+                 class PlayerStatisticIncrementEvent extends org.bukkit.event.player.PlayerEvent implements org.bukkit.event.Cancellable {
                     constructor(player: org.bukkit.entity.Player, statistic: org.bukkit.Statistic, initialValue: number, newValue: number)
                     constructor(player: org.bukkit.entity.Player, statistic: org.bukkit.Statistic, initialValue: number, newValue: number, entityType: org.bukkit.entity.EntityType)
                     constructor(player: org.bukkit.entity.Player, statistic: org.bukkit.Statistic, initialValue: number, newValue: number, material: org.bukkit.Material)

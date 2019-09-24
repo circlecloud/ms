@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerInteractAtEntityEvent {
+                 class PlayerInteractAtEntityEvent extends org.bukkit.event.player.PlayerInteractEntityEvent {
                     constructor(who: org.bukkit.entity.Player, clickedEntity: org.bukkit.entity.Entity, position: org.bukkit.util.Vector)
                     constructor(who: org.bukkit.entity.Player, clickedEntity: org.bukkit.entity.Entity, position: org.bukkit.util.Vector, hand: org.bukkit.inventory.EquipmentSlot)
                     public getClickedPosition(): org.bukkit.util.Vector;

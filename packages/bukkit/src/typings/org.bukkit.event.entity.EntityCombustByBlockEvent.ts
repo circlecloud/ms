@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace entity {
                 // @ts-ignore
-                 class EntityCombustByBlockEvent {
+                 class EntityCombustByBlockEvent extends org.bukkit.event.entity.EntityCombustEvent {
                     constructor(combuster: org.bukkit.block.Block, combustee: org.bukkit.entity.Entity, duration: number)
                     /**
                      * The combuster can be lava or a block that is on fire.

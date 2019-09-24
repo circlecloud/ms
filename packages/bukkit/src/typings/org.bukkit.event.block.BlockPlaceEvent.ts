@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace block {
                 // @ts-ignore
-                 class BlockPlaceEvent implements org.bukkit.event.Cancellable {
+                 class BlockPlaceEvent extends org.bukkit.event.block.BlockEvent implements org.bukkit.event.Cancellable {
                     constructor(placedBlock: org.bukkit.block.Block, replacedBlockState: org.bukkit.block.BlockState, placedAgainst: org.bukkit.block.Block, itemInHand: org.bukkit.inventory.ItemStack, thePlayer: org.bukkit.entity.Player, canBuild: boolean)
                     constructor(placedBlock: org.bukkit.block.Block, replacedBlockState: org.bukkit.block.BlockState, placedAgainst: org.bukkit.block.Block, itemInHand: org.bukkit.inventory.ItemStack, thePlayer: org.bukkit.entity.Player, canBuild: boolean, hand: org.bukkit.inventory.EquipmentSlot)
                     protected cancel: boolean;

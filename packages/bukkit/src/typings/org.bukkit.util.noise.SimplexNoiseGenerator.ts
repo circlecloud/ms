@@ -3,7 +3,7 @@ declare namespace org {
         namespace util {
             namespace noise {
                 // @ts-ignore
-                 class SimplexNoiseGenerator {
+                 class SimplexNoiseGenerator extends org.bukkit.util.noise.PerlinNoiseGenerator {
                     constructor()
                     /**
                      * Creates a seeded simplex noise generator for the given world
@@ -55,13 +55,6 @@ declare namespace org {
                      * 4D space
                      */
                     public static getNoise(x: number, y: number, z: number, w: number): number;
-                    public noise(xin: number, yin: number, zin: number): number;
-                    public noise(xin: number, yin: number): number;
-                    /**
-                     * Computes and returns the 4D simplex noise for the given coordinates in
-                     * 4D space
-                     */
-                    public noise(x: number, y: number, z: number, w: number): number;
                     /**
                      * Gets the singleton unseeded instance of this generator
                      */

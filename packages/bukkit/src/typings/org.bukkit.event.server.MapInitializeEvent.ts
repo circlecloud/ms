@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace server {
                 // @ts-ignore
-                 class MapInitializeEvent {
+                 class MapInitializeEvent extends org.bukkit.event.server.ServerEvent {
                     constructor(mapView: org.bukkit.map.MapView)
                     /**
                      * Gets the map initialized in this event.

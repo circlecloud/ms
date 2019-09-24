@@ -3,7 +3,7 @@ declare namespace org {
         namespace configuration {
             namespace file {
                 // @ts-ignore
-                abstract class FileConfiguration {
+                abstract class FileConfiguration extends org.bukkit.configuration.MemoryConfiguration {
                     /**
                      * Creates an empty {@link FileConfiguration} with no default values.
                      */

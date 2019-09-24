@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace server {
                 // @ts-ignore
-                 class ServerCommandEvent implements org.bukkit.event.Cancellable {
+                 class ServerCommandEvent extends org.bukkit.event.server.ServerEvent implements org.bukkit.event.Cancellable {
                     constructor(sender: org.bukkit.command.CommandSender, command: string)
                     /**
                      * Gets the command that the user is attempting to execute from the

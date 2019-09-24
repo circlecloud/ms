@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace enchantment {
                 // @ts-ignore
-                 class PrepareItemEnchantEvent implements org.bukkit.event.Cancellable {
+                 class PrepareItemEnchantEvent extends org.bukkit.event.inventory.InventoryEvent implements org.bukkit.event.Cancellable {
                     constructor(enchanter: org.bukkit.entity.Player, view: org.bukkit.inventory.InventoryView, table: org.bukkit.block.Block, item: org.bukkit.inventory.ItemStack, offers: org.bukkit.enchantments.EnchantmentOffer, bonus: number)
                     /**
                      * Gets the player enchanting the item

@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace material {
             // @ts-ignore
-             class Dispenser {
+             class Dispenser extends org.bukkit.material.FurnaceAndDispenser {
                 constructor()
                 constructor(direction: org.bukkit.block.BlockFace)
                 constructor(type: org.bukkit.Material)

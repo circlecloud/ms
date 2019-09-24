@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace command {
             // @ts-ignore
-             class MultipleCommandAlias {
+             class MultipleCommandAlias extends org.bukkit.command.Command {
                 constructor(name: string, commands: org.bukkit.command.Command)
                 /**
                  * Gets the commands associated with the multi-command alias.

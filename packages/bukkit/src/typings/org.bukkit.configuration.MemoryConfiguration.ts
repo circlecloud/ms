@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace configuration {
             // @ts-ignore
-             class MemoryConfiguration implements org.bukkit.configuration.Configuration {
+             class MemoryConfiguration extends org.bukkit.configuration.MemorySection implements org.bukkit.configuration.Configuration {
                 /**
                  * Creates an empty {@link MemoryConfiguration} with no default values.
                  */

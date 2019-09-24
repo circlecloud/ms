@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace inventory {
                 // @ts-ignore
-                 class FurnaceSmeltEvent {
+                 class FurnaceSmeltEvent extends org.bukkit.event.block.BlockCookEvent {
                     constructor(furnace: org.bukkit.block.Block, source: org.bukkit.inventory.ItemStack, result: org.bukkit.inventory.ItemStack)
                 }
             }

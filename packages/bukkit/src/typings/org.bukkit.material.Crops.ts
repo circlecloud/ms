@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace material {
             // @ts-ignore
-             class Crops {
+             class Crops extends org.bukkit.material.MaterialData {
                 /**
                  * Constructs a wheat crop block in the seeded state.
                  */

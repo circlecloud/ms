@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace block {
                 // @ts-ignore
-                 class BlockSpreadEvent {
+                 class BlockSpreadEvent extends org.bukkit.event.block.BlockFormEvent {
                     constructor(block: org.bukkit.block.Block, source: org.bukkit.block.Block, newState: org.bukkit.block.BlockState)
                     /**
                      * Gets the source block involved in this event.

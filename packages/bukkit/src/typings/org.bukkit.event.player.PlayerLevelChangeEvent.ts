@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerLevelChangeEvent {
+                 class PlayerLevelChangeEvent extends org.bukkit.event.player.PlayerEvent {
                     constructor(player: org.bukkit.entity.Player, oldLevel: number, newLevel: number)
                     /**
                      * Gets the old level of the player

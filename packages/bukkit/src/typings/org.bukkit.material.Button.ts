@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace material {
             // @ts-ignore
-             class Button implements org.bukkit.material.Redstone {
+             class Button extends org.bukkit.material.SimpleAttachableMaterialData implements org.bukkit.material.Redstone {
                 constructor()
                 constructor(type: org.bukkit.Material)
                 constructor(type: org.bukkit.Material, data: number)

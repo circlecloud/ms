@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerMoveEvent implements org.bukkit.event.Cancellable {
+                 class PlayerMoveEvent extends org.bukkit.event.player.PlayerEvent implements org.bukkit.event.Cancellable {
                     constructor(player: org.bukkit.entity.Player, from: org.bukkit.Location, to: org.bukkit.Location)
                     /**
                      * Gets the cancellation state of this event. A cancelled event will not

@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace enchantments {
             // @ts-ignore
-             class EnchantmentWrapper {
+             class EnchantmentWrapper extends org.bukkit.enchantments.Enchantment {
                 constructor(name: string)
                 /**
                  * Gets the enchantment bound to this wrapper

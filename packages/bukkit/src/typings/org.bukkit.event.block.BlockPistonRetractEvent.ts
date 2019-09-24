@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace block {
                 // @ts-ignore
-                 class BlockPistonRetractEvent {
+                 class BlockPistonRetractEvent extends org.bukkit.event.block.BlockPistonEvent {
                     constructor(block: org.bukkit.block.Block, blocks: any[] /*java.util.List*/, direction: org.bukkit.block.BlockFace)
                     /**
                      * Gets the location where the possible moving block might be if the

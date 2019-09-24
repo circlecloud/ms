@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace weather {
                 // @ts-ignore
-                 class WeatherChangeEvent implements org.bukkit.event.Cancellable {
+                 class WeatherChangeEvent extends org.bukkit.event.weather.WeatherEvent implements org.bukkit.event.Cancellable {
                     constructor(world: org.bukkit.World, to: boolean)
                     public isCancelled(): boolean;
                     public setCancelled(cancel: boolean): void;
