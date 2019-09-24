@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace material {
             // @ts-ignore
-             class Chest {
+             class Chest extends org.bukkit.material.DirectionalContainer {
                 constructor()
                 /**
                  * Instantiate a chest facing in a particular direction.

@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerBedLeaveEvent {
+                 class PlayerBedLeaveEvent extends org.bukkit.event.player.PlayerEvent {
                     constructor(who: org.bukkit.entity.Player, bed: org.bukkit.block.Block, setBedSpawn: boolean)
                     /**
                      * Returns the bed block involved in this event.

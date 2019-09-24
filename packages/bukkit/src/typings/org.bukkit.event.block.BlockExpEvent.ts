@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace block {
                 // @ts-ignore
-                 class BlockExpEvent {
+                 class BlockExpEvent extends org.bukkit.event.block.BlockEvent {
                     constructor(block: org.bukkit.block.Block, exp: number)
                     /**
                      * Get the experience dropped by the block after the event has processed

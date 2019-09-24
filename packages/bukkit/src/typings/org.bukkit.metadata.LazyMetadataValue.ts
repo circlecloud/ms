@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace metadata {
             // @ts-ignore
-             class LazyMetadataValue {
+             class LazyMetadataValue extends org.bukkit.metadata.MetadataValueAdapter {
                 /**
                  * Initialized a LazyMetadataValue object with the default
                  * CACHE_AFTER_FIRST_EVAL cache strategy.

@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace vehicle {
                 // @ts-ignore
-                 class VehicleDestroyEvent implements org.bukkit.event.Cancellable {
+                 class VehicleDestroyEvent extends org.bukkit.event.vehicle.VehicleEvent implements org.bukkit.event.Cancellable {
                     constructor(vehicle: org.bukkit.entity.Vehicle, attacker: org.bukkit.entity.Entity)
                     /**
                      * Gets the Entity that has destroyed the vehicle, potentially null

@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerTakeLecternBookEvent implements org.bukkit.event.Cancellable {
+                 class PlayerTakeLecternBookEvent extends org.bukkit.event.player.PlayerEvent implements org.bukkit.event.Cancellable {
                     constructor(who: org.bukkit.entity.Player, lectern: org.bukkit.block.Lectern)
                     /**
                      * Gets the lectern involved.

@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace inventory {
                 // @ts-ignore
-                 class InventoryPickupItemEvent implements org.bukkit.event.Cancellable {
+                 class InventoryPickupItemEvent extends org.bukkit.event.Event implements org.bukkit.event.Cancellable {
                     constructor(inventory: org.bukkit.inventory.Inventory, item: org.bukkit.entity.Item)
                     /**
                      * Gets the Inventory that picked up the item

@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace inventory {
                 // @ts-ignore
-                 class InventoryDragEvent {
+                 class InventoryDragEvent extends org.bukkit.event.inventory.InventoryInteractEvent {
                     constructor(what: org.bukkit.inventory.InventoryView, newCursor: org.bukkit.inventory.ItemStack, oldCursor: org.bukkit.inventory.ItemStack, right: boolean, slots: Map<any, any> /*java.util.Map*/)
                     /**
                      * Gets all items to be added to the inventory in this drag.

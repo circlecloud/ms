@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerChangedWorldEvent {
+                 class PlayerChangedWorldEvent extends org.bukkit.event.player.PlayerEvent {
                     constructor(player: org.bukkit.entity.Player, from: org.bukkit.World)
                     /**
                      * Gets the world the player is switching from.

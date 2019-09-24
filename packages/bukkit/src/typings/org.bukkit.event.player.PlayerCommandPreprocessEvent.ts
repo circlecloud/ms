@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerCommandPreprocessEvent implements org.bukkit.event.Cancellable {
+                 class PlayerCommandPreprocessEvent extends org.bukkit.event.player.PlayerEvent implements org.bukkit.event.Cancellable {
                     constructor(player: org.bukkit.entity.Player, message: string)
                     constructor(player: org.bukkit.entity.Player, message: string, recipients: any[] /*java.util.Set*/)
                     public isCancelled(): boolean;

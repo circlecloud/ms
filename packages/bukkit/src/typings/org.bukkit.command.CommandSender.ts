@@ -1,6 +1,7 @@
 declare namespace org {
     namespace bukkit {
         namespace command {
+            // @ts-ignore
             interface CommandSender extends org.bukkit.permissions.Permissible {
                 /**
                  * Sends this sender a message

@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace hanging {
                 // @ts-ignore
-                 class HangingBreakEvent implements org.bukkit.event.Cancellable {
+                 class HangingBreakEvent extends org.bukkit.event.hanging.HangingEvent implements org.bukkit.event.Cancellable {
                     constructor(hanging: org.bukkit.entity.Hanging, cause: org.bukkit.event.hanging.HangingBreakEvent.RemoveCause)
                     /**
                      * Gets the cause for the hanging entity's removal

@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace block {
                 // @ts-ignore
-                 class BlockCanBuildEvent {
+                 class BlockCanBuildEvent extends org.bukkit.event.block.BlockEvent {
                     constructor(block: org.bukkit.block.Block, type: org.bukkit.block.data.BlockData, canBuild: boolean)
                     constructor(block: org.bukkit.block.Block, player: org.bukkit.entity.Player, type: org.bukkit.block.data.BlockData, canBuild: boolean)
                     protected buildable: boolean;

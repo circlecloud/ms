@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerLoginEvent {
+                 class PlayerLoginEvent extends org.bukkit.event.player.PlayerEvent {
                     /**
                      * This constructor defaults message to an empty string, and result to
                      * ALLOWED

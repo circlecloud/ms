@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace inventory {
                 // @ts-ignore
-                 class BrewingStandFuelEvent implements org.bukkit.event.Cancellable {
+                 class BrewingStandFuelEvent extends org.bukkit.event.block.BlockEvent implements org.bukkit.event.Cancellable {
                     constructor(brewingStand: org.bukkit.block.Block, fuel: org.bukkit.inventory.ItemStack, fuelPower: number)
                     /**
                      * Gets the ItemStack of the fuel before the amount was subtracted.

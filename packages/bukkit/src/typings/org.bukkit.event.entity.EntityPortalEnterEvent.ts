@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace entity {
                 // @ts-ignore
-                 class EntityPortalEnterEvent {
+                 class EntityPortalEnterEvent extends org.bukkit.event.entity.EntityEvent {
                     constructor(entity: org.bukkit.entity.Entity, location: org.bukkit.Location)
                     /**
                      * Gets the portal block the entity is touching

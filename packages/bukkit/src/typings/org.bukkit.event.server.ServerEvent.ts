@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace server {
                 // @ts-ignore
-                abstract class ServerEvent {
+                abstract class ServerEvent extends org.bukkit.event.Event {
                     constructor()
                     constructor(isAsync: boolean)
                 }

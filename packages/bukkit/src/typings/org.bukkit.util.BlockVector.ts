@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace util {
             // @ts-ignore
-             class BlockVector {
+             class BlockVector extends org.bukkit.util.Vector {
                 /**
                  * Construct the vector with all components as 0.
                  */

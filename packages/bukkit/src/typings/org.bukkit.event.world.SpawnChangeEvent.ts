@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace world {
                 // @ts-ignore
-                 class SpawnChangeEvent {
+                 class SpawnChangeEvent extends org.bukkit.event.world.WorldEvent {
                     constructor(world: org.bukkit.World, previousLocation: org.bukkit.Location)
                     /**
                      * Gets the previous spawn location

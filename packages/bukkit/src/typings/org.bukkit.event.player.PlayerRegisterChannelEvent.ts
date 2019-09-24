@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerRegisterChannelEvent {
+                 class PlayerRegisterChannelEvent extends org.bukkit.event.player.PlayerChannelEvent {
                     constructor(player: org.bukkit.entity.Player, channel: string)
                 }
             }

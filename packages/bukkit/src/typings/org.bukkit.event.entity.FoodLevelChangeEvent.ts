@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace entity {
                 // @ts-ignore
-                 class FoodLevelChangeEvent implements org.bukkit.event.Cancellable {
+                 class FoodLevelChangeEvent extends org.bukkit.event.entity.EntityEvent implements org.bukkit.event.Cancellable {
                     constructor(what: org.bukkit.entity.HumanEntity, level: number)
                     constructor(what: org.bukkit.entity.HumanEntity, level: number, item: org.bukkit.inventory.ItemStack)
                     public getEntity(): org.bukkit.entity.HumanEntity;

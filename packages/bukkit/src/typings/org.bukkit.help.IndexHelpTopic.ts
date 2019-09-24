@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace help {
             // @ts-ignore
-             class IndexHelpTopic {
+             class IndexHelpTopic extends org.bukkit.help.HelpTopic {
                 constructor(name: string, shortText: string, permission: string, topics: any[] /*java.util.Collection*/)
                 constructor(name: string, shortText: string, permission: string, topics: any[] /*java.util.Collection*/, preamble: string)
                 protected permission: string;

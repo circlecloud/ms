@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace block {
                 // @ts-ignore
-                 class BlockFertilizeEvent implements org.bukkit.event.Cancellable {
+                 class BlockFertilizeEvent extends org.bukkit.event.block.BlockEvent implements org.bukkit.event.Cancellable {
                     constructor(theBlock: org.bukkit.block.Block, player: org.bukkit.entity.Player, blocks: any[] /*java.util.List*/)
                     /**
                      * Gets the player that triggered the fertilization.

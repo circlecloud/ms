@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace block {
                 // @ts-ignore
-                 class FluidLevelChangeEvent implements org.bukkit.event.Cancellable {
+                 class FluidLevelChangeEvent extends org.bukkit.event.block.BlockEvent implements org.bukkit.event.Cancellable {
                     constructor(theBlock: org.bukkit.block.Block, newData: org.bukkit.block.data.BlockData)
                     /**
                      * Gets the new data of the changed block.

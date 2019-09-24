@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace entity {
                 // @ts-ignore
-                 class VillagerReplenishTradeEvent implements org.bukkit.event.Cancellable {
+                 class VillagerReplenishTradeEvent extends org.bukkit.event.entity.EntityEvent implements org.bukkit.event.Cancellable {
                     constructor(what: org.bukkit.entity.AbstractVillager, recipe: org.bukkit.inventory.MerchantRecipe, bonus: number)
                     /**
                      * Get the recipe to replenish.

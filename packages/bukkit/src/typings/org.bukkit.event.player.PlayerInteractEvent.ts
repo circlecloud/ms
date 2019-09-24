@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerInteractEvent implements org.bukkit.event.Cancellable {
+                 class PlayerInteractEvent extends org.bukkit.event.player.PlayerEvent implements org.bukkit.event.Cancellable {
                     constructor(who: org.bukkit.entity.Player, action: org.bukkit.event.block.Action, item: org.bukkit.inventory.ItemStack, clickedBlock: org.bukkit.block.Block, clickedFace: org.bukkit.block.BlockFace)
                     constructor(who: org.bukkit.entity.Player, action: org.bukkit.event.block.Action, item: org.bukkit.inventory.ItemStack, clickedBlock: org.bukkit.block.Block, clickedFace: org.bukkit.block.BlockFace, hand: org.bukkit.inventory.EquipmentSlot)
                     protected item: org.bukkit.inventory.ItemStack;

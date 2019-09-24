@@ -3,13 +3,9 @@ declare namespace org {
         namespace configuration {
             namespace file {
                 // @ts-ignore
-                 class YamlConfigurationOptions {
+                 class YamlConfigurationOptions extends org.bukkit.configuration.file.FileConfigurationOptions {
                     constructor(configuration: org.bukkit.configuration.file.YamlConfiguration)
                     public configuration(): org.bukkit.configuration.file.YamlConfiguration;
-                    public copyDefaults(value: boolean): org.bukkit.configuration.file.YamlConfigurationOptions;
-                    public pathSeparator(value: string): org.bukkit.configuration.file.YamlConfigurationOptions;
-                    public header(value: string): org.bukkit.configuration.file.YamlConfigurationOptions;
-                    public copyHeader(value: boolean): org.bukkit.configuration.file.YamlConfigurationOptions;
                     /**
                      * Gets how much spaces should be used to indent each line.
                      * <p>

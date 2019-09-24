@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace inventory {
                 // @ts-ignore
-                 class PrepareItemCraftEvent {
+                 class PrepareItemCraftEvent extends org.bukkit.event.inventory.InventoryEvent {
                     constructor(what: org.bukkit.inventory.CraftingInventory, view: org.bukkit.inventory.InventoryView, isRepair: boolean)
                     /**
                      * Get the recipe that has been formed. If this event was triggered by a

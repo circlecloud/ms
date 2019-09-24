@@ -3,11 +3,11 @@ declare namespace org {
         namespace event {
             namespace entity {
                 // @ts-ignore
-                 class PlayerDeathEvent {
+                 class PlayerDeathEvent extends org.bukkit.event.entity.EntityDeathEvent {
                     constructor(player: org.bukkit.entity.Player, drops: any[] /*java.util.List*/, droppedExp: number, deathMessage: string)
                     constructor(player: org.bukkit.entity.Player, drops: any[] /*java.util.List*/, droppedExp: number, newExp: number, deathMessage: string)
                     constructor(player: org.bukkit.entity.Player, drops: any[] /*java.util.List*/, droppedExp: number, newExp: number, newTotalExp: number, newLevel: number, deathMessage: string)
-                    public getEntity(): org.bukkit.entity.Player;
+                    public getEntity(): org.bukkit.entity.LivingEntity;
                     /**
                      * Set the death message that will appear to everyone on the server.
                      */

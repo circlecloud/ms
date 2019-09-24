@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerExpChangeEvent {
+                 class PlayerExpChangeEvent extends org.bukkit.event.player.PlayerEvent {
                     constructor(player: org.bukkit.entity.Player, expAmount: number)
                     /**
                      * Get the amount of experience the player will receive

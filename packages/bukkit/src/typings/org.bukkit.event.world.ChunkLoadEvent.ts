@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace world {
                 // @ts-ignore
-                 class ChunkLoadEvent {
+                 class ChunkLoadEvent extends org.bukkit.event.world.ChunkEvent {
                     constructor(chunk: org.bukkit.Chunk, newChunk: boolean)
                     /**
                      * Gets if this chunk was newly created or not.

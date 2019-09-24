@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace block {
                 // @ts-ignore
-                 class BlockFromToEvent implements org.bukkit.event.Cancellable {
+                 class BlockFromToEvent extends org.bukkit.event.block.BlockEvent implements org.bukkit.event.Cancellable {
                     constructor(block: org.bukkit.block.Block, face: org.bukkit.block.BlockFace)
                     constructor(block: org.bukkit.block.Block, toBlock: org.bukkit.block.Block)
                     protected to: org.bukkit.block.Block;

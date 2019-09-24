@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerToggleSprintEvent implements org.bukkit.event.Cancellable {
+                 class PlayerToggleSprintEvent extends org.bukkit.event.player.PlayerEvent implements org.bukkit.event.Cancellable {
                     constructor(player: org.bukkit.entity.Player, isSprinting: boolean)
                     /**
                      * Gets whether the player is now sprinting or not.

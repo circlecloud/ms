@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace block {
                 // @ts-ignore
-                 class BlockExplodeEvent implements org.bukkit.event.Cancellable {
+                 class BlockExplodeEvent extends org.bukkit.event.block.BlockEvent implements org.bukkit.event.Cancellable {
                     constructor(what: org.bukkit.block.Block, blocks: any[] /*java.util.List*/, yield: number)
                     public isCancelled(): boolean;
                     public setCancelled(cancel: boolean): void;

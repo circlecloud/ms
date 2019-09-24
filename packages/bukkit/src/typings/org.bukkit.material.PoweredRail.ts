@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace material {
             // @ts-ignore
-             class PoweredRail implements org.bukkit.material.Redstone {
+             class PoweredRail extends org.bukkit.material.ExtendedRails implements org.bukkit.material.Redstone {
                 constructor()
                 constructor(type: org.bukkit.Material)
                 constructor(type: org.bukkit.Material, data: number)

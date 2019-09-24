@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace material {
             // @ts-ignore
-             class PistonExtensionMaterial implements org.bukkit.material.Attachable {
+             class PistonExtensionMaterial extends org.bukkit.material.MaterialData implements org.bukkit.material.Attachable {
                 constructor(type: org.bukkit.Material)
                 constructor(type: org.bukkit.Material, data: number)
                 public setFacingDirection(face: org.bukkit.block.BlockFace): void;

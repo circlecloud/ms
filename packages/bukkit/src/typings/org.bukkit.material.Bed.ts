@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace material {
             // @ts-ignore
-             class Bed implements org.bukkit.material.Directional {
+             class Bed extends org.bukkit.material.MaterialData implements org.bukkit.material.Directional {
                 /**
                  * Default constructor for a bed.
                  */

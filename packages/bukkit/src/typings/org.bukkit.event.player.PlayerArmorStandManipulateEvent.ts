@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerArmorStandManipulateEvent {
+                 class PlayerArmorStandManipulateEvent extends org.bukkit.event.player.PlayerInteractEntityEvent {
                     constructor(who: org.bukkit.entity.Player, clickedEntity: org.bukkit.entity.ArmorStand, playerItem: org.bukkit.inventory.ItemStack, armorStandItem: org.bukkit.inventory.ItemStack, slot: org.bukkit.inventory.EquipmentSlot)
                     /**
                      * Returns the item held by the player. If this Item is null and the armor stand Item is also null,

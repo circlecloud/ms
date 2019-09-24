@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerPickupArrowEvent {
+                 class PlayerPickupArrowEvent extends org.bukkit.event.player.PlayerPickupItemEvent {
                     constructor(player: org.bukkit.entity.Player, item: org.bukkit.entity.Item, arrow: org.bukkit.entity.AbstractArrow)
                     /**
                      * Get the arrow being picked up by the player

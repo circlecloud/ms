@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace block {
                 // @ts-ignore
-                 class SpongeAbsorbEvent implements org.bukkit.event.Cancellable {
+                 class SpongeAbsorbEvent extends org.bukkit.event.block.BlockEvent implements org.bukkit.event.Cancellable {
                     constructor(block: org.bukkit.block.Block, waterblocks: any[] /*java.util.List*/)
                     /**
                      * Get a list of all blocks to be removed by the sponge.

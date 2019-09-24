@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace command {
             // @ts-ignore
-             class PluginCommand implements org.bukkit.command.PluginIdentifiableCommand {
+             class PluginCommand extends org.bukkit.command.Command implements org.bukkit.command.PluginIdentifiableCommand {
                 constructor(name: string, owner: org.bukkit.plugin.Plugin)
                 /**
                  * Executes the command, returning its success

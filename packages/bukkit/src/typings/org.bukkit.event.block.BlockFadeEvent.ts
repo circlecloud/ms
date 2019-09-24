@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace block {
                 // @ts-ignore
-                 class BlockFadeEvent implements org.bukkit.event.Cancellable {
+                 class BlockFadeEvent extends org.bukkit.event.block.BlockEvent implements org.bukkit.event.Cancellable {
                     constructor(block: org.bukkit.block.Block, newState: org.bukkit.block.BlockState)
                     /**
                      * Gets the state of the block that will be fading, melting or

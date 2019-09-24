@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace world {
                 // @ts-ignore
-                 class WorldUnloadEvent implements org.bukkit.event.Cancellable {
+                 class WorldUnloadEvent extends org.bukkit.event.world.WorldEvent implements org.bukkit.event.Cancellable {
                     constructor(world: org.bukkit.World)
                     public isCancelled(): boolean;
                     public setCancelled(cancel: boolean): void;

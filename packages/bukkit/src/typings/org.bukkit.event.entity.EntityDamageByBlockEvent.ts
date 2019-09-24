@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace entity {
                 // @ts-ignore
-                 class EntityDamageByBlockEvent {
+                 class EntityDamageByBlockEvent extends org.bukkit.event.entity.EntityDamageEvent {
                     constructor(damager: org.bukkit.block.Block, damagee: org.bukkit.entity.Entity, cause: org.bukkit.event.entity.EntityDamageEvent.DamageCause, damage: number)
                     constructor(damager: org.bukkit.block.Block, damagee: org.bukkit.entity.Entity, cause: org.bukkit.event.entity.EntityDamageEvent.DamageCause, modifiers: Map<any, any> /*java.util.Map*/, modifierFunctions: Map<any, any> /*java.util.Map*/)
                     /**

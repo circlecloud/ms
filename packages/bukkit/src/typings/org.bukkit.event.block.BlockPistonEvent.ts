@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace block {
                 // @ts-ignore
-                abstract class BlockPistonEvent implements org.bukkit.event.Cancellable {
+                abstract class BlockPistonEvent extends org.bukkit.event.block.BlockEvent implements org.bukkit.event.Cancellable {
                     constructor(block: org.bukkit.block.Block, direction: org.bukkit.block.BlockFace)
                     public isCancelled(): boolean;
                     public setCancelled(cancelled: boolean): void;

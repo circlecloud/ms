@@ -3,7 +3,7 @@ declare namespace org {
         namespace plugin {
             namespace java {
                 // @ts-ignore
-                abstract class JavaPlugin {
+                abstract class JavaPlugin extends org.bukkit.plugin.PluginBase {
                     constructor()
                     constructor(loader: org.bukkit.plugin.java.JavaPluginLoader, description: org.bukkit.plugin.PluginDescriptionFile, dataFolder: any, file: any)
                     /**

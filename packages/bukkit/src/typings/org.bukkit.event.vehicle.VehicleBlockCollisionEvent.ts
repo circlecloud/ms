@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace vehicle {
                 // @ts-ignore
-                 class VehicleBlockCollisionEvent {
+                 class VehicleBlockCollisionEvent extends org.bukkit.event.vehicle.VehicleCollisionEvent {
                     constructor(vehicle: org.bukkit.entity.Vehicle, block: org.bukkit.block.Block)
                     /**
                      * Gets the block the vehicle collided with

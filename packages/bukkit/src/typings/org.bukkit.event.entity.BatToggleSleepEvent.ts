@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace entity {
                 // @ts-ignore
-                 class BatToggleSleepEvent implements org.bukkit.event.Cancellable {
+                 class BatToggleSleepEvent extends org.bukkit.event.entity.EntityEvent implements org.bukkit.event.Cancellable {
                     constructor(what: org.bukkit.entity.Bat, awake: boolean)
                     /**
                      * Get whether or not the bat is attempting to awaken.

@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace block {
                 // @ts-ignore
-                 class BlockDropItemEvent implements org.bukkit.event.Cancellable {
+                 class BlockDropItemEvent extends org.bukkit.event.block.BlockEvent implements org.bukkit.event.Cancellable {
                     constructor(block: org.bukkit.block.Block, blockState: org.bukkit.block.BlockState, player: org.bukkit.entity.Player, items: any[] /*java.util.List*/)
                     /**
                      * Gets the Player that is breaking the block involved in this event.

@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace material {
             // @ts-ignore
-             class Leaves {
+             class Leaves extends org.bukkit.material.Wood {
                 /**
                  * Constructs a leaf block.
                  */

@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace material {
             // @ts-ignore
-             class NetherWarts {
+             class NetherWarts extends org.bukkit.material.MaterialData {
                 constructor()
                 constructor(state: org.bukkit.NetherWartsState)
                 constructor(type: org.bukkit.Material)

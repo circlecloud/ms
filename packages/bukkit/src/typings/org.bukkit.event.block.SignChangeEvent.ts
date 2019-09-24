@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace block {
                 // @ts-ignore
-                 class SignChangeEvent implements org.bukkit.event.Cancellable {
+                 class SignChangeEvent extends org.bukkit.event.block.BlockEvent implements org.bukkit.event.Cancellable {
                     constructor(theBlock: org.bukkit.block.Block, thePlayer: org.bukkit.entity.Player, theLines: string)
                     /**
                      * Gets the player changing the sign involved in this event.

@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace material {
             // @ts-ignore
-             class Sapling {
+             class Sapling extends org.bukkit.material.Wood {
                 /**
                  * Constructs a sapling.
                  */

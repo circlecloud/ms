@@ -3,7 +3,7 @@ declare namespace org {
         namespace command {
             namespace defaults {
                 // @ts-ignore
-                 class VersionCommand {
+                 class VersionCommand extends org.bukkit.command.defaults.BukkitCommand {
                     constructor(name: string)
                     public execute(sender: org.bukkit.command.CommandSender, currentAlias: string, args: string): boolean;
                     public tabComplete(sender: org.bukkit.command.CommandSender, alias: string, args: string): any[] /*java.util.List*/;

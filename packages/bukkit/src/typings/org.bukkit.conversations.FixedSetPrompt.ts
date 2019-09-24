@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace conversations {
             // @ts-ignore
-            abstract class FixedSetPrompt {
+            abstract class FixedSetPrompt extends org.bukkit.conversations.ValidatingPrompt {
                 /**
                  * Creates a FixedSetPrompt from a set of strings.
                  * <p>

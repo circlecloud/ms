@@ -3,11 +3,8 @@ declare namespace org {
         namespace configuration {
             namespace file {
                 // @ts-ignore
-                 class FileConfigurationOptions {
+                 class FileConfigurationOptions extends org.bukkit.configuration.MemoryConfigurationOptions {
                     constructor(configuration: org.bukkit.configuration.MemoryConfiguration)
-                    public configuration(): org.bukkit.configuration.file.FileConfiguration;
-                    public copyDefaults(value: boolean): org.bukkit.configuration.file.FileConfigurationOptions;
-                    public pathSeparator(value: string): org.bukkit.configuration.file.FileConfigurationOptions;
                     /**
                      * Gets the header that will be applied to the top of the saved output.
                      * <p>

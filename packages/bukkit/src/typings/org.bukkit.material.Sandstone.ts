@@ -2,7 +2,7 @@ declare namespace org {
     namespace bukkit {
         namespace material {
             // @ts-ignore
-             class Sandstone {
+             class Sandstone extends org.bukkit.material.MaterialData {
                 constructor()
                 constructor(type: org.bukkit.SandstoneType)
                 constructor(type: org.bukkit.Material)

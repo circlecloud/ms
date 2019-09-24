@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace entity {
                 // @ts-ignore
-                 class PotionSplashEvent implements org.bukkit.event.Cancellable {
+                 class PotionSplashEvent extends org.bukkit.event.entity.ProjectileHitEvent implements org.bukkit.event.Cancellable {
                     constructor(potion: org.bukkit.entity.ThrownPotion, affectedEntities: Map<any, any> /*java.util.Map*/)
                     public getEntity(): org.bukkit.entity.ThrownPotion;
                     /**

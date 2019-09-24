@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace entity {
                 // @ts-ignore
-                 class FireworkExplodeEvent implements org.bukkit.event.Cancellable {
+                 class FireworkExplodeEvent extends org.bukkit.event.entity.EntityEvent implements org.bukkit.event.Cancellable {
                     constructor(what: org.bukkit.entity.Firework)
                     public isCancelled(): boolean;
                     /**

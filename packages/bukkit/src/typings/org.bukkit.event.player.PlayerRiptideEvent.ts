@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace player {
                 // @ts-ignore
-                 class PlayerRiptideEvent {
+                 class PlayerRiptideEvent extends org.bukkit.event.player.PlayerEvent {
                     constructor(who: org.bukkit.entity.Player, item: org.bukkit.inventory.ItemStack)
                     /**
                      * Gets the item containing the used enchantment.

@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace block {
                 // @ts-ignore
-                 class BlockRedstoneEvent {
+                 class BlockRedstoneEvent extends org.bukkit.event.block.BlockEvent {
                     constructor(block: org.bukkit.block.Block, oldCurrent: number, newCurrent: number)
                     /**
                      * Gets the old current of this block

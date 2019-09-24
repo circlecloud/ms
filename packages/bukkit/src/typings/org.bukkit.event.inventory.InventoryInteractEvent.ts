@@ -3,7 +3,7 @@ declare namespace org {
         namespace event {
             namespace inventory {
                 // @ts-ignore
-                abstract class InventoryInteractEvent implements org.bukkit.event.Cancellable {
+                abstract class InventoryInteractEvent extends org.bukkit.event.inventory.InventoryEvent implements org.bukkit.event.Cancellable {
                     constructor(transaction: org.bukkit.inventory.InventoryView)
                     /**
                      * Gets the player who performed the click.
