@@ -11,7 +11,7 @@ function _proxyGetter(
     resolve: () => any,
     doCache: boolean
 ) {
-    function getter() {
+    function getter(this: object) {
         if (doCache && !Reflect.hasMetadata(INJECTION, this, key)) {
             Reflect.defineMetadata(INJECTION, resolve(), this, key);
         }
@@ -22,7 +22,7 @@ function _proxyGetter(
         }
     }
 
-    function setter(newVal: any) {
+    function setter(this: object, newVal: any) {
         Reflect.defineMetadata(INJECTION, newVal, this, key);
     }
 
