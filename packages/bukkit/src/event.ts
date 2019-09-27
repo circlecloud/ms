@@ -2,12 +2,12 @@ import { event, server, plugin } from '@ms/api'
 import { injectable, inject } from '@ms/container';
 import * as reflect from '@ms/common/dist/reflect'
 
-let Bukkit = Java.type("org.bukkit.Bukkit");
-let Event = Java.type("org.bukkit.event.Event");
-let Modifier = Java.type("java.lang.reflect.Modifier");
-let Listener = Java.type("org.bukkit.event.Listener");
-let EventPriority = Java.type("org.bukkit.event.EventPriority");
-let EventExecutor = Java.type("org.bukkit.plugin.EventExecutor");
+const Bukkit = Java.type("org.bukkit.Bukkit");
+const Event = Java.type("org.bukkit.event.Event");
+const Modifier = Java.type("java.lang.reflect.Modifier");
+const Listener = Java.type("org.bukkit.event.Listener");
+const EventPriority = Java.type("org.bukkit.event.EventPriority");
+const EventExecutor = Java.type("org.bukkit.plugin.EventExecutor");
 
 @injectable()
 export class BukkitEvent extends event.Event {
@@ -18,6 +18,9 @@ export class BukkitEvent extends event.Event {
         super('org/bukkit/event');
     }
 
+    getJarFile(resource: string) {
+        return super.getJarFile('org/bukkit/Bukkit.class')
+    }
     isValidEvent(clazz: any): boolean {
         // 继承于 org.bukkit.event.Event
         return Event.class.isAssignableFrom(clazz) &&
@@ -27,7 +30,7 @@ export class BukkitEvent extends event.Event {
             !Modifier.isAbstract(clazz.getModifiers());
     }
     register(eventCls: any, exec: Function, priority: any, ignoreCancel: boolean) {
-        var listener = new Listener({});
+        let listener = new Listener({});
         Bukkit.pluginManager.registerEvent(
             eventCls,
             listener,

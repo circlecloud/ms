@@ -4,13 +4,15 @@
         "outDir": "dist",
         "target": "es5",
         "module": "commonjs",
+        "strict": true,
+        "strictNullChecks": false,
         "sourceMap": false,
         "declaration": true,
         "noImplicitAny": false,
         "downlevelIteration": true,
         "allowUnreachableCode": true,
-        "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
         "lib": []
     }
 }
