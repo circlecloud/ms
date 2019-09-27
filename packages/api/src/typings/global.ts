@@ -1,3 +1,5 @@
+import { XMLHttpRequest as xhr } from '@ms/ployfill'
+
 declare global {
     namespace NodeJS {
         interface Global {
@@ -5,10 +7,12 @@ declare global {
             debug: boolean;
             noop: Function;
             console: Console;
+            XMLHttpRequest: typeof xhr;
         }
     }
     var root: string;
     var base: Core;
+    var XMLHttpRequest: typeof xhr;
     var ScriptEngineContextHolder: any;
     function engineLoad(str: string): any;
     interface Core {
