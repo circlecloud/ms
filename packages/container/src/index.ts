@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { initContainer } from './decorators'
 import { interfaces, Container } from 'inversify';
 import { fluentProvide } from 'inversify-binding-decorators';
 
@@ -11,6 +12,7 @@ const provideSingleton = (identifier: interfaces.ServiceIdentifier<any>) => {
 };
 
 const DefaultContainer = new Container();
+initContainer(DefaultContainer);
 
 export * from 'inversify'
 export * from './decorators'
