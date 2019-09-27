@@ -6,14 +6,15 @@ import '@ms/core'
 import '@ms/nashorn'
 import { injectable } from '@ms/container'
 
-const Thread = Java.type("java.lang.Thread");
+const Thread = Java.type('java.lang.Thread');
 
 export namespace event {
     @injectable()
     export abstract class Event {
         private mapEvent = [];
         private listenerMap = [];
-        private baseEventDir = '';
+
+        protected baseEventDir = '';
 
         constructor(baseEventDir: string) {
             this.baseEventDir = baseEventDir;
@@ -27,43 +28,44 @@ export namespace event {
             if (this.baseEventDir === "") {
                 throw new Error("事件基础包名为空 无法进行事件映射!");
             }
-            var count = 0;
-            var dirs = Thread.currentThread().getContextClassLoader().getResources(this.baseEventDir);
-            while (dirs.hasMoreElements()) {
-                var url = dirs.nextElement();
-                var protocol = url.protocol;
-                if (protocol === "jar") {
-                    // noinspection JSUnresolvedVariable
-                    var jar = url.openConnection().jarFile;
-                    var entries = jar.entries();
-                    while (entries.hasMoreElements()) {
-                        var entry = entries.nextElement();
-                        var name = entry.name;
-                        // 以 org/bukkit/event 开头 并且以 .class 结尾
-                        if (name.startsWith(this.baseEventDir) && name.endsWith(".class")) {
-                            var i = name.replaceAll('/', '.');
-                            try {
-                                var clz = base.getClass(i.substring(0, i.length - 6));
-                                // 继承于 org.bukkit.event.Event 访问符为Public
-                                if (this.isValidEvent(clz)) {
-                                    var simpleName = this.class2Name(clz).toLowerCase();
-                                    console.debug(`Mapping Event [${clz.canonicalName}] => ${simpleName}`);
-                                    this.mapEvent[simpleName] = clz;
-                                    count++;
-                                }
-                            } catch (ex) {
-                                //ignore already loaded class
-                            }
+            let count = 0;
+            let jar = this.getJarFile(this.baseEventDir);
+            let entries = jar.entries();
+            while (entries.hasMoreElements()) {
+                let entry = entries.nextElement();
+                let name = entry.name;
+                // 以 org/bukkit/event 开头 并且以 .class 结尾
+                if (name.startsWith(this.baseEventDir) && name.endsWith(".class")) {
+                    let qualifiedName = name.replaceAll('/', '.');
+                    try {
+                        let clazz = base.getClass(qualifiedName.substring(0, qualifiedName.length - 6));
+                        // 继承于 org.bukkit.event.Event 访问符为Public
+                        if (this.isValidEvent(clazz)) {
+                            let simpleName = this.class2Name(clazz).toLowerCase();
+                            console.debug(`Mapping Event [${clazz.canonicalName}] => ${simpleName}`);
+                            this.mapEvent[simpleName] = clazz;
+                            count++;
                         }
+                    } catch (ex) {
+                        //ignore already loaded class
                     }
                 }
             }
             return count;
-        };
+        }
+
+        getJarFile(resource: string) {
+            let dirs = Thread.currentThread().getContextClassLoader().getResources(resource);
+            if (dirs.hasMoreElements()) {
+                let url = dirs.nextElement();
+                if (url.protocol === "jar") { return url.openConnection().jarFile; }
+            }
+            throw new Error(`Can't Mapping Event Because not found Resources ${resource}!`)
+        }
 
         class2Name(clazz) {
             return clazz.simpleName;
-        };
+        }
 
         name2Class(name, event) {
             var eventCls = this.mapEvent[event.toLowerCase()] || this.mapEvent[event.toLowerCase() + 'event'];
@@ -78,7 +80,7 @@ export namespace event {
                 }
             }
             return eventCls;
-        };
+        }
 
         execute(name, exec, eventCls) {
             return (...args) => {
@@ -93,8 +95,8 @@ export namespace event {
                     console.console(`§6插件 §b${name} §6处理 §d${this.class2Name(eventCls)} §6事件时发生异常 §4${ex}`);
                     console.ex(ex);
                 }
-            };
-        };
+            }
+        }
 
         /**
         * 添加事件监听
