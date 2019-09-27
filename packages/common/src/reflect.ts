@@ -3,10 +3,10 @@ import '@ms/core'
  * 反射工具类
  * Created by 蒋天蓓 on 2017/2/9 0009.
  */
-var JavaClass = Java.type('java.lang.Class');
-var JavaObject = Java.type('java.lang.Object')
-var NoSuchFieldException = Java.type('java.lang.NoSuchFieldException');
-var methodCache = [];
+const JavaClass = Java.type('java.lang.Class');
+const JavaObject = Java.type('java.lang.Object')
+const NoSuchFieldException = Java.type('java.lang.NoSuchFieldException');
+const methodCache = [];
 
 class Reflect {
     private obj: any;
@@ -35,7 +35,7 @@ class Reflect {
     field(name): Reflect {
         try {
             // Try getting a public field
-            var field = this.class.field(name);
+            let field = this.class.field(name);
             return on(field.get(this.obj));
         } catch (ex) {
             // Try again, getting a non-public field
@@ -48,14 +48,14 @@ class Reflect {
     }
 
     values(declared = false) {
-        var cache = {};
+        let cache = {};
         this.fields(declared).forEach(fed => cache[fed.name] = this.field(fed.name).get())
         return cache;
     }
 
     call(...args): Reflect {
-        var params = args.slice(1);
-        var method = accessible(declaredMethod(this.class, args[0], types(params)));
+        let params = args.slice(1);
+        let method = accessible(declaredMethod(this.class, args[0], types(params)));
         let result = method.invoke(this.get(), params);
         return result && on(result);
     };
@@ -82,7 +82,7 @@ function types(values, def?) {
     if (values === null) {
         return [];
     }
-    var result = [];
+    let result: any[] = [];
     values.forEach(t => result.push((t || def) ? JavaObject.class : t instanceof JavaClass ? t : t.class));
     return result;
 }
@@ -98,7 +98,7 @@ function accessible(accessible) {
 }
 
 function declaredConstructor(clazz, param) {
-    var constructor;
+    let constructor;
     try {
         constructor = clazz.getDeclaredConstructor(types(param));
     } catch (ex) {
@@ -112,8 +112,8 @@ function declaredConstructor(clazz, param) {
 }
 
 function declaredField(clazz, name) {
-    var clazzt = clazz;
-    var field = null;
+    let clazzt = clazz;
+    let field = null;
     // noinspection JSUnresolvedVariable
     while (clazzt !== JavaObject.class) {
         try {
@@ -132,7 +132,7 @@ function declaredField(clazz, name) {
 }
 
 function declaredMethod(clazz, name, clazzs) {
-    var key = clazz.name + '.' + name + ':' + (clazzs || []).join(':');
+    let key = clazz.name + '.' + name + ':' + (clazzs || []).join(':');
     if (!methodCache[key]) {
         try {
             methodCache[key] = clazz.getMethod(name, clazzs);
@@ -156,21 +156,21 @@ function declaredMethods(clazz) {
     return clazz.declaredMethods;
 }
 
-var classMethodsCache = [];
+let classMethodsCache: any[] = [];
 
 function mapToObject(javaObj) {
     if (!javaObj || !javaObj.class) { throw new TypeError(`参数 ${javaObj} 不是一个Java对象!`) }
-    var target = {};
+    let target = {};
     getJavaObjectMethods(javaObj).forEach(t => mapMethod(target, javaObj, t));
     return target;
 }
 
 function getJavaObjectMethods(javaObj) {
-    var className = javaObj.class.name;
+    let className = javaObj.class.name;
     if (!classMethodsCache[className]) {
-        var names = [];
-        var methods = javaObj.class.methods;
-        for (var i in methods) {
+        let names: any[] = [];
+        let methods = javaObj.class.methods;
+        for (let i in methods) {
             names.push(methods[i].name);
         }
         classMethodsCache[className] = names;
