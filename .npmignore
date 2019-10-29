@@ -1,4 +1,3 @@
-src
 test
 typings
 bundled
@@ -19,4 +18,5 @@ wallaby.js
 .travis.yml
 .gitignore
 .vscode
+.theia
 type_definitions
