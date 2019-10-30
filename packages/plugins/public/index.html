@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<!-- UC应用模式 -->
+	<meta name="browsermode" content="application">
+	<!-- QQ应用模式 -->
+	<meta name="x5-page-mode" content="app">
+	<title>MiaoConsole 调试工具</title>
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/avalon2@2.2.10/dist/avalon.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/js-yaml@3.13.0/dist/js-yaml.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/messenger-hubspot@1.5.0/build/js/messenger.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/messenger-hubspot@1.5.0/build/js/messenger-theme-future.js"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/xterm@3.12.2/dist/xterm.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/xterm@3.12.2/dist/addons/fit/fit.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/xterm@3.12.2/dist/addons/attach/attach.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/xterm@3.12.2/dist/addons/fullscreen/fullscreen.js"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@3.12.2/dist/xterm.css" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@3.12.2/dist/addons/fullscreen/fullscreen.css">
+
+	<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.18.1/min/vs/loader.js"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.18.1/min/vs/editor/editor.main.css">
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@3.0.1/github-markdown.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/messenger-hubspot@1.5.0/build/css/messenger.min.css">
+	<link rel="stylesheet"
+		href="https://cdn.jsdelivr.net/npm/messenger-hubspot@1.5.0/build/css/messenger-theme-future.min.css">
+
+	<script src="https://cdn.jsdelivr.net/npm/axios@0.19.0/dist/axios.min.js"></script>
+
+	<!-- <script src="https://raw.githubusercontent.com/imaya/zlib.js/develop/bin/gzip.min.js"></script>
+	<script src="https://raw.githubusercontent.com/imaya/zlib.js/develop/bin/gunzip.min.js"></script> -->
+
+	<script src="js/message.js"></script>
+	<script src="js/term.js"></script>
+	<script src="js/main.js"></script>
+	<script src="js/editor.js"></script>
+</head>
+
+<body noscroll="true">
+	<div class="container-fluid bs-docs-container" :controller="main">
+		<h3>欢迎使用 MiaoConsole 调试控制台</h3>
+		<div class="input-group">
+			<span class="input-group-addon">服务器地址</span>
+			<input id="address" class="form-control" :duplex="@server" :keydown="@connect" style="width: 100%"></input>
+			<a class="input-group-addon btn" :click="@connect">连接</a>
+		</div>
+		<div class="panel panel-success" style="margin-top: 10px; height: 332px;">
+			<div class="panel-heading">服务器日志 当前服务器类型: {{@type}}</div>
+			<div id="terminal" style="height: 300px; width:100%;"></div>
+		</div>
+		<div class="progress progress-striped active" :visible='@classes.total != @classes.loaded'>
+			<div class="progress-bar progress-bar-primary" role="progressbar" aria-valuenow="60" aria-valuemin="0"
+				aria-valuemax="100" :css="{width: (@classes.loaded/@classes.total*100) +'%', 'min-width': '30em'}">
+				<span>正在加载 {{@type}} 类型定义 {{@classes.loaded}}/{{@classes.total}}({{~~(@classes.loaded/@classes.total*100)|percent}}%) </span>
+			</div>
+		</div>
+		<div class="panel panel-info" :visible='@classes.total == @classes.loaded'>
+			<div class="panel-heading">代码编辑器</div>
+			<div id="editor" style="height: 450px; width:100%;"></div>
+		</div>
+	</div>
+</body>
+
+</html>
