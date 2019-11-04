@@ -9,11 +9,11 @@ import { SpongeCommand } from './command';
 import { SpongeTaskManager } from './task';
 
 let SpongeServerType = 'sponge';
-let Sponge = Java.type("org.spongepowered.api.Sponge");
+let Sponge = org.spongepowered.api.Sponge;
 
 container.bind(server.Console).toConstantValue(SpongeConsole);
 container.bind(server.ServerType).toConstantValue(SpongeServerType);
-container.bind(plugin.PluginInstance).toConstantValue(Sponge.pluginManager.getPlugin('MiaoScript').orElse(null));
+container.bind(plugin.PluginInstance).toConstantValue(Sponge.getPluginManager().getPlugin('MiaoScript').orElse(null));
 
 container.bind(event.Event).to(SpongeEvent).inSingletonScope();
 container.bind(command.Command).to(SpongeCommand).inSingletonScope();
