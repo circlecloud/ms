@@ -43,15 +43,37 @@ enum ReadyState {
     LOADING,//Downloading; responseText holds partial data.
     DONE,//The operation is complete.
 }
-type RequestMethod = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE' | 'CONNECT' | 'OPTIONS' | 'TRACE' | 'PATCH';
-type ResponseType = '' | 'arraybuffer' | 'blob' | 'document' | 'json' | 'text';
-type EventType = 'load' | 'error' | 'abort' | 'progress' | 'timeout' | 'loadend' | 'loadstart';
+type RequestMethod =
+    | 'get' | 'GET'
+    | 'delete' | 'DELETE'
+    | 'head' | 'HEAD'
+    | 'options' | 'OPTIONS'
+    | 'post' | 'POST'
+    | 'put' | 'PUT'
+    | 'patch' | 'PATCH';
+type ResponseType =
+    | 'arraybuffer'
+    | 'blob'
+    | 'document'
+    | 'json'
+    | 'text'
+    | 'stream';
+type EventType =
+    | 'load'
+    | 'error'
+    | 'abort'
+    | 'progress'
+    | 'timeout'
+    | 'loadend'
+    | 'loadstart';
+type HttpHeader = { [key: string]: string };
+
 
 const executor = Executors.newCachedThreadPool();
 
 export class XMLHttpRequest {
     private _timeout: number;
-    private _responseType: ResponseType;
+    private _responseType: ResponseType = 'text';
     private _withCredentials: boolean;
 
     private _readyState: ReadyState = ReadyState.UNSENT;
@@ -65,6 +87,7 @@ export class XMLHttpRequest {
     private _statusText: string = null;
     private _response: any;
     private _responseURL: string;
+    private _responseHeaders: HttpHeader;
 
     private _connection = null;
 
@@ -103,30 +126,23 @@ export class XMLHttpRequest {
         return this._responseURL;
     }
 
-    onreadystatechange() {
-
-    }
-    onprogress() {
-
-    }
-    onabort() {
-
-    }
-    onerror(ex: Error) {
-
-    }
-    ontimeout(ex: Error) {
-
-    }
+    onload() { }
+    onerror(ex: Error) { }
+    onabort() { }
+    onprogress() { }
+    ontimeout(ex: Error) { }
+    onloadend() { }
+    onloadstart() { }
+    onreadystatechange() { }
 
     setRequestHeader(key: string, val: string) {
         this._connection.setRequestProperty(key, val);
     }
     getResponseHeader(key: string): string {
-        return this._connection.getHeaderField(key);
+        return this._responseHeaders[key];
     }
     getAllResponseHeaders(): any {
-        return this._connection.getHeaderFields();
+        return this._responseHeaders;
     }
     addEventListener(event: EventType, callback: Function) {
         this[`on${event.toLowerCase()}`] = callback;
@@ -167,6 +183,7 @@ export class XMLHttpRequest {
         try {
             this._connection.connect();
 
+            this.onloadstart();
             if (body) {
                 let bodyType = Object.prototype.toString.call(body);
                 if (bodyType !== '[object String]') { throw new Error(`body(${bodyType}) must be string!`) }
@@ -175,11 +192,10 @@ export class XMLHttpRequest {
                 out.flush();
                 out.close();
             }
-
             this.setReadyState(ReadyState.LOADING);
             this._status = this._connection.getResponseCode();
             this._statusText = this._connection.getResponseMessage();
-
+            this.setResponseHeaders(this._connection.getHeaderFields());
             if (this._status >= 0 && this._status < 300) {
                 this._response = this.readOutput(this._connection.getInputStream());
             } else if (this._status >= 300 && this._status < 400) {
@@ -187,17 +203,33 @@ export class XMLHttpRequest {
             } else {
                 this._response = this.readOutput(this._connection.getErrorStream());
             }
-            return this._response;
-        } catch (ex) {
-            if (ex instanceof SocketTimeoutException) {
-                this.ontimeout(ex)
-            } else {
-                this.onerror(ex);
+            this.onloadend();
+            switch (this._responseType) {
+                case "json":
+                    return this.response;
+                case "text":
+                    return this.responseText;
+                default:
+                    throw Error(`Unsupport ResponseType: ${this._responseType} !`)
             }
+        } catch (ex) {
+            if (ex instanceof SocketTimeoutException && this.ontimeout) {
+                return this.ontimeout(ex)
+            } else if (this.onerror) {
+                return this.onerror(ex);
+            }
+            throw ex;
         } finally {
             this._connection.disconnect();
             this.setReadyState(ReadyState.DONE);
         }
+    }
+
+    private setResponseHeaders(header: any) {
+        this._responseHeaders = {};
+        header.forEach((key, value) => {
+            this._responseHeaders[key] = value[value.length - 1]
+        });
     }
 
     private setReadyState(state: ReadyState) {
