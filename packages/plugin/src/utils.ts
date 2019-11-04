@@ -34,7 +34,7 @@ function getPluginCommandMetadata(target: any) {
 }
 
 function getPluginTabCompleterMetadata(target: any) {
-    let tabcompleterMetadata: Map<string, interfaces.CommandMetadata> = Reflect.getMetadata(
+    let tabcompleterMetadata: Map<string, interfaces.TabCompleterMetadata> = Reflect.getMetadata(
         METADATA_KEY.tab,
         target.constructor
     ) || new Map<string, interfaces.TabCompleterMetadata>();

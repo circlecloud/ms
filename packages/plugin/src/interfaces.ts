@@ -1,4 +1,4 @@
-import { injectable, postConstruct } from "inversify";
+import { injectable } from "@ms/container";
 
 export namespace interfaces {
     @injectable()
