@@ -2,6 +2,7 @@ import '@ms/nashorn'
 
 import { plugin, server, task } from '@ms/api'
 import { PluginManagerImpl } from '@ms/plugin'
+import { XMLHttpRequest as xhr } from '@ms/ployfill'
 import { DefaultContainer as container, injectable, inject, postConstruct } from '@ms/container'
 
 let startTime = new Date().getTime();
@@ -29,15 +30,16 @@ class MiaoScriptCore {
     }
 
     loadServerConsole() {
-        //@ts-ignore
-        global.console = new this.Console();
+        // @ts-ignore
+        console = new this.Console();
+        XMLHttpRequest = xhr;
     }
 
     loadTaskFunction() {
         //@ts-ignore
-        global.setTimeout = (func: Function, tick: number) => this.taskManager.create(func).later(tick).run()
+        global.setTimeout = (func: Function, tick: number) => this.taskManager.create(func).later(tick).submit()
         //@ts-ignore
-        global.setInterval = (func: Function, tick: number) => this.taskManager.create(func).timer(tick).run()
+        global.setInterval = (func: Function, tick: number) => this.taskManager.create(func).timer(tick).submit()
     }
 
     loadPlugins() {
