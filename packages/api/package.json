@@ -22,8 +22,8 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
-        "@ms/common": "^0.1.0",
-        "@ms/container": "^0.1.0"
+        "@ms/container": "^0.1.0",
+        "@ms/ployfill": "^0.1.0"
     },
     "devDependencies": {
         "reflect-metadata": "^0.1.13",

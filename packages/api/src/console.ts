@@ -1,6 +1,6 @@
 let Arrays = Java.type('java.util.Arrays');
 let Level = Java.type('java.util.logging.Level');
-let ignoreLogPrefix = ['java.', 'net.minecraft.', 'org.bukkit.', 'jdk.nashorn.'];
+let ignoreLogPrefix = ['java.', 'net.minecraft.', 'org.bukkit.', 'jdk.nashorn.', 'io.netty.'];
 
 export class MiaoScriptConsole implements Console {
     Console: NodeJS.ConsoleConstructor;
