@@ -1,7 +1,7 @@
 import '@ms/core'
 /**
  * 反射工具类
- * Created by 蒋天蓓 on 2017/2/9 0009.
+ * Created by MiaoWoo on 2017/2/9 0009.
  */
 const JavaClass = Java.type('java.lang.Class');
 const JavaObject = Java.type('java.lang.Object')
@@ -13,6 +13,7 @@ class Reflect {
     private class: any
 
     constructor(obj: any) {
+        // if (obj === undefined || obj === null) { throw Error(`reflect object can't be ${obj}!`) }
         if (obj instanceof JavaClass) {
             this.obj = null;
             this.class = obj;
@@ -112,17 +113,17 @@ function declaredConstructor(clazz, param) {
 }
 
 function declaredField(clazz, name) {
-    let clazzt = clazz;
+    if (!clazz) { throw Error(`target class can't be ${clazz}!`) }
+    let target = clazz;
     let field = null;
     // noinspection JSUnresolvedVariable
-    while (clazzt !== JavaObject.class) {
+    while (target !== JavaObject.class) {
         try {
-            field = clazzt.getDeclaredField(name);
-            if (field !== null) {
-                break;
-            }
+            field = target.getDeclaredField(name);
+            if (field !== null) { break; }
         } catch (e) {
-            clazzt = clazzt.getSuperclass();
+            if (target === undefined) { break; }
+            target = target.getSuperclass();
         }
     }
     if (field === null) {
