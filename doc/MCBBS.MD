@@ -1,4 +1,14 @@
-为了方便阅读 我对帖子进行了分页 请点击目录阅读!
+- 构建状态 [![Build Status](https://ci.yumc.pw/job/Minecraft/job/MiaoScript/badge/icon?style=flat-square)](https://ci.yumc.pw/job/Minecraft/job/MiaoScript/)
+- 当前版本 ![Build Status](https://ci.yumc.pw/job/Minecraft/job/MiaoScript/badge/icon?style=flat-square&subject=version&status=0.1.0beta&color=darkturquoise)
+- 下载地址 [![Build Status](https://ci.yumc.pw/job/Minecraft/job/MiaoScript/badge/icon?style=flat-square&subject=download&status=MiaoScript&color=darkgreen)](http://w.yumc.pw/free.html#MiaoScript-download)
+- 为了方便阅读 我对帖子进行了分页 请点击目录阅读!
+
+### 更新日志
+
+- 2019-09-25
+  - 完善 `Sponge` 类型自动补全
+- 2019-09-24
+  - 完善 `Bukkit` 类型自动补全
 
 ## 插件简介
 
@@ -49,6 +59,12 @@
   - 核心全部由 JS 编写
   - 兼容 `CommonJS` 规范
   - 实时重载
+- 2019年9月14号 emm 咸鱼2年之后
+  - TypeScript 重构版本横空出世
+  - 只保留 基础Java启动类 三个环境初始化js
+  - 完整的服务端Java类自动补全
+  - 全新的 IOC容器 注入功能
+  - 注解式 注册命令 注册事件
 
 ### 进展
 
@@ -79,6 +95,7 @@
     ├─nashorn     Nashorn 的类型定义
     ├─bukkit      BukkitAPI内部实现
     ├─sponge      SpongeAPI内部实现
+    ├─ployfill    JS环境的相关环境补全
     ├─plugin      插件管理器
     └─plugins     这里当然是插件啦
         ├─bukkit  只兼容Bukkit的插件
@@ -95,7 +112,7 @@ Github: https://github.com/circlecloud/ms
 
 如果只是简单的开发 你可用记事本 (但是没有任何补全和错误提示)
 
-### 开发环境准备(针对高级用户))
+### 开发环境准备(针对高级用户)
 
 - 安装 `NodeJS` 和 `Yarn`
 - 拉取代码
@@ -117,6 +134,9 @@ Github: https://github.com/circlecloud/ms
 先来一个 `HelloWorld.ts` 插件示范!
 
 ```ts
+/// <reference types="@ms/bukkit/dist/typings" />
+/// <reference types="@ms/sponge/dist/typings" />
+
 import { plugin, interfaces, cmd, listener, tab } from '@ms/plugin'
 
 @plugin({ name: 'HelloWorld', version: '1.0.0', author: 'MiaoWoo', source: __filename })
@@ -154,7 +174,7 @@ export class HelloWorld extends interfaces.Plugin {
     @cmd()
     hello(sender: any, command: string, args: string[]) {
         this.logger.log(sender, command, args);
-        this.logger.sender(sender, JSON.stringify({ command, args }));
+        sender.sendMessage(JSON.stringify({ command, ...args }))
     }
 
     @tab()
@@ -163,15 +183,16 @@ export class HelloWorld extends interfaces.Plugin {
     }
 
     @listener({ servertype: 'bukkit' })
-    playerjoin(event: any) {
-        this.logger.console(`§aBukkit PlayerJoinEvent: §b${event.player.name}`)
-        setTimeout(() => this.logger.sender(event.player, `§a欢迎来到 §bMiaoScript §a的世界!`), 10);
+    playerjoin(event: org.bukkit.event.player.PlayerJoinEvent) {
+        let plyaer = event.getPlayer();
+        this.logger.console(`§aBukkit PlayerJoinEvent: §b${plyaer.getName()}`)
+        setTimeout(() => this.logger.sender(plyaer, `§a欢迎来到 §bMiaoScript §a的世界!`), 10);
     }
 
     @listener({ servertype: 'sponge' })
-    clientconnectionevent$join(event: any) {
-        this.logger.console(`§aSponge ClientConnectionEvent.Join: §b${event.targetEntity.name}`)
-        setTimeout(() => this.logger.sender(event.targetEntity, `§a欢迎来到 §bMiaoScript §a的世界!`), 10);
+    clientconnectionevent$join(event: org.spongepowered.api.event.network.ClientConnectionEvent.Join) {
+        this.logger.console(`§aSponge ClientConnectionEvent.Join: §b${event.getTargetEntity().getName()}`)
+        setTimeout(() => this.logger.sender(event.getTargetEntity(), `§a欢迎来到 §bMiaoScript §a的世界!`), 10);
     }
 }
 

@@ -8,6 +8,7 @@
         "strictNullChecks": false,
         "sourceMap": false,
         "declaration": true,
+        "declarationMap": true,
         "noImplicitAny": false,
         "downlevelIteration": true,
         "allowUnreachableCode": true,
