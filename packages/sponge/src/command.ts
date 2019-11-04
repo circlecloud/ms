@@ -20,11 +20,11 @@ class SimpleCommandCallable {
         this.callable = new CommandCallable({
             //CommandResult process(CommandSource source, String arguments) throws CommandException;
             process: (sender: any, args) => {
-                return this.executor(sender, command, args.length === 0 ? [] : args.split(" ").filter(e => e)) ? CommandResult.success() : CommandResult.empty();
+                return this.executor(sender, '', command, Java.to(args.split(" ").filter(e => e))) ? CommandResult.success() : CommandResult.empty();
             },
             //List<String> getSuggestions(CommandSource source, String arguments, @Nullable  Location<World> targetPosition) throws CommandException;
             getSuggestions: (sender: any, args, target) => {
-                return this.tabCompleter(sender, command, args.length === 0 ? [] : args.split(" ").filter(e => e));
+                return this.tabCompleter(sender, '', command, Java.to(args.split(" ").filter(e => e)));
             },
             //boolean testPermission(CommandSource source);
             testPermission: () => {
@@ -54,21 +54,19 @@ class SimpleCommandCallable {
 export class SpongeCommand extends command.Command {
     @inject(plugin.PluginInstance)
     private pluginInstance: any
-    private commandMap: any[] = [];
     private commandMapping: any[] = [];
 
     create(plugin: any, command: string) {
-        var commandKey = this.getCommandKey(plugin, command);
-        if (!this.commandMap[commandKey]) {
-            this.commandMap[commandKey] = new SimpleCommandCallable(command);
-            this.commandMapping[commandKey] = Sponge.getCommandManager().register(this.pluginInstance, this.commandMap[commandKey].callable, command, commandKey).orElse(null);
-        }
-        return this.commandMap[commandKey];
+        let commandKey = this.getCommandKey(plugin, command);
+        let commandCallable = new SimpleCommandCallable(command);
+        this.commandMapping[commandKey] = Sponge.getCommandManager().register(this.pluginInstance, commandCallable.callable, command, commandKey).orElse(null);
+        return commandCallable;
     }
     remove(plugin: any, command: string) {
         var commandKey = this.getCommandKey(plugin, command);
         if (this.commandMapping[commandKey]) {
             Sponge.getCommandManager().removeMapping(this.commandMapping[commandKey]);
+            delete this.commandMapping[commandKey];
         }
     }
     onCommand(plugin: any, command: any, executor: Function) {
