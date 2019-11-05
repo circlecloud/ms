@@ -37,9 +37,9 @@ class MiaoScriptCore {
 
     loadTaskFunction() {
         //@ts-ignore
-        global.setTimeout = (func: Function, tick: number) => this.taskManager.create(func).later(tick).submit()
+        global.setTimeout = (func: Function, tick: number, async: boolean = false) => this.taskManager.create(func).later(tick).async(async).submit()
         //@ts-ignore
-        global.setInterval = (func: Function, tick: number) => this.taskManager.create(func).timer(tick).submit()
+        global.setInterval = (func: Function, tick: number, async: boolean = false) => this.taskManager.create(func).timer(tick).async(async).submit()
     }
 
     loadPlugins() {
