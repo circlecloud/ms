@@ -1,4 +1,3 @@
-// @ts-nocheck
 declare namespace org {
     namespace bukkit {
         namespace conversations {

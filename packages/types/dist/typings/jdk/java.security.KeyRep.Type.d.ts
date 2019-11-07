@@ -1,4 +1,3 @@
-// @ts-nocheck
 declare namespace java {
     namespace security {
         namespace KeyRep {

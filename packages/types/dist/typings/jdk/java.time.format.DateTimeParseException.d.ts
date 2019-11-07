@@ -1,4 +1,3 @@
-// @ts-nocheck
 declare namespace java {
     namespace time {
         namespace format {
