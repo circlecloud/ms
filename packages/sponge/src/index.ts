@@ -1,4 +1,4 @@
-/// <reference path="./typings/index.ts" />
+/// <reference types="@ms/types/dist/typings/sponge" />
 
 import { server, plugin, command, event, task } from '@ms/api'
 import { DefaultContainer as container } from '@ms/container'
@@ -9,7 +9,7 @@ import { SpongeCommand } from './command';
 import { SpongeTaskManager } from './task';
 
 let SpongeServerType = 'sponge';
-let Sponge = org.spongepowered.api.Sponge;
+let Sponge = Java.type("org.spongepowered.api.Sponge");
 
 container.bind(server.Console).toConstantValue(SpongeConsole);
 container.bind(server.ServerType).toConstantValue(SpongeServerType);

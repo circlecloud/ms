@@ -1,4 +1,4 @@
-/// <reference path="./typings/index.ts" />
+/// <reference types="@ms/types/dist/typings/bukkit" />
 
 import { server, plugin, command, event, task } from '@ms/api'
 import { DefaultContainer as container } from '@ms/container'
