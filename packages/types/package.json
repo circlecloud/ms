@@ -1,0 +1,19 @@
+{
+    "private": true,
+    "name": "@ms/types",
+    "version": "0.1.1",
+    "description": "MiaoScript types package",
+    "keywords": [
+        "miaoscript",
+        "minecraft",
+        "bukkit",
+        "sponge"
+    ],
+    "author": "MiaoWoo <admin@yumc.pw>",
+    "homepage": "https://github.com/circlecloud/ms.git",
+    "license": "ISC",
+    "main": "dist/index.js",
+    "publishConfig": {
+        "registry": "https://repo.yumc.pw/repository/npm-hosted/"
+    }
+}
