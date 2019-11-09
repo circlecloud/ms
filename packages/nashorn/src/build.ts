@@ -10,7 +10,7 @@ function convertJson2TypeDefiend(infile: string, outDir: string) {
     closeBuk++;
     const nms = qnas.slice(1, qnas.length - 1);
     for (const nm of nms) {
-        temp += `${'    '.repeat(closeBuk)}namespace ${nm} {\n`;
+        temp += `${'    '.repeat(closeBuk)}namespace ${nm.replace('function', 'function$')} {\n`;
         closeBuk++;
     }
     let classModifier = formatClassModifier(obj.modifiers)
@@ -33,7 +33,7 @@ function convertJson2TypeDefiend(infile: string, outDir: string) {
             temp = temp.substr(0, temp.length - 2);
         }
     } else {
-        temp += `${(obj.superclass && obj.superclass.qualifiedName.startsWith('org.')) ? (' extends ' + obj.superclass.qualifiedName) : ''}`;
+        temp += `${(obj.superclass) ? (' extends ' + obj.superclass.qualifiedName) : ''}`;
         if (safeInterface.length > 0) {
             temp += ' implements '
             for (const ifs of safeInterface) {
@@ -46,7 +46,7 @@ function convertJson2TypeDefiend(infile: string, outDir: string) {
     temp += ' {\n'
     closeBuk++;
     for (const constructor of obj.constructors) {
-        temp += `${formatDoc(constructor.docString, closeBuk)}${'    '.repeat(closeBuk)}constructor(${formatParameters(constructor.parameters)})\n`;
+        temp += `${formatDoc(constructor.docString, closeBuk)}${'    '.repeat(closeBuk)}// @ts-ignore\n${'    '.repeat(closeBuk)}constructor(${formatParameters(constructor.parameters)})\n`;
     }
 
     let members = [];
@@ -77,8 +77,8 @@ function convertJson2TypeDefiend(infile: string, outDir: string) {
         temp += `${'    '.repeat(closeBuk - index - 1)}}\n`;
     }
 
-    fs.writeFileSync(`${outDir}/${file}.ts`, temp);
-    return `${file}.ts`;
+    fs.writeFileSync(`${outDir}/${file}.${suffix}`, temp);
+    return `${file}.${suffix}`;
 }
 
 function formatClassModifier(modifiers: string) {
@@ -98,7 +98,11 @@ function formatDoc(doc: string, closeBuk: number) {
 }
 
 function replaceModifiers(modifiers: string, absClass = false): string {
+    // modifiers = modifiers.replace(' final', ' readonly');
     modifiers = modifiers.split(" final")[0];
+    modifiers = modifiers.split(" native")[0];
+    modifiers = modifiers.split(" volatile")[0];
+    modifiers = modifiers.split(" transient")[0];
     modifiers = modifiers.split(" synchronized")[0];
     if (!absClass) {
         modifiers = modifiers.split(" abstract")[0];
@@ -117,6 +121,7 @@ function formatParameters(params: any[]) {
 const nameMap = [];
 nameMap['function'] = 'func'
 nameMap['in'] = 'input'
+nameMap['var'] = 'variable'
 
 function mappingName(name: string) {
     if (whiteKey.includes(name)) { return name }
@@ -124,7 +129,7 @@ function mappingName(name: string) {
     return outName;
 }
 
-let whiteKey = ['shift', "map", 'filter', 'values', 'valueOf', 'toString', 'length', 'includes', 'entries','keys']
+let whiteKey = ['shift', "map", 'filter', 'values', 'valueOf', 'toString', 'length', 'includes', 'entries', 'keys', 'join', 'fill']
 
 const typeMap = [];
 typeMap['int'] = 'number';
@@ -133,17 +138,22 @@ typeMap['int[][]'] = 'number[][]';
 typeMap['byte'] = 'number';
 typeMap['byte[]'] = 'number[]';
 typeMap['double'] = 'number';
+typeMap['double[]'] = 'number[]';
 typeMap['short'] = 'number';
+typeMap['short[]'] = 'number[]';
 typeMap['float'] = 'number';
+typeMap['float[]'] = 'number[]';
 typeMap['long'] = 'number';
+typeMap['long[]'] = 'number[]';
 typeMap['<any>'] = 'any';
 typeMap['char'] = 'string';
+typeMap['char[]'] = 'string[]';
 typeMap['java.lang.String'] = "string";
-typeMap['java.util.Date'] = 'any /*java.util.Date*/'
-typeMap['java.util.List'] = 'any[] /*java.util.List*/'
-typeMap['java.util.Set'] = 'any[] /*java.util.Set*/'
-typeMap['java.util.Collection'] = 'any[] /*java.util.Collection*/'
-typeMap['java.util.Map'] = 'Map<any, any> /*java.util.Map*/'
+// typeMap['java.util.Date'] = 'any /*java.util.Date*/'
+// typeMap['java.util.List'] = 'any[] /*java.util.List*/'
+// typeMap['java.util.Set'] = 'any[] /*java.util.Set*/'
+// typeMap['java.util.Collection'] = 'any[] /*java.util.Collection*/'
+// typeMap['java.util.Map'] = 'Map<any, any> /*java.util.Map*/'
 // Sponge
 typeMap['Vectori'] = 'any /*Vector3i*/'
 typeMap['Vectord'] = 'any /*Vector3d*/'
@@ -167,12 +177,19 @@ typeMap['Matrix4d'] = 'any /*Matrix4d*/'
 
 function mappingType(type: string): string {
     let outType = typeMap[type] || type || 'any';
-    outType = outType.startsWith('java.') || outType.startsWith('javax.') ? 'any' : outType;
-    return outType;
+    if (outType.indexOf('.') != -1) {
+        if (outType.startsWith('java.') || outType.startsWith('org.')) {
+
+        } else {
+            outType = `any /*${outType}*/`
+        }
+    }
+    return outType.replace('function', 'function$');
 }
 
 var args = process.argv.splice(2)
 
+const suffix = 'd.ts'
 const inDir = `../docs/${args[0]}`
 const outDir = "./temp";
 const files = fs.readdirSync(inDir);
@@ -180,4 +197,4 @@ let index = '';
 for (const file of files) {
     index += `/// <reference path="./${convertJson2TypeDefiend(file, outDir)}" />\n`;
 }
-fs.writeFileSync(`${outDir}/index.ts`, index);
+fs.writeFileSync(`${outDir}/index.${suffix}`, index);
