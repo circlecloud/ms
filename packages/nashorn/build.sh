@@ -1,11 +1,12 @@
-# sponge bukkit
-TYPE=sponge
+# sponge bukkit jdk
+TYPE=jdk
+TARGET=../types/dist/typings
 npx tsc src/build.ts --outDir dist
 cd dist
 rm -rf temp
 mkdir -p temp
 node build.js ${TYPE}
 cd ../
-rm -rf src/typings
-mkdir -p src/typings/${TYPE}
-cp dist/temp/* src/typings/${TYPE}/ -R
+rm -rf ${TARGET}/${TYPE}
+mkdir -p ${TARGET}/${TYPE}
+cp dist/temp/* ${TARGET}/${TYPE}/ -R
