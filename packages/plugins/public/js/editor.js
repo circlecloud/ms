@@ -4,29 +4,32 @@ let codeStorageKey = "MiaoScript:code";
 let monaco_path = 'https://cdn.jsdelivr.net/npm/monaco-editor@0.18.1/min'
 require.config({ paths: { 'vs': monaco_path + '/vs' } });
 window.MonacoEnvironment = { getWorkerUrl: () => proxy };
-let proxy = URL.createObjectURL(new Blob([`
-	self.MonacoEnvironment = {
-        baseUrl: '${monaco_path}/'
-    };
-    importScripts('${monaco_path}/vs/base/worker/workerMain.js');
-`], { type: 'text/javascript' }));
+let proxy = URL.createObjectURL(new Blob([`self.MonacoEnvironment = {baseUrl: '${monaco_path}/'};
+importScripts('${monaco_path}/vs/base/worker/workerMain.js');`], { type: 'text/javascript' }));
 
-require(["vs/editor/editor.main"], function() {
-    if (main.type !== 'unknow') {
-        let ts_d_src = `https://cdn.jsdelivr.net/gh/circlecloud/ms@master/packages/${main.type}/src/typings`
-        $.get(`${ts_d_src}/index.ts`, (res) => {
-            monaco.languages.typescript.javascriptDefaults.addExtraLib(res, 'file:///src/typings/index.ts')
-            let classes = res.split('\n').map(line => line.match(/.*\.\/(.*)".*/)).filter(line => line).map(dts => dts[1])
-            main.classes.total = classes.length
-            main.classes.loaded = 0
-            classes.forEach(fname => {
-                $.get(`${ts_d_src}/${fname}`, content => {
-                    monaco.languages.typescript.javascriptDefaults.addExtraLib(content, `file:///src/typings/${fname}`)
-                    main.classes.loaded++
-                })
-            })
-        })
-    }
+function loadExtraLibs(ts_d_src, filter) {
+    let count = 0;
+    axios.get(`${ts_d_src}/index.d.ts`).then(async result => {
+        monaco.languages.typescript.javascriptDefaults.addExtraLib(result.data, 'file:///src/typings/index.d.ts')
+        let classes = result.data.split('\n').map(line => line.match(/.*\.\/(.*)".*/)).filter(line => line).map(dts => dts[1])
+        if (filter) {
+            classes = classes.filter(line => filter(line))
+        }
+        main.classes.total += classes.length
+        for (let fname of classes) {
+            if (count++ % 50 == 0) { await axios.get(`${ts_d_src}/${fname}`) }
+            loadExtraLib(`${ts_d_src}/${fname}`, `file:///src/typings/${fname}`)
+        }
+    })
+}
+
+function loadExtraLib(url, file) {
+    axios.get(url).then(result => monaco.languages.typescript.javascriptDefaults.addExtraLib(result.data, file)).finally(() => main.classes.loaded++)
+}
+
+require(["vs/editor/editor.main"], async function() {
+    main.classes.total = 0
+    main.classes.loaded = 0
     editor = monaco.editor.create(document.getElementById('editor'), {
         value: window.localStorage.getItem(codeStorageKey) || 'org.bukkit.Bukkit.server.version',
         language: 'javascript',
@@ -47,6 +50,10 @@ require(["vs/editor/editor.main"], function() {
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_Q, function() {
         console.log('switch')
     })
+    loadExtraLibs(`https://cdn.jsdelivr.net/gh/circlecloud/ms@master/packages/types/dist/typings/jdk`, (line) => line.startsWith('java.lang'))
+    if (main.type !== 'unknow') {
+        loadExtraLibs(`https://cdn.jsdelivr.net/gh/circlecloud/ms@master/packages/types/dist/typings/${main.type}`)
+    }
 });
 function getSelectContent(editor) {
     let selInfo = editor.getSelection();
