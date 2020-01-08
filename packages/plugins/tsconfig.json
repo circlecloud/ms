@@ -2,6 +2,11 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
         "baseUrl": "src",
-        "outDir": "dist"
-    }
+        "outDir": "dist",
+        "skipLibCheck": true
+    },
+    "exclude": [
+        "dist",
+        "public"
+    ]
 }

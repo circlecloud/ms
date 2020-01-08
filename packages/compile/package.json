@@ -1,7 +1,7 @@
 {
-    "name": "@ms/api",
-    "version": "0.1.1",
-    "description": "MiaoScript api package",
+    "name": "@ms/compile",
+    "version": "0.1.0",
+    "description": "MiaoScript compile package",
     "keywords": [
         "miaoscript",
         "minecraft",
@@ -21,13 +21,11 @@
         "build": "yarn clean && npx tsc",
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
-    "dependencies": {
-        "@ms/container": "^0.1.0",
-        "@ms/ployfill": "^0.1.0"
-    },
     "devDependencies": {
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.0",
-        "typescript": "^3.7.4"
+        "typescript": "^3.7.2"
+    },
+    "dependencies": {
     }
 }
