@@ -1,13 +1,15 @@
-var ws
 var SPLIT_LINE = '\\M\\W\\S|T|S|S/L/T/'
 let serverKey = 'MiaoScript:server'
+let codeStorageKey = "MiaoScript:code:"
 var main = avalon.define({
     $id: 'main',
     server: window.localStorage.getItem(serverKey) || location.host,
     type: 'unknow',
     logs: '',
+    codes: ["default", "bukkit", "sponge", "common", "test", "dev", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+    code: 'default',
     classes: {
-        total: 1,
+        total: 0,
         loaded: 0,
     },
     precent: () => {
@@ -24,39 +26,30 @@ var main = avalon.define({
         if (event.key !== "Enter") {
             return;
         }
-        if (ws && ws.readyState == 1) {
-            ws.close()
-        }
-        window.localStorage.setItem(serverKey, main.server)
-        ws = new WebSocket(`${location.protocol == 'http:' ? 'ws' : 'wss'}://${main.server}/ws`)
-        ws.onmessage = (event) => {
-            const [type, obj] = event.data.split(SPLIT_LINE)
-            switch (type) {
-                case "log":
-                    main.log(obj)
-                    break;
-                case "type":
-                    main.type = obj;
-                    break;
-            }
-        }
-        ws.onopen = () => {
-            main.send("execDetect", "type");
-        }
-        ws.onclose = (ev) => {
-            main.log(`Remote Server Close Connection... ${ev.code}`)
-            if (ev.code == 1006) {
-                setTimeout(() => {
-                    main.connect()
-                }, 1000)
-            }
-        }
+        connectWebSocket()
     },
     init: () => {
         if (main.server) {
             main.connect()
         }
+    },
+    load: (editor) => {
+        editor.setValue(window.localStorage.getItem(codeStorageKey + main.code) || '')
+    },
+    save: (editor) => {
+        window.localStorage.setItem(codeStorageKey + main.code, editor.getValue())
+        showMessenger('代码页 ' + main.code + ' 保存成功!')
+    },
+    switch: (editor) => {
+        let index = main.codes.indexOf(main.code) + 1
+        main.code = main.codes[index == main.codes.length ? 0 : index]
     }
 });
+
+main.$watch('code', (now, old, name) => {
+    window.localStorage.setItem(codeStorageKey + old, editor.getValue())
+    showMessenger('代码页 ' + old + ' 保存成功!')
+    editor.setValue(window.localStorage.getItem(codeStorageKey + now) || '// empty code page ' + now)
+})
 
 main.init()
