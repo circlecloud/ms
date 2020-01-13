@@ -1,6 +1,4 @@
 let editor
-let codeStorageKey = "MiaoScript:code";
-
 let monaco_path = 'https://cdn.jsdelivr.net/npm/monaco-editor@0.18.1/min'
 require.config({ paths: { 'vs': monaco_path + '/vs' } });
 window.MonacoEnvironment = { getWorkerUrl: () => proxy };
@@ -31,15 +29,15 @@ require(["vs/editor/editor.main"], async function() {
     main.classes.total = 0
     main.classes.loaded = 0
     editor = monaco.editor.create(document.getElementById('editor'), {
-        value: window.localStorage.getItem(codeStorageKey) || 'org.bukkit.Bukkit.server.version',
+        value: '',
         language: 'javascript',
         automaticLayout: true,
         scrollBeyondLastLine: false,
         theme: 'vs-dark'
     });
+    main.load(editor)
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, function() {
-        window.localStorage.setItem(codeStorageKey, editor.getValue())
-        showMessenger('代码保存成功!')
+        main.save(editor)
     })
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_R, function() {
         main.send('execCode', getSelectContent(editor) || editor.getValue())
@@ -48,7 +46,7 @@ require(["vs/editor/editor.main"], async function() {
         main.send('execCommand', getSelectContent(editor))
     })
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_Q, function() {
-        console.log('switch')
+        main.switch(editor)
     })
     loadExtraLibs(`https://cdn.jsdelivr.net/gh/circlecloud/ms@master/packages/types/dist/typings/jdk`, (line) => line.startsWith('java.lang'))
     if (main.type !== 'unknow') {
@@ -57,5 +55,15 @@ require(["vs/editor/editor.main"], async function() {
 });
 function getSelectContent(editor) {
     let selInfo = editor.getSelection();
-    return editor.getModel().getLineContent(selInfo.startLineNumber).substr(selInfo.startColumn - 1, selInfo.endColumn - selInfo.startColumn);
+    if (selInfo.startLineNumber === selInfo.endLineNumber) {
+        return editor.getModel().getLineContent(selInfo.startLineNumber).substr(selInfo.startColumn - 1, selInfo.endColumn - selInfo.startColumn);
+    } else {
+        let first = editor.getModel().getLineContent(selInfo.startLineNumber).substr(selInfo.startColumn - 1)
+        let content = '\n'
+        for (let i = selInfo.startLineNumber + 1; i < selInfo.endLineNumber; i++) {
+            content += editor.getModel().getLineContent(i) + '\n'
+        }
+        let last = editor.getModel().getLineContent(selInfo.endLineNumber).substr(0, selInfo.endColumn - 1)
+        return first + content + last
+    }
 }
