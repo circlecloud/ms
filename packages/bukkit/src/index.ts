@@ -5,6 +5,7 @@ import { DefaultContainer as container } from '@ms/container'
 
 import { BukkitConsole } from './console';
 import { BukkitEvent } from './event';
+import { BukkitServer } from './server';
 import { BukkitCommand } from './command';
 import { BukkitTaskManager } from './task';
 
@@ -16,7 +17,6 @@ container.bind(server.ServerType).toConstantValue(BukkitServerType);
 container.bind(plugin.PluginInstance).toConstantValue(Bukkit.pluginManager.getPlugin('MiaoScript'));
 
 container.bind(event.Event).to(BukkitEvent).inSingletonScope();
+container.bind(server.Server).to(BukkitServer).inSingletonScope();
 container.bind(command.Command).to(BukkitCommand).inSingletonScope();
 container.bind(task.TaskManager).to(BukkitTaskManager).inSingletonScope();
-
-console.debug(`Detect Bukkit Compatible set ServerType to ${BukkitServerType} ...`)
