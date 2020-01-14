@@ -5,5 +5,11 @@ export namespace server {
     export interface Server {
         getVersion(): string;
         getPlayer(name: string): any;
+        getOnlinePlayers(): any[];
+        getConsoleSender(): any;
+        getService(service: string): any;
+        dispatchCommand(sender: string | any, command: string): boolean;
+        dispatchConsoleCommand(command: string): boolean;
+        sendJson(sender: string | any, json: object | string): void;
     }
 }
