@@ -12,12 +12,12 @@ declare namespace net {
                      * Creates a favicon from an image.
                      */
                     // @ts-ignore
-                    public static create(image: java.awt.image.BufferedImage): any /*net.md_5.bungee.api.Favicon*/;
+                    public static create(image: java.awt.image.BufferedImage): net.md_5.bungee.api.Favicon;
                     /**
                      * Creates a Favicon from an encoded PNG.
                      */
                     // @ts-ignore
-                    public static create(encodedString: string): any /*net.md_5.bungee.api.Favicon*/;
+                    public static create(encodedString: string): net.md_5.bungee.api.Favicon;
                 }
             }
         }

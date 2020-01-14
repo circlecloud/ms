@@ -19,9 +19,9 @@ declare namespace net {
                          * Creates a score component from the original to clone it.
                          */
                         // @ts-ignore
-                        constructor(original: any /*net.md_5.bungee.api.chat.ScoreComponent*/)
+                        constructor(original: net.md_5.bungee.api.chat.ScoreComponent)
                         // @ts-ignore
-                        public duplicate(): any /*net.md_5.bungee.api.chat.ScoreComponent*/;
+                        public duplicate(): net.md_5.bungee.api.chat.ScoreComponent;
                         // @ts-ignore
                         protected toPlainText(builder: java.lang.StringBuilder): void;
                         // @ts-ignore

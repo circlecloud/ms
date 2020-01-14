@@ -6,19 +6,19 @@ declare namespace net {
                     // @ts-ignore
                      class Result extends java.lang.Enum {
                         // @ts-ignore
-                        public static EVENT_CANCEL: any /*net.md_5.bungee.api.ServerConnectRequest.Result*/;
+                        public static EVENT_CANCEL: net.md_5.bungee.api.ServerConnectRequest.Result;
                         // @ts-ignore
-                        public static ALREADY_CONNECTED: any /*net.md_5.bungee.api.ServerConnectRequest.Result*/;
+                        public static ALREADY_CONNECTED: net.md_5.bungee.api.ServerConnectRequest.Result;
                         // @ts-ignore
-                        public static ALREADY_CONNECTING: any /*net.md_5.bungee.api.ServerConnectRequest.Result*/;
+                        public static ALREADY_CONNECTING: net.md_5.bungee.api.ServerConnectRequest.Result;
                         // @ts-ignore
-                        public static SUCCESS: any /*net.md_5.bungee.api.ServerConnectRequest.Result*/;
+                        public static SUCCESS: net.md_5.bungee.api.ServerConnectRequest.Result;
                         // @ts-ignore
-                        public static FAIL: any /*net.md_5.bungee.api.ServerConnectRequest.Result*/;
+                        public static FAIL: net.md_5.bungee.api.ServerConnectRequest.Result;
                         // @ts-ignore
-                        public static values(): any /*net.md_5.bungee.api.ServerConnectRequest.Result[]*/;
+                        public static values(): net.md_5.bungee.api.ServerConnectRequest.Result[];
                         // @ts-ignore
-                        public static valueOf(name: string): any /*net.md_5.bungee.api.ServerConnectRequest.Result*/;
+                        public static valueOf(name: string): net.md_5.bungee.api.ServerConnectRequest.Result;
                     }
                 }
             }

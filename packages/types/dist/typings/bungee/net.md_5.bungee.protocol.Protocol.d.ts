@@ -5,19 +5,19 @@ declare namespace net {
                 // @ts-ignore
                  class Protocol extends java.lang.Enum {
                     // @ts-ignore
-                    public static HANDSHAKE: any /*net.md_5.bungee.protocol.Protocol*/;
+                    public static HANDSHAKE: net.md_5.bungee.protocol.Protocol;
                     // @ts-ignore
-                    public static GAME: any /*net.md_5.bungee.protocol.Protocol*/;
+                    public static GAME: net.md_5.bungee.protocol.Protocol;
                     // @ts-ignore
-                    public static STATUS: any /*net.md_5.bungee.protocol.Protocol*/;
+                    public static STATUS: net.md_5.bungee.protocol.Protocol;
                     // @ts-ignore
-                    public static LOGIN: any /*net.md_5.bungee.protocol.Protocol*/;
+                    public static LOGIN: net.md_5.bungee.protocol.Protocol;
                     // @ts-ignore
                     public static MAX_PACKET_ID: number;
                     // @ts-ignore
-                    public static values(): any /*net.md_5.bungee.protocol.Protocol[]*/;
+                    public static values(): net.md_5.bungee.protocol.Protocol[];
                     // @ts-ignore
-                    public static valueOf(name: string): any /*net.md_5.bungee.protocol.Protocol*/;
+                    public static valueOf(name: string): net.md_5.bungee.protocol.Protocol;
                     // @ts-ignore
                     public static main(args: string): void;
                 }

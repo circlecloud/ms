@@ -7,11 +7,11 @@ declare namespace net {
                     // @ts-ignore
                     constructor()
                     // @ts-ignore
-                    public static getProvider(provider: java.lang.Class): any /*net.md_5.bungee.config.ConfigurationProvider*/;
+                    public static getProvider(provider: java.lang.Class): net.md_5.bungee.config.ConfigurationProvider;
                     // @ts-ignore
-                    public abstract save(config: any /*net.md_5.bungee.config.Configuration*/, file: java.io.File): void;
+                    public abstract save(config: net.md_5.bungee.config.Configuration, file: java.io.File): void;
                     // @ts-ignore
-                    public abstract load(file: java.io.File): any /*net.md_5.bungee.config.Configuration*/;
+                    public abstract load(file: java.io.File): net.md_5.bungee.config.Configuration;
                 }
             }
         }

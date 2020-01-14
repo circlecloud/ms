@@ -8,7 +8,7 @@ declare namespace net {
                 // @ts-ignore
                 public isRunning: boolean;
                 // @ts-ignore
-                public config: any /*net.md_5.bungee.conf.Configuration*/;
+                public config: net.md_5.bungee.conf.Configuration;
                 // @ts-ignore
                 public eventLoops: EventLoopGroup;
                 // @ts-ignore
@@ -16,7 +16,7 @@ declare namespace net {
                 // @ts-ignore
                 public gson: any /*Gson*/;
                 // @ts-ignore
-                public static getInstance(): any /*net.md_5.bungee.BungeeCord*/;
+                public static getInstance(): net.md_5.bungee.BungeeCord;
                 /**
                  * Start this proxy instance by loading the configuration, plugins and
                  * starting the connect thread.
@@ -51,7 +51,7 @@ declare namespace net {
                 // @ts-ignore
                 public getPlayer(name: string): ProxiedPlayer;
                 // @ts-ignore
-                public getPlayerByOfflineUUID(name: java.util.UUID): any /*net.md_5.bungee.UserConnection*/;
+                public getPlayerByOfflineUUID(name: java.util.UUID): net.md_5.bungee.UserConnection;
                 // @ts-ignore
                 public getPlayer(uuid: java.util.UUID): ProxiedPlayer;
                 // @ts-ignore
@@ -79,9 +79,9 @@ declare namespace net {
                 // @ts-ignore
                 public broadcast(message: BaseComponent): void;
                 // @ts-ignore
-                public addConnection(con: any /*net.md_5.bungee.UserConnection*/): void;
+                public addConnection(con: net.md_5.bungee.UserConnection): void;
                 // @ts-ignore
-                public removeConnection(con: any /*net.md_5.bungee.UserConnection*/): void;
+                public removeConnection(con: net.md_5.bungee.UserConnection): void;
                 // @ts-ignore
                 public getDisabledCommands(): java.util.Collection;
                 // @ts-ignore

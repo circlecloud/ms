@@ -7,7 +7,7 @@ declare namespace net {
                     // @ts-ignore
                     constructor()
                     // @ts-ignore
-                    public retrieve(module: any /*net.md_5.bungee.module.ModuleSpec*/, version: any /*net.md_5.bungee.module.ModuleVersion*/): void;
+                    public retrieve(module: net.md_5.bungee.module.ModuleSpec, version: net.md_5.bungee.module.ModuleVersion): void;
                 }
             }
         }

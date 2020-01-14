@@ -9,14 +9,14 @@ declare namespace net {
                          * Creates a keybind component from the original to clone it.
                          */
                         // @ts-ignore
-                        constructor(original: any /*net.md_5.bungee.api.chat.KeybindComponent*/)
+                        constructor(original: net.md_5.bungee.api.chat.KeybindComponent)
                         /**
                          * Creates a keybind component with the passed internal keybind value.
                          */
                         // @ts-ignore
                         constructor(keybind: string)
                         // @ts-ignore
-                        public duplicate(): any /*net.md_5.bungee.api.chat.BaseComponent*/;
+                        public duplicate(): net.md_5.bungee.api.chat.BaseComponent;
                         // @ts-ignore
                         protected toPlainText(builder: java.lang.StringBuilder): void;
                         // @ts-ignore

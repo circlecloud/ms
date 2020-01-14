@@ -15,32 +15,32 @@ declare namespace net {
                          * component
                          */
                         // @ts-ignore
-                        constructor(textComponent: any /*net.md_5.bungee.api.chat.TextComponent*/)
+                        constructor(textComponent: net.md_5.bungee.api.chat.TextComponent)
                         /**
                          * Creates a TextComponent with blank text and the extras set to the passed
                          * array
                          */
                         // @ts-ignore
-                        constructor(extras: any /*net.md_5.bungee.api.chat.BaseComponent*/)
+                        constructor(extras: net.md_5.bungee.api.chat.BaseComponent)
                         /**
                          * Converts the old formatting system that used
                          * {@link net.md_5.bungee.api.ChatColor#COLOR_CHAR} into the new json based
                          * system.
                          */
                         // @ts-ignore
-                        public static fromLegacyText(message: string): any /*net.md_5.bungee.api.chat.BaseComponent[]*/;
+                        public static fromLegacyText(message: string): net.md_5.bungee.api.chat.BaseComponent[];
                         /**
                          * Converts the old formatting system that used
                          * {@link net.md_5.bungee.api.ChatColor#COLOR_CHAR} into the new json based
                          * system.
                          */
                         // @ts-ignore
-                        public static fromLegacyText(message: string, defaultColor: any /*net.md_5.bungee.api.ChatColor*/): any /*net.md_5.bungee.api.chat.BaseComponent[]*/;
+                        public static fromLegacyText(message: string, defaultColor: net.md_5.bungee.api.ChatColor): net.md_5.bungee.api.chat.BaseComponent[];
                         /**
                          * Creates a duplicate of this TextComponent.
                          */
                         // @ts-ignore
-                        public duplicate(): any /*net.md_5.bungee.api.chat.BaseComponent*/;
+                        public duplicate(): net.md_5.bungee.api.chat.BaseComponent;
                         // @ts-ignore
                         protected toPlainText(builder: java.lang.StringBuilder): void;
                         // @ts-ignore

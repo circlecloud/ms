@@ -6,7 +6,7 @@ declare namespace net {
                     // @ts-ignore
                      class ChatEvent extends net.md_5.bungee.api.event.TargetedEvent implements net.md_5.bungee.api.plugin.Cancellable {
                         // @ts-ignore
-                        constructor(sender: any /*net.md_5.bungee.api.connection.Connection*/, receiver: any /*net.md_5.bungee.api.connection.Connection*/, message: string)
+                        constructor(sender: net.md_5.bungee.api.connection.Connection, receiver: net.md_5.bungee.api.connection.Connection, message: string)
                         /**
                          * Checks whether this message is valid as a command
                          */

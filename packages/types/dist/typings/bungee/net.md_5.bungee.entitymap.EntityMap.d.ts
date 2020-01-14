@@ -7,7 +7,7 @@ declare namespace net {
                     // @ts-ignore
                     constructor()
                     // @ts-ignore
-                    public static getEntityMap(version: number): any /*net.md_5.bungee.entitymap.EntityMap*/;
+                    public static getEntityMap(version: number): net.md_5.bungee.entitymap.EntityMap;
                     // @ts-ignore
                     protected addRewrite(id: number, direction: any /*ProtocolConstants.Direction*/, varint: boolean): void;
                     // @ts-ignore

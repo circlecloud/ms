@@ -9,7 +9,7 @@ declare namespace net {
                     // @ts-ignore
                     public shouldHandle(packet: PacketWrapper): boolean;
                     // @ts-ignore
-                    public connected(channel: any /*net.md_5.bungee.netty.ChannelWrapper*/): void;
+                    public connected(channel: net.md_5.bungee.netty.ChannelWrapper): void;
                     // @ts-ignore
                     public exception(t: java.lang.Throwable): void;
                     // @ts-ignore

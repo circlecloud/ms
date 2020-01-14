@@ -41,7 +41,7 @@ declare namespace net {
                          * Get the unsafe methods of this class.
                          */
                         // @ts-ignore
-                         unsafe(): any /*net.md_5.bungee.api.connection.Connection.Unsafe*/;
+                         unsafe(): net.md_5.bungee.api.connection.Connection.Unsafe;
                     }
                 }
             }

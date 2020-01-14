@@ -32,40 +32,40 @@ declare namespace net {
                          * might return before the user has been connected.
                          */
                         // @ts-ignore
-                         connect(target: any /*net.md_5.bungee.api.config.ServerInfo*/): void;
+                         connect(target: net.md_5.bungee.api.config.ServerInfo): void;
                         /**
                          * Connects / transfers this user to the specified connection, gracefully
                          * closing the current one. Depending on the implementation, this method
                          * might return before the user has been connected.
                          */
                         // @ts-ignore
-                         connect(target: any /*net.md_5.bungee.api.config.ServerInfo*/, reason: any /*net.md_5.bungee.api.event.ServerConnectEvent.Reason*/): void;
+                         connect(target: net.md_5.bungee.api.config.ServerInfo, reason: net.md_5.bungee.api.event.ServerConnectEvent.Reason): void;
                         /**
                          * Connects / transfers this user to the specified connection, gracefully
                          * closing the current one. Depending on the implementation, this method
                          * might return before the user has been connected.
                          */
                         // @ts-ignore
-                         connect(target: any /*net.md_5.bungee.api.config.ServerInfo*/, callback: any /*net.md_5.bungee.api.Callback*/): void;
+                         connect(target: net.md_5.bungee.api.config.ServerInfo, callback: net.md_5.bungee.api.Callback): void;
                         /**
                          * Connects / transfers this user to the specified connection, gracefully
                          * closing the current one. Depending on the implementation, this method
                          * might return before the user has been connected.
                          */
                         // @ts-ignore
-                         connect(target: any /*net.md_5.bungee.api.config.ServerInfo*/, callback: any /*net.md_5.bungee.api.Callback*/, reason: any /*net.md_5.bungee.api.event.ServerConnectEvent.Reason*/): void;
+                         connect(target: net.md_5.bungee.api.config.ServerInfo, callback: net.md_5.bungee.api.Callback, reason: net.md_5.bungee.api.event.ServerConnectEvent.Reason): void;
                         /**
                          * Connects / transfers this user to the specified connection, gracefully
                          * closing the current one. Depending on the implementation, this method
                          * might return before the user has been connected.
                          */
                         // @ts-ignore
-                         connect(request: any /*net.md_5.bungee.api.ServerConnectRequest*/): void;
+                         connect(request: net.md_5.bungee.api.ServerConnectRequest): void;
                         /**
                          * Gets the server this player is connected to.
                          */
                         // @ts-ignore
-                         getServer(): any /*net.md_5.bungee.api.connection.Server*/;
+                         getServer(): net.md_5.bungee.api.connection.Server;
                         /**
                          * Gets the ping time between the proxy and this connection.
                          */
@@ -83,7 +83,7 @@ declare namespace net {
                          * Get the pending connection that belongs to this player.
                          */
                         // @ts-ignore
-                         getPendingConnection(): any /*net.md_5.bungee.api.connection.PendingConnection*/;
+                         getPendingConnection(): net.md_5.bungee.api.connection.PendingConnection;
                         /**
                          * Make this player chat (say something), to the server he is currently on.
                          */
@@ -93,12 +93,12 @@ declare namespace net {
                          * Get the server which this player will be sent to next time the log in.
                          */
                         // @ts-ignore
-                         getReconnectServer(): any /*net.md_5.bungee.api.config.ServerInfo*/;
+                         getReconnectServer(): net.md_5.bungee.api.config.ServerInfo;
                         /**
                          * Set the server which this player will be sent to next time the log in.
                          */
                         // @ts-ignore
-                         setReconnectServer(server: any /*net.md_5.bungee.api.config.ServerInfo*/): void;
+                         setReconnectServer(server: net.md_5.bungee.api.config.ServerInfo): void;
                         /**
                          * Get this connection's UUID, if set.
                          */
@@ -123,7 +123,7 @@ declare namespace net {
                          * Gets this player's chat mode.
                          */
                         // @ts-ignore
-                         getChatMode(): any /*net.md_5.bungee.api.connection.ProxiedPlayer.ChatMode*/;
+                         getChatMode(): net.md_5.bungee.api.connection.ProxiedPlayer.ChatMode;
                         /**
                          * Gets if this player has chat colors enabled or disabled.
                          */
@@ -133,12 +133,12 @@ declare namespace net {
                          * Gets this player's skin settings.
                          */
                         // @ts-ignore
-                         getSkinParts(): any /*net.md_5.bungee.api.SkinConfiguration*/;
+                         getSkinParts(): net.md_5.bungee.api.SkinConfiguration;
                         /**
                          * Gets this player's main hand setting.
                          */
                         // @ts-ignore
-                         getMainHand(): any /*net.md_5.bungee.api.connection.ProxiedPlayer.MainHand*/;
+                         getMainHand(): net.md_5.bungee.api.connection.ProxiedPlayer.MainHand;
                         /**
                          * Set the header and footer displayed in the tab player list.
                          */
@@ -159,7 +159,7 @@ declare namespace net {
                          * {@link Title#send(ProxiedPlayer)}.
                          */
                         // @ts-ignore
-                         sendTitle(title: any /*net.md_5.bungee.api.Title*/): void;
+                         sendTitle(title: net.md_5.bungee.api.Title): void;
                         /**
                          * Gets whether this player is using a FML client.
                          * <p>
@@ -197,7 +197,7 @@ declare namespace net {
                          * Get the {@link Scoreboard} that belongs to this player.
                          */
                         // @ts-ignore
-                         getScoreboard(): any /*net.md_5.bungee.api.score.Scoreboard*/;
+                         getScoreboard(): net.md_5.bungee.api.score.Scoreboard;
                     }
                 }
             }

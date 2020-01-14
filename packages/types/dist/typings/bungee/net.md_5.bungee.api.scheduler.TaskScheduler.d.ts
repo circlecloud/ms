@@ -16,25 +16,25 @@ declare namespace net {
                          * prevent its further execution.
                          */
                         // @ts-ignore
-                         cancel(task: any /*net.md_5.bungee.api.scheduler.ScheduledTask*/): void;
+                         cancel(task: net.md_5.bungee.api.scheduler.ScheduledTask): void;
                         /**
                          * Cancel all tasks owned by this plugin, this preventing them from being
                          * executed hereon in.
                          */
                         // @ts-ignore
-                         cancel(plugin: any /*net.md_5.bungee.api.plugin.Plugin*/): number;
+                         cancel(plugin: net.md_5.bungee.api.plugin.Plugin): number;
                         /**
                          * Schedule a task to be executed asynchronously. The task will commence
                          * running as soon as this method returns.
                          */
                         // @ts-ignore
-                         runAsync(owner: any /*net.md_5.bungee.api.plugin.Plugin*/, task: java.lang.Runnable): any /*net.md_5.bungee.api.scheduler.ScheduledTask*/;
+                         runAsync(owner: net.md_5.bungee.api.plugin.Plugin, task: java.lang.Runnable): net.md_5.bungee.api.scheduler.ScheduledTask;
                         /**
                          * Schedules a task to be executed asynchronously after the specified delay
                          * is up.
                          */
                         // @ts-ignore
-                         schedule(owner: any /*net.md_5.bungee.api.plugin.Plugin*/, task: java.lang.Runnable, delay: number, unit: java.util.concurrent.TimeUnit): any /*net.md_5.bungee.api.scheduler.ScheduledTask*/;
+                         schedule(owner: net.md_5.bungee.api.plugin.Plugin, task: java.lang.Runnable, delay: number, unit: java.util.concurrent.TimeUnit): net.md_5.bungee.api.scheduler.ScheduledTask;
                         /**
                          * Schedules a task to be executed asynchronously after the specified delay
                          * is up. The scheduled task will continue running at the specified
@@ -42,12 +42,12 @@ declare namespace net {
                          * invocation is complete.
                          */
                         // @ts-ignore
-                         schedule(owner: any /*net.md_5.bungee.api.plugin.Plugin*/, task: java.lang.Runnable, delay: number, period: number, unit: java.util.concurrent.TimeUnit): any /*net.md_5.bungee.api.scheduler.ScheduledTask*/;
+                         schedule(owner: net.md_5.bungee.api.plugin.Plugin, task: java.lang.Runnable, delay: number, period: number, unit: java.util.concurrent.TimeUnit): net.md_5.bungee.api.scheduler.ScheduledTask;
                         /**
                          * Get the unsafe methods of this class.
                          */
                         // @ts-ignore
-                         unsafe(): any /*net.md_5.bungee.api.scheduler.TaskScheduler.Unsafe*/;
+                         unsafe(): net.md_5.bungee.api.scheduler.TaskScheduler.Unsafe;
                     }
                 }
             }

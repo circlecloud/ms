@@ -7,7 +7,7 @@ declare namespace net {
                     // @ts-ignore
                     constructor()
                     // @ts-ignore
-                    public static INSTANCE: any /*net.md_5.bungee.chat.TranslationRegistry*/;
+                    public static INSTANCE: net.md_5.bungee.chat.TranslationRegistry;
                     // @ts-ignore
                     public translate(s: string): string;
                 }

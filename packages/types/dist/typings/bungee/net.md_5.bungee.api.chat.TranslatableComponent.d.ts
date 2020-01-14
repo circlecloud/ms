@@ -4,12 +4,12 @@ declare namespace net {
             namespace api {
                 namespace chat {
                     // @ts-ignore
-                    class TranslatableComponent extends net.md_5.bungee.api.chat.BaseComponent {
+                     class TranslatableComponent extends net.md_5.bungee.api.chat.BaseComponent {
                         /**
                          * Creates a translatable component from the original to clone it.
                          */
                         // @ts-ignore
-                        constructor(original: any /*net.md_5.bungee.api.chat.TranslatableComponent*/)
+                        constructor(original: net.md_5.bungee.api.chat.TranslatableComponent)
                         /**
                          * Creates a translatable component with the passed substitutions
                          */
@@ -19,7 +19,7 @@ declare namespace net {
                          * Creates a duplicate of this TranslatableComponent.
                          */
                         // @ts-ignore
-                        public duplicate(): any /*net.md_5.bungee.api.chat.BaseComponent*/;
+                        public duplicate(): net.md_5.bungee.api.chat.BaseComponent;
                         /**
                          * Sets the translation substitutions to be used in this component. Removes
                          * any previously set substitutions
@@ -37,7 +37,7 @@ declare namespace net {
                          * this component's formatting
                          */
                         // @ts-ignore
-                        public addWith(component: any /*net.md_5.bungee.api.chat.BaseComponent*/): void;
+                        public addWith(component: net.md_5.bungee.api.chat.BaseComponent): void;
                         // @ts-ignore
                         protected toPlainText(builder: java.lang.StringBuilder): void;
                         // @ts-ignore

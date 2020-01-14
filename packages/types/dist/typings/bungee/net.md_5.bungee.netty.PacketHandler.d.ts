@@ -15,11 +15,11 @@ declare namespace net {
                     // @ts-ignore
                     public handle(packet: PacketWrapper): void;
                     // @ts-ignore
-                    public connected(channel: any /*net.md_5.bungee.netty.ChannelWrapper*/): void;
+                    public connected(channel: net.md_5.bungee.netty.ChannelWrapper): void;
                     // @ts-ignore
-                    public disconnected(channel: any /*net.md_5.bungee.netty.ChannelWrapper*/): void;
+                    public disconnected(channel: net.md_5.bungee.netty.ChannelWrapper): void;
                     // @ts-ignore
-                    public writabilityChanged(channel: any /*net.md_5.bungee.netty.ChannelWrapper*/): void;
+                    public writabilityChanged(channel: net.md_5.bungee.netty.ChannelWrapper): void;
                 }
             }
         }

@@ -6,7 +6,7 @@ declare namespace net {
                     // @ts-ignore
                      class PlayerHandshakeEvent extends net.md_5.bungee.api.plugin.Event {
                         // @ts-ignore
-                        constructor(connection: any /*net.md_5.bungee.api.connection.PendingConnection*/, handshake: Handshake)
+                        constructor(connection: net.md_5.bungee.api.connection.PendingConnection, handshake: Handshake)
                     }
                 }
             }

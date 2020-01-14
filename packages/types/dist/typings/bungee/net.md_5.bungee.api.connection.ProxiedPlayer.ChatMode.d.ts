@@ -7,15 +7,15 @@ declare namespace net {
                         // @ts-ignore
                          class ChatMode extends java.lang.Enum {
                             // @ts-ignore
-                            public static SHOWN: any /*net.md_5.bungee.api.connection.ProxiedPlayer.ChatMode*/;
+                            public static SHOWN: net.md_5.bungee.api.connection.ProxiedPlayer.ChatMode;
                             // @ts-ignore
-                            public static COMMANDS_ONLY: any /*net.md_5.bungee.api.connection.ProxiedPlayer.ChatMode*/;
+                            public static COMMANDS_ONLY: net.md_5.bungee.api.connection.ProxiedPlayer.ChatMode;
                             // @ts-ignore
-                            public static HIDDEN: any /*net.md_5.bungee.api.connection.ProxiedPlayer.ChatMode*/;
+                            public static HIDDEN: net.md_5.bungee.api.connection.ProxiedPlayer.ChatMode;
                             // @ts-ignore
-                            public static values(): any /*net.md_5.bungee.api.connection.ProxiedPlayer.ChatMode[]*/;
+                            public static values(): net.md_5.bungee.api.connection.ProxiedPlayer.ChatMode[];
                             // @ts-ignore
-                            public static valueOf(name: string): any /*net.md_5.bungee.api.connection.ProxiedPlayer.ChatMode*/;
+                            public static valueOf(name: string): net.md_5.bungee.api.connection.ProxiedPlayer.ChatMode;
                         }
                     }
                 }

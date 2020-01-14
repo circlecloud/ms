@@ -8,12 +8,12 @@ declare namespace net {
                      * Handles any {@link PluginMessage} packets.
                      */
                     // @ts-ignore
-                     handle(message: PluginMessage, con: any /*net.md_5.bungee.UserConnection*/): java.lang.Object;
+                     handle(message: PluginMessage, con: net.md_5.bungee.UserConnection): java.lang.Object;
                     /**
                      * Sends any {@link PluginMessage} packets.
                      */
                     // @ts-ignore
-                     send(message: PluginMessage, con: any /*net.md_5.bungee.UserConnection*/): java.lang.Object;
+                     send(message: PluginMessage, con: net.md_5.bungee.UserConnection): java.lang.Object;
                 }
             }
         }

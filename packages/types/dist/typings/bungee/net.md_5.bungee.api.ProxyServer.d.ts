@@ -11,7 +11,7 @@ declare namespace net {
                      * application.
                      */
                     // @ts-ignore
-                    public static setInstance(instance: any /*net.md_5.bungee.api.ProxyServer*/): void;
+                    public static setInstance(instance: net.md_5.bungee.api.ProxyServer): void;
                     /**
                      * Gets the name of the currently running proxy software.
                      */
@@ -42,7 +42,7 @@ declare namespace net {
                      * Gets a connected player via their unique username.
                      */
                     // @ts-ignore
-                    public abstract getPlayer(name: string): any /*net.md_5.bungee.api.connection.ProxiedPlayer*/;
+                    public abstract getPlayer(name: string): net.md_5.bungee.api.connection.ProxiedPlayer;
                     /**
                      * Return all servers registered to this proxy, keyed by name. Unlike the
                      * methods in {@link ConfigurationAdapter#getServers()}, this will not
@@ -54,35 +54,35 @@ declare namespace net {
                      * Gets the server info of a server.
                      */
                     // @ts-ignore
-                    public abstract getServerInfo(name: string): any /*net.md_5.bungee.api.config.ServerInfo*/;
+                    public abstract getServerInfo(name: string): net.md_5.bungee.api.config.ServerInfo;
                     /**
                      * Get the {@link PluginManager} associated with loading plugins and
                      * dispatching events. It is recommended that implementations use the
                      * provided PluginManager class.
                      */
                     // @ts-ignore
-                    public abstract getPluginManager(): any /*net.md_5.bungee.api.plugin.PluginManager*/;
+                    public abstract getPluginManager(): net.md_5.bungee.api.plugin.PluginManager;
                     /**
                      * Returns the currently in use configuration adapter.
                      */
                     // @ts-ignore
-                    public abstract getConfigurationAdapter(): any /*net.md_5.bungee.api.config.ConfigurationAdapter*/;
+                    public abstract getConfigurationAdapter(): net.md_5.bungee.api.config.ConfigurationAdapter;
                     /**
                      * Set the configuration adapter to be used. Must be called from
                      * {@link Plugin#onLoad()}.
                      */
                     // @ts-ignore
-                    public abstract setConfigurationAdapter(adapter: any /*net.md_5.bungee.api.config.ConfigurationAdapter*/): void;
+                    public abstract setConfigurationAdapter(adapter: net.md_5.bungee.api.config.ConfigurationAdapter): void;
                     /**
                      * Get the currently in use reconnect handler.
                      */
                     // @ts-ignore
-                    public abstract getReconnectHandler(): any /*net.md_5.bungee.api.ReconnectHandler*/;
+                    public abstract getReconnectHandler(): net.md_5.bungee.api.ReconnectHandler;
                     /**
                      * Sets the reconnect handler to be used for subsequent connections.
                      */
                     // @ts-ignore
-                    public abstract setReconnectHandler(handler: any /*net.md_5.bungee.api.ReconnectHandler*/): void;
+                    public abstract setReconnectHandler(handler: net.md_5.bungee.api.ReconnectHandler): void;
                     /**
                      * Gracefully mark this instance for shutdown.
                      */
@@ -119,14 +119,14 @@ declare namespace net {
                      * instance.
                      */
                     // @ts-ignore
-                    public abstract constructServerInfo(name: string, address: java.net.InetSocketAddress, motd: string, restricted: boolean): any /*net.md_5.bungee.api.config.ServerInfo*/;
+                    public abstract constructServerInfo(name: string, address: java.net.InetSocketAddress, motd: string, restricted: boolean): net.md_5.bungee.api.config.ServerInfo;
                     /**
                      * Returns the console overlord for this proxy. Being the console, this
                      * command server cannot have permissions or groups, and will be able to
                      * execute anything.
                      */
                     // @ts-ignore
-                    public abstract getConsole(): any /*net.md_5.bungee.api.CommandSender*/;
+                    public abstract getConsole(): net.md_5.bungee.api.CommandSender;
                     /**
                      * Return the folder used to load plugins from.
                      */
@@ -136,7 +136,7 @@ declare namespace net {
                      * Get the scheduler instance for this proxy.
                      */
                     // @ts-ignore
-                    public abstract getScheduler(): any /*net.md_5.bungee.api.scheduler.TaskScheduler*/;
+                    public abstract getScheduler(): net.md_5.bungee.api.scheduler.TaskScheduler;
                     /**
                      * Get the current number of connected users. The default implementation is
                      * more efficient than {@link #getPlayers()} as it does not take a lock or
@@ -158,7 +158,7 @@ declare namespace net {
                      * Gets BungeeCord's core config.
                      */
                     // @ts-ignore
-                    public abstract getConfig(): any /*net.md_5.bungee.api.ProxyConfig*/;
+                    public abstract getConfig(): net.md_5.bungee.api.ProxyConfig;
                     /**
                      * Attempts to match any players with the given name, and returns a list of
                      * all possible matches.
@@ -174,7 +174,7 @@ declare namespace net {
                      * affected by a previous one.
                      */
                     // @ts-ignore
-                    public abstract createTitle(): any /*net.md_5.bungee.api.Title*/;
+                    public abstract createTitle(): net.md_5.bungee.api.Title;
                 }
             }
         }

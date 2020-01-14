@@ -17,13 +17,13 @@ declare namespace net {
                          * event to proceed.
                          */
                         // @ts-ignore
-                        public registerIntent(plugin: any /*net.md_5.bungee.api.plugin.Plugin*/): void;
+                        public registerIntent(plugin: net.md_5.bungee.api.plugin.Plugin): void;
                         /**
                          * Notifies this event that this plugin has completed an intent and wishes
                          * to let the event proceed once all intents have been completed.
                          */
                         // @ts-ignore
-                        public completeIntent(plugin: any /*net.md_5.bungee.api.plugin.Plugin*/): void;
+                        public completeIntent(plugin: net.md_5.bungee.api.plugin.Plugin): void;
                     }
                 }
             }

@@ -24,7 +24,7 @@ declare namespace net {
                          * Get the listener that accepted this connection.
                          */
                         // @ts-ignore
-                         getListener(): any /*net.md_5.bungee.api.config.ListenerInfo*/;
+                         getListener(): net.md_5.bungee.api.config.ListenerInfo;
                         /**
                          * Get this connection's UUID, if set.
                          */

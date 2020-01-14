@@ -7,21 +7,21 @@ declare namespace net {
                         // @ts-ignore
                          class Action extends java.lang.Enum {
                             // @ts-ignore
-                            public static TITLE: any /*net.md_5.bungee.protocol.packet.Title.Action*/;
+                            public static TITLE: net.md_5.bungee.protocol.packet.Title.Action;
                             // @ts-ignore
-                            public static SUBTITLE: any /*net.md_5.bungee.protocol.packet.Title.Action*/;
+                            public static SUBTITLE: net.md_5.bungee.protocol.packet.Title.Action;
                             // @ts-ignore
-                            public static ACTIONBAR: any /*net.md_5.bungee.protocol.packet.Title.Action*/;
+                            public static ACTIONBAR: net.md_5.bungee.protocol.packet.Title.Action;
                             // @ts-ignore
-                            public static TIMES: any /*net.md_5.bungee.protocol.packet.Title.Action*/;
+                            public static TIMES: net.md_5.bungee.protocol.packet.Title.Action;
                             // @ts-ignore
-                            public static CLEAR: any /*net.md_5.bungee.protocol.packet.Title.Action*/;
+                            public static CLEAR: net.md_5.bungee.protocol.packet.Title.Action;
                             // @ts-ignore
-                            public static RESET: any /*net.md_5.bungee.protocol.packet.Title.Action*/;
+                            public static RESET: net.md_5.bungee.protocol.packet.Title.Action;
                             // @ts-ignore
-                            public static values(): any /*net.md_5.bungee.protocol.packet.Title.Action[]*/;
+                            public static values(): net.md_5.bungee.protocol.packet.Title.Action[];
                             // @ts-ignore
-                            public static valueOf(name: string): any /*net.md_5.bungee.protocol.packet.Title.Action*/;
+                            public static valueOf(name: string): net.md_5.bungee.protocol.packet.Title.Action;
                         }
                     }
                 }

@@ -9,7 +9,7 @@ declare namespace net {
                     // @ts-ignore
                     constructor(name: string, permission: string, aliases: string)
                     // @ts-ignore
-                    public onTabComplete(sender: any /*net.md_5.bungee.api.CommandSender*/, args: string): java.lang.Iterable;
+                    public onTabComplete(sender: net.md_5.bungee.api.CommandSender, args: string): java.lang.Iterable;
                 }
             }
         }

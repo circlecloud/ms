@@ -6,7 +6,7 @@ declare namespace net {
                     // @ts-ignore
                      class PreLoginEvent extends net.md_5.bungee.api.event.AsyncEvent implements net.md_5.bungee.api.plugin.Cancellable {
                         // @ts-ignore
-                        constructor(connection: any /*net.md_5.bungee.api.connection.PendingConnection*/, done: any /*net.md_5.bungee.api.Callback*/)
+                        constructor(connection: net.md_5.bungee.api.connection.PendingConnection, done: net.md_5.bungee.api.Callback)
                         // @ts-ignore
                         public getCancelReason(): string;
                         // @ts-ignore

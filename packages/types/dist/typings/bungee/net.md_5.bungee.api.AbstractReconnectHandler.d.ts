@@ -7,11 +7,11 @@ declare namespace net {
                     // @ts-ignore
                     constructor()
                     // @ts-ignore
-                    public getServer(player: any /*net.md_5.bungee.api.connection.ProxiedPlayer*/): any /*net.md_5.bungee.api.config.ServerInfo*/;
+                    public getServer(player: net.md_5.bungee.api.connection.ProxiedPlayer): net.md_5.bungee.api.config.ServerInfo;
                     // @ts-ignore
-                    public static getForcedHost(con: any /*net.md_5.bungee.api.connection.PendingConnection*/): any /*net.md_5.bungee.api.config.ServerInfo*/;
+                    public static getForcedHost(con: net.md_5.bungee.api.connection.PendingConnection): net.md_5.bungee.api.config.ServerInfo;
                     // @ts-ignore
-                    protected abstract getStoredServer(player: any /*net.md_5.bungee.api.connection.ProxiedPlayer*/): any /*net.md_5.bungee.api.config.ServerInfo*/;
+                    protected abstract getStoredServer(player: net.md_5.bungee.api.connection.ProxiedPlayer): net.md_5.bungee.api.config.ServerInfo;
                 }
             }
         }

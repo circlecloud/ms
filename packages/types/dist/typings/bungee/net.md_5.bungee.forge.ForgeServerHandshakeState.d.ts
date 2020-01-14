@@ -5,19 +5,19 @@ declare namespace net {
                 // @ts-ignore
                  class ForgeServerHandshakeState extends java.lang.Enum implements net.md_5.bungee.forge.IForgeServerPacketHandler {
                     // @ts-ignore
-                    public static START: any /*net.md_5.bungee.forge.ForgeServerHandshakeState*/;
+                    public static START: net.md_5.bungee.forge.ForgeServerHandshakeState;
                     // @ts-ignore
-                    public static HELLO: any /*net.md_5.bungee.forge.ForgeServerHandshakeState*/;
+                    public static HELLO: net.md_5.bungee.forge.ForgeServerHandshakeState;
                     // @ts-ignore
-                    public static WAITINGCACK: any /*net.md_5.bungee.forge.ForgeServerHandshakeState*/;
+                    public static WAITINGCACK: net.md_5.bungee.forge.ForgeServerHandshakeState;
                     // @ts-ignore
-                    public static COMPLETE: any /*net.md_5.bungee.forge.ForgeServerHandshakeState*/;
+                    public static COMPLETE: net.md_5.bungee.forge.ForgeServerHandshakeState;
                     // @ts-ignore
-                    public static DONE: any /*net.md_5.bungee.forge.ForgeServerHandshakeState*/;
+                    public static DONE: net.md_5.bungee.forge.ForgeServerHandshakeState;
                     // @ts-ignore
-                    public static values(): any /*net.md_5.bungee.forge.ForgeServerHandshakeState[]*/;
+                    public static values(): net.md_5.bungee.forge.ForgeServerHandshakeState[];
                     // @ts-ignore
-                    public static valueOf(name: string): any /*net.md_5.bungee.forge.ForgeServerHandshakeState*/;
+                    public static valueOf(name: string): net.md_5.bungee.forge.ForgeServerHandshakeState;
                 }
             }
         }

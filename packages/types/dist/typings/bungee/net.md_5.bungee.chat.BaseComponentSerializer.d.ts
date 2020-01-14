@@ -7,9 +7,9 @@ declare namespace net {
                     // @ts-ignore
                     constructor()
                     // @ts-ignore
-                    protected deserialize(object: JsonObject, component: any /*net.md_5.bungee.api.chat.BaseComponent*/, context: JsonDeserializationContext): void;
+                    protected deserialize(object: JsonObject, component: net.md_5.bungee.api.chat.BaseComponent, context: JsonDeserializationContext): void;
                     // @ts-ignore
-                    protected serialize(object: JsonObject, component: any /*net.md_5.bungee.api.chat.BaseComponent*/, context: JsonSerializationContext): void;
+                    protected serialize(object: JsonObject, component: net.md_5.bungee.api.chat.BaseComponent, context: JsonSerializationContext): void;
                 }
             }
         }

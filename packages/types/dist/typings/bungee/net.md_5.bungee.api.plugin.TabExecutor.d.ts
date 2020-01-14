@@ -6,7 +6,7 @@ declare namespace net {
                     // @ts-ignore
                     interface TabExecutor {
                         // @ts-ignore
-                         onTabComplete(sender: any /*net.md_5.bungee.api.CommandSender*/, args: string): java.lang.Iterable;
+                         onTabComplete(sender: net.md_5.bungee.api.CommandSender, args: string): java.lang.Iterable;
                     }
                 }
             }

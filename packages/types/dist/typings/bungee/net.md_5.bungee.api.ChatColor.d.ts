@@ -5,49 +5,49 @@ declare namespace net {
                 // @ts-ignore
                  class ChatColor extends java.lang.Enum {
                     // @ts-ignore
-                    public static BLACK: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static BLACK: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static DARK_BLUE: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static DARK_BLUE: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static DARK_GREEN: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static DARK_GREEN: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static DARK_AQUA: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static DARK_AQUA: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static DARK_RED: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static DARK_RED: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static DARK_PURPLE: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static DARK_PURPLE: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static GOLD: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static GOLD: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static GRAY: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static GRAY: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static DARK_GRAY: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static DARK_GRAY: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static BLUE: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static BLUE: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static GREEN: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static GREEN: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static AQUA: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static AQUA: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static RED: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static RED: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static LIGHT_PURPLE: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static LIGHT_PURPLE: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static YELLOW: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static YELLOW: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static WHITE: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static WHITE: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static MAGIC: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static MAGIC: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static BOLD: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static BOLD: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static STRIKETHROUGH: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static STRIKETHROUGH: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static UNDERLINE: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static UNDERLINE: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static ITALIC: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static ITALIC: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
-                    public static RESET: any /*net.md_5.bungee.api.ChatColor*/;
+                    public static RESET: net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
                     public static COLOR_CHAR: string;
                     // @ts-ignore
@@ -55,9 +55,9 @@ declare namespace net {
                     // @ts-ignore
                     public static STRIP_COLOR_PATTERN: java.util.regex.Pattern;
                     // @ts-ignore
-                    public static values(): any /*net.md_5.bungee.api.ChatColor[]*/;
+                    public static values(): net.md_5.bungee.api.ChatColor[];
                     // @ts-ignore
-                    public static valueOf(name: string): any /*net.md_5.bungee.api.ChatColor*/;
+                    public static valueOf(name: string): net.md_5.bungee.api.ChatColor;
                     // @ts-ignore
                     public toString(): string;
                     /**
@@ -71,7 +71,7 @@ declare namespace net {
                      * Get the colour represented by the specified code.
                      */
                     // @ts-ignore
-                    public static getByChar(code: string): any /*net.md_5.bungee.api.ChatColor*/;
+                    public static getByChar(code: string): net.md_5.bungee.api.ChatColor;
                 }
             }
         }

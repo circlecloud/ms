@@ -7,17 +7,17 @@ declare namespace net {
                         // @ts-ignore
                          class FormatRetention extends java.lang.Enum {
                             // @ts-ignore
-                            public static NONE: any /*net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention*/;
+                            public static NONE: net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention;
                             // @ts-ignore
-                            public static FORMATTING: any /*net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention*/;
+                            public static FORMATTING: net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention;
                             // @ts-ignore
-                            public static EVENTS: any /*net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention*/;
+                            public static EVENTS: net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention;
                             // @ts-ignore
-                            public static ALL: any /*net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention*/;
+                            public static ALL: net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention;
                             // @ts-ignore
-                            public static values(): any /*net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention[]*/;
+                            public static values(): net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention[];
                             // @ts-ignore
-                            public static valueOf(name: string): any /*net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention*/;
+                            public static valueOf(name: string): net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention;
                         }
                     }
                 }

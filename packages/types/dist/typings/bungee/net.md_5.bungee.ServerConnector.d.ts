@@ -8,9 +8,9 @@ declare namespace net {
                 // @ts-ignore
                 public exception(t: java.lang.Throwable): void;
                 // @ts-ignore
-                public connected(channel: any /*net.md_5.bungee.netty.ChannelWrapper*/): void;
+                public connected(channel: net.md_5.bungee.netty.ChannelWrapper): void;
                 // @ts-ignore
-                public disconnected(channel: any /*net.md_5.bungee.netty.ChannelWrapper*/): void;
+                public disconnected(channel: net.md_5.bungee.netty.ChannelWrapper): void;
                 // @ts-ignore
                 public handle(packet: PacketWrapper): void;
                 // @ts-ignore

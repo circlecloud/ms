@@ -14,7 +14,7 @@ declare namespace net {
                          * Return the plugin which scheduled this task for execution.
                          */
                         // @ts-ignore
-                         getOwner(): any /*net.md_5.bungee.api.plugin.Plugin*/;
+                         getOwner(): net.md_5.bungee.api.plugin.Plugin;
                         /**
                          * Get the actual method which will be executed by this task.
                          */

@@ -8,13 +8,13 @@ declare namespace net {
                      * Gets the initial server name for a connecting player.
                      */
                     // @ts-ignore
-                     getServer(player: any /*net.md_5.bungee.api.connection.ProxiedPlayer*/): any /*net.md_5.bungee.api.config.ServerInfo*/;
+                     getServer(player: net.md_5.bungee.api.connection.ProxiedPlayer): net.md_5.bungee.api.config.ServerInfo;
                     /**
                      * Save the server of this player before they disconnect so it can be
                      * retrieved later.
                      */
                     // @ts-ignore
-                     setServer(player: any /*net.md_5.bungee.api.connection.ProxiedPlayer*/): void;
+                     setServer(player: net.md_5.bungee.api.connection.ProxiedPlayer): void;
                     /**
                      * Save all pending reconnect locations. Whilst not used for database
                      * connections, this method will be called at a predefined interval to allow

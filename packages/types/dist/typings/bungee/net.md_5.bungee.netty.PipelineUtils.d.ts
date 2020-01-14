@@ -15,7 +15,7 @@ declare namespace net {
                     // @ts-ignore
                     public static SERVER_CHILD: any;
                     // @ts-ignore
-                    public static BASE: any /*net.md_5.bungee.netty.PipelineUtils.Base*/;
+                    public static BASE: net.md_5.bungee.netty.PipelineUtils.Base;
                     // @ts-ignore
                     public static TIMEOUT_HANDLER: string;
                     // @ts-ignore

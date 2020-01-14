@@ -14,17 +14,17 @@ declare namespace net {
                         // @ts-ignore
                         public getTeams(): java.util.Collection;
                         // @ts-ignore
-                        public addObjective(objective: any /*net.md_5.bungee.api.score.Objective*/): void;
+                        public addObjective(objective: net.md_5.bungee.api.score.Objective): void;
                         // @ts-ignore
-                        public addScore(score: any /*net.md_5.bungee.api.score.Score*/): void;
+                        public addScore(score: net.md_5.bungee.api.score.Score): void;
                         // @ts-ignore
-                        public getScore(name: string): any /*net.md_5.bungee.api.score.Score*/;
+                        public getScore(name: string): net.md_5.bungee.api.score.Score;
                         // @ts-ignore
-                        public addTeam(team: any /*net.md_5.bungee.api.score.Team*/): void;
+                        public addTeam(team: net.md_5.bungee.api.score.Team): void;
                         // @ts-ignore
-                        public getTeam(name: string): any /*net.md_5.bungee.api.score.Team*/;
+                        public getTeam(name: string): net.md_5.bungee.api.score.Team;
                         // @ts-ignore
-                        public getObjective(name: string): any /*net.md_5.bungee.api.score.Objective*/;
+                        public getObjective(name: string): net.md_5.bungee.api.score.Objective;
                         // @ts-ignore
                         public removeObjective(objectiveName: string): void;
                         // @ts-ignore

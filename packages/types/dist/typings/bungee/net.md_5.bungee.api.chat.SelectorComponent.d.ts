@@ -9,9 +9,9 @@ declare namespace net {
                          * Creates a selector component from the original to clone it.
                          */
                         // @ts-ignore
-                        constructor(original: any /*net.md_5.bungee.api.chat.SelectorComponent*/)
+                        constructor(original: net.md_5.bungee.api.chat.SelectorComponent)
                         // @ts-ignore
-                        public duplicate(): any /*net.md_5.bungee.api.chat.SelectorComponent*/;
+                        public duplicate(): net.md_5.bungee.api.chat.SelectorComponent;
                         // @ts-ignore
                         protected toPlainText(builder: java.lang.StringBuilder): void;
                         // @ts-ignore

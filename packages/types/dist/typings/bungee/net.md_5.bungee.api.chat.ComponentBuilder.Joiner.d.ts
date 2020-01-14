@@ -14,7 +14,7 @@ declare namespace net {
                              * previous component in builder unmodified.
                              */
                             // @ts-ignore
-                             join(componentBuilder: any /*net.md_5.bungee.api.chat.ComponentBuilder*/, retention: any /*net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention*/): any /*net.md_5.bungee.api.chat.ComponentBuilder*/;
+                             join(componentBuilder: net.md_5.bungee.api.chat.ComponentBuilder, retention: net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention): net.md_5.bungee.api.chat.ComponentBuilder;
                         }
                     }
                 }

@@ -7,7 +7,7 @@ declare namespace net {
                     // @ts-ignore
                     constructor()
                     // @ts-ignore
-                    constructor(defaults: any /*net.md_5.bungee.config.Configuration*/)
+                    constructor(defaults: net.md_5.bungee.config.Configuration)
                     // @ts-ignore
                     public get(path: string, def: java.lang.Object): java.lang.Object;
                     // @ts-ignore
@@ -19,7 +19,7 @@ declare namespace net {
                     // @ts-ignore
                     public set(path: string, value: java.lang.Object): void;
                     // @ts-ignore
-                    public getSection(path: string): any /*net.md_5.bungee.config.Configuration*/;
+                    public getSection(path: string): net.md_5.bungee.config.Configuration;
                     /**
                      * Gets keys, not deep by default.
                      */

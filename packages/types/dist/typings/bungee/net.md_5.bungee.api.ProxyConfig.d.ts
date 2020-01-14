@@ -63,7 +63,7 @@ declare namespace net {
                      * The favicon used for the server ping list.
                      */
                     // @ts-ignore
-                     getFaviconObject(): any /*net.md_5.bungee.api.Favicon*/;
+                     getFaviconObject(): net.md_5.bungee.api.Favicon;
                 }
             }
         }

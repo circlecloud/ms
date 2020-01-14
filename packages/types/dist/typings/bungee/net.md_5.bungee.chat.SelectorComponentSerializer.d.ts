@@ -7,9 +7,9 @@ declare namespace net {
                     // @ts-ignore
                     constructor()
                     // @ts-ignore
-                    public deserialize(element: JsonElement, type: java.lang.reflect.Type, context: JsonDeserializationContext): any /*net.md_5.bungee.api.chat.SelectorComponent*/;
+                    public deserialize(element: JsonElement, type: java.lang.reflect.Type, context: JsonDeserializationContext): net.md_5.bungee.api.chat.SelectorComponent;
                     // @ts-ignore
-                    public serialize(component: any /*net.md_5.bungee.api.chat.SelectorComponent*/, type: java.lang.reflect.Type, context: JsonSerializationContext): JsonElement;
+                    public serialize(component: net.md_5.bungee.api.chat.SelectorComponent, type: java.lang.reflect.Type, context: JsonSerializationContext): JsonElement;
                 }
             }
         }

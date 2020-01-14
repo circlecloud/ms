@@ -7,17 +7,17 @@ declare namespace net {
                         // @ts-ignore
                          class HealthDisplay extends java.lang.Enum {
                             // @ts-ignore
-                            public static INTEGER: any /*net.md_5.bungee.protocol.packet.ScoreboardObjective.HealthDisplay*/;
+                            public static INTEGER: net.md_5.bungee.protocol.packet.ScoreboardObjective.HealthDisplay;
                             // @ts-ignore
-                            public static HEARTS: any /*net.md_5.bungee.protocol.packet.ScoreboardObjective.HealthDisplay*/;
+                            public static HEARTS: net.md_5.bungee.protocol.packet.ScoreboardObjective.HealthDisplay;
                             // @ts-ignore
-                            public static values(): any /*net.md_5.bungee.protocol.packet.ScoreboardObjective.HealthDisplay[]*/;
+                            public static values(): net.md_5.bungee.protocol.packet.ScoreboardObjective.HealthDisplay[];
                             // @ts-ignore
-                            public static valueOf(name: string): any /*net.md_5.bungee.protocol.packet.ScoreboardObjective.HealthDisplay*/;
+                            public static valueOf(name: string): net.md_5.bungee.protocol.packet.ScoreboardObjective.HealthDisplay;
                             // @ts-ignore
                             public toString(): string;
                             // @ts-ignore
-                            public static fromString(s: string): any /*net.md_5.bungee.protocol.packet.ScoreboardObjective.HealthDisplay*/;
+                            public static fromString(s: string): net.md_5.bungee.protocol.packet.ScoreboardObjective.HealthDisplay;
                         }
                     }
                 }

@@ -44,7 +44,7 @@ declare namespace net {
                          * the player has no permission and this server is restricted.
                          */
                         // @ts-ignore
-                         canAccess(sender: any /*net.md_5.bungee.api.CommandSender*/): boolean;
+                         canAccess(sender: net.md_5.bungee.api.CommandSender): boolean;
                         /**
                          * Send data by any available means to this server. This data may be queued
                          * and there is no guarantee of its timely arrival.
@@ -66,7 +66,7 @@ declare namespace net {
                          * Asynchronously gets the current player count on this server.
                          */
                         // @ts-ignore
-                         ping(callback: any /*net.md_5.bungee.api.Callback*/): void;
+                         ping(callback: net.md_5.bungee.api.Callback): void;
                     }
                 }
             }

@@ -10,56 +10,56 @@ declare namespace net {
                          * formatting will be replaced.
                          */
                         // @ts-ignore
-                        public copyFormatting(component: any /*net.md_5.bungee.api.chat.BaseComponent*/): void;
+                        public copyFormatting(component: net.md_5.bungee.api.chat.BaseComponent): void;
                         /**
                          * Copies the events and formatting of a BaseComponent.
                          */
                         // @ts-ignore
-                        public copyFormatting(component: any /*net.md_5.bungee.api.chat.BaseComponent*/, replace: boolean): void;
+                        public copyFormatting(component: net.md_5.bungee.api.chat.BaseComponent, replace: boolean): void;
                         /**
                          * Copies the specified formatting of a BaseComponent.
                          */
                         // @ts-ignore
-                        public copyFormatting(component: any /*net.md_5.bungee.api.chat.BaseComponent*/, retention: any /*net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention*/, replace: boolean): void;
+                        public copyFormatting(component: net.md_5.bungee.api.chat.BaseComponent, retention: net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention, replace: boolean): void;
                         /**
                          * Retains only the specified formatting.
                          */
                         // @ts-ignore
-                        public retain(retention: any /*net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention*/): void;
+                        public retain(retention: net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention): void;
                         /**
                          * Clones the BaseComponent and returns the clone.
                          */
                         // @ts-ignore
-                        public abstract duplicate(): any /*net.md_5.bungee.api.chat.BaseComponent*/;
+                        public abstract duplicate(): net.md_5.bungee.api.chat.BaseComponent;
                         /**
                          * Clones the BaseComponent without formatting and returns the clone.
                          */
                         // @ts-ignore
-                        public duplicateWithoutFormatting(): any /*net.md_5.bungee.api.chat.BaseComponent*/;
+                        public duplicateWithoutFormatting(): net.md_5.bungee.api.chat.BaseComponent;
                         /**
                          * Converts the components to a string that uses the old formatting codes
                          * ({@link net.md_5.bungee.api.ChatColor#COLOR_CHAR}
                          */
                         // @ts-ignore
-                        public static toLegacyText(components: any /*net.md_5.bungee.api.chat.BaseComponent*/): string;
+                        public static toLegacyText(components: net.md_5.bungee.api.chat.BaseComponent): string;
                         /**
                          * Converts the components into a string without any formatting
                          */
                         // @ts-ignore
-                        public static toPlainText(components: any /*net.md_5.bungee.api.chat.BaseComponent*/): string;
+                        public static toPlainText(components: net.md_5.bungee.api.chat.BaseComponent): string;
                         /**
                          * Returns the color of this component. This uses the parent's color if this
                          * component doesn't have one. {@link net.md_5.bungee.api.ChatColor#WHITE}
                          * is returned if no color is found.
                          */
                         // @ts-ignore
-                        public getColor(): any /*net.md_5.bungee.api.ChatColor*/;
+                        public getColor(): net.md_5.bungee.api.ChatColor;
                         /**
                          * Returns the color of this component without checking the parents color.
                          * May return null
                          */
                         // @ts-ignore
-                        public getColorRaw(): any /*net.md_5.bungee.api.ChatColor*/;
+                        public getColorRaw(): net.md_5.bungee.api.ChatColor;
                         /**
                          * Returns whether this component is bold. This uses the parent's setting if
                          * this component hasn't been set. false is returned if none of the parent
@@ -138,7 +138,7 @@ declare namespace net {
                          * component's formatting
                          */
                         // @ts-ignore
-                        public addExtra(component: any /*net.md_5.bungee.api.chat.BaseComponent*/): void;
+                        public addExtra(component: net.md_5.bungee.api.chat.BaseComponent): void;
                         /**
                          * Returns whether the component has any formatting or events applied to it
                          */

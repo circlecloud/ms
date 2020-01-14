@@ -7,25 +7,25 @@ declare namespace net {
                     // @ts-ignore
                     constructor()
                     // @ts-ignore
-                    public save(config: any /*net.md_5.bungee.config.Configuration*/, file: java.io.File): void;
+                    public save(config: net.md_5.bungee.config.Configuration, file: java.io.File): void;
                     // @ts-ignore
-                    public save(config: any /*net.md_5.bungee.config.Configuration*/, writer: java.io.Writer): void;
+                    public save(config: net.md_5.bungee.config.Configuration, writer: java.io.Writer): void;
                     // @ts-ignore
-                    public load(file: java.io.File): any /*net.md_5.bungee.config.Configuration*/;
+                    public load(file: java.io.File): net.md_5.bungee.config.Configuration;
                     // @ts-ignore
-                    public load(file: java.io.File, defaults: any /*net.md_5.bungee.config.Configuration*/): any /*net.md_5.bungee.config.Configuration*/;
+                    public load(file: java.io.File, defaults: net.md_5.bungee.config.Configuration): net.md_5.bungee.config.Configuration;
                     // @ts-ignore
-                    public load(reader: java.io.Reader): any /*net.md_5.bungee.config.Configuration*/;
+                    public load(reader: java.io.Reader): net.md_5.bungee.config.Configuration;
                     // @ts-ignore
-                    public load(reader: java.io.Reader, defaults: any /*net.md_5.bungee.config.Configuration*/): any /*net.md_5.bungee.config.Configuration*/;
+                    public load(reader: java.io.Reader, defaults: net.md_5.bungee.config.Configuration): net.md_5.bungee.config.Configuration;
                     // @ts-ignore
-                    public load(is: java.io.InputStream): any /*net.md_5.bungee.config.Configuration*/;
+                    public load(is: java.io.InputStream): net.md_5.bungee.config.Configuration;
                     // @ts-ignore
-                    public load(is: java.io.InputStream, defaults: any /*net.md_5.bungee.config.Configuration*/): any /*net.md_5.bungee.config.Configuration*/;
+                    public load(is: java.io.InputStream, defaults: net.md_5.bungee.config.Configuration): net.md_5.bungee.config.Configuration;
                     // @ts-ignore
-                    public load(string: string): any /*net.md_5.bungee.config.Configuration*/;
+                    public load(string: string): net.md_5.bungee.config.Configuration;
                     // @ts-ignore
-                    public load(string: string, defaults: any /*net.md_5.bungee.config.Configuration*/): any /*net.md_5.bungee.config.Configuration*/;
+                    public load(string: string, defaults: net.md_5.bungee.config.Configuration): net.md_5.bungee.config.Configuration;
                 }
             }
         }

@@ -9,7 +9,7 @@ declare namespace net {
                     // @ts-ignore
                     public exception(t: java.lang.Throwable): void;
                     // @ts-ignore
-                    public disconnected(channel: any /*net.md_5.bungee.netty.ChannelWrapper*/): void;
+                    public disconnected(channel: net.md_5.bungee.netty.ChannelWrapper): void;
                     // @ts-ignore
                     public shouldHandle(packet: PacketWrapper): boolean;
                     // @ts-ignore
@@ -25,7 +25,7 @@ declare namespace net {
                     // @ts-ignore
                     public handle(displayScoreboard: ScoreboardDisplay): void;
                     // @ts-ignore
-                    public handle(team: any /*net.md_5.bungee.protocol.packet.Team*/): void;
+                    public handle(team: net.md_5.bungee.protocol.packet.Team): void;
                     // @ts-ignore
                     public handle(pluginMessage: PluginMessage): void;
                     // @ts-ignore

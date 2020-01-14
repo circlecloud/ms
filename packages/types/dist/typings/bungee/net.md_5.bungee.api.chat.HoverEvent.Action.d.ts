@@ -7,17 +7,17 @@ declare namespace net {
                         // @ts-ignore
                          class Action extends java.lang.Enum {
                             // @ts-ignore
-                            public static SHOW_TEXT: any /*net.md_5.bungee.api.chat.HoverEvent.Action*/;
+                            public static SHOW_TEXT: net.md_5.bungee.api.chat.HoverEvent.Action;
                             // @ts-ignore
-                            public static SHOW_ACHIEVEMENT: any /*net.md_5.bungee.api.chat.HoverEvent.Action*/;
+                            public static SHOW_ACHIEVEMENT: net.md_5.bungee.api.chat.HoverEvent.Action;
                             // @ts-ignore
-                            public static SHOW_ITEM: any /*net.md_5.bungee.api.chat.HoverEvent.Action*/;
+                            public static SHOW_ITEM: net.md_5.bungee.api.chat.HoverEvent.Action;
                             // @ts-ignore
-                            public static SHOW_ENTITY: any /*net.md_5.bungee.api.chat.HoverEvent.Action*/;
+                            public static SHOW_ENTITY: net.md_5.bungee.api.chat.HoverEvent.Action;
                             // @ts-ignore
-                            public static values(): any /*net.md_5.bungee.api.chat.HoverEvent.Action[]*/;
+                            public static values(): net.md_5.bungee.api.chat.HoverEvent.Action[];
                             // @ts-ignore
-                            public static valueOf(name: string): any /*net.md_5.bungee.api.chat.HoverEvent.Action*/;
+                            public static valueOf(name: string): net.md_5.bungee.api.chat.HoverEvent.Action;
                         }
                     }
                 }

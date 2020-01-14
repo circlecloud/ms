@@ -5,13 +5,13 @@ declare namespace net {
                 // @ts-ignore
                  class UpstreamBridge extends net.md_5.bungee.netty.PacketHandler {
                     // @ts-ignore
-                    constructor(bungee: ProxyServer, con: any /*net.md_5.bungee.UserConnection*/)
+                    constructor(bungee: ProxyServer, con: net.md_5.bungee.UserConnection)
                     // @ts-ignore
                     public exception(t: java.lang.Throwable): void;
                     // @ts-ignore
-                    public disconnected(channel: any /*net.md_5.bungee.netty.ChannelWrapper*/): void;
+                    public disconnected(channel: net.md_5.bungee.netty.ChannelWrapper): void;
                     // @ts-ignore
-                    public writabilityChanged(channel: any /*net.md_5.bungee.netty.ChannelWrapper*/): void;
+                    public writabilityChanged(channel: net.md_5.bungee.netty.ChannelWrapper): void;
                     // @ts-ignore
                     public shouldHandle(packet: PacketWrapper): boolean;
                     // @ts-ignore

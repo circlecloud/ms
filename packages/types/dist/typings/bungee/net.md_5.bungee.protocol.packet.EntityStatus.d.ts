@@ -16,7 +16,7 @@ declare namespace net {
                         // @ts-ignore
                         public write(buf: ByteBuf): void;
                         // @ts-ignore
-                        public handle(handler: any /*net.md_5.bungee.protocol.AbstractPacketHandler*/): void;
+                        public handle(handler: net.md_5.bungee.protocol.AbstractPacketHandler): void;
                     }
                 }
             }

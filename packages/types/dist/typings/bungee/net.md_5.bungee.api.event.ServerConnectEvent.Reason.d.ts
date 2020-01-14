@@ -7,25 +7,25 @@ declare namespace net {
                         // @ts-ignore
                          class Reason extends java.lang.Enum {
                             // @ts-ignore
-                            public static LOBBY_FALLBACK: any /*net.md_5.bungee.api.event.ServerConnectEvent.Reason*/;
+                            public static LOBBY_FALLBACK: net.md_5.bungee.api.event.ServerConnectEvent.Reason;
                             // @ts-ignore
-                            public static COMMAND: any /*net.md_5.bungee.api.event.ServerConnectEvent.Reason*/;
+                            public static COMMAND: net.md_5.bungee.api.event.ServerConnectEvent.Reason;
                             // @ts-ignore
-                            public static SERVER_DOWN_REDIRECT: any /*net.md_5.bungee.api.event.ServerConnectEvent.Reason*/;
+                            public static SERVER_DOWN_REDIRECT: net.md_5.bungee.api.event.ServerConnectEvent.Reason;
                             // @ts-ignore
-                            public static KICK_REDIRECT: any /*net.md_5.bungee.api.event.ServerConnectEvent.Reason*/;
+                            public static KICK_REDIRECT: net.md_5.bungee.api.event.ServerConnectEvent.Reason;
                             // @ts-ignore
-                            public static PLUGIN_MESSAGE: any /*net.md_5.bungee.api.event.ServerConnectEvent.Reason*/;
+                            public static PLUGIN_MESSAGE: net.md_5.bungee.api.event.ServerConnectEvent.Reason;
                             // @ts-ignore
-                            public static JOIN_PROXY: any /*net.md_5.bungee.api.event.ServerConnectEvent.Reason*/;
+                            public static JOIN_PROXY: net.md_5.bungee.api.event.ServerConnectEvent.Reason;
                             // @ts-ignore
-                            public static PLUGIN: any /*net.md_5.bungee.api.event.ServerConnectEvent.Reason*/;
+                            public static PLUGIN: net.md_5.bungee.api.event.ServerConnectEvent.Reason;
                             // @ts-ignore
-                            public static UNKNOWN: any /*net.md_5.bungee.api.event.ServerConnectEvent.Reason*/;
+                            public static UNKNOWN: net.md_5.bungee.api.event.ServerConnectEvent.Reason;
                             // @ts-ignore
-                            public static values(): any /*net.md_5.bungee.api.event.ServerConnectEvent.Reason[]*/;
+                            public static values(): net.md_5.bungee.api.event.ServerConnectEvent.Reason[];
                             // @ts-ignore
-                            public static valueOf(name: string): any /*net.md_5.bungee.api.event.ServerConnectEvent.Reason*/;
+                            public static valueOf(name: string): net.md_5.bungee.api.event.ServerConnectEvent.Reason;
                         }
                     }
                 }

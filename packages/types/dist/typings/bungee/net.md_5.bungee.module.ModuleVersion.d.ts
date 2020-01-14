@@ -7,7 +7,7 @@ declare namespace net {
                     // @ts-ignore
                     constructor()
                     // @ts-ignore
-                    public static parse(version: string): any /*net.md_5.bungee.module.ModuleVersion*/;
+                    public static parse(version: string): net.md_5.bungee.module.ModuleVersion;
                 }
             }
         }

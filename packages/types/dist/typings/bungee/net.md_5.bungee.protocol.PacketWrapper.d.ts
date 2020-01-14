@@ -7,7 +7,7 @@ declare namespace net {
                     // @ts-ignore
                     constructor()
                     // @ts-ignore
-                    public packet: any /*net.md_5.bungee.protocol.DefinedPacket*/;
+                    public packet: net.md_5.bungee.protocol.DefinedPacket;
                     // @ts-ignore
                     public buf: ByteBuf;
                     // @ts-ignore

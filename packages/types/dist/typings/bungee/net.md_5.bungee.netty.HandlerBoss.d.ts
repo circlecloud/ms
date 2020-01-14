@@ -7,7 +7,7 @@ declare namespace net {
                     // @ts-ignore
                     constructor()
                     // @ts-ignore
-                    public setHandler(handler: any /*net.md_5.bungee.netty.PacketHandler*/): void;
+                    public setHandler(handler: net.md_5.bungee.netty.PacketHandler): void;
                     // @ts-ignore
                     public channelActive(ctx: ChannelHandlerContext): void;
                     // @ts-ignore

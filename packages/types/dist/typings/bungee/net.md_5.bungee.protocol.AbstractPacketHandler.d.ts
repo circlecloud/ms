@@ -7,73 +7,73 @@ declare namespace net {
                     // @ts-ignore
                     constructor()
                     // @ts-ignore
-                    public handle(ping: any /*net.md_5.bungee.protocol.packet.LegacyPing*/): void;
+                    public handle(ping: net.md_5.bungee.protocol.packet.LegacyPing): void;
                     // @ts-ignore
-                    public handle(tabResponse: any /*net.md_5.bungee.protocol.packet.TabCompleteResponse*/): void;
+                    public handle(tabResponse: net.md_5.bungee.protocol.packet.TabCompleteResponse): void;
                     // @ts-ignore
-                    public handle(ping: any /*net.md_5.bungee.protocol.packet.PingPacket*/): void;
+                    public handle(ping: net.md_5.bungee.protocol.packet.PingPacket): void;
                     // @ts-ignore
-                    public handle(statusRequest: any /*net.md_5.bungee.protocol.packet.StatusRequest*/): void;
+                    public handle(statusRequest: net.md_5.bungee.protocol.packet.StatusRequest): void;
                     // @ts-ignore
-                    public handle(statusResponse: any /*net.md_5.bungee.protocol.packet.StatusResponse*/): void;
+                    public handle(statusResponse: net.md_5.bungee.protocol.packet.StatusResponse): void;
                     // @ts-ignore
-                    public handle(handshake: any /*net.md_5.bungee.protocol.packet.Handshake*/): void;
+                    public handle(handshake: net.md_5.bungee.protocol.packet.Handshake): void;
                     // @ts-ignore
-                    public handle(keepAlive: any /*net.md_5.bungee.protocol.packet.KeepAlive*/): void;
+                    public handle(keepAlive: net.md_5.bungee.protocol.packet.KeepAlive): void;
                     // @ts-ignore
-                    public handle(login: any /*net.md_5.bungee.protocol.packet.Login*/): void;
+                    public handle(login: net.md_5.bungee.protocol.packet.Login): void;
                     // @ts-ignore
-                    public handle(chat: any /*net.md_5.bungee.protocol.packet.Chat*/): void;
+                    public handle(chat: net.md_5.bungee.protocol.packet.Chat): void;
                     // @ts-ignore
-                    public handle(respawn: any /*net.md_5.bungee.protocol.packet.Respawn*/): void;
+                    public handle(respawn: net.md_5.bungee.protocol.packet.Respawn): void;
                     // @ts-ignore
-                    public handle(loginRequest: any /*net.md_5.bungee.protocol.packet.LoginRequest*/): void;
+                    public handle(loginRequest: net.md_5.bungee.protocol.packet.LoginRequest): void;
                     // @ts-ignore
-                    public handle(settings: any /*net.md_5.bungee.protocol.packet.ClientSettings*/): void;
+                    public handle(settings: net.md_5.bungee.protocol.packet.ClientSettings): void;
                     // @ts-ignore
-                    public handle(clientStatus: any /*net.md_5.bungee.protocol.packet.ClientStatus*/): void;
+                    public handle(clientStatus: net.md_5.bungee.protocol.packet.ClientStatus): void;
                     // @ts-ignore
-                    public handle(playerListItem: any /*net.md_5.bungee.protocol.packet.PlayerListItem*/): void;
+                    public handle(playerListItem: net.md_5.bungee.protocol.packet.PlayerListItem): void;
                     // @ts-ignore
-                    public handle(playerListHeaderFooter: any /*net.md_5.bungee.protocol.packet.PlayerListHeaderFooter*/): void;
+                    public handle(playerListHeaderFooter: net.md_5.bungee.protocol.packet.PlayerListHeaderFooter): void;
                     // @ts-ignore
-                    public handle(tabComplete: any /*net.md_5.bungee.protocol.packet.TabCompleteRequest*/): void;
+                    public handle(tabComplete: net.md_5.bungee.protocol.packet.TabCompleteRequest): void;
                     // @ts-ignore
-                    public handle(scoreboardObjective: any /*net.md_5.bungee.protocol.packet.ScoreboardObjective*/): void;
+                    public handle(scoreboardObjective: net.md_5.bungee.protocol.packet.ScoreboardObjective): void;
                     // @ts-ignore
-                    public handle(scoreboardScore: any /*net.md_5.bungee.protocol.packet.ScoreboardScore*/): void;
+                    public handle(scoreboardScore: net.md_5.bungee.protocol.packet.ScoreboardScore): void;
                     // @ts-ignore
-                    public handle(encryptionRequest: any /*net.md_5.bungee.protocol.packet.EncryptionRequest*/): void;
+                    public handle(encryptionRequest: net.md_5.bungee.protocol.packet.EncryptionRequest): void;
                     // @ts-ignore
-                    public handle(displayScoreboard: any /*net.md_5.bungee.protocol.packet.ScoreboardDisplay*/): void;
+                    public handle(displayScoreboard: net.md_5.bungee.protocol.packet.ScoreboardDisplay): void;
                     // @ts-ignore
-                    public handle(team: any /*net.md_5.bungee.protocol.packet.Team*/): void;
+                    public handle(team: net.md_5.bungee.protocol.packet.Team): void;
                     // @ts-ignore
-                    public handle(title: any /*net.md_5.bungee.protocol.packet.Title*/): void;
+                    public handle(title: net.md_5.bungee.protocol.packet.Title): void;
                     // @ts-ignore
-                    public handle(pluginMessage: any /*net.md_5.bungee.protocol.packet.PluginMessage*/): void;
+                    public handle(pluginMessage: net.md_5.bungee.protocol.packet.PluginMessage): void;
                     // @ts-ignore
-                    public handle(kick: any /*net.md_5.bungee.protocol.packet.Kick*/): void;
+                    public handle(kick: net.md_5.bungee.protocol.packet.Kick): void;
                     // @ts-ignore
-                    public handle(encryptionResponse: any /*net.md_5.bungee.protocol.packet.EncryptionResponse*/): void;
+                    public handle(encryptionResponse: net.md_5.bungee.protocol.packet.EncryptionResponse): void;
                     // @ts-ignore
-                    public handle(loginSuccess: any /*net.md_5.bungee.protocol.packet.LoginSuccess*/): void;
+                    public handle(loginSuccess: net.md_5.bungee.protocol.packet.LoginSuccess): void;
                     // @ts-ignore
-                    public handle(legacyHandshake: any /*net.md_5.bungee.protocol.packet.LegacyHandshake*/): void;
+                    public handle(legacyHandshake: net.md_5.bungee.protocol.packet.LegacyHandshake): void;
                     // @ts-ignore
-                    public handle(setCompression: any /*net.md_5.bungee.protocol.packet.SetCompression*/): void;
+                    public handle(setCompression: net.md_5.bungee.protocol.packet.SetCompression): void;
                     // @ts-ignore
-                    public handle(bossBar: any /*net.md_5.bungee.protocol.packet.BossBar*/): void;
+                    public handle(bossBar: net.md_5.bungee.protocol.packet.BossBar): void;
                     // @ts-ignore
-                    public handle(request: any /*net.md_5.bungee.protocol.packet.LoginPayloadRequest*/): void;
+                    public handle(request: net.md_5.bungee.protocol.packet.LoginPayloadRequest): void;
                     // @ts-ignore
-                    public handle(response: any /*net.md_5.bungee.protocol.packet.LoginPayloadResponse*/): void;
+                    public handle(response: net.md_5.bungee.protocol.packet.LoginPayloadResponse): void;
                     // @ts-ignore
-                    public handle(status: any /*net.md_5.bungee.protocol.packet.EntityStatus*/): void;
+                    public handle(status: net.md_5.bungee.protocol.packet.EntityStatus): void;
                     // @ts-ignore
-                    public handle(commands: any /*net.md_5.bungee.protocol.packet.Commands*/): void;
+                    public handle(commands: net.md_5.bungee.protocol.packet.Commands): void;
                     // @ts-ignore
-                    public handle(viewDistance: any /*net.md_5.bungee.protocol.packet.ViewDistance*/): void;
+                    public handle(viewDistance: net.md_5.bungee.protocol.packet.ViewDistance): void;
                 }
             }
         }

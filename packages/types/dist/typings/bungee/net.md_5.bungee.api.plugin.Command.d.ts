@@ -19,12 +19,12 @@ declare namespace net {
                          * Execute this command with the specified sender and arguments.
                          */
                         // @ts-ignore
-                        public abstract execute(sender: any /*net.md_5.bungee.api.CommandSender*/, args: string): void;
+                        public abstract execute(sender: net.md_5.bungee.api.CommandSender, args: string): void;
                         /**
                          * Check if this command can be executed by the given sender.
                          */
                         // @ts-ignore
-                        public hasPermission(sender: any /*net.md_5.bungee.api.CommandSender*/): boolean;
+                        public hasPermission(sender: net.md_5.bungee.api.CommandSender): boolean;
                     }
                 }
             }

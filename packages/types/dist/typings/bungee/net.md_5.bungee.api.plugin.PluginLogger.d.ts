@@ -6,7 +6,7 @@ declare namespace net {
                     // @ts-ignore
                      class PluginLogger extends java.util.logging.Logger {
                         // @ts-ignore
-                        constructor(plugin: any /*net.md_5.bungee.api.plugin.Plugin*/)
+                        constructor(plugin: net.md_5.bungee.api.plugin.Plugin)
                         // @ts-ignore
                         public log(logRecord: java.util.logging.LogRecord): void;
                     }

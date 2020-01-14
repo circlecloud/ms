@@ -7,7 +7,7 @@ declare namespace net {
                     // @ts-ignore
                     constructor()
                     // @ts-ignore
-                    public static getInstance(): any /*net.md_5.bungee.util.ChatComponentTransformer*/;
+                    public static getInstance(): net.md_5.bungee.util.ChatComponentTransformer;
                     /**
                      * Transform a set of components, and attempt to transform the transformable
                      * fields. Entity selectors <b>cannot</b> be evaluated. This will

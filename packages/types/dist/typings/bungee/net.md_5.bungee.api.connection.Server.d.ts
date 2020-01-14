@@ -9,7 +9,7 @@ declare namespace net {
                          * Returns the basic information about this server.
                          */
                         // @ts-ignore
-                         getInfo(): any /*net.md_5.bungee.api.config.ServerInfo*/;
+                         getInfo(): net.md_5.bungee.api.config.ServerInfo;
                         /**
                          * Send data by any available means to this server.
                          * In recent Minecraft versions channel names must contain a colon separator

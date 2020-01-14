@@ -8,11 +8,11 @@ declare namespace net {
                         // @ts-ignore
                         constructor(uuid: java.util.UUID, action: number)
                         // @ts-ignore
-                        public read(buf: ByteBuf, direction: any /*net.md_5.bungee.protocol.ProtocolConstants.Direction*/, protocolVersion: number): void;
+                        public read(buf: ByteBuf, direction: net.md_5.bungee.protocol.ProtocolConstants.Direction, protocolVersion: number): void;
                         // @ts-ignore
-                        public write(buf: ByteBuf, direction: any /*net.md_5.bungee.protocol.ProtocolConstants.Direction*/, protocolVersion: number): void;
+                        public write(buf: ByteBuf, direction: net.md_5.bungee.protocol.ProtocolConstants.Direction, protocolVersion: number): void;
                         // @ts-ignore
-                        public handle(handler: any /*net.md_5.bungee.protocol.AbstractPacketHandler*/): void;
+                        public handle(handler: net.md_5.bungee.protocol.AbstractPacketHandler): void;
                     }
                 }
             }

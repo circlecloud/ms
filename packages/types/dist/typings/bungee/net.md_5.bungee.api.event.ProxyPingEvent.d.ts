@@ -6,7 +6,7 @@ declare namespace net {
                     // @ts-ignore
                      class ProxyPingEvent extends net.md_5.bungee.api.event.AsyncEvent {
                         // @ts-ignore
-                        constructor(connection: any /*net.md_5.bungee.api.connection.PendingConnection*/, response: any /*net.md_5.bungee.api.ServerPing*/, done: any /*net.md_5.bungee.api.Callback*/)
+                        constructor(connection: net.md_5.bungee.api.connection.PendingConnection, response: net.md_5.bungee.api.ServerPing, done: net.md_5.bungee.api.Callback)
                     }
                 }
             }

@@ -6,47 +6,47 @@ declare namespace net {
                     // @ts-ignore
                      class Position extends java.lang.Enum {
                         // @ts-ignore
-                        public static LIST: any /*net.md_5.bungee.api.score.Position*/;
+                        public static LIST: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static SIDEBAR: any /*net.md_5.bungee.api.score.Position*/;
+                        public static SIDEBAR: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static BELOW: any /*net.md_5.bungee.api.score.Position*/;
+                        public static BELOW: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static SIDEBAR_BLACK: any /*net.md_5.bungee.api.score.Position*/;
+                        public static SIDEBAR_BLACK: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static SIDEBAR_DARK_BLUE: any /*net.md_5.bungee.api.score.Position*/;
+                        public static SIDEBAR_DARK_BLUE: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static SIDEBAR_DARK_GREEN: any /*net.md_5.bungee.api.score.Position*/;
+                        public static SIDEBAR_DARK_GREEN: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static SIDEBAR_DARK_AQUA: any /*net.md_5.bungee.api.score.Position*/;
+                        public static SIDEBAR_DARK_AQUA: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static SIDEBAR_DARK_RED: any /*net.md_5.bungee.api.score.Position*/;
+                        public static SIDEBAR_DARK_RED: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static SIDEBAR_DARK_PURPLE: any /*net.md_5.bungee.api.score.Position*/;
+                        public static SIDEBAR_DARK_PURPLE: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static SIDEBAR_GOLD: any /*net.md_5.bungee.api.score.Position*/;
+                        public static SIDEBAR_GOLD: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static SIDEBAR_GRAY: any /*net.md_5.bungee.api.score.Position*/;
+                        public static SIDEBAR_GRAY: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static SIDEBAR_DARK_GRAY: any /*net.md_5.bungee.api.score.Position*/;
+                        public static SIDEBAR_DARK_GRAY: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static SIDEBAR_BLUE: any /*net.md_5.bungee.api.score.Position*/;
+                        public static SIDEBAR_BLUE: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static SIDEBAR_GREEN: any /*net.md_5.bungee.api.score.Position*/;
+                        public static SIDEBAR_GREEN: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static SIDEBAR_AQUA: any /*net.md_5.bungee.api.score.Position*/;
+                        public static SIDEBAR_AQUA: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static SIDEBAR_RED: any /*net.md_5.bungee.api.score.Position*/;
+                        public static SIDEBAR_RED: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static SIDEBAR_LIGHT_PURPLE: any /*net.md_5.bungee.api.score.Position*/;
+                        public static SIDEBAR_LIGHT_PURPLE: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static SIDEBAR_YELLOW: any /*net.md_5.bungee.api.score.Position*/;
+                        public static SIDEBAR_YELLOW: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static SIDEBAR_WHITE: any /*net.md_5.bungee.api.score.Position*/;
+                        public static SIDEBAR_WHITE: net.md_5.bungee.api.score.Position;
                         // @ts-ignore
-                        public static values(): any /*net.md_5.bungee.api.score.Position[]*/;
+                        public static values(): net.md_5.bungee.api.score.Position[];
                         // @ts-ignore
-                        public static valueOf(name: string): any /*net.md_5.bungee.api.score.Position*/;
+                        public static valueOf(name: string): net.md_5.bungee.api.score.Position;
                     }
                 }
             }
