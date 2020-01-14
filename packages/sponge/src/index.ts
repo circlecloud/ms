@@ -5,6 +5,7 @@ import { DefaultContainer as container } from '@ms/container'
 
 import { SpongeConsole } from './console';
 import { SpongeEvent } from './event';
+import { SpongeServer } from './server';
 import { SpongeCommand } from './command';
 import { SpongeTaskManager } from './task';
 
@@ -16,7 +17,6 @@ container.bind(server.ServerType).toConstantValue(SpongeServerType);
 container.bind(plugin.PluginInstance).toConstantValue(Sponge.getPluginManager().getPlugin('MiaoScript').orElse(null));
 
 container.bind(event.Event).to(SpongeEvent).inSingletonScope();
+container.bind(server.Server).to(SpongeServer).inSingletonScope();
 container.bind(command.Command).to(SpongeCommand).inSingletonScope();
 container.bind(task.TaskManager).to(SpongeTaskManager).inSingletonScope();
-
-console.debug(`Detect Sponge Compatible set ServerType to ${SpongeServerType} ...`)
