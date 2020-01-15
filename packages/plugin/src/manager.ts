@@ -111,7 +111,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
      * 更新插件
      * @param path
      */
-    private checkUpdateFolder(path) {
+    private checkUpdateFolder(path: any) {
         var update = fs.file(path, "update")
         if (!update.exists()) {
             update.mkdirs()

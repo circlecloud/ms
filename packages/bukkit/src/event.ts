@@ -29,7 +29,7 @@ export class BukkitEvent extends event.Event {
             // 不是抽象类
             !Modifier.isAbstract(clazz.getModifiers());
     }
-    register(eventCls: any, exec: Function, priority: any, ignoreCancel: boolean) {
+    register(eventCls: any, exec: Function, priority: event.EventPriority, ignoreCancel: boolean) {
         let listener = new Listener({});
         Bukkit.pluginManager.registerEvent(
             eventCls,

@@ -5,7 +5,7 @@ let Bukkit = org.bukkit.Bukkit;
 export class BukkitConsole extends MiaoScriptConsole {
     sender(sender, ...args) {
         if (!(sender instanceof Java.type('org.bukkit.command.CommandSender'))) {
-            this.error("第一个参数未实现 org.bukkit.command.CommandSender 无法发送消息!")
+            this.error(`First parameter ${sender} not instanceof org.bukkit.command.CommandSender can't send message!`)
             return;
         }
         if (Object.prototype.toString.call(args[0]) === "[object Array]") {
@@ -14,7 +14,7 @@ export class BukkitConsole extends MiaoScriptConsole {
             sender.sendMessage(this.prefix + args.join(' '));
         }
     }
-    console(...args): void {
+    console(...args: string[]): void {
         this.sender(Bukkit.getConsoleSender(), args.join(' '));
     }
 }

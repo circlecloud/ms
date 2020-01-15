@@ -40,7 +40,7 @@ export class SpongeEvent extends event.Event {
     class2Name(clazz: any) {
         return clazz.name.substring(clazz.name.lastIndexOf(".") + 1);
     }
-    register(eventCls: any, exec: Function, priority: any = 'NORMAL', ignoreCancel: boolean = true) {
+    register(eventCls: any, exec: Function, priority: event.EventPriority = event.EventPriority.NORMAL, ignoreCancel: boolean = true) {
         var listener = new EventListener({
             handle: exec
         });

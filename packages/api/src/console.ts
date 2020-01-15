@@ -1,11 +1,23 @@
 let Arrays = Java.type('java.util.Arrays');
 let Level = Java.type('java.util.logging.Level');
-let ignoreLogPrefix = ['java.', 'net.minecraft.', 'org.bukkit.', 'jdk.nashorn.', 'io.netty.'];
+let ignoreLogPrefix = ['java.', 'net.minecraft.', 'org.bukkit.', 'jdk.nashorn.', 'io.netty.', 'org.spongepowered.'];
+
+enum LogLevel {
+    ALL,
+    TRACE,
+    DEBUG,
+    INFO,
+    WARN,
+    ERROR,
+    FATAL,
+    OFF
+}
 
 export class MiaoScriptConsole implements Console {
     Console: NodeJS.ConsoleConstructor;
 
     private _name: string = '';
+    private _level: LogLevel = global.debug ? LogLevel.DEBUG : LogLevel.INFO;
 
     protected logger: any;
     protected prefix: string = '§6[§bMiaoScript§6]§r ';
@@ -26,23 +38,28 @@ export class MiaoScriptConsole implements Console {
             this.prefix = `§6[§cMS§6][§b${name}§6]§r `;
         }
     }
-    log(...args): void {
+    log(...args: any[]): void {
         this.logger.info(this.name + args.join(' '));
     }
-    info(...args) {
+    info(...args: any[]) {
         this.logger.info(this.name + args.join(' '));
-    };
-    warn(...args) {
+    }
+    warn(...args: any[]) {
         this.logger.warning(this.name + args.join(' '));
-    };
-    error(...args) {
+    }
+    error(...args: any[]) {
         this.logger.log(Level.SEVERE, this.name + args.join(' '));
-    };
-    debug(...args) {
+    }
+    debug(...args: any[]) {
         if (global.debug) {
             this.logger.info(this.name + '[DEBUG] ' + args.join(' '));
         }
-    };
+    }
+    trace(...args: any[]): void {
+        if (this._level <= LogLevel.TRACE) {
+            this.logger.info(this.name + '[TRACE] ' + args.join(' '));
+        }
+    }
     sender(...args) {
         this.info(args)
     }
@@ -53,10 +70,10 @@ export class MiaoScriptConsole implements Console {
         for (var i in obj) {
             this.logger(i, '=>', obj[i])
         }
-    };
+    }
     ex(ex: Error) {
         this.stack(ex).forEach(line => this.console(line))
-    };
+    }
     stack(ex: Error): string[] {
         var stack = ex.getStackTrace();
         var cache = ['§4' + ex];
@@ -124,9 +141,6 @@ export class MiaoScriptConsole implements Console {
         throw new Error("Method not implemented.");
     }
     timeLog(label?: string, ...data: any[]): void {
-        throw new Error("Method not implemented.");
-    }
-    trace(message?: any, ...optionalParams: any[]): void {
         throw new Error("Method not implemented.");
     }
     markTimeline(label?: string): void {

@@ -9,6 +9,15 @@ import { injectable } from '@ms/container'
 const Thread = Java.type('java.lang.Thread');
 
 export namespace event {
+    export enum EventPriority {
+        LOWEST = "LOWEST",
+        LOW = "LOW",
+        NORMAL = "NORMAL",
+        HIGH = "HIGH",
+        HIGHEST = "HIGHEST",
+        MONITOR = "MONITOR",
+    }
+
     @injectable()
     export abstract class Event {
         private mapEvent = [];
@@ -21,12 +30,13 @@ export namespace event {
         }
 
         /**
-         * 扫描包 org.bukkit.event 下的所有事件
-         * 映射简写名称 org.bukkit.event.player.PlayerLoginEvent => playerloginevent
+         * abstract event map function
+         * ig: org.bukkit.event.player.PlayerLoginEvent => playerloginevent
+         *     org.spongepowered.api.event.game.GameRegistryEvent.Register => gameregistryevent$register
          */
         mapEventName() {
             if (this.baseEventDir === "") {
-                throw new Error("事件基础包名为空 无法进行事件映射!");
+                throw new Error("base event dir is empty, can't map event name !");
             }
             let count = 0;
             let jar = this.getJarFile(this.baseEventDir);
@@ -34,15 +44,14 @@ export namespace event {
             while (entries.hasMoreElements()) {
                 let entry = entries.nextElement();
                 let name = entry.name;
-                // 以 org/bukkit/event 开头 并且以 .class 结尾
                 if (name.startsWith(this.baseEventDir) && name.endsWith(".class")) {
+                    // replace name to qualifiedName
                     let qualifiedName = name.replaceAll('/', '.');
                     try {
                         let clazz = base.getClass(qualifiedName.substring(0, qualifiedName.length - 6));
-                        // 继承于 org.bukkit.event.Event 访问符为Public
                         if (this.isValidEvent(clazz)) {
                             let simpleName = this.class2Name(clazz).toLowerCase();
-                            console.debug(`Mapping Event [${clazz.canonicalName}] => ${simpleName}`);
+                            console.trace(`Mapping Event [${clazz.canonicalName}] => ${simpleName}`);
                             this.mapEvent[simpleName] = clazz;
                             count++;
                         }
@@ -63,11 +72,11 @@ export namespace event {
             throw new Error(`Can't Mapping Event Because not found Resources ${resource}!`)
         }
 
-        class2Name(clazz) {
+        class2Name(clazz: any) {
             return clazz.simpleName;
         }
 
-        name2Class(name, event) {
+        name2Class(name: any, event: string) {
             var eventCls = this.mapEvent[event.toLowerCase()] || this.mapEvent[event.toLowerCase() + 'event'];
             if (!eventCls) {
                 try {
@@ -75,7 +84,7 @@ export namespace event {
                     this.mapEvent[event] = eventCls;
                 } catch (ex) {
                     console.console(`§6插件 §b${name} §6注册事件 §c${event} §6失败 §4事件未找到!`);
-                    console.ex(new Error(`插件 ${name} 注册事件 ${event} 失败 事件未找到!`));
+                    console.ex(new Error(`Plugin ${name} register event error ${event} not found!`));
                     return;
                 }
             }
@@ -83,7 +92,7 @@ export namespace event {
         }
 
         execute(name, exec, eventCls) {
-            return (...args) => {
+            return (...args: any[]) => {
                 try {
                     var time = new Date().getTime()
                     exec(args[args.length - 1]);
@@ -100,31 +109,31 @@ export namespace event {
 
         /**
         * 添加事件监听
-        * @param plugin
-        * @param event
+        * @param plugin {any}
+        * @param event {string}
         * @param exec {function}
-        * @param priority [LOWEST,LOW,NORMAL,HIGH,HIGHEST,MONITOR]
+        * @param priority {string} [LOWEST,LOW,NORMAL,HIGH,HIGHEST,MONITOR]
         * @param ignoreCancel
         */
-        listen(plugin, event, exec, priority = 'NORMAL', ignoreCancel = false) {
+        listen(plugin: any, event: string, exec: () => void, priority: EventPriority = EventPriority.NORMAL, ignoreCancel = false) {
             if (!plugin || !plugin.description || !plugin.description.name) throw new TypeError('插件名称为空 请检查传入参数!');
             var name = plugin.description.name;
             var eventCls = this.name2Class(name, event);
             if (!eventCls) { return; }
             if (typeof priority === 'boolean') {
                 ignoreCancel = priority;
-                priority = 'NORMAL';
+                priority = EventPriority.NORMAL;
             }
-            priority = priority || 'NORMAL';
+            priority = priority || EventPriority.NORMAL;
             ignoreCancel = ignoreCancel || false;
             // noinspection JSUnusedGlobalSymbols
             var listener = this.register(eventCls, this.execute(name, exec, eventCls), priority, ignoreCancel);
             var listenerMap = this.listenerMap;
-            // 添加到缓存 用于关闭插件的时候关闭事件
+            // add to cache Be used for close plugin to close event
             if (!listenerMap[name]) listenerMap[name] = [];
             var offExec = () => {
                 this.unregister(eventCls, listener);
-                console.debug(`插件 ${name} 注销事件 ${this.class2Name(eventCls)}`);
+                console.debug(`[${name}] unregister event ${this.class2Name(eventCls)}`);
             };
             var off = {
                 event: eventCls,
@@ -133,7 +142,7 @@ export namespace event {
             };
             listenerMap[name].push(off);
             // noinspection JSUnresolvedVariable
-            console.debug(`插件 ${name} 注册事件 ${this.class2Name(eventCls)} => ${exec.name || '匿名方法'}`);
+            console.debug(`[${name}] register event ${this.class2Name(eventCls)} => ${exec.name || '[anonymous]'}`);
             return off;
         }
 
