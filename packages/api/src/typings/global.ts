@@ -16,7 +16,11 @@ declare global {
     var ScriptEngineContextHolder: any;
     function engineLoad(str: string): any;
     interface Core {
-        getClass(name: String);
+        getClass(name: String): any;
+        getInstance(): any;
+        read(path: string): string;
+        save(path: string, content: string): void;
+        delete(path: string): void;
     }
     interface Console {
         ex(err: Error): void;
