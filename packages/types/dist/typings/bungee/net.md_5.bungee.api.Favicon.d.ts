@@ -5,8 +5,6 @@ declare namespace net {
                 // @ts-ignore
                  class Favicon extends java.lang.Object {
                     // @ts-ignore
-                    constructor()
-                    // @ts-ignore
                     public static getFaviconTypeAdapter(): any;
                     /**
                      * Creates a favicon from an image.
@@ -18,6 +16,11 @@ declare namespace net {
                      */
                     // @ts-ignore
                     public static create(encodedString: string): net.md_5.bungee.api.Favicon;
+                    /**
+                     * The base64 encoded favicon, including MIME header.
+                     */
+                    // @ts-ignore
+                    public getEncoded(): string;
                 }
             }
         }

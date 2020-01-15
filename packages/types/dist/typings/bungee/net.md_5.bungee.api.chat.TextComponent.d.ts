@@ -22,6 +22,8 @@ declare namespace net {
                          */
                         // @ts-ignore
                         constructor(extras: net.md_5.bungee.api.chat.BaseComponent)
+                        // @ts-ignore
+                        constructor(text: string)
                         /**
                          * Converts the old formatting system that used
                          * {@link net.md_5.bungee.api.ChatColor#COLOR_CHAR} into the new json based
@@ -47,6 +49,22 @@ declare namespace net {
                         protected toLegacyText(builder: java.lang.StringBuilder): void;
                         // @ts-ignore
                         public toString(): string;
+                        /**
+                         * The text of the component that will be displayed to the client
+                         */
+                        // @ts-ignore
+                        public getText(): string;
+                        /**
+                         * The text of the component that will be displayed to the client
+                         */
+                        // @ts-ignore
+                        public setText(text: string): void;
+                        // @ts-ignore
+                        public equals(o: java.lang.Object): boolean;
+                        // @ts-ignore
+                        protected canEqual(other: java.lang.Object): boolean;
+                        // @ts-ignore
+                        public hashCode(): number;
                     }
                 }
             }

@@ -72,6 +72,8 @@ declare namespace net {
                      */
                     // @ts-ignore
                     public static getByChar(code: string): net.md_5.bungee.api.ChatColor;
+                    // @ts-ignore
+                    public getName(): string;
                 }
             }
         }

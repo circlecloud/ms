@@ -175,6 +175,8 @@ declare namespace net {
                      */
                     // @ts-ignore
                     public abstract createTitle(): net.md_5.bungee.api.Title;
+                    // @ts-ignore
+                    public static getInstance(): net.md_5.bungee.api.ProxyServer;
                 }
             }
         }

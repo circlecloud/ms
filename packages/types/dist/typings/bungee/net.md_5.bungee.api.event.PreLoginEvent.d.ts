@@ -13,6 +13,34 @@ declare namespace net {
                         public setCancelReason(cancelReason: string): void;
                         // @ts-ignore
                         public setCancelReason(cancelReason: BaseComponent): void;
+                        /**
+                         * Cancelled state.
+                         */
+                        // @ts-ignore
+                        public isCancelled(): boolean;
+                        /**
+                         * Message to use when kicking if this event is canceled.
+                         */
+                        // @ts-ignore
+                        public getCancelReasonComponents(): BaseComponent[];
+                        /**
+                         * Connection attempting to login.
+                         */
+                        // @ts-ignore
+                        public getConnection(): net.md_5.bungee.api.connection.PendingConnection;
+                        /**
+                         * Cancelled state.
+                         */
+                        // @ts-ignore
+                        public setCancelled(cancelled: boolean): void;
+                        // @ts-ignore
+                        public toString(): string;
+                        // @ts-ignore
+                        public equals(o: java.lang.Object): boolean;
+                        // @ts-ignore
+                        protected canEqual(other: java.lang.Object): boolean;
+                        // @ts-ignore
+                        public hashCode(): number;
                     }
                 }
             }

@@ -5,7 +5,7 @@ declare namespace net {
                 // @ts-ignore
                  class ConsoleCommandCompleter extends java.lang.Object {
                     // @ts-ignore
-                    constructor()
+                    constructor(proxy: ProxyServer)
                     // @ts-ignore
                     public complete(buffer: string, cursor: number, candidates: java.util.List): number;
                 }

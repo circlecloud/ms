@@ -4,7 +4,7 @@ declare namespace net {
             // @ts-ignore
              class PlayerSkinConfiguration extends java.lang.Object {
                 // @ts-ignore
-                constructor()
+                constructor(bitmask: number)
                 // @ts-ignore
                 public hasCape(): boolean;
                 // @ts-ignore

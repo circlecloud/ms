@@ -5,7 +5,7 @@ declare namespace net {
                 // @ts-ignore
                 abstract class TabList extends java.lang.Object {
                     // @ts-ignore
-                    constructor()
+                    constructor(player: ProxiedPlayer)
                     // @ts-ignore
                     protected player: ProxiedPlayer;
                     // @ts-ignore

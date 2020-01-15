@@ -6,7 +6,7 @@ declare namespace net {
                     // @ts-ignore
                      class CipherDecoder extends object {
                         // @ts-ignore
-                        constructor()
+                        constructor(cipher: BungeeCipher)
                         // @ts-ignore
                         protected decode(ctx: ChannelHandlerContext, msg: ByteBuf, out: java.util.List): void;
                         // @ts-ignore

@@ -5,6 +5,8 @@ declare namespace net {
                 namespace chat {
                     // @ts-ignore
                     abstract class BaseComponent extends java.lang.Object {
+                        // @ts-ignore
+                        constructor()
                         /**
                          * Copies the events and formatting of a BaseComponent. Already set
                          * formatting will be replaced.
@@ -155,6 +157,90 @@ declare namespace net {
                          */
                         // @ts-ignore
                         public toLegacyText(): string;
+                        /**
+                         * The color of this component and any child components (unless overridden)
+                         */
+                        // @ts-ignore
+                        public setColor(color: net.md_5.bungee.api.ChatColor): void;
+                        /**
+                         * Whether this component and any child components (unless overridden) is
+                         * bold
+                         */
+                        // @ts-ignore
+                        public setBold(bold: java.lang.Boolean): void;
+                        /**
+                         * Whether this component and any child components (unless overridden) is
+                         * italic
+                         */
+                        // @ts-ignore
+                        public setItalic(italic: java.lang.Boolean): void;
+                        /**
+                         * Whether this component and any child components (unless overridden) is
+                         * underlined
+                         */
+                        // @ts-ignore
+                        public setUnderlined(underlined: java.lang.Boolean): void;
+                        /**
+                         * Whether this component and any child components (unless overridden) is
+                         * strikethrough
+                         */
+                        // @ts-ignore
+                        public setStrikethrough(strikethrough: java.lang.Boolean): void;
+                        /**
+                         * Whether this component and any child components (unless overridden) is
+                         * obfuscated
+                         */
+                        // @ts-ignore
+                        public setObfuscated(obfuscated: java.lang.Boolean): void;
+                        /**
+                         * The text to insert into the chat when this component (and child
+                         * components) are clicked while pressing the shift key
+                         */
+                        // @ts-ignore
+                        public setInsertion(insertion: string): void;
+                        /**
+                         * The action to perform when this component (and child components) are
+                         * clicked
+                         */
+                        // @ts-ignore
+                        public setClickEvent(clickEvent: net.md_5.bungee.api.chat.ClickEvent): void;
+                        /**
+                         * The action to perform when this component (and child components) are
+                         * hovered over
+                         */
+                        // @ts-ignore
+                        public setHoverEvent(hoverEvent: net.md_5.bungee.api.chat.HoverEvent): void;
+                        // @ts-ignore
+                        public toString(): string;
+                        // @ts-ignore
+                        public equals(o: java.lang.Object): boolean;
+                        // @ts-ignore
+                        protected canEqual(other: java.lang.Object): boolean;
+                        // @ts-ignore
+                        public hashCode(): number;
+                        /**
+                         * The text to insert into the chat when this component (and child
+                         * components) are clicked while pressing the shift key
+                         */
+                        // @ts-ignore
+                        public getInsertion(): string;
+                        /**
+                         * Appended components that inherit this component's formatting and events
+                         */
+                        // @ts-ignore
+                        public getExtra(): java.util.List;
+                        /**
+                         * The action to perform when this component (and child components) are
+                         * clicked
+                         */
+                        // @ts-ignore
+                        public getClickEvent(): net.md_5.bungee.api.chat.ClickEvent;
+                        /**
+                         * The action to perform when this component (and child components) are
+                         * hovered over
+                         */
+                        // @ts-ignore
+                        public getHoverEvent(): net.md_5.bungee.api.chat.HoverEvent;
                     }
                 }
             }

@@ -7,6 +7,8 @@ declare namespace net {
                      class PluginManager extends java.lang.Object {
                         // @ts-ignore
                         constructor(proxy: net.md_5.bungee.api.ProxyServer)
+                        // @ts-ignore
+                        constructor(proxy: net.md_5.bungee.api.ProxyServer, yaml: Yaml, eventBus: EventBus)
                         /**
                          * Register a command so that it may be executed.
                          */

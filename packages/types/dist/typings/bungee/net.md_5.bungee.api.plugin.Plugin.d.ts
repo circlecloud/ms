@@ -38,6 +38,14 @@ declare namespace net {
                         public getResourceAsStream(name: string): java.io.InputStream;
                         // @ts-ignore
                         public getExecutorService(): java.util.concurrent.ExecutorService;
+                        // @ts-ignore
+                        public getDescription(): net.md_5.bungee.api.plugin.PluginDescription;
+                        // @ts-ignore
+                        public getProxy(): net.md_5.bungee.api.ProxyServer;
+                        // @ts-ignore
+                        public getFile(): java.io.File;
+                        // @ts-ignore
+                        public getLogger(): java.util.logging.Logger;
                     }
                 }
             }

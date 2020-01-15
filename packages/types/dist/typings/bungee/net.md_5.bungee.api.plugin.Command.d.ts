@@ -25,6 +25,20 @@ declare namespace net {
                          */
                         // @ts-ignore
                         public hasPermission(sender: net.md_5.bungee.api.CommandSender): boolean;
+                        // @ts-ignore
+                        public getName(): string;
+                        // @ts-ignore
+                        public getPermission(): string;
+                        // @ts-ignore
+                        public getAliases(): java.lang.String[];
+                        // @ts-ignore
+                        public equals(o: java.lang.Object): boolean;
+                        // @ts-ignore
+                        protected canEqual(other: java.lang.Object): boolean;
+                        // @ts-ignore
+                        public hashCode(): number;
+                        // @ts-ignore
+                        public toString(): string;
                     }
                 }
             }

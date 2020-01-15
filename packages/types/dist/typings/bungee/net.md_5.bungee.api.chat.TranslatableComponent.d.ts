@@ -14,7 +14,9 @@ declare namespace net {
                          * Creates a translatable component with the passed substitutions
                          */
                         // @ts-ignore
-                        constructor(translate: string, object: java.lang.Object)
+                        constructor(translate: string, with: java.lang.Object)
+                        // @ts-ignore
+                        constructor()
                         /**
                          * Creates a duplicate of this TranslatableComponent.
                          */
@@ -42,6 +44,33 @@ declare namespace net {
                         protected toPlainText(builder: java.lang.StringBuilder): void;
                         // @ts-ignore
                         protected toLegacyText(builder: java.lang.StringBuilder): void;
+                        // @ts-ignore
+                        public getFormat(): java.util.regex.Pattern;
+                        /**
+                         * The key into the Minecraft locale files to use for the translation. The
+                         * text depends on the client's locale setting. The console is always en_US
+                         */
+                        // @ts-ignore
+                        public getTranslate(): string;
+                        /**
+                         * The components to substitute into the translation
+                         */
+                        // @ts-ignore
+                        public getWith(): java.util.List;
+                        /**
+                         * The key into the Minecraft locale files to use for the translation. The
+                         * text depends on the client's locale setting. The console is always en_US
+                         */
+                        // @ts-ignore
+                        public setTranslate(translate: string): void;
+                        // @ts-ignore
+                        public toString(): string;
+                        // @ts-ignore
+                        public equals(o: java.lang.Object): boolean;
+                        // @ts-ignore
+                        protected canEqual(other: java.lang.Object): boolean;
+                        // @ts-ignore
+                        public hashCode(): number;
                     }
                 }
             }

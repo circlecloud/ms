@@ -5,7 +5,7 @@ declare namespace net {
                 // @ts-ignore
                  class DownstreamBridge extends net.md_5.bungee.netty.PacketHandler {
                     // @ts-ignore
-                    constructor()
+                    constructor(bungee: ProxyServer, con: net.md_5.bungee.UserConnection, server: net.md_5.bungee.ServerConnection)
                     // @ts-ignore
                     public exception(t: java.lang.Throwable): void;
                     // @ts-ignore

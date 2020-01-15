@@ -5,8 +5,6 @@ declare namespace net {
                 // @ts-ignore
                  class YamlConfiguration extends net.md_5.bungee.config.ConfigurationProvider {
                     // @ts-ignore
-                    constructor()
-                    // @ts-ignore
                     public save(config: net.md_5.bungee.config.Configuration, file: java.io.File): void;
                     // @ts-ignore
                     public save(config: net.md_5.bungee.config.Configuration, writer: java.io.Writer): void;

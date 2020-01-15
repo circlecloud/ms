@@ -5,7 +5,7 @@ declare namespace net {
                 // @ts-ignore
                  class ForgeServerHandler extends java.lang.Object {
                     // @ts-ignore
-                    constructor()
+                    constructor(con: net.md_5.bungee.UserConnection, ch: net.md_5.bungee.netty.ChannelWrapper, serverInfo: ServerInfo)
                     /**
                      * Handles any {@link PluginMessage} that contains a FML Handshake or Forge
                      * Register.
@@ -23,6 +23,12 @@ declare namespace net {
                      */
                     // @ts-ignore
                     public setServerAsForgeServer(): void;
+                    // @ts-ignore
+                    public getCh(): net.md_5.bungee.netty.ChannelWrapper;
+                    // @ts-ignore
+                    public getState(): net.md_5.bungee.forge.ForgeServerHandshakeState;
+                    // @ts-ignore
+                    public isServerForge(): boolean;
                 }
             }
         }

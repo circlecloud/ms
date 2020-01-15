@@ -21,11 +21,51 @@ declare namespace net {
                         // @ts-ignore
                         constructor(original: net.md_5.bungee.api.chat.ScoreComponent)
                         // @ts-ignore
+                        constructor(name: string, objective: string, value: string)
+                        // @ts-ignore
                         public duplicate(): net.md_5.bungee.api.chat.ScoreComponent;
                         // @ts-ignore
                         protected toPlainText(builder: java.lang.StringBuilder): void;
                         // @ts-ignore
                         protected toLegacyText(builder: java.lang.StringBuilder): void;
+                        /**
+                         * The name of the entity whose score should be displayed.
+                         */
+                        // @ts-ignore
+                        public getName(): string;
+                        /**
+                         * The internal name of the objective the score is attached to.
+                         */
+                        // @ts-ignore
+                        public getObjective(): string;
+                        /**
+                         * The optional value to use instead of the one present in the Scoreboard.
+                         */
+                        // @ts-ignore
+                        public getValue(): string;
+                        /**
+                         * The name of the entity whose score should be displayed.
+                         */
+                        // @ts-ignore
+                        public setName(name: string): void;
+                        /**
+                         * The internal name of the objective the score is attached to.
+                         */
+                        // @ts-ignore
+                        public setObjective(objective: string): void;
+                        /**
+                         * The optional value to use instead of the one present in the Scoreboard.
+                         */
+                        // @ts-ignore
+                        public setValue(value: string): void;
+                        // @ts-ignore
+                        public toString(): string;
+                        // @ts-ignore
+                        public equals(o: java.lang.Object): boolean;
+                        // @ts-ignore
+                        protected canEqual(other: java.lang.Object): boolean;
+                        // @ts-ignore
+                        public hashCode(): number;
                     }
                 }
             }

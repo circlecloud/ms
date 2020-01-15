@@ -5,7 +5,7 @@ declare namespace net {
                 // @ts-ignore
                  class RemoteQuery extends java.lang.Object {
                     // @ts-ignore
-                    constructor()
+                    constructor(bungee: ProxyServer, listener: ListenerInfo)
                     // @ts-ignore
                     public start(channel: java.lang.Class, address: java.net.InetSocketAddress, eventLoop: EventLoopGroup, future: ChannelFutureListener): void;
                 }

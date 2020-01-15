@@ -4,7 +4,7 @@ declare namespace net {
             // @ts-ignore
              class UserConnection extends java.lang.Object {
                 // @ts-ignore
-                constructor()
+                constructor(bungee: ProxyServer, ch: net.md_5.bungee.netty.ChannelWrapper, name: string, pendingConnection: net.md_5.bungee.connection.InitialHandler)
                 // @ts-ignore
                 public init(): void;
                 // @ts-ignore
@@ -113,6 +113,72 @@ declare namespace net {
                 public isConnected(): boolean;
                 // @ts-ignore
                 public getScoreboard(): Scoreboard;
+                // @ts-ignore
+                public getName(): string;
+                // @ts-ignore
+                public getPendingConnection(): net.md_5.bungee.connection.InitialHandler;
+                // @ts-ignore
+                public getServer(): net.md_5.bungee.ServerConnection;
+                // @ts-ignore
+                public setServer(server: net.md_5.bungee.ServerConnection): void;
+                // @ts-ignore
+                public getDimension(): number;
+                // @ts-ignore
+                public setDimension(dimension: number): void;
+                // @ts-ignore
+                public isDimensionChange(): boolean;
+                // @ts-ignore
+                public setDimensionChange(dimensionChange: boolean): void;
+                // @ts-ignore
+                public getPendingConnects(): java.util.Collection;
+                // @ts-ignore
+                public getSentPingTime(): number;
+                // @ts-ignore
+                public setSentPingTime(sentPingTime: number): void;
+                // @ts-ignore
+                public getPing(): number;
+                // @ts-ignore
+                public setPing(ping: number): void;
+                // @ts-ignore
+                public getReconnectServer(): ServerInfo;
+                // @ts-ignore
+                public setReconnectServer(reconnectServer: ServerInfo): void;
+                // @ts-ignore
+                public getTabListHandler(): net.md_5.bungee.tab.TabList;
+                // @ts-ignore
+                public getGamemode(): number;
+                // @ts-ignore
+                public setGamemode(gamemode: number): void;
+                // @ts-ignore
+                public getCompressionThreshold(): number;
+                // @ts-ignore
+                public setServerJoinQueue(serverJoinQueue: java.util.Queue): void;
+                // @ts-ignore
+                public getClientEntityId(): number;
+                // @ts-ignore
+                public setClientEntityId(clientEntityId: number): void;
+                // @ts-ignore
+                public getServerEntityId(): number;
+                // @ts-ignore
+                public setServerEntityId(serverEntityId: number): void;
+                // @ts-ignore
+                public getSettings(): ClientSettings;
+                // @ts-ignore
+                public getServerSentScoreboard(): Scoreboard;
+                // @ts-ignore
+                public getSentBossBars(): java.util.Collection;
+                // @ts-ignore
+                public getDisplayName(): string;
+                // @ts-ignore
+                public getEntityRewrite(): net.md_5.bungee.entitymap.EntityMap;
+                // @ts-ignore
+                public getForgeClientHandler(): net.md_5.bungee.forge.ForgeClientHandler;
+                // @ts-ignore
+                public setForgeClientHandler(forgeClientHandler: net.md_5.bungee.forge.ForgeClientHandler): void;
+                // @ts-ignore
+                public getForgeServerHandler(): net.md_5.bungee.forge.ForgeServerHandler;
+                // @ts-ignore
+                public setForgeServerHandler(forgeServerHandler: net.md_5.bungee.forge.ForgeServerHandler): void;
             }
         }
     }

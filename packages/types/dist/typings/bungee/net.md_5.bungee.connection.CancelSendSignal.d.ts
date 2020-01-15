@@ -5,8 +5,6 @@ declare namespace net {
                 // @ts-ignore
                  class CancelSendSignal extends java.lang.Error {
                     // @ts-ignore
-                    constructor()
-                    // @ts-ignore
                     public static INSTANCE: net.md_5.bungee.connection.CancelSendSignal;
                     // @ts-ignore
                     public initCause(cause: java.lang.Throwable): java.lang.Throwable;

@@ -88,6 +88,34 @@ declare namespace net {
                 public matchPlayer(partialName: string): java.util.Collection;
                 // @ts-ignore
                 public createTitle(): Title;
+                /**
+                 * Configuration.
+                 */
+                // @ts-ignore
+                public getConfig(): net.md_5.bungee.conf.Configuration;
+                /**
+                 * Plugin manager.
+                 */
+                // @ts-ignore
+                public getPluginManager(): PluginManager;
+                // @ts-ignore
+                public getReconnectHandler(): ReconnectHandler;
+                // @ts-ignore
+                public setReconnectHandler(reconnectHandler: ReconnectHandler): void;
+                // @ts-ignore
+                public getConfigurationAdapter(): ConfigurationAdapter;
+                // @ts-ignore
+                public setConfigurationAdapter(configurationAdapter: ConfigurationAdapter): void;
+                // @ts-ignore
+                public getPluginsFolder(): java.io.File;
+                // @ts-ignore
+                public getScheduler(): net.md_5.bungee.scheduler.BungeeScheduler;
+                // @ts-ignore
+                public getConsoleReader(): ConsoleReader;
+                // @ts-ignore
+                public getLogger(): java.util.logging.Logger;
+                // @ts-ignore
+                public getConnectionThrottle(): net.md_5.bungee.ConnectionThrottle;
             }
         }
     }

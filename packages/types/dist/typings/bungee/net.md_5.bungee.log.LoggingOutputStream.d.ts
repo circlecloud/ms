@@ -5,7 +5,7 @@ declare namespace net {
                 // @ts-ignore
                  class LoggingOutputStream extends java.io.ByteArrayOutputStream {
                     // @ts-ignore
-                    constructor()
+                    constructor(logger: java.util.logging.Logger, level: java.util.logging.Level)
                     // @ts-ignore
                     public flush(): void;
                 }

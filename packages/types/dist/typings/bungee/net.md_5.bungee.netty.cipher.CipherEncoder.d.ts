@@ -6,7 +6,7 @@ declare namespace net {
                     // @ts-ignore
                      class CipherEncoder extends object {
                         // @ts-ignore
-                        constructor()
+                        constructor(cipher: BungeeCipher)
                         // @ts-ignore
                         protected encode(ctx: ChannelHandlerContext, input: ByteBuf, out: ByteBuf): void;
                         // @ts-ignore

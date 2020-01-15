@@ -5,8 +5,6 @@ declare namespace net {
                 // @ts-ignore
                 abstract class EntityMap extends java.lang.Object {
                     // @ts-ignore
-                    constructor()
-                    // @ts-ignore
                     public static getEntityMap(version: number): net.md_5.bungee.entitymap.EntityMap;
                     // @ts-ignore
                     protected addRewrite(id: number, direction: any /*ProtocolConstants.Direction*/, varint: boolean): void;

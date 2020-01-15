@@ -13,6 +13,8 @@ declare namespace net {
                         public free(): void;
                         // @ts-ignore
                         public process(input: ByteBuf, out: ByteBuf): void;
+                        // @ts-ignore
+                        public getNativeCompress(): net.md_5.bungee.jni.zlib.NativeCompressImpl;
                     }
                 }
             }

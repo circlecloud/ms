@@ -5,7 +5,7 @@ declare namespace net {
                 // @ts-ignore
                  class InitialHandler extends net.md_5.bungee.netty.PacketHandler {
                     // @ts-ignore
-                    constructor()
+                    constructor(bungee: net.md_5.bungee.BungeeCord, listener: ListenerInfo)
                     // @ts-ignore
                     public shouldHandle(packet: PacketWrapper): boolean;
                     // @ts-ignore
@@ -56,6 +56,28 @@ declare namespace net {
                     public toString(): string;
                     // @ts-ignore
                     public isConnected(): boolean;
+                    // @ts-ignore
+                    public getListener(): ListenerInfo;
+                    // @ts-ignore
+                    public getHandshake(): Handshake;
+                    // @ts-ignore
+                    public getLoginRequest(): LoginRequest;
+                    // @ts-ignore
+                    public getRelayMessages(): java.util.List;
+                    // @ts-ignore
+                    public isOnlineMode(): boolean;
+                    // @ts-ignore
+                    public getVirtualHost(): java.net.InetSocketAddress;
+                    // @ts-ignore
+                    public getUniqueId(): java.util.UUID;
+                    // @ts-ignore
+                    public getOfflineId(): java.util.UUID;
+                    // @ts-ignore
+                    public getLoginProfile(): net.md_5.bungee.connection.LoginResult;
+                    // @ts-ignore
+                    public isLegacy(): boolean;
+                    // @ts-ignore
+                    public getExtraDataInHandshake(): string;
                 }
             }
         }

@@ -5,7 +5,7 @@ declare namespace net {
                 // @ts-ignore
                  class ForgeClientHandler extends java.lang.Object {
                     // @ts-ignore
-                    constructor()
+                    constructor(con: net.md_5.bungee.UserConnection)
                     /**
                      * Handles the Forge packet.
                      */
@@ -46,6 +46,23 @@ declare namespace net {
                      */
                     // @ts-ignore
                     public isForgeUser(): boolean;
+                    /**
+                     * The users' mod list.
+                     */
+                    // @ts-ignore
+                    public getClientModList(): java.util.Map;
+                    /**
+                     * Gets or sets a value indicating whether the '\00FML\00' token was found
+                     * in the handshake.
+                     */
+                    // @ts-ignore
+                    public isFmlTokenInHandshake(): boolean;
+                    /**
+                     * Gets or sets a value indicating whether the '\00FML\00' token was found
+                     * in the handshake.
+                     */
+                    // @ts-ignore
+                    public setFmlTokenInHandshake(fmlTokenInHandshake: boolean): void;
                 }
             }
         }

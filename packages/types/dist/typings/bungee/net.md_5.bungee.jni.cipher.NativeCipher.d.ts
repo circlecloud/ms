@@ -15,6 +15,8 @@ declare namespace net {
                         public cipher(input: ByteBuf, out: ByteBuf): void;
                         // @ts-ignore
                         public cipher(ctx: ChannelHandlerContext, input: ByteBuf): ByteBuf;
+                        // @ts-ignore
+                        public getNativeCipher(): net.md_5.bungee.jni.cipher.NativeCipherImpl;
                     }
                 }
             }

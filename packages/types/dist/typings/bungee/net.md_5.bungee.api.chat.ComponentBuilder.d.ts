@@ -21,6 +21,8 @@ declare namespace net {
                          */
                         // @ts-ignore
                         constructor(component: net.md_5.bungee.api.chat.BaseComponent)
+                        // @ts-ignore
+                        constructor()
                         /**
                          * Resets the cursor to index of the last element.
                          */
@@ -171,6 +173,15 @@ declare namespace net {
                          */
                         // @ts-ignore
                         public create(): net.md_5.bungee.api.chat.BaseComponent[];
+                        /**
+                         * The position for the current part to modify. Modified cursors will
+                         * automatically reset to the last part after appending new components.
+                         * Default value at -1 to assert that the builder has no parts.
+                         */
+                        // @ts-ignore
+                        public getCursor(): number;
+                        // @ts-ignore
+                        public getParts(): java.util.List;
                     }
                 }
             }

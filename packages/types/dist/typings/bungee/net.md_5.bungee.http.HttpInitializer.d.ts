@@ -5,7 +5,7 @@ declare namespace net {
                 // @ts-ignore
                  class HttpInitializer extends object {
                     // @ts-ignore
-                    constructor()
+                    constructor(callback: any, ssl: boolean, host: string, port: number)
                     // @ts-ignore
                     protected initChannel(ch: Channel): void;
                 }

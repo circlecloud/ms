@@ -4,7 +4,7 @@ declare namespace net {
             // @ts-ignore
              class BungeeServerInfo extends java.lang.Object {
                 // @ts-ignore
-                constructor()
+                constructor(name: string, address: java.net.InetSocketAddress, motd: string, restricted: boolean)
                 // @ts-ignore
                 public addPlayer(player: ProxiedPlayer): void;
                 // @ts-ignore
@@ -27,6 +27,18 @@ declare namespace net {
                 public ping(callback: any): void;
                 // @ts-ignore
                 public ping(callback: any, protocolVersion: number): void;
+                // @ts-ignore
+                public toString(): string;
+                // @ts-ignore
+                public getName(): string;
+                // @ts-ignore
+                public getAddress(): java.net.InetSocketAddress;
+                // @ts-ignore
+                public getMotd(): string;
+                // @ts-ignore
+                public isRestricted(): boolean;
+                // @ts-ignore
+                public getPacketQueue(): java.util.Queue;
             }
         }
     }

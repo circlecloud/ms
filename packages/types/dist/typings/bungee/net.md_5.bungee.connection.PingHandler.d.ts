@@ -5,7 +5,7 @@ declare namespace net {
                 // @ts-ignore
                  class PingHandler extends net.md_5.bungee.netty.PacketHandler {
                     // @ts-ignore
-                    constructor()
+                    constructor(target: ServerInfo, callback: any, protocol: number)
                     // @ts-ignore
                     public connected(channel: net.md_5.bungee.netty.ChannelWrapper): void;
                     // @ts-ignore

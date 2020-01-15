@@ -5,8 +5,6 @@ declare namespace net {
                 // @ts-ignore
                  class EventPriority extends java.lang.Object {
                     // @ts-ignore
-                    constructor()
-                    // @ts-ignore
                     public static LOWEST: number;
                     // @ts-ignore
                     public static LOW: number;

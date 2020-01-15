@@ -4,7 +4,7 @@ declare namespace net {
             // @ts-ignore
              class ServerConnector extends net.md_5.bungee.netty.PacketHandler {
                 // @ts-ignore
-                constructor()
+                constructor(bungee: ProxyServer, user: net.md_5.bungee.UserConnection, target: net.md_5.bungee.BungeeServerInfo)
                 // @ts-ignore
                 public exception(t: java.lang.Throwable): void;
                 // @ts-ignore
@@ -27,6 +27,8 @@ declare namespace net {
                 public handle(pluginMessage: PluginMessage): void;
                 // @ts-ignore
                 public toString(): string;
+                // @ts-ignore
+                public getHandshakeHandler(): net.md_5.bungee.forge.ForgeServerHandler;
             }
         }
     }

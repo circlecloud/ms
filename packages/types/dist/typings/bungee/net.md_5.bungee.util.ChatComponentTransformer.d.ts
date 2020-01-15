@@ -5,8 +5,6 @@ declare namespace net {
                 // @ts-ignore
                  class ChatComponentTransformer extends java.lang.Object {
                     // @ts-ignore
-                    constructor()
-                    // @ts-ignore
                     public static getInstance(): net.md_5.bungee.util.ChatComponentTransformer;
                     /**
                      * Transform a set of components, and attempt to transform the transformable

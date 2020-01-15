@@ -17,6 +17,8 @@ declare namespace net {
                 public static getPubkey(request: EncryptionRequest): java.security.PublicKey;
                 // @ts-ignore
                 public static encrypt(key: java.security.Key, b: number): number[];
+                // @ts-ignore
+                public static getSecret(): any /*javax.crypto.SecretKey*/;
             }
         }
     }

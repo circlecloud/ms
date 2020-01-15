@@ -6,7 +6,7 @@ declare namespace net {
                     // @ts-ignore
                      class AsyncEvent extends net.md_5.bungee.api.plugin.Event {
                         // @ts-ignore
-                        constructor()
+                        constructor(done: net.md_5.bungee.api.Callback)
                         // @ts-ignore
                         public postCall(): void;
                         /**
@@ -24,6 +24,14 @@ declare namespace net {
                          */
                         // @ts-ignore
                         public completeIntent(plugin: net.md_5.bungee.api.plugin.Plugin): void;
+                        // @ts-ignore
+                        public toString(): string;
+                        // @ts-ignore
+                        public equals(o: java.lang.Object): boolean;
+                        // @ts-ignore
+                        protected canEqual(other: java.lang.Object): boolean;
+                        // @ts-ignore
+                        public hashCode(): number;
                     }
                 }
             }

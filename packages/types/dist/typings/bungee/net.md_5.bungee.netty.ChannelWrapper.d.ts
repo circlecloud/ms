@@ -26,6 +26,14 @@ declare namespace net {
                     public getHandle(): Channel;
                     // @ts-ignore
                     public setCompressionThreshold(compressionThreshold: number): void;
+                    // @ts-ignore
+                    public getRemoteAddress(): java.net.InetSocketAddress;
+                    // @ts-ignore
+                    public setRemoteAddress(remoteAddress: java.net.InetSocketAddress): void;
+                    // @ts-ignore
+                    public isClosed(): boolean;
+                    // @ts-ignore
+                    public isClosing(): boolean;
                 }
             }
         }

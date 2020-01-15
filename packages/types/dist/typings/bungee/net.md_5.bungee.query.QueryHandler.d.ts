@@ -5,7 +5,7 @@ declare namespace net {
                 // @ts-ignore
                  class QueryHandler extends object {
                     // @ts-ignore
-                    constructor()
+                    constructor(bungee: ProxyServer, listener: ListenerInfo)
                     // @ts-ignore
                     protected channelRead0(ctx: ChannelHandlerContext, msg: DatagramPacket): void;
                     // @ts-ignore

@@ -33,6 +33,34 @@ declare namespace net {
                         public removeTeam(teamName: string): void;
                         // @ts-ignore
                         public clear(): void;
+                        /**
+                         * Unique name for this scoreboard.
+                         */
+                        // @ts-ignore
+                        public getName(): string;
+                        /**
+                         * Position of this scoreboard.
+                         */
+                        // @ts-ignore
+                        public getPosition(): net.md_5.bungee.api.score.Position;
+                        /**
+                         * Unique name for this scoreboard.
+                         */
+                        // @ts-ignore
+                        public setName(name: string): void;
+                        /**
+                         * Position of this scoreboard.
+                         */
+                        // @ts-ignore
+                        public setPosition(position: net.md_5.bungee.api.score.Position): void;
+                        // @ts-ignore
+                        public equals(o: java.lang.Object): boolean;
+                        // @ts-ignore
+                        protected canEqual(other: java.lang.Object): boolean;
+                        // @ts-ignore
+                        public hashCode(): number;
+                        // @ts-ignore
+                        public toString(): string;
                     }
                 }
             }

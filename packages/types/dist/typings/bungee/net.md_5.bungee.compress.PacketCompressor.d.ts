@@ -12,6 +12,8 @@ declare namespace net {
                     public handlerRemoved(ctx: ChannelHandlerContext): void;
                     // @ts-ignore
                     protected encode(ctx: ChannelHandlerContext, msg: ByteBuf, out: ByteBuf): void;
+                    // @ts-ignore
+                    public setThreshold(threshold: number): void;
                 }
             }
         }

@@ -5,8 +5,6 @@ declare namespace net {
                 // @ts-ignore
                  class ConsoleCommandSender extends java.lang.Object {
                     // @ts-ignore
-                    constructor()
-                    // @ts-ignore
                     public sendMessage(message: string): void;
                     // @ts-ignore
                     public sendMessages(messages: string): void;
@@ -28,6 +26,8 @@ declare namespace net {
                     public setPermission(permission: string, value: boolean): void;
                     // @ts-ignore
                     public getPermissions(): java.util.Collection;
+                    // @ts-ignore
+                    public static getInstance(): net.md_5.bungee.command.ConsoleCommandSender;
                 }
             }
         }

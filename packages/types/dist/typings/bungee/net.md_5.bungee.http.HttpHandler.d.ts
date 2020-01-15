@@ -5,7 +5,7 @@ declare namespace net {
                 // @ts-ignore
                  class HttpHandler extends object {
                     // @ts-ignore
-                    constructor()
+                    constructor(callback: any)
                     // @ts-ignore
                     public exceptionCaught(ctx: ChannelHandlerContext, cause: java.lang.Throwable): void;
                     // @ts-ignore

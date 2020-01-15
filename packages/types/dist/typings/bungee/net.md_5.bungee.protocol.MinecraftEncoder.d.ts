@@ -5,9 +5,13 @@ declare namespace net {
                 // @ts-ignore
                  class MinecraftEncoder extends object {
                     // @ts-ignore
-                    constructor()
+                    constructor(protocol: net.md_5.bungee.protocol.Protocol, server: boolean, protocolVersion: number)
                     // @ts-ignore
                     protected encode(ctx: ChannelHandlerContext, msg: net.md_5.bungee.protocol.DefinedPacket, out: ByteBuf): void;
+                    // @ts-ignore
+                    public setProtocol(protocol: net.md_5.bungee.protocol.Protocol): void;
+                    // @ts-ignore
+                    public setProtocolVersion(protocolVersion: number): void;
                 }
             }
         }
