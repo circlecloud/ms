@@ -14,7 +14,6 @@ let Bukkit = Java.type("org.bukkit.Bukkit");
 
 container.bind(server.Console).toConstantValue(BukkitConsole);
 container.bind(server.ServerType).toConstantValue(BukkitServerType);
-container.bind(plugin.PluginInstance).toConstantValue(Bukkit.pluginManager.getPlugin('MiaoScript'));
 
 container.bind(event.Event).to(BukkitEvent).inSingletonScope();
 container.bind(server.Server).to(BukkitServer).inSingletonScope();
