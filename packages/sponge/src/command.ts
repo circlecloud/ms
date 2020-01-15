@@ -12,11 +12,12 @@ var Optional = Java.type('java.util.Optional');
 
 class SimpleCommandCallable {
     public callable: any;
-
+    private name: string;
     private executor: Function;
     private tabCompleter: Function;
 
     constructor(command: string, description: string = '暂无描述!') {
+        this.name = command;
         this.callable = new CommandCallable({
             //CommandResult process(CommandSource source, String arguments) throws CommandException;
             process: (sender: any, args) => {
@@ -47,7 +48,7 @@ class SimpleCommandCallable {
 
     setExecutor = (executor: Function) => this.executor = executor;
     setTabCompleter = (tabCompleter: Function) => this.tabCompleter = tabCompleter;
-    toString = () => `Sponge SimpleCommandCallable`
+    toString = () => `Sponge SimpleCommandCallable(${this.name})`
 }
 
 @injectable()

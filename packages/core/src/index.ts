@@ -1,6 +1,6 @@
 import '@ms/nashorn'
 
-import { plugin, server, task } from '@ms/api'
+import { plugin, server, task, MiaoScriptConsole } from '@ms/api'
 import { PluginManagerImpl } from '@ms/plugin'
 import { XMLHttpRequest as xhr } from '@ms/ployfill'
 import { DefaultContainer as container, injectable, inject, postConstruct } from '@ms/container'
@@ -17,18 +17,13 @@ class MiaoScriptCore {
     private pluginManager: plugin.PluginManager;
 
     enable() {
-        try {
-            this.loadServerConsole();
-            this.loadTaskFunction();
-            this.loadPlugins();
-        } catch (error) {
-            console.console(`§cMiaoScript start error please contact plugin author!`);
-            console.ex(error);
-        }
+        this.loadServerConsole();
+        this.loadTaskFunction();
+        this.loadPlugins();
         console.log('MiaoScript engine loading completed... Done (' + (new Date().getTime() - startTime) / 1000 + 's)!');
         return () => this.disable();
     }
-
+ 
     loadServerConsole() {
         // @ts-ignore
         console = new this.Console();
@@ -54,21 +49,38 @@ class MiaoScriptCore {
     }
 }
 
-function init() {
+function detectServer(){
+    let type = 'unknow'
     try {
         Java.type("org.bukkit.Bukkit");
-        require('@ms/bukkit');
+        type = 'bukkit';
+        console.info(`Detect Bukkit Compatible set ServerType to ${type} ...`)
     } catch (ex) {
     }
-
     try {
         Java.type("org.spongepowered.api.Sponge");
-        require('@ms/sponge');
+        type = 'sponge';
+        console.info(`Detect Sponge Compatible set ServerType to ${type} ...`)
     } catch (ex) {
     }
+    try {
+        Java.type("net.md_5.bungee.api.ProxyServer");
+        type = 'bungee';
+        console.info(`Detect Sponge Compatible set ServerType to ${type} ...`)
+    } catch (ex) {
+    }
+    if (type === 'unknow') { throw Error('Unknow Server Type...') }
+    return type;
+}
 
+function init() {
+    console.info('Initialization MiaoScript Core Package @ms/core. Please wait...')
+    container.bind(plugin.PluginInstance).toConstantValue(base.getInstance());
+    let type = detectServer();
+    require(`@ms/${type}`);
     container.bind(plugin.PluginManager).to(PluginManagerImpl).inSingletonScope();
     container.bind(MiaoScriptCore).to(MiaoScriptCore).inSingletonScope();
+    console.log(`Initialization MiaoScript Sub Package @ms/${type} loading completed... cost (${(new Date().getTime() - startTime) / 1000}s)!`);
 }
 
 init();

@@ -1,7 +1,23 @@
 export namespace server {
+    /**
+     * Runtime ServerType
+     */
     export const ServerType = Symbol("ServerType");
+    /**
+     * Runtime Console
+     */
     export const Console = Symbol("Console");
+    /**
+     * MiaoScript Server
+     */
     export const Server = Symbol("Server");
+    /**
+     * Runtime Server Instance
+     */
+    export const ServerInstance = Symbol("ServerInstance");
+    /**
+     * MiaoScript Server
+     */
     export interface Server {
         getVersion(): string;
         getPlayer(name: string): any;

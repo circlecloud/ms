@@ -5,7 +5,7 @@ export namespace command {
     export abstract class Command {
         on(plugin: any, name: string, exec: { cmd: Function, tab?: Function }) {
             var cmd = this.create(plugin, name);
-            console.debug(`插件 ${plugin.description.name} 创建命令 ${name}(${cmd})...`)
+            console.debug(`[${plugin.description.name}] register command ${name}(${cmd})...`)
             if (exec.cmd && typeof exec.cmd === "function") {
                 this.onCommand(plugin, cmd, exec.cmd);
             } else {
@@ -16,7 +16,7 @@ export namespace command {
             }
         }
         off(plugin: any, name: string) {
-            console.debug(`插件 ${plugin.description.name} 注销命令 ${name}...`)
+            console.debug(`[${plugin.description.name}] unregister command ${name}...`)
             this.remove(plugin, name);
         }
         /**
@@ -28,7 +28,7 @@ export namespace command {
         protected abstract onTabComplete(plugin: any, command: any, tabCompleter: Function);
 
         protected setExecutor(plugin: any, command: any, executor: Function) {
-            return (sender: any, _, command: string, args: string[]) => {
+            return (sender: any, _: any, command: string, args: string[]) => {
                 try {
                     return executor(sender, command, Java.from(args));
                 } catch (ex) {
@@ -41,7 +41,7 @@ export namespace command {
         }
 
         protected setTabCompleter(plugin: any, command: any, tabCompleter: Function) {
-            return (sender: any, _, command: string, args: string[]) => {
+            return (sender: any, _: any, command: string, args: string[]) => {
                 try {
                     var token = args[args.length - 1];
                     var complete = tabCompleter(sender, command, Java.from(args)) || [];
