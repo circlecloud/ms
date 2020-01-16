@@ -1,5 +1,5 @@
-# sponge bukkit jdk
-TYPE=jdk
+# sponge bukkit jdk bungee
+TYPE=bungee
 TARGET=../types/dist/typings
 npx tsc src/build.ts --outDir dist
 cd dist
