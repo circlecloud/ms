@@ -17,6 +17,7 @@ declare global {
     function engineLoad(str: string): any;
     interface Core {
         getClass(name: String): any;
+        getProxyClass(): any;
         getInstance(): any;
         read(path: string): string;
         save(path: string, content: string): void;
