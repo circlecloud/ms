@@ -33,7 +33,7 @@ function convertJson2TypeDefiend(infile: string, outDir: string) {
             temp = temp.substr(0, temp.length - 2);
         }
     } else {
-        temp += `${(obj.superclass) ? (' extends ' + obj.superclass.qualifiedName) : ''}`;
+        temp += `${(obj.superclass) ? (' extends ' + (obj.superclass.qualifiedName == "<any>" ? "object" : obj.superclass.qualifiedName)) : ''}`;
         if (safeInterface.length > 0) {
             temp += ' implements '
             for (const ifs of safeInterface) {
@@ -178,7 +178,7 @@ typeMap['Matrix4d'] = 'any /*Matrix4d*/'
 function mappingType(type: string): string {
     let outType = typeMap[type] || type || 'any';
     if (outType.indexOf('.') != -1) {
-        if (outType.startsWith('java.') || outType.startsWith('org.')) {
+        if (outType.startsWith('java.') || outType.startsWith('org.') || outType.startsWith('net.')) {
 
         } else {
             outType = `any /*${outType}*/`
