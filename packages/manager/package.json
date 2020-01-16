@@ -16,15 +16,21 @@
         "registry": "https://repo.yumc.pw/repository/npm-hosted/"
     },
     "scripts": {
+        "dev": "npx ts-node-dev --respawn --debounce=1500 src/index.ts",
         "clean": "rimraf dist",
         "watch": "npx tsc --watch",
         "build": "yarn clean && npx tsc",
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
+    "dependencies": {
+        "@cc-server/core": "^0.7.0",
+        "mongodb": "^3.4.1"
+    },
     "devDependencies": {
+        "@types/mongodb": "^3.3.14",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.0",
+        "ts-node-dev": "^1.0.0-pre.44",
         "typescript": "^3.7.2"
-    },
-    "dependencies": {}
+    }
 }
