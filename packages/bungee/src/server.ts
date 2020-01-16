@@ -21,10 +21,13 @@ export class BungeeServer implements server.Server {
         throw new Error("Method not implemented.");
     }
     dispatchCommand(sender: string | any, command: string): boolean {
-        return false
+        if (typeof sender === 'string') {
+            sender = this.getPlayer(sender)
+        }
+        return Bungee.getPluginManager().dispatchCommand(sender, command)
     }
     dispatchConsoleCommand(command: string): boolean {
-        return false
+        return Bungee.getPluginManager().dispatchCommand(Bungee.getConsole(), command)
     }
     sendJson(sender: string | any, json: string): void {
         throw new Error("Method not implemented.");
