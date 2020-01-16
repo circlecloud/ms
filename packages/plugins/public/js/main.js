@@ -6,7 +6,7 @@ var main = avalon.define({
     server: window.localStorage.getItem(serverKey) || location.host,
     type: 'unknow',
     logs: '',
-    codes: ["default", "bukkit", "sponge", "common", "test", "dev", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+    codes: ["default", "bukkit", "sponge", "bungee", "common", "test", "dev", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
     code: 'default',
     classes: {
         total: 0,
