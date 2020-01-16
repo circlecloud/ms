@@ -1,6 +1,8 @@
 /// <reference types="@ms/types/dist/typings/bukkit" />
 /// <reference types="@ms/types/dist/typings/sponge" />
-import { plugin as pluginApi, server } from '@ms/api'
+/// <reference types="@ms/types/dist/typings/bungee" />
+
+import { plugin as pluginApi, server, task } from '@ms/api'
 import { plugin, interfaces, cmd } from '@ms/plugin'
 import { DefaultContainer as container, inject, postConstruct } from '@ms/container'
 import * as reflect from '@ms/common/dist/reflect'
@@ -8,25 +10,31 @@ import * as reflect from '@ms/common/dist/reflect'
 let clients: any[] = []
 let SPLIT_LINE = '\\M\\W\\S|T|S|S/L/T/'
 const refList: Array<{ server: string, future: string }> = [
-    { server: 'an', future: 'g' },
-    { server: 'getServerConnection', future: 'f' },
-    { server: 'func_147137_ag', future: 'field_151274_e' }
+    { server: 'an', future: 'g' },//spigot 1.12.2
+    { server: 'getServerConnection', future: 'f' },//spigot 1.14.4
+    { server: 'func_147137_ag', future: 'field_151274_e' }//catserver 1.12.2
 ]
 
 const Callable = Java.type('java.util.concurrent.Callable')
+const Runnable = Java.type('java.lang.Runnable')
 
-@plugin({ name: 'WebSocket', version: '1.0.0', author: 'MiaoWoo', source: __filename })
-export class WebSocket extends interfaces.Plugin {
+@plugin({ name: 'MiaoConsole', version: '1.0.0', author: 'MiaoWoo', source: __filename })
+export class MiaoConsole extends interfaces.Plugin {
     @inject(pluginApi.PluginManager)
     private PluginManager: pluginApi.PluginManager
     @inject(server.ServerType)
     private ServerType: string
+    @inject(server.Server)
+    private Server: server.Server
+    @inject(task.TaskManager)
+    private Task: task.TaskManager
     @inject(pluginApi.PluginInstance)
     private pluginInstance: any
+
     private pipeline: any
 
     @cmd()
-    ws(sender: any, command: string, args: string[]) {
+    mconsole(sender: any, command: string, args: string[]) {
         switch (args[0]) {
             case "reload":
                 this.PluginManager.reload(this)
@@ -37,7 +45,9 @@ export class WebSocket extends interfaces.Plugin {
 
     disable() {
         if (this.pipeline) {
-            this.pipeline.remove('miao_detect')
+            if (this.pipeline.names().contains('miao_detect')) {
+                this.pipeline.remove('miao_detect')
+            }
             clients.forEach(c => c.close())
             container.unbind('onmessage')
         }
@@ -46,13 +56,28 @@ export class WebSocket extends interfaces.Plugin {
     bukkitenable() {
         let Bukkit = Java.type('org.bukkit.Bukkit')
         let consoleServer = reflect.on(Bukkit.getServer()).get('console').get()
-        this.injectMiaoDetect(this.reflectPromise(consoleServer))
+        this.reflectChannel(this.reflectPromise(consoleServer))
+        this.injectMiaoDetect()
     }
 
     spongeenable() {
         let Sponge = Java.type('org.spongepowered.api.Sponge')
         let consoleServer = reflect.on(Sponge.getServer()).get()
-        this.injectMiaoDetect(this.reflectPromise(consoleServer))
+        this.reflectChannel(this.reflectPromise(consoleServer))
+        this.injectMiaoDetect()
+    }
+
+    bungeeenable() {
+        let wait = this.Task.create(() => {
+            try {
+                // @ts-ignore
+                this.pipeline = reflect.on(base.getInstance().getProxy()).get('listeners').get().toArray()[0].pipeline()
+                this.injectMiaoDetect()
+                wait.cancel();
+            } catch (ex) {
+                this.logger.warn('Wait BungeeCord start ready to get netty channel pipeline. Err: ' + ex)
+            }
+        }).later(300).timer(500).submit()
     }
 
     reflectPromise(consoleServer) {
@@ -61,16 +86,20 @@ export class WebSocket extends interfaces.Plugin {
         }
     }
 
-    injectMiaoDetect(promise) {
+    reflectChannel(promise) {
         if (!promise) { throw Error(`Can't found ServerConnection or ChannelFuture !`) }
         this.pipeline = reflect.on(promise).get('channel').get().pipeline()
+    }
+
+    injectMiaoDetect() {
         this.pipeline.addFirst('miao_detect', new MiaoDetectHandler())
         container.bind('onmessage').toFunction(this.onmessage.bind(this))
+        this.logger.info('Netty Channel Pipeline Inject MiaoDetectHandler Successful!')
     }
 
     onmessage(ctx: any, msg: any) {
         let text: string = msg.text()
-        const [type, content] = text.split('\\M\\W\\S|T|S|S/L/T/')
+        const [type, content] = text.split(SPLIT_LINE)
         try {
             var result = this[type](ctx, content)
         } catch (ex) {
@@ -80,13 +109,7 @@ export class WebSocket extends interfaces.Plugin {
     }
 
     execCommand(ctx: any, cmd: string) {
-        switch (this.ServerType) {
-            case "bukkit":
-                org.bukkit.Bukkit.dispatchCommand(org.bukkit.Bukkit.getConsoleSender(), cmd)
-                break
-            case "sponge":
-                break
-        }
+        setTimeout(() => this.Server.dispatchConsoleCommand(cmd), 0)
         return `§6命令: §b${cmd} §a执行成功!`
     }
 
@@ -95,16 +118,17 @@ export class WebSocket extends interfaces.Plugin {
             case "bukkit":
                 return org.bukkit.Bukkit.getScheduler().callSyncMethod(this.pluginInstance, new Callable({ call: () => eval(code) })).get() || '无返回结果'
             case "sponge":
-                return ''
+                return org.spongepowered.api.Sponge.getScheduler().createSyncExecutor(this.pluginInstance).schedule(new Runnable({ run: () => eval(code) }), 0, {})
+            case "bungee":
+                return eval(code)
         }
     }
 
     execDetect(ctx: any, cmd: string) {
         switch (cmd) {
             case "type":
-                let version = this.ServerType == 'bukkit' ? org.bukkit.Bukkit.getServer().getVersion() : org.spongepowered.api.Sponge.getPlatform().getMinecraftVersion()
                 this.sendResult(ctx, "type", this.ServerType)
-                return `Currect Server Version is ${version}`
+                return `Currect Server Version is ${this.Server.getVersion()}`
         }
     }
 
@@ -196,7 +220,7 @@ const WebSocketHandler = Java.extend(ChannelInboundHandlerAdapter, {
         let channel = ctx.channel()
         let pipeline = channel.pipeline()
         if (message.indexOf('HTTP/1.1') > 0) {
-            channel.pipeline().names().forEach(f => {
+            pipeline.names().forEach(f => {
                 if (f == 'miaowebsocket' || f.indexOf('DefaultChannelPipeline') > -1) { return }
                 pipeline.remove(f)
             })

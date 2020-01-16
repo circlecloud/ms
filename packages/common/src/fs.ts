@@ -12,8 +12,8 @@ const StandardCopyOption = Java.type("java.nio.file.StandardCopyOption");
 /**
  * 用文件分割符合并路径
  */
-export function concat() {
-    return Array.prototype.join.call(arguments, separatorChar);
+export function concat(...args: string[]) {
+    return args.join(separatorChar);
 }
 
 /**
@@ -23,12 +23,12 @@ export function concat() {
  * @returns {*}
  */
 export function file(...opts: any[]): any {
-    if (!arguments[0]) {
+    if (!opts[0]) {
         console.warn("文件名称不得为 undefined 或者 null !");
     }
-    switch (arguments.length) {
+    switch (opts.length) {
         case 1:
-            var f = arguments[0];
+            var f = opts[0];
             if (f instanceof File) {
                 return f;
             }
@@ -40,7 +40,7 @@ export function file(...opts: any[]): any {
             }
             break;
         default:
-            return new File(file(arguments[0]), arguments[1]);
+            return new File(file(opts[0]), opts[1]);
     }
 }
 
@@ -48,7 +48,7 @@ export function file(...opts: any[]): any {
  * 创建目录
  * @param path
  */
-export function mkdirs(path) {
+export function mkdirs(path: any) {
     // noinspection JSUnresolvedVariable
     file(path).parentFile.mkdirs();
 }
@@ -57,7 +57,7 @@ export function mkdirs(path) {
  * 创建文件
  * @param file
  */
-export function create(path) {
+export function create(path: any) {
     var f = file(path);
     if (!f.exists()) {
         mkdirs(f);
@@ -70,7 +70,7 @@ export function create(path) {
  * @param file
  * @returns {*}
  */
-export function path(f) {
+export function path(f: any) {
     return file(f).canonicalPath;
 }
 
@@ -80,7 +80,7 @@ export function path(f) {
  * @param target 目标文件
  * @param override 是否覆盖
  */
-export function copy(inputStream, target, override) {
+export function copy(inputStream: any, target: any, override: any) {
     Files.copy(inputStream, target.toPath(), StandardCopyOption[override ? 'REPLACE_EXISTING' : 'ATOMIC_MOVE']);
 }
 

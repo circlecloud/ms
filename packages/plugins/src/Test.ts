@@ -2,6 +2,9 @@ import { plugin as pluginApi } from '@ms/api'
 import { plugin, interfaces, cmd, listener, tab } from '@ms/plugin'
 import { inject } from '@ms/container';
 
+import * as reflect from '@ms/common/dist/reflect';
+import http from '@ms/common/dist/http';
+
 @plugin({ name: 'Test', version: '1.0.0', author: 'MiaoWoo', source: __filename })
 export class Test extends interfaces.Plugin {
     @inject(pluginApi.PluginManager)
@@ -51,7 +54,18 @@ export class Test extends interfaces.Plugin {
                 setTimeout(() => location.block.type = Java.type('org.bukkit.Material').STONE, 8);
                 break;
             case "add":
-                require('js-yaml1');
+                break;
+            case "get":
+                let result = http.get('https://www.baidu.com');
+                this.logger.sender(sender, JSON.stringify(result));
+                // 好了 扯结束 继续咸鱼
+                break;
+            case "ws":
+                let Sponge = Java.type('org.spongepowered.api.Sponge');
+                // let promise = reflect.on(Bukkit.server).get('console').get('field_147144_o').get('field_151274_e').get().get(0);
+                console.log(reflect.on(Sponge.server).get('field_147144_o').get())
+                // let channel = reflect.on(promise).get('channel').get().pipeline().first();
+                // console.log(channel);
                 break;
             default:
                 this.logger.log(sender, command, args);

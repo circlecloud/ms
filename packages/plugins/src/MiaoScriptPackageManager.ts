@@ -1,7 +1,8 @@
-import { plugin as pluginApi, task } from '@ms/api'
+import { plugin as pluginApi, task, server } from '@ms/api'
 
+import * as fs from '@ms/common/dist/fs'
 import { inject } from '@ms/container';
-import { plugin, cmd, tab } from '@ms/plugin'
+import { interfaces, plugin, cmd, tab } from '@ms/plugin'
 
 let help = [
     '§6========= §6[§aMiaoScriptPackageManager§6] 帮助 §aBy §b喵♂呜 §6=========',
@@ -16,23 +17,21 @@ let help = [
 ];
 
 @plugin({ name: 'MiaoScriptPackageManager', prefix: 'PM', version: '1.0.0', author: 'MiaoWoo', source: __filename })
-export class MiaoScriptPackageManager {
+export class MiaoScriptPackageManager extends interfaces.Plugin {
     @inject(pluginApi.PluginManager)
     private pluginManager: pluginApi.PluginManager;
     @inject(task.TaskManager)
     private taskManager: task.TaskManager;
+    @inject(server.ServerType)
+    private serverType: string;
+    @inject(server.Server)
+    private server: server.Server
 
-    private pluginCache = [];
-    private packageCache = [];
-    private packageNameCache = [];
+    private packageCache: any[] = [];
+    private packageNameCache: any[] = [];
 
     load() {
         this.taskManager.create(() => {
-            this.pluginCache = [...this.pluginManager.getPlugins().keys()];
-            // JSON.parse(http.get(self.config.center)).data.forEach(function cachePackageName(pkg) {
-            //     packageCache[pkg.name] = pkg;
-            // })
-            // packageNameCache = Object.keys(packageCache);
         }).async().submit();
     }
 
@@ -47,19 +46,19 @@ export class MiaoScriptPackageManager {
 
     main(sender: any, command: string, args: string[]) {
         if (!args[0] || args[1] === 'help') {
-            console.sender(sender, help);
+            this.logger.sender(sender, help);
             return;
         }
         switch (args[0]) {
             case "list":
                 if (args[1]) {
-                    console.sender(sender, '§6当前 §bMiaoScript §6已安装下列插件:');
-                    this.pluginCache.forEach(function listInfo(pluginName) {
-                        // var desc = manager.plugins[pluginName].description;
-                        // console.sender(sender, `§6插件名称: §b${desc.name} §6版本: §a${desc.version|| '1.0'} §6作者: §3${desc.author || '未知'}`)
+                    this.logger.sender(sender, '§6当前 §bMiaoScript §6已安装下列插件:');
+                    this.pluginManager.getPlugins().forEach((plugin) => {
+                        var desc = plugin.description;
+                        this.logger.sender(sender, `§6插件名称: §b${desc.name} §6版本: §a${desc.version || '1.0'} §6作者: §3${desc.author || '未知'}`)
                     })
                 } else {
-                    console.sender(sender, '§6当前 §bMiaoScriptPackageCenter §6中存在下列插件:');
+                    this.logger.sender(sender, '§6当前 §bMiaoScriptPackageCenter §6中存在下列插件:');
                     for (var pkgName in this.packageCache) {
                         var pkg = this.packageCache[pkgName];
                         // console.sender(sender, '§6插件名称: §b%s §6版本: §a%s §6作者: §3%s'.format(pkg.name, pkg.version || '1.0', pkg.author || '未知'))
@@ -82,6 +81,9 @@ export class MiaoScriptPackageManager {
                 // }
                 break;
             case "upgrade":
+                if (args[3] === "engine") {
+                    fs.del(fs.concat(root, '', ''))
+                }
                 break;
             case "delete":
                 // if (args.length > 1) {
@@ -91,57 +93,59 @@ export class MiaoScriptPackageManager {
                 // }
                 break;
             case "reload":
-                // if (args.length > 1) {
-                //     var pname = args[1];
-                //     if (pluginCache.indexOf(pname) !== -1) {
-                //         manager.reload(pname)
-                //         console.sender(sender, '§6插件 §b%s §a重载完成!'.format(pname))
-                //     } else {
-                //         console.sender(sender, '§c插件 §b%s §c不存在!'.format(pname))
-                //     }
-                // } else {
-                //     self.reloadConfig();
-                //     load();
-                // }
+                if (args.length > 1) {
+                    var pname = args[1];
+                    if (!this.pluginManager.getPlugins().has(pname)) {
+                        this.logger.sender(sender, `§6插件 §b${pname} §c不存在!`)
+                        return
+                    }
+                    this.pluginManager.reload(pname);
+                    this.logger.sender(sender, `§6插件 §b${pname} §a重载完成!`)
+                }
                 break;
             case "restart":
+                if (this.serverType === "sponge") {
+                    setTimeout(() => this.server.dispatchConsoleCommand('sponge plugins reload'), 0)
+                    return
+                }
                 try {
-                    console.sender(sender, '§6Reloading §3MiaoScript Engine...');
+                    this.logger.sender(sender, '§6Reloading §3MiaoScript Engine...');
                     ScriptEngineContextHolder.disableEngine();
                     ScriptEngineContextHolder.enableEngine();
-                    console.sender(sender, '§3MiaoScript Engine §6Reload §aSuccessful...');
+                    this.logger.sender(sender, '§3MiaoScript Engine §6Reload §aSuccessful...');
                 } catch (ex) {
-                    console.sender(sender, "§3MiaoScript Engine §6Reload §cError! ERR: " + ex);
-                    console.sender(sender, console.stack(ex));
+                    this.logger.sender(sender, "§3MiaoScript Engine §6Reload §cError! ERR: " + ex);
+                    this.logger.sender(sender, this.logger.stack(ex));
                 }
                 break;
             case "run":
                 args.shift();
                 try {
-                    var script = args.join(' ')
-                    console.sender(sender, '§b运行脚本:§r', script)
-                    console.sender(sender, '§a返回结果:§r', eval(script) || '§4没有返回结果!');
+                    var script = args.join(' ');
+                    this.logger.sender(sender, '§b运行脚本:§r', script);
+                    this.logger.sender(sender, '§a返回结果:§r', eval(script) || '§4没有返回结果!');
                 } catch (ex) {
-                    console.sender(sender, console.stack(ex))
+                    this.logger.sender(sender, this.logger.stack(ex));
                 }
                 break;
             case "create":
+                this.logger.sender(sender, `§4当前暂不支持生成插件模板!`);
                 // var name = args[1];
                 // if (!name) {
-                //     console.sender(sender, '§4参数错误 /mpm create <插件名称> [作者] [版本] [主命令]');
+                //     this.logger.sender(sender, '§4参数错误 /mpm create <插件名称> [作者] [版本] [主命令]');
                 //     return;
                 // }
-                // var result = template.create(http.get(self.config.template)).render({
-                //     name: name,
-                //     author: args[2] || 'MiaoWoo',
-                //     version: args[3] || '1.0',
-                //     command: args[4] || name.toLowerCase(),
-                // });
-                // fs.save(fs.file(__dirname, name + '.js'), result);
-                // console.sender(sender, '§6插件 §a' + name + ' §6已生成到插件目录...');
+                // // var result = template.create(http.get(self.config.template)).render({
+                // //     name: name,
+                // //     author: args[2] || 'MiaoWoo',
+                // //     version: args[3] || '1.0',
+                // //     command: args[4] || name.toLowerCase(),
+                // // });
+                // // fs.save(fs.file(__dirname, name + '.js'), result);
+                // this.logger.sender(sender, '§6插件 §a' + name + ' §6已生成到插件目录...');
                 break;
             default:
-                console.sender(sender, help);
+                this.logger.sender(sender, help);
                 break;
         }
     }
@@ -156,7 +160,7 @@ export class MiaoScriptPackageManager {
                 case "update":
                 case "upgrade":
                 case "reload":
-                    return this.pluginCache;
+                    return [...this.pluginManager.getPlugins().keys()];
             }
         }
     }
