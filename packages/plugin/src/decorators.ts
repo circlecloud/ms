@@ -9,10 +9,9 @@ import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata
  */
 export function plugin(metadata: interfaces.PluginMetadata) {
     return function(target: any) {
-        target.description = metadata;
         metadata.target = target;
         decorate(injectable(), target);
-        Reflect.defineMetadata(METADATA_KEY.plugin, metadata, target.constructor);
+        Reflect.defineMetadata(METADATA_KEY.plugin, metadata, target);
         const previousMetadata: Map<string, interfaces.PluginMetadata> = getPluginMetadatas();
         previousMetadata.set(metadata.name, metadata);
         Reflect.defineMetadata(METADATA_KEY.plugin, previousMetadata, Reflect);

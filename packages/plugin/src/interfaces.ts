@@ -1,10 +1,19 @@
-import { injectable } from "@ms/container";
+import { server, MiaoScriptConsole } from "@ms/api";
+import { METADATA_KEY } from './constants'
+import { injectable, inject, postConstruct } from "@ms/container";
+import { getPluginMetadata } from "./utils";
 
 export namespace interfaces {
     @injectable()
     export abstract class Plugin {
         public description: PluginMetadata;
         public logger: Console;
+
+        constructor(@inject(server.Console) Console: MiaoScriptConsole) {
+            this.description = getPluginMetadata(this)
+            // @ts-ignore
+            this.logger = new Console(this.description.prefix || this.description.name)
+        }
 
         public load() { }
         public enable() { }
