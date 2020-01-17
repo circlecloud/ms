@@ -17,7 +17,10 @@ export class SpongeTaskManager implements task.TaskManager {
         return new SpongeTask(this.pluginInstance, func);
     }
     callSyncMethod(func: Function): any {
-        return Sponge.getScheduler().createSyncExecutor(this.pluginInstance).schedule(new Callable({ call: () => func() }), 0, TimeUnit.NANOSECONDS).get()
+        return Sponge.getScheduler()
+            .createSyncExecutor(this.pluginInstance)
+            // @ts-ignore
+            .schedule(new Callable({ call: () => func() }), java.lang.Long.valueOf(0), TimeUnit.NANOSECONDS).get()
     }
 }
 
