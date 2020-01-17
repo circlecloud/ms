@@ -3,7 +3,7 @@ import '@ms/nashorn'
 import { plugin, server, task, MiaoScriptConsole } from '@ms/api'
 import { PluginManagerImpl } from '@ms/plugin'
 import { XMLHttpRequest as xhr } from '@ms/ployfill'
-import { DefaultContainer as container, injectable, inject, postConstruct } from '@ms/container'
+import { DefaultContainer as container, injectable, inject, ContainerInstance } from '@ms/container'
 
 let startTime = new Date().getTime();
 
@@ -23,7 +23,7 @@ class MiaoScriptCore {
         console.log('MiaoScript engine loading completed... Done (' + (new Date().getTime() - startTime) / 1000 + 's)!');
         return () => this.disable();
     }
- 
+
     loadServerConsole() {
         // @ts-ignore
         console = new this.Console();
@@ -39,7 +39,7 @@ class MiaoScriptCore {
 
     loadPlugins() {
         this.pluginManager.scan('plugins');
-        this.pluginManager.build(container);
+        this.pluginManager.build();
         this.pluginManager.load();
         this.pluginManager.enable();
     }
@@ -49,7 +49,7 @@ class MiaoScriptCore {
     }
 }
 
-function detectServer(){
+function detectServer() {
     let type = 'unknow'
     try {
         Java.type("org.bukkit.Bukkit");
@@ -75,6 +75,7 @@ function detectServer(){
 
 function init() {
     console.info('Initialization MiaoScript Core Package @ms/core. Please wait...')
+    container.bind(ContainerInstance).toConstantValue(container);
     container.bind(plugin.PluginInstance).toConstantValue(base.getInstance());
     let type = detectServer();
     require(`@ms/${type}`);
