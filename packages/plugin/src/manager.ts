@@ -1,5 +1,5 @@
 import { plugin, server, command, event, MiaoScriptConsole } from '@ms/api'
-import { injectable, inject, postConstruct, Container, DefaultContainer as container } from '@ms/container'
+import { injectable, inject, postConstruct, Container, ContainerInstance } from '@ms/container'
 import * as fs from '@ms/common/dist/fs'
 
 import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPlugin, getPluginTabCompleterMetadata } from './utils'
@@ -7,6 +7,8 @@ import { interfaces } from './interfaces'
 
 @injectable()
 export class PluginManagerImpl implements plugin.PluginManager {
+    @inject(ContainerInstance)
+    private container: Container
     @inject(plugin.PluginInstance)
     private pluginInstance: any
     @inject(server.ServerType)
@@ -40,8 +42,8 @@ export class PluginManagerImpl implements plugin.PluginManager {
         this.loadPlugins(files)
     }
 
-    build(container: Container): void {
-        this.buildPlugins(container)
+    build(): void {
+        this.buildPlugins()
     }
 
     load(...args: any[]): void {
@@ -147,23 +149,24 @@ export class PluginManagerImpl implements plugin.PluginManager {
         }
     }
 
-    private createPlugin(file) {
+    private createPlugin(file: string) {
         //@ts-ignore
         require(file, {
             cache: false
         })
     }
 
-    private buildPlugins(container: Container) {
+    private buildPlugins() {
         let pluginMetadatas = getPluginMetadatas()
         pluginMetadatas.forEach(metadata => {
+            if (metadata.servers?.indexOf(this.serverType) == -1) { return }
             this.buildPlugin(metadata)
         })
     }
 
     private buildPlugin(metadata: interfaces.PluginMetadata) {
         this.bindPlugin(metadata)
-        let pluginInstance = container.getNamed<interfaces.Plugin>(plugin.Plugin, metadata.name)
+        let pluginInstance = this.container.getNamed<interfaces.Plugin>(plugin.Plugin, metadata.name)
         if (!(pluginInstance instanceof interfaces.Plugin)) {
             console.console(`§4found error plugin §b${metadata.source} §4it's not extends interfaces.Plugin, the plugin will be ignore!`)
             return
@@ -177,33 +180,34 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
     private bindPlugin(metadata: interfaces.PluginMetadata) {
         try {
-            let pluginInstance = container.getNamed<interfaces.Plugin>(plugin.Plugin, metadata.name)
+            let pluginInstance = this.container.getNamed<interfaces.Plugin>(plugin.Plugin, metadata.name)
             if (pluginInstance.description.source + '' !== metadata.source + '') {
                 console.console(`§4found duplicate plugin §b${pluginInstance.description.source} §4and §b${metadata.source}§4. the first plugin will be ignore!`)
             }
-            container.rebind(plugin.Plugin).to(metadata.target).inSingletonScope().whenTargetNamed(metadata.name)
+            this.container.rebind(plugin.Plugin).to(metadata.target).inSingletonScope().whenTargetNamed(metadata.name)
         } catch{
-            container.bind(plugin.Plugin).to(metadata.target).inSingletonScope().whenTargetNamed(metadata.name)
+            this.container.bind(plugin.Plugin).to(metadata.target).inSingletonScope().whenTargetNamed(metadata.name)
         }
     }
 
     private registryCommand(pluginInstance: interfaces.Plugin) {
         let cmds = getPluginCommandMetadata(pluginInstance)
         let tabs = getPluginTabCompleterMetadata(pluginInstance)
-        cmds.forEach(cmd => {
+        for (const [_, cmd] of cmds) {
             let tab = tabs.get(cmd.name)
+            if (cmd.servers?.indexOf(this.serverType) == -1) { continue }
             this.CommandManager.on(pluginInstance, cmd.name, {
                 cmd: pluginInstance[cmd.executor].bind(pluginInstance),
                 tab: tab ? pluginInstance[tab.executor].bind(pluginInstance) : undefined
             })
-        })
+        }
     }
 
     private registryListener(pluginInstance: interfaces.Plugin) {
         let events = getPluginListenerMetadata(pluginInstance)
         for (const event of events) {
             // ignore space listener
-            if (event.servertype && event.servertype != this.serverType) { continue }
+            if (event.servers?.indexOf(this.serverType) == -1) { continue }
             // here must bind this to pluginInstance
             this.EventManager.listen(pluginInstance, event.name, pluginInstance[event.executor].bind(pluginInstance))
         }
