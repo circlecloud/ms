@@ -35,10 +35,6 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         }).async().submit();
     }
 
-    enable() {
-
-    }
-
     @cmd()
     mpm(sender: any, command: string, args: string[]) {
         this.taskManager.create(() => this.main(sender, command, args)).async().submit();
