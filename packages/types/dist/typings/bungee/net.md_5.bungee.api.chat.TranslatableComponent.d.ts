@@ -14,7 +14,7 @@ declare namespace net {
                          * Creates a translatable component with the passed substitutions
                          */
                         // @ts-ignore
-                        constructor(translate: string, with: java.lang.Object)
+                        constructor(translate: string, object: java.lang.Object)
                         // @ts-ignore
                         constructor()
                         /**
