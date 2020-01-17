@@ -4,6 +4,7 @@ export namespace task {
     export const TaskManager = Symbol('TaskManager')
     export interface TaskManager {
         create(func: Function): task.Task;
+        callSyncMethod(func: Function): any;
     }
     /**
      * 任务抽象
