@@ -88,13 +88,21 @@ class Tellraw {
     json() {
         if (!this.cache) {
             var temp = [];
-            this.parts.forEach(function(t) {
+            this.parts.forEach(t => {
                 temp.push(t.convert());
             });
             this.cache = JSON.stringify(temp);
             console.trace(this.cache);
         }
         return this.cache;
+    }
+
+    string() {
+        var temp = '';
+        this.parts.forEach(t => {
+            temp += t.text
+        });
+        return temp;
     }
 }
 
