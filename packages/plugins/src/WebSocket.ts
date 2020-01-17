@@ -4,22 +4,25 @@
 
 import { plugin as pluginApi, server, task } from '@ms/api'
 import { plugin, interfaces, cmd } from '@ms/plugin'
-import { DefaultContainer as container, inject, postConstruct } from '@ms/container'
+import { inject, Container, ContainerInstance, postConstruct } from '@ms/container'
 import * as reflect from '@ms/common/dist/reflect'
 
 let clients: any[] = []
 let SPLIT_LINE = '\\M\\W\\S|T|S|S/L/T/'
+let MessageHandle = Symbol.for('MiaoConsole:MessageHandle')
 const refList: Array<{ server: string, future: string }> = [
     { server: 'an', future: 'g' },//spigot 1.12.2
-    { server: 'getServerConnection', future: 'f' },//spigot 1.14.4
+    { server: 'getServerConnection', future: 'f' },//after spigot 1.14.4
     { server: 'func_147137_ag', future: 'field_151274_e' }//catserver 1.12.2
 ]
 
-const Callable = Java.type('java.util.concurrent.Callable')
-const Runnable = Java.type('java.lang.Runnable')
-
 @plugin({ name: 'MiaoConsole', version: '1.0.0', author: 'MiaoWoo', source: __filename })
 export class MiaoConsole extends interfaces.Plugin {
+    public static GlobalContainer: Container
+    public static GlobalLogger: Console
+
+    @inject(ContainerInstance)
+    private container: Container
     @inject(pluginApi.PluginManager)
     private PluginManager: pluginApi.PluginManager
     @inject(server.ServerType)
@@ -28,8 +31,6 @@ export class MiaoConsole extends interfaces.Plugin {
     private Server: server.Server
     @inject(task.TaskManager)
     private Task: task.TaskManager
-    @inject(pluginApi.PluginInstance)
-    private pluginInstance: any
 
     private pipeline: any
 
@@ -43,13 +44,18 @@ export class MiaoConsole extends interfaces.Plugin {
         }
     }
 
+    enable() {
+        MiaoConsole.GlobalLogger = this.logger
+        MiaoConsole.GlobalContainer = this.container
+    }
+
     disable() {
         if (this.pipeline) {
             if (this.pipeline.names().contains('miao_detect')) {
                 this.pipeline.remove('miao_detect')
             }
             clients.forEach(c => c.close())
-            container.unbind('onmessage')
+            this.container.unbind(MessageHandle)
         }
     }
 
@@ -93,7 +99,7 @@ export class MiaoConsole extends interfaces.Plugin {
 
     injectMiaoDetect() {
         this.pipeline.addFirst('miao_detect', new MiaoDetectHandler())
-        container.bind('onmessage').toFunction(this.onmessage.bind(this))
+        this.container.bind(MessageHandle).toFunction(this.onmessage.bind(this))
         this.logger.info('Netty Channel Pipeline Inject MiaoDetectHandler Successful!')
     }
 
@@ -114,14 +120,7 @@ export class MiaoConsole extends interfaces.Plugin {
     }
 
     execCode(ctx: any, code: string) {
-        switch (this.ServerType) {
-            case "bukkit":
-                return org.bukkit.Bukkit.getScheduler().callSyncMethod(this.pluginInstance, new Callable({ call: () => eval(code) })).get() || '无返回结果'
-            case "sponge":
-                return org.spongepowered.api.Sponge.getScheduler().createSyncExecutor(this.pluginInstance).schedule(new Runnable({ run: () => eval(code) }), 0, {})
-            case "bungee":
-                return eval(code)
-        }
+        return this.Task.callSyncMethod(() => eval(code)) + '';
     }
 
     execDetect(ctx: any, cmd: string) {
@@ -203,14 +202,14 @@ const TextWebSocketFrameHandler = Java.extend(SimpleChannelInboundHandler, {
     userEventTriggered: (ctx: any, evt: any) => {
         if (evt == 'HANDSHAKE_COMPLETE') {
             clients.push(ctx.channel())
-            console.console(`§6[§cMS§6][§bWebSocket§6]§r new client §b${ctx.channel().id()} §aconnected...`)
+            MiaoConsole.GlobalLogger.console(`new client §b${ctx.channel().id()} §aconnected...`)
         }
     },
     acceptInboundMessage: (msg: any) => {
         return TextWebSocketFrameMatcher.match(msg)
     },
     channelRead0: (ctx: any, msg: any) => {
-        container.get<any>('onmessage')(ctx, msg)
+        MiaoConsole.GlobalContainer.get<any>(MessageHandle)(ctx, msg)
     }
 })
 const WebSocketHandler = Java.extend(ChannelInboundHandlerAdapter, {
