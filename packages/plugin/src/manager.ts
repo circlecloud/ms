@@ -13,8 +13,6 @@ export class PluginManagerImpl implements plugin.PluginManager {
     private pluginInstance: any
     @inject(server.ServerType)
     private serverType: string
-    @inject(server.Console)
-    private Console: MiaoScriptConsole
     @inject(command.Command)
     private CommandManager: command.Command
     @inject(event.Event)
@@ -149,19 +147,22 @@ export class PluginManagerImpl implements plugin.PluginManager {
         }
     }
 
+    private checkServers(servers: string[]) {
+        if (!servers) { return true }
+        return servers?.indexOf(this.serverType) != -1 && servers?.indexOf(`!${this.serverType}`) == -1
+    }
+
     private createPlugin(file: string) {
         //@ts-ignore
-        require(file, {
-            cache: false
-        })
+        require(file, { cache: false })
     }
 
     private buildPlugins() {
         let pluginMetadatas = getPluginMetadatas()
-        pluginMetadatas.forEach(metadata => {
-            if (metadata.servers?.indexOf(this.serverType) == -1) { return }
+        for (const [_, metadata] of pluginMetadatas) {
+            if (!this.checkServers(metadata.servers)) { continue }
             this.buildPlugin(metadata)
-        })
+        }
     }
 
     private buildPlugin(metadata: interfaces.PluginMetadata) {
@@ -172,9 +173,6 @@ export class PluginManagerImpl implements plugin.PluginManager {
             return
         }
         this.pluginMap.set(metadata.name, pluginInstance)
-        pluginInstance.description = metadata
-        // @ts-ignore
-        pluginInstance.logger = new this.Console(metadata.prefix || metadata.name)
         return pluginInstance
     }
 
@@ -195,7 +193,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
         let tabs = getPluginTabCompleterMetadata(pluginInstance)
         for (const [_, cmd] of cmds) {
             let tab = tabs.get(cmd.name)
-            if (cmd.servers?.indexOf(this.serverType) == -1) { continue }
+            if (!this.checkServers(cmd.servers)) { continue }
             this.CommandManager.on(pluginInstance, cmd.name, {
                 cmd: pluginInstance[cmd.executor].bind(pluginInstance),
                 tab: tab ? pluginInstance[tab.executor].bind(pluginInstance) : undefined
@@ -207,7 +205,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
         let events = getPluginListenerMetadata(pluginInstance)
         for (const event of events) {
             // ignore space listener
-            if (event.servers?.indexOf(this.serverType) == -1) { continue }
+            if (!this.checkServers(event.servers)) { continue }
             // here must bind this to pluginInstance
             this.EventManager.listen(pluginInstance, event.name, pluginInstance[event.executor].bind(pluginInstance))
         }
