@@ -10,7 +10,11 @@ export namespace interfaces {
         public enable() { }
         public disable() { }
     }
-    export interface PluginMetadata {
+    interface BaseMetadata {
+        name?: string;
+        servers?: string[];
+    }
+    export interface PluginMetadata extends BaseMetadata {
         /**
          * 插件名称
          */
@@ -36,20 +40,16 @@ export namespace interfaces {
          */
         target?: any;
     }
-    export interface CommandMetadata {
-        name?: string;
+    interface ExecMetadata extends BaseMetadata {
         executor?: string;
+    }
+    export interface CommandMetadata extends ExecMetadata {
         paramtypes?: string[];
     }
-    export interface TabCompleterMetadata {
-        name?: string;
-        executor?: string;
+    export interface TabCompleterMetadata extends ExecMetadata {
         paramtypes?: string[];
     }
-    export interface ListenerMetadata {
-        name?: string;
-        executor?: string;
-        servertype?: string;
+    export interface ListenerMetadata extends ExecMetadata {
     }
     export type PluginLike = Plugin | string;
 }
