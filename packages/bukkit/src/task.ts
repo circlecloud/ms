@@ -1,7 +1,9 @@
 import { task, plugin } from '@ms/api'
 import { injectable, inject } from '@ms/container';
 
-let BukkitRunnable = Java.type('org.bukkit.scheduler.BukkitRunnable');
+const Bukkit = Java.type('org.bukkit.Bukkit');
+const BukkitRunnable = Java.type('org.bukkit.scheduler.BukkitRunnable');
+const Callable = Java.type('java.util.concurrent.Callable')
 
 @injectable()
 export class BukkitTaskManager implements task.TaskManager {
@@ -11,6 +13,9 @@ export class BukkitTaskManager implements task.TaskManager {
     create(func: Function): task.Task {
         if (Object.prototype.toString.call(func) !== "[object Function]") { throw TypeError('第一个参数 Task 必须为 function !'); };
         return new BukkitTask(this.pluginInstance, func);
+    }
+    callSyncMethod(func: Function): any {
+        return Bukkit.getScheduler().callSyncMethod(this.pluginInstance, new Callable({ call: () => func() })).get()
     }
 }
 
