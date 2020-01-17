@@ -13,6 +13,9 @@ export class BungeeTaskManager implements task.TaskManager {
         if (Object.prototype.toString.call(func) !== "[object Function]") { throw TypeError('第一个参数 Task 必须为 function !'); };
         return new BungeeTask(this.pluginInstance, func);
     }
+    callSyncMethod(func: Function): any {
+        return func();
+    }
 }
 
 export class BungeeTask extends task.Task {

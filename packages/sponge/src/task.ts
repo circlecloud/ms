@@ -1,8 +1,11 @@
 import { task, plugin } from '@ms/api'
 import { injectable, inject } from '@ms/container';
 
-var Consumer = Java.type('java.util.function.Consumer');
-var Task = Java.type("org.spongepowered.api.scheduler.Task");
+const Sponge = Java.type("org.spongepowered.api.Sponge");
+const Task = Java.type("org.spongepowered.api.scheduler.Task");
+const Consumer = Java.type('java.util.function.Consumer');
+const Callable = Java.type('java.util.concurrent.Callable');
+const TimeUnit = Java.type('java.util.concurrent.TimeUnit');
 
 @injectable()
 export class SpongeTaskManager implements task.TaskManager {
@@ -12,6 +15,9 @@ export class SpongeTaskManager implements task.TaskManager {
     create(func: Function): task.Task {
         if (Object.prototype.toString.call(func) !== "[object Function]") { throw TypeError('第一个参数 Task 必须为 function !'); };
         return new SpongeTask(this.pluginInstance, func);
+    }
+    callSyncMethod(func: Function): any {
+        return Sponge.getScheduler().createSyncExecutor(this.pluginInstance).schedule(new Callable({ call: () => func() }), 0, TimeUnit.NANOSECONDS).get()
     }
 }
 
