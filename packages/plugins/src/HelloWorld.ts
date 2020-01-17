@@ -57,23 +57,29 @@ export class HelloWorld extends interfaces.Plugin {
         return ['world']
     }
 
-    @listener({ servertype: 'bukkit' })
-    playerjoin(event: org.bukkit.event.player.PlayerJoinEvent) {
+    @listener({ servers: ['bukkit'] })
+    PlayerJoin(event: org.bukkit.event.player.PlayerJoinEvent) {
         let plyaer = event.getPlayer();
         this.logger.console(`§cBukkit §aPlayerJoinEvent: §b${plyaer.getName()}`)
         setTimeout(() => this.logger.sender(plyaer, `§a欢迎来到 §bMiaoScript §a的世界!`), 10);
     }
 
-    @listener({ servertype: 'sponge' })
-    clientconnectionevent$join(event: org.spongepowered.api.event.network.ClientConnectionEvent.Join) {
+    @listener({ servers: ['sponge'] })
+    ClientConnectionEvent$Join(event: org.spongepowered.api.event.network.ClientConnectionEvent.Join) {
         this.logger.console(`§cSponge §aClientConnectionEvent.Join: §b${event.getTargetEntity().getName()}`)
         setTimeout(() => this.logger.sender(event.getTargetEntity(), `§a欢迎来到 §bMiaoScript §a的世界!`), 10);
     }
 
-    @listener({ servertype: 'bungee' })
-    serverconnected(e: any) {
+    @listener({ servers: ['bungee'] })
+    ServerConnected(e: any) {
         let event = e as net.md_5.bungee.api.event.ServerConnectedEvent
         this.logger.console(`§cBungeeCord §aServerConnectedEvent: §b${event.getPlayer().getDisplayName()}`)
         setTimeout(() => this.logger.sender(event.getPlayer(), `§a欢迎来到 §bMiaoScript §a的世界 §6来自 §cBungeeCord §6的问候!`), 10);
+    }
+
+    @listener({ servers: ["bungee"] })
+    PluginMessage(e: any) {
+        let event = e as net.md_5.bungee.api.event.PluginMessageEvent
+        this.logger.console(`§cBungeeCord §aPluginMessageEvent: §b${event.getTag()}`)
     }
 }

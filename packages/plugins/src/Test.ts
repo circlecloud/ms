@@ -78,7 +78,7 @@ export class Test extends interfaces.Plugin {
         return ['run', 'reload', 'channel', 'add', 'yaml', 'speed', 'top', 'up']
     }
 
-    @listener({ servertype: 'bukkit' })
+    @listener({ servers: ['bukkit'] })
     playerjoin(event: any) {
         this.logger.console('PlayerJoinEvent: ', event.player.name)
     }
