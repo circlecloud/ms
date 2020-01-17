@@ -8,13 +8,15 @@ const Modifier = Java.type("java.lang.reflect.Modifier");
 const ProxyClass = Java.type(base.getProxyClass().name);
 const ProxyMethod = reflect.on(base.getProxyClass()).method("method");
 const HashMap = Java.type('java.util.HashMap');
+const ReflectMethodArray = Java.type('java.lang.reflect.Method[]');
 
+const Byte = Java.type('java.lang.Byte');
 const EventPriority = [];
-EventPriority[event.EventPriority.LOWEST] = -64;
-EventPriority[event.EventPriority.LOW] = -32;
-EventPriority[event.EventPriority.NORMAL] = 0;
-EventPriority[event.EventPriority.HIGH] = 32;
-EventPriority[event.EventPriority.HIGHEST] = 64;
+EventPriority[event.EventPriority.LOWEST] = Byte.valueOf(-64);
+EventPriority[event.EventPriority.LOW] = -Byte.valueOf(32);
+EventPriority[event.EventPriority.NORMAL] = Byte.valueOf(0);
+EventPriority[event.EventPriority.HIGH] = Byte.valueOf(32);
+EventPriority[event.EventPriority.HIGHEST] = Byte.valueOf(64);
 
 /**
  * Bungee Event Impl
@@ -74,10 +76,14 @@ export class BungeeEvent extends event.Event {
             }
             let listener = new ProxyClass(ScriptEngineContextHolder.getEngine(), "exec(args)", { exec, priority: EventPriority[priority] })
             // 方法[]
-            currentPriorityMap.put(listener, Java.to([ProxyMethod]));
+            let methods = new ReflectMethodArray(1);
+            methods[0] = ProxyMethod;
+            currentPriorityMap.put(listener, methods);
             this.bakeHandlers.invoke(this.eventBus, eventCls);
             return listener;
         } catch (ex) {
+            console.ex(ex)
+        } finally {
             this.lock.unlock()
         }
     }
@@ -89,7 +95,9 @@ export class BungeeEvent extends event.Event {
             // Map<优先级, Map<监听器, 方法[]>>
             let prioritiesMap = this.byListenerAndPriority.get(eventCls);
             if (prioritiesMap != null) {
-                let priority = reflect.on(listener).get("bindings").get().get("priority");
+                let bindings = reflect.on(listener).get("bindings").get();
+                // Can't read hash map so need serialize and deserialize
+                let priority = JSON.parse(JSON.stringify(bindings))["priority"];
                 // Map<监听器, 方法[]>
                 let currentPriorityMap = prioritiesMap.get(priority);
                 if (currentPriorityMap != null) {
@@ -104,6 +112,8 @@ export class BungeeEvent extends event.Event {
                 this.bakeHandlers.invoke(this.eventBus, eventCls);
             }
         } catch (ex) {
+            console.ex(ex)
+        } finally {
             this.lock.unlock()
         }
     }
