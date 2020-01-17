@@ -18,7 +18,7 @@ export namespace plugin {
      */
     export interface PluginManager {
         scan(folder: string): void;
-        build(container: Container): void;
+        build(): void;
         load(...args: any[]): void;
         enable(...args: any[]): void;
         disable(...args: any[]): void;

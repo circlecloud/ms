@@ -2,7 +2,7 @@ import { interfaces, Container } from "inversify";
 
 let _container: Container;
 
-const CONTAINER = Symbol.for("@ms/ioc:Container");
+const ContainerInstance = Symbol.for("@ms/ioc:Container");
 const INJECTION = Symbol.for("INJECTION");
 
 function _proxyGetter(
@@ -35,12 +35,12 @@ function _proxyGetter(
 }
 
 function initContainer(container: Container) {
-    Reflect.defineMetadata(CONTAINER, container, Reflect);
+    Reflect.defineMetadata(ContainerInstance, container, Reflect);
     _container = container;
 }
 
 function getContainer(): Container {
-    return _container || Reflect.getMetadata(CONTAINER, Reflect)
+    return _container || Reflect.getMetadata(ContainerInstance, Reflect)
 }
 
 function makePropertyInjectDecorator(doCache: boolean) {
@@ -97,6 +97,7 @@ let lazyMultiInject = makePropertyMultiInjectDecorator(doCache)
 export {
     initContainer,
     getContainer,
+    ContainerInstance,
     lazyInject,
     lazyInjectNamed,
     lazyInjectTagged,
