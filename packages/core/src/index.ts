@@ -1,11 +1,10 @@
-import '@ms/nashorn'
-
-import { plugin, server, task, MiaoScriptConsole } from '@ms/api'
+import '@ms/ployfill'
+let containerStartTime = new Date().getTime()
+console.log(`Initialization MiaoScript IOC Container @ms/container. Please wait...`)
+import { plugin, server, task } from '@ms/api'
 import { PluginManagerImpl } from '@ms/plugin'
-import { XMLHttpRequest as xhr } from '@ms/ployfill'
 import { DefaultContainer as container, injectable, inject, ContainerInstance } from '@ms/container'
-
-let startTime = new Date().getTime();
+console.log('MiaoScript IOC Container @ms/container loading completed(' + (new Date().getTime() - containerStartTime) / 1000 + 's)!');
 
 @injectable()
 class MiaoScriptCore {
@@ -19,15 +18,14 @@ class MiaoScriptCore {
     enable() {
         this.loadServerConsole();
         this.loadTaskFunction();
+        global.level = "TRACE"
         this.loadPlugins();
-        console.log('MiaoScript engine loading completed... Done (' + (new Date().getTime() - startTime) / 1000 + 's)!');
         return () => this.disable();
     }
 
     loadServerConsole() {
         // @ts-ignore
         console = new this.Console();
-        XMLHttpRequest = xhr;
     }
 
     loadTaskFunction() {
@@ -38,10 +36,13 @@ class MiaoScriptCore {
     }
 
     loadPlugins() {
+        let loadPluginStartTime = new Date().getTime()
+        console.log(`Initialization MiaoScript Plugin System. Please wait...`)
         this.pluginManager.scan('plugins');
         this.pluginManager.build();
         this.pluginManager.load();
         this.pluginManager.enable();
+        console.log('MiaoScript Plugin System loading completed(' + (new Date().getTime() - loadPluginStartTime) / 1000 + 's)!');
     }
 
     disable() {
@@ -74,16 +75,19 @@ function detectServer() {
 }
 
 function init() {
-    console.info('Initialization MiaoScript Core Package @ms/core. Please wait...')
+    let corePackageStartTime = new Date().getTime()
     container.bind(ContainerInstance).toConstantValue(container);
     container.bind(plugin.PluginInstance).toConstantValue(base.getInstance());
     let type = detectServer();
-    require(`@ms/${type}`);
+    container.bind(server.ServerType).toConstantValue(type);
+    console.log(`Initialization MiaoScript Package @ms/core @ms/${type}. Please wait...`)
+    require(`@ms/${type}`).default(container);
     container.bind(plugin.PluginManager).to(PluginManagerImpl).inSingletonScope();
     container.bind(MiaoScriptCore).to(MiaoScriptCore).inSingletonScope();
-    console.log(`Initialization MiaoScript Sub Package @ms/${type} loading completed... cost (${(new Date().getTime() - startTime) / 1000}s)!`);
+    console.log(`MiaoScript Package @ms/core @ms/${type} loading completed(` + (new Date().getTime() - corePackageStartTime) / 1000 + 's)!');
+    let disable = container.get<MiaoScriptCore>(MiaoScriptCore).enable()
+    console.log('MiaoScript ScriptEngine loading completed... Done (' + (new Date().getTime() - global.NashornEngineStartTime) / 1000 + 's)!');
+    return disable;
 }
 
-init();
-
-export default container.get<MiaoScriptCore>(MiaoScriptCore).enable();
+export default init();
