@@ -1,4 +1,4 @@
-import { plugin, server, command, event, MiaoScriptConsole } from '@ms/api'
+import { plugin, server, command, event } from '@ms/api'
 import { injectable, inject, postConstruct, Container, ContainerInstance } from '@ms/container'
 import * as fs from '@ms/common/dist/fs'
 
@@ -21,7 +21,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     private pluginMap: Map<string, interfaces.Plugin>
 
     @postConstruct()
-    init() {
+    initialize() {
         if (this.pluginInstance !== null) {
             // 如果plugin不等于null 则代表是正式环境
             console.info(`Initialization MiaoScript Plugin System: ${this.pluginInstance} ...`)
@@ -44,15 +44,21 @@ export class PluginManagerImpl implements plugin.PluginManager {
         this.buildPlugins()
     }
 
+    private logStage(plugin: interfaces.Plugin, stage: string) {
+        console.log(`[${plugin.description.name}] ${stage} ${plugin.description.name} version ${plugin.description.version} by ${plugin.description.author || 'Unknow'}`)
+    }
+
     load(...args: any[]): void {
-        this.checkAndGet(args[0]).forEach(pl => {
-            this.runCatch(pl, 'load')
-            this.runCatch(pl, `${this.serverType}load`)
+        this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
+            this.logStage(plugin, "Loading")
+            this.runCatch(plugin, 'load')
+            this.runCatch(plugin, `${this.serverType}load`)
         })
     }
 
     enable(...args: any[]): void {
-        this.checkAndGet(args[0]).forEach(plugin => {
+        this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
+            this.logStage(plugin, "Enabling")
             this.runCatch(plugin, 'enable')
             this.runCatch(plugin, `${this.serverType}enable`)
             this.registryCommand(plugin)
@@ -61,11 +67,12 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     disable(...args: any[]): void {
-        this.checkAndGet(args[0]).forEach(pl => {
-            this.runCatch(pl, 'disable')
-            this.runCatch(pl, `${this.serverType}disable`)
-            this.unregistryCommand(pl)
-            this.unregistryListener(pl)
+        this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
+            this.logStage(plugin, "Disabling")
+            this.runCatch(plugin, 'disable')
+            this.runCatch(plugin, `${this.serverType}disable`)
+            this.unregistryCommand(plugin)
+            this.unregistryListener(plugin)
         })
     }
 
