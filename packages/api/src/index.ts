@@ -1,4 +1,4 @@
-/// <reference path="./typings/global.ts" />
+import '@ms/ployfill'
 
 export * from './task'
 export * from './event'
