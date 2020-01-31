@@ -17,7 +17,7 @@ export class MiaoScriptConsole implements Console {
     Console: NodeJS.ConsoleConstructor;
 
     private _name: string = '';
-    private _level: LogLevel = global.debug ? LogLevel.DEBUG : LogLevel.INFO;
+    private _level: LogLevel = LogLevel.INFO;
 
     protected logger: any;
     protected prefix: string = '§6[§bMiaoScript§6]§r ';
@@ -25,6 +25,12 @@ export class MiaoScriptConsole implements Console {
     constructor(name?: string) {
         this.name = name;
         this.logger = global.logger;
+        if (global.debug) {
+            this._level = LogLevel.DEBUG
+        }
+        if (global.level?.toUpperCase() === "TRACE") {
+            this._level = LogLevel.TRACE
+        }
     }
 
     get name() {

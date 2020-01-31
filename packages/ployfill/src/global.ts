@@ -1,13 +1,14 @@
-import { XMLHttpRequest as xhr } from '@ms/ployfill'
-
+import { XMLHttpRequest as xhr } from './xml-http-request'
 declare global {
     namespace NodeJS {
         interface Global {
             logger: any;
             debug: boolean;
-            noop: Function;
+            level: string;
+            NashornEngineStartTime: number;
+            setGlobal: (key: string, value: any) => void;
+            noop: () => void;
             console: Console;
-            XMLHttpRequest: typeof xhr;
         }
     }
     var root: string;
