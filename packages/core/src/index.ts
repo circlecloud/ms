@@ -51,34 +51,30 @@ class MiaoScriptCore {
 }
 
 function detectServer() {
-    let type = 'unknow'
     try {
         Java.type("org.bukkit.Bukkit");
-        type = 'bukkit';
-        console.info(`Detect Bukkit Compatible set ServerType to ${type} ...`)
+        return 'bukkit'
     } catch (ex) {
     }
     try {
         Java.type("org.spongepowered.api.Sponge");
-        type = 'sponge';
-        console.info(`Detect Sponge Compatible set ServerType to ${type} ...`)
+        return 'sponge'
     } catch (ex) {
     }
     try {
         Java.type("net.md_5.bungee.api.ProxyServer");
-        type = 'bungee';
-        console.info(`Detect Sponge Compatible set ServerType to ${type} ...`)
+        return 'bungee'
     } catch (ex) {
     }
-    if (type === 'unknow') { throw Error('Unknow Server Type...') }
-    return type;
+    throw Error('Unknow Server Type...')
 }
 
-function init() {
+function initialize() {
     let corePackageStartTime = new Date().getTime()
     container.bind(ContainerInstance).toConstantValue(container);
     container.bind(plugin.PluginInstance).toConstantValue(base.getInstance());
     let type = detectServer();
+    console.info(`Detect Compatible Server set ServerType to ${type} ...`)
     container.bind(server.ServerType).toConstantValue(type);
     console.log(`Initialization MiaoScript Package @ms/core @ms/${type}. Please wait...`)
     require(`@ms/${type}`).default(container);
@@ -90,4 +86,4 @@ function init() {
     return disable;
 }
 
-export default init();
+export default initialize();
