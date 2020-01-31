@@ -1,0 +1,34 @@
+{
+    "name": "@ms/websocket",
+    "version": "0.1.1",
+    "description": "MiaoScript api package",
+    "keywords": [
+        "miaoscript",
+        "minecraft",
+        "bukkit",
+        "sponge"
+    ],
+    "author": "MiaoWoo <admin@yumc.pw>",
+    "homepage": "https://github.com/circlecloud/ms.git",
+    "license": "ISC",
+    "main": "dist/index.js",
+    "publishConfig": {
+        "registry": "https://repo.yumc.pw/repository/npm-hosted/"
+    },
+    "scripts": {
+        "clean": "rimraf dist",
+        "watch": "npx tsc --watch",
+        "build": "yarn clean && npx tsc",
+        "test": "echo \"Error: run tests from root\" && exit 1"
+    },
+    "devDependencies": {
+        "reflect-metadata": "^0.1.13",
+        "rimraf": "^3.0.0",
+        "typescript": "^3.7.4"
+    },
+    "dependencies": {
+        "@ms/api": "^0.1.1",
+        "@ms/common": "^0.1.0"
+    },
+    "gitHead": "781524f83e52cad26d7c480513e3c525df867121"
+}
