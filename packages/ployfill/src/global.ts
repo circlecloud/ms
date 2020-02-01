@@ -1,4 +1,3 @@
-import { XMLHttpRequest as xhr } from './xml-http-request'
 declare global {
     namespace NodeJS {
         interface Global {
@@ -13,7 +12,6 @@ declare global {
     }
     var root: string;
     var base: Core;
-    var XMLHttpRequest: typeof xhr;
     var ScriptEngineContextHolder: any;
     function engineLoad(str: string): any;
     interface Core {
