@@ -18,13 +18,13 @@ interface RequestConfig {
 }
 
 function request(config: RequestConfig) {
+    // @ts-ignore
     let xhr = new XMLHttpRequest();
     xhr.open(config.method, config.url, false);
     for (const header in config.headers) {
         xhr.setRequestHeader(header, config.headers[header]);
     }
     let future = xhr.send(config.data);
-    // @ts-ignore
     return future.get();
 }
 
