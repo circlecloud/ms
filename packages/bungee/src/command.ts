@@ -2,10 +2,14 @@ import { command, plugin } from "@ms/api";
 import { inject, injectable } from "@ms/container";
 import * as ref from '@ms/common/dist/reflect'
 
-const Command = Java.type('net.md_5.bungee.api.plugin.Command');
+const Arrays = Java.type('java.util.Arrays')
+const Command = Java.extend(Java.type('net.md_5.bungee.api.plugin.Command'), Java.type('net.md_5.bungee.api.plugin.TabExecutor'));
 const createCommand = eval(`
-            function(cls, name, exec){
-                return new cls(name) {execute:exec}
+            function(cls, name, exec, tab){
+                return new cls(name) {
+                    execute: exec,
+                    onTabComplete: tab
+                }
             }
         `)
 
@@ -13,13 +17,18 @@ class SimpleCommand {
     public callable: any;
     private name: string;
     private executor: Function;
+    private tabComplete: Function = () => [];
 
     constructor(command: string) {
         this.name = command;
-        this.callable = createCommand(Command, command, (sender, args) => this.executor(sender, '', command, args));
+        this.callable = createCommand(Command, command,
+            (sender, args) => this.executor(sender, '', command, args),
+            (sender, args) => Arrays.asList(this.tabComplete(sender, '', command, args))
+        );
     }
 
     setExecutor = (executor: Function) => this.executor = executor;
+    setTabComplete = (tabComplete: Function) => this.tabComplete = tabComplete;
     toString = () => `Bungee SimpleCommand(${this.name})`
 }
 
@@ -48,7 +57,7 @@ export class BungeeCommand extends command.Command {
         command.setExecutor(super.setExecutor(plugin, command, executor));
     }
     onTabComplete(plugin: any, command: any, tabCompleter: Function) {
-        console.warn(`[${plugin.description.name}] command ${command.name} register tab failed. BungeeCord not support !`)
+        command.setTabComplete(super.setTabCompleter(plugin, command, tabCompleter))
     }
 
     private getCommandKey(plugin: any, command: string) {
