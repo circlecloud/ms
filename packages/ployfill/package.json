@@ -17,7 +17,8 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
-        "@ms/nashorn": "^0.1.0"
+        "@ms/nashorn": "^0.1.0",
+        "core-js": "^3.6.4"
     },
     "devDependencies": {
         "reflect-metadata": "^0.1.13",
