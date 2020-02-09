@@ -138,22 +138,6 @@ export class MiaoChat extends interfaces.Plugin {
     private PlaceholderAPI: { setPlaceholders: (player: any, str: string) => string };
 
     load() {
-        if (!Object.values) {
-            Object.defineProperty(Object, "values", {
-                enumerable: false,
-                configurable: true,
-                writable: true,
-                value: function(target) {
-                    "use strict";
-                    var values = [];
-                    for (var key in target) {
-                        var desc = Object.getOwnPropertyDescriptor(target, key);
-                        if (desc !== undefined && desc.enumerable) values.push(target[key]);
-                    }
-                    return values;
-                }
-            });
-        }
         this.chatFormats = Object.values(this.config.ChatFormats);
         this.chatFormats.sort(this.compare('index'));
         this.initFormat(this.chatFormats);

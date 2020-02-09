@@ -1,3 +1,4 @@
+// Nashorn JSAdapter See https://wiki.openjdk.java.net/display/Nashorn/Nashorn+extensions#Nashornextensions-JSAdapterconstructor
 let createProxy = eval(`
     function(handle){ return new JSAdapter(handle) }
 `)
