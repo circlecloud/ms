@@ -14,6 +14,8 @@ const GZIPOutputStream = Java.type("java.util.zip.GZIPOutputStream");
 const Consumer = Java.type("java.util.function.Consumer");
 const ByteArray = Java.type("byte[]")
 
+const BiConsumer = Java.type('java.util.function.BiConsumer')
+
 class MiaoMessage {
     // public static final String CHANNEL = "MiaoChat:Default".toLowerCase();
     public static CHANNEL: string = "MiaoChat:Default".toLowerCase()
@@ -287,11 +289,13 @@ export class MiaoChat extends interfaces.Plugin {
         let event = e as net.md_5.bungee.api.event.PluginMessageEvent
         if (event.getTag() == MiaoMessage.CHANNEL || event.getTag() == MiaoMessage.NORMAL_CHANNEL) {
             let origin = event.getSender().getAddress();
-            bungee.getServers().forEach(server => {
-                if (server.getAddress() != origin && server.getPlayers().size() > 0) {
-                    server.sendData(event.getTag(), event.getData())
+            bungee.getServers().forEach(new BiConsumer({
+                accept: (s, server) => {
+                    if (server.getAddress() != origin && server.getPlayers().size() > 0) {
+                        server.sendData(event.getTag(), event.getData())
+                    }
                 }
-            });
+            }))
         }
     }
 
