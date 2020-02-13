@@ -5,6 +5,11 @@ var packetTypeConstructor;
 var nmsChatMessageTypeClass;
 var chatMessageTypes;
 
+var RemapUtils;
+
+var playerConnectionFieldName;
+var sendPacketMethod;
+
 var downgrade = false;
 /**
  * 获取NMS版本
@@ -18,13 +23,37 @@ function nmsCls(name) {
     return base.getClass(['net.minecraft.server', nmsVersion, name].join('.'))
 }
 
-function init() {
-    nmsChatSerializerClass = nmsCls(nmsVersion.split("_")[1] > 7 ? "IChatBaseComponent$ChatSerializer" : "ChatSerializer");
+function remapMethod(clazz: any, origin: string, test: string, params) {
     try {
-        nmsChatSerializerMethod = nmsChatSerializerClass.getMethod('a', base.getClass('java.lang.String'))
+        return clazz.getMethod(origin, params)
     } catch (ex) {
-        nmsChatSerializerMethod = nmsChatSerializerClass.getMethod('func_150699_a', base.getClass('java.lang.String'))
+        if (RemapUtils) {
+            return clazz.getMethod(RemapUtils.mapMethod(clazz, origin, params), params)
+        } else {
+            return clazz.getMethod(test, params)
+        }
     }
+}
+
+function remapFieldName(clazz: any, origin: string, test: string) {
+    try {
+        return clazz.getField(origin)
+    } catch (ex) {
+        if (RemapUtils) {
+            return clazz.getField(RemapUtils.mapFieldName(clazz, origin))
+        } else {
+            return clazz.getField(test)
+        }
+    }
+}
+
+function init() {
+    try {
+        RemapUtils = Java.type('catserver.server.remapper.RemapUtils');
+    } catch (ex) {
+    }
+    nmsChatSerializerClass = nmsCls(nmsVersion.split("_")[1] > 7 ? "IChatBaseComponent$ChatSerializer" : "ChatSerializer");
+    nmsChatSerializerMethod = remapMethod(nmsChatSerializerClass, 'a', 'func_150699_a', base.getClass('java.lang.String'))
     var packetTypeClass = nmsCls("PacketPlayOutChat");
     Java.from(packetTypeClass.constructors).forEach(function(c) {
         if (c.parameterTypes.length === 2) {
@@ -46,6 +75,11 @@ function init() {
                 break;
         }
     }
+    var entityPlayerClass = nmsCls('EntityPlayer');
+    var packetClass = nmsCls('Packet');
+    var playerConnectionField = remapFieldName(entityPlayerClass, 'playerConnection', 'field_71135_a')
+    playerConnectionFieldName = playerConnectionField.getName()
+    sendPacketMethod = remapMethod(playerConnectionField.getType(), 'sendPacket', 'func_179290_a', packetClass)
 }
 
 function json(sender, json) {
@@ -63,7 +97,7 @@ function send(sender, json, type) {
 }
 
 function sendPacket(player, p) {
-    player.handle.playerConnection.sendPacket(p);
+    sendPacketMethod.invoke(player.handle[playerConnectionFieldName], p)
 }
 
 try {
