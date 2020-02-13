@@ -96,8 +96,7 @@ export class BungeeEvent extends event.Event {
             let prioritiesMap = this.byListenerAndPriority.get(eventCls);
             if (prioritiesMap != null) {
                 let bindings = reflect.on(listener).get("bindings").get();
-                // Can't read hash map so need serialize and deserialize
-                let priority = JSON.parse(JSON.stringify(bindings))["priority"];
+                let priority = bindings["priority"];
                 // Map<监听器, 方法[]>
                 let currentPriorityMap = prioritiesMap.get(priority);
                 if (currentPriorityMap != null) {
