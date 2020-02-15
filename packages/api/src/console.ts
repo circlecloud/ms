@@ -1,6 +1,11 @@
-let Arrays = Java.type('java.util.Arrays');
-let Level = Java.type('java.util.logging.Level');
-let ignoreLogPrefix = ['java.', 'net.minecraft.', 'org.bukkit.', 'jdk.nashorn.', 'io.netty.', 'org.spongepowered.'];
+import { SourceMapBuilder } from 'source-map-builder'
+
+const Arrays = Java.type('java.util.Arrays');
+const Level = Java.type('java.util.logging.Level');
+const JavaString = Java.type('java.lang.String');
+const Files = Java.type('java.nio.file.Files');
+const Paths = Java.type('java.nio.file.Paths');
+const ignoreLogPrefix = ['java.', 'net.minecraft.', 'org.bukkit.', 'jdk.nashorn.', 'io.netty.', 'org.spongepowered.'];
 
 enum LogLevel {
     ALL,
@@ -16,6 +21,7 @@ enum LogLevel {
 export class MiaoScriptConsole implements Console {
     Console: NodeJS.ConsoleConstructor;
 
+    private sourceMaps: { [key: string]: SourceMapBuilder } = {};
     private _name: string = '';
     private _level: LogLevel = LogLevel.INFO;
 
@@ -87,14 +93,33 @@ export class MiaoScriptConsole implements Console {
         if (stack.class) {
             stack = Arrays.asList(stack)
         }
-        stack.forEach(function(trace) {
+        stack.forEach(trace => {
             if (trace.className.startsWith('<')) {
-                var fileName = trace.fileName
+                var fileName = trace.fileName;
+                var lineNumber = trace.lineNumber;
+                try {
+                    if (fileName.endsWith('js')) {
+                        var file = Paths.get(fileName + '.map');
+                        if (!this.sourceMaps[fileName]) {
+                            if (file.toFile().exists()) {
+                                var sourceMapObj = JSON.parse(new JavaString(Files.readAllBytes(file), "UTF-8"))
+                                this.sourceMaps[fileName] = new SourceMapBuilder(sourceMapObj)
+                            }
+                        }
+                        if (this.sourceMaps[fileName]) {
+                            var sourceMapping = this.sourceMaps[fileName].getSource(lineNumber, lineNumber);
+                            fileName = fileName.replace(".js", ".ts");
+                            lineNumber = sourceMapping.mapping.sourceLine;
+                        }
+                    }
+                } catch (error) {
+                    console.debug('search source map error:', error)
+                }
                 if (fileName.startsWith(root)) { fileName = fileName.split(root)[1] }
-                cache.push(`    §e->§c ${fileName} => §4${trace.methodName}:${trace.lineNumber}`)
+                cache.push(`    §e->§c ${fileName} => §4${trace.methodName}:${lineNumber}`)
             } else {
                 var className = trace.className;
-                var fileName = trace.fileName
+                var fileName = trace.fileName;
                 if (className.startsWith('jdk.nashorn.internal.scripts')) {
                     className = className.substr(className.lastIndexOf('$') + 1)
                     if (fileName.startsWith(root)) { fileName = fileName.split(root)[1] }
