@@ -6,7 +6,7 @@
         "module": "commonjs",
         "strict": true,
         "strictNullChecks": false,
-        "sourceMap": false,
+        "sourceMap": true,
         "declaration": true,
         "declarationMap": true,
         "noImplicitAny": false,
