@@ -86,6 +86,32 @@ export class MiaoScriptConsole implements Console {
     ex(ex: Error) {
         this.stack(ex).forEach(line => this.console(line))
     }
+    readSourceMap(fileName: string, lineNumber: number) {
+        try {
+            if (fileName.endsWith('js')) {
+                var file = Paths.get(fileName + '.map');
+                if (!this.sourceMaps[fileName]) {
+                    if (file.toFile().exists()) {
+                        var sourceMapObj = JSON.parse(new JavaString(Files.readAllBytes(file), "UTF-8"))
+                        this.sourceMaps[fileName] = new SourceMapBuilder(sourceMapObj)
+                    }
+                }
+                if (this.sourceMaps[fileName]) {
+                    var sourceMapping = this.sourceMaps[fileName].getSource(lineNumber, lineNumber);
+                    if (sourceMapping) {
+                        fileName = fileName.replace(".js", ".ts");
+                        lineNumber = sourceMapping.mapping.sourceLine;
+                    }
+                }
+            }
+        } catch (error) {
+            console.debug('search source map', fileName, 'line', lineNumber, 'error:', error)
+        }
+        return {
+            fileName,
+            lineNumber
+        }
+    }
     stack(ex: Error): string[] {
         var stack = ex.getStackTrace();
         var cache = ['§4' + ex];
@@ -95,33 +121,15 @@ export class MiaoScriptConsole implements Console {
         }
         stack.forEach(trace => {
             if (trace.className.startsWith('<')) {
-                var fileName = trace.fileName;
-                var lineNumber = trace.lineNumber;
-                try {
-                    if (fileName.endsWith('js')) {
-                        var file = Paths.get(fileName + '.map');
-                        if (!this.sourceMaps[fileName]) {
-                            if (file.toFile().exists()) {
-                                var sourceMapObj = JSON.parse(new JavaString(Files.readAllBytes(file), "UTF-8"))
-                                this.sourceMaps[fileName] = new SourceMapBuilder(sourceMapObj)
-                            }
-                        }
-                        if (this.sourceMaps[fileName]) {
-                            var sourceMapping = this.sourceMaps[fileName].getSource(lineNumber, lineNumber);
-                            fileName = fileName.replace(".js", ".ts");
-                            lineNumber = sourceMapping.mapping.sourceLine;
-                        }
-                    }
-                } catch (error) {
-                    console.debug('search source map error:', error)
-                }
+                var { fileName, lineNumber } = this.readSourceMap(trace.fileName, trace.lineNumber)
                 if (fileName.startsWith(root)) { fileName = fileName.split(root)[1] }
                 cache.push(`    §e->§c ${fileName} => §4${trace.methodName}:${lineNumber}`)
             } else {
                 var className = trace.className;
-                var fileName = trace.fileName;
+                var fileName = trace.fileName as string;
                 if (className.startsWith('jdk.nashorn.internal.scripts')) {
                     className = className.substr(className.lastIndexOf('$') + 1)
+                    var { fileName, lineNumber } = this.readSourceMap(trace.fileName, trace.lineNumber)
                     if (fileName.startsWith(root)) { fileName = fileName.split(root)[1] }
                 } else {
                     for (var prefix in ignoreLogPrefix) {
