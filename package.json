@@ -6,13 +6,13 @@
     "author": "MiaoWoo <admin@yumc.pw>",
     "license": "MIT",
     "scripts": {
-        "bs": "npx lerna bootstrap",
-        "clean": "npx lerna run clean",
-        "watch": "npx lerna run watch --parallel --scope='@ms/!(manager)'",
-        "build": "npx lerna run build --scope='@ms/!(plugins|manager)'",
-        "build:plugins": "npx lerna run build --scope=@ms/plugins",
+        "bs": "lerna bootstrap",
+        "clean": "lerna run clean",
+        "watch": "lerna run watch --parallel --scope=\"@ms/!(manager)\"",
+        "build": "lerna run build --scope=\"@ms/!(plugins|manager)\"",
+        "build:plugins": "lerna run build --scope=\"@ms/plugins\"",
         "ug": "yarn upgrade-interactive --latest",
-        "lp": "npx lerna publish"
+        "lp": "lerna publish"
     },
     "workspaces": [
         "packages/*"
