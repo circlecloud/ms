@@ -1,0 +1,33 @@
+{
+    "name": "@ms/client",
+    "version": "0.1.0",
+    "description": "MiaoScript client package",
+    "keywords": [
+        "miaoscript",
+        "minecraft",
+        "bukkit",
+        "sponge"
+    ],
+    "author": "MiaoWoo <admin@yumc.pw>",
+    "homepage": "https://github.com/circlecloud/ms.git",
+    "license": "ISC",
+    "main": "dist/index.js",
+    "publishConfig": {
+        "registry": "https://repo.yumc.pw/repository/npm-hosted/"
+    },
+    "scripts": {
+        "dev": "ts-node-dev --respawn --debounce=1500 src/index.ts",
+        "clean": "rimraf dist",
+        "watch": "tsc --watch",
+        "build": "yarn clean && tsc",
+        "test": "echo \"Error: run tests from root\" && exit 1"
+    },
+    "dependencies": {
+        "minecraft-protocol": "^1.11.0"
+    },
+    "devDependencies": {
+        "@nestjs/cli": "^6.14.2",
+        "rimraf": "^3.0.2",
+        "typescript": "^3.7.5"
+    }
+}
