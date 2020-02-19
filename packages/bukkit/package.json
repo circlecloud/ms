@@ -17,8 +17,8 @@
     },
     "scripts": {
         "clean": "rimraf dist",
-        "watch": "npx tsc --watch",
-        "build": "yarn clean && npx tsc",
+        "watch": "tsc --watch",
+        "build": "yarn clean && tsc",
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "devDependencies": {
