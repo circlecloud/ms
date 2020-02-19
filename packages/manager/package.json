@@ -16,10 +16,10 @@
         "registry": "https://repo.yumc.pw/repository/npm-hosted/"
     },
     "scripts": {
-        "dev": "npx ts-node-dev --respawn --debounce=1500 src/index.ts",
+        "dev": "ts-node-dev --respawn --debounce=1500 src/index.ts",
         "clean": "rimraf dist",
-        "watch": "npx tsc --watch",
-        "build": "yarn clean && npx tsc",
+        "watch": "tsc --watch",
+        "build": "yarn clean && tsc",
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
