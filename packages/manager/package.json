@@ -1,7 +1,8 @@
 {
+    "private": true,
     "name": "@ms/manager",
     "version": "0.1.0",
-    "description": "MiaoScript compile package",
+    "description": "MiaoScript manager package",
     "keywords": [
         "miaoscript",
         "minecraft",
