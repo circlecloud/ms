@@ -2,7 +2,7 @@ import { plugin, server, command, event } from '@ms/api'
 import { injectable, inject, postConstruct, Container, ContainerInstance } from '@ms/container'
 import * as fs from '@ms/common/dist/fs'
 
-import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPlugin, getPluginTabCompleterMetadata } from './utils'
+import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPlugin, getPluginTabCompleterMetadata, getPluginConfigMetadata } from './utils'
 import { interfaces } from './interfaces'
 
 @injectable()
@@ -53,6 +53,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
             this.logStage(plugin, "Loading")
             this.runCatch(plugin, 'load')
             this.runCatch(plugin, `${this.serverType}load`)
+            this.loadConfig(plugin)
         })
     }
 
@@ -110,7 +111,8 @@ export class PluginManagerImpl implements plugin.PluginManager {
         var files = []
         console.info(`Scanning Plugins in ${plugin} ...`)
         this.checkUpdateFolder(plugin)
-        fs.list(plugin).forEach((file: any) => files.push(file.toFile()))
+        // must check file is exist maybe is a illegal symbolic link file
+        fs.list(plugin).forEach((file: any) => file.toFile().exists() ? files.push(file.toFile()) : void 0)
         return files
     }
 
@@ -193,6 +195,11 @@ export class PluginManagerImpl implements plugin.PluginManager {
         } catch{
             this.container.bind(plugin.Plugin).to(metadata.target).inSingletonScope().whenTargetNamed(metadata.name)
         }
+    }
+
+    private loadConfig(pluginInstance: interfaces.Plugin) {
+        let configs = getPluginConfigMetadata(pluginInstance);
+
     }
 
     private registryCommand(pluginInstance: interfaces.Plugin) {
