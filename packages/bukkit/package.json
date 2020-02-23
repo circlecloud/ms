@@ -1,7 +1,7 @@
 {
     "name": "@ms/bukkit",
     "version": "0.2.0",
-    "description": "MiaoScript api package",
+    "description": "MiaoScript bukkit package",
     "keywords": [
         "miaoscript",
         "minecraft",

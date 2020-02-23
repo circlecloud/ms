@@ -1,6 +1,7 @@
 /// <reference types="@ms/types/dist/typings/bukkit" />
 /// <reference types="@ms/types/dist/typings/sponge" />
 /// <reference types="@ms/types/dist/typings/bungee" />
+/// <reference types="@ms/types/dist/typings/nukkit" />
 
 import { server } from '@ms/api';
 import { inject } from '@ms/container';
@@ -62,7 +63,7 @@ export class HelloWorld extends interfaces.Plugin {
         return ['world']
     }
 
-    @listener({ servers: ['bukkit'] })
+    @listener({ servers: ['bukkit', 'nukkit'] })
     PlayerJoin(event: org.bukkit.event.player.PlayerJoinEvent) {
         let plyaer = event.getPlayer();
         this.logger.console(`§cBukkit §aPlayerJoinEvent: §b${plyaer.getName()}`)
