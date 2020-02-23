@@ -1,5 +1,6 @@
 /// <reference types="@ms/types/dist/typings/bukkit" />
 /// <reference types="@ms/types/dist/typings/sponge" />
+/// <reference types="@ms/types/dist/typings/bungee" />
 
 import { server, plugin as pluginApi } from '@ms/api'
 import { inject } from '@ms/container';
