@@ -19,7 +19,6 @@ export class BukkitCommand extends command.Command {
     init() {
         this.commandMap = reflect.on(Bukkit.getPluginManager()).get('commandMap').get();
     }
-
     create(plugin: any, command: string) {
         var cmd = this.commandMap.getCommand(command)
         if (cmd && cmd instanceof PluginCommand) { return cmd };
