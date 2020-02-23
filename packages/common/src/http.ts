@@ -24,8 +24,11 @@ function request(config: RequestConfig) {
     for (const header in config.headers) {
         xhr.setRequestHeader(header, config.headers[header]);
     }
-    let future = xhr.send(config.data);
-    return future.get();
+    xhr.send(config.data);
+    if ((xhr.getResponseHeader("Content-Type") + '').indexOf('application/json') != -1) {
+        xhr.responseType = "json"
+    }
+    return xhr.get();
 }
 
 function _proxy(method: Method) {

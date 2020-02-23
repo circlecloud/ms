@@ -80,7 +80,7 @@ export class MiaoScriptConsole implements Console {
     }
     object(obj) {
         for (var i in obj) {
-            this.logger(i, '=>', obj[i])
+            this.info(i, '=>', obj[i])
         }
     }
     ex(ex: Error) {
