@@ -1,53 +1,61 @@
 import { createInterface } from 'readline'
 import { createClient } from 'minecraft-protocol'
 
-import { $ } from './color'
 import { attachForge } from './forge'
+import { attachEvents } from './event'
 
-let client = createClient({
-    version: '1.12.2',
-    host: '192.168.2.5',
-    port: 25577,
-    username: process.argv[2] || 'Mr_jtb',
-    skipValidation: true
-})
+let username = process.argv[2] || 'Mr_jtb'
+let client = createConnection('192.168.2.5', 25577, username)
 
-attachForge(client)
+function createConnection(host: string, port: number, username: string) {
+    let client = createClient({
+        version: '1.12.2',
+        host,
+        port,
+        username,
+        skipValidation: true
+    })
 
-client.on('chat', (packet) => {
-    // Listen for chat messages and echo them back.
-    var jsonMsg = JSON.parse(packet.message);
-    console.log($(jsonMsg))
-})
+    attachForge(client)
+    attachEvents(client)
+    return client;
+}
 
-client.on('state', (newState, oldState) => {
-    console.log('Client Change State', oldState, 'to', newState)
-    let targetServer = process.argv[3]
-    if (newState == "play" && targetServer) {
-        setTimeout(() => {
-            client.write('chat', {
-                message: '/server ' + targetServer
-            })
-        }, 3000)
-    }
+client.on('end', (resone) => {
+    console.log("Client End Resone:", resone)
+    client = createConnection('192.168.2.5', 25577, username)
 })
 
 const rl = createInterface({
     input: process.stdin,
     output: process.stdout,
-    terminal: false
+    terminal: true,
+    prompt: ''
 })
 
 rl.on('line', function(line) {
-    if (line === '') {
-        return
-    } else if (line === '/quit') {
-        console.info('Disconnected')
-        client.end("")
-        return
-    } else if (line === '/end') {
-        console.info('Forcibly ended client')
-        process.exit(0)
+    switch (line) {
+        case "":
+            break;
+        case "/respawn":
+            client.write('client_command', { payload: 0 })
+            // client.write("respawn", {
+
+            // })
+            break;
+        case "//reco":
+            client.end("")
+            client = createConnection('192.168.2.5', 25577, username)
+            break;
+        case "//quit":
+            console.info('Disconnected')
+            client.end("")
+            break;
+        case "//end":
+            console.info('Forcibly ended client')
+            process.exit(0)
+        default:
+            client.write('chat', { message: line })
     }
-    client.write('chat', { message: line })
+    rl.prompt()
 })

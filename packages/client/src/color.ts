@@ -87,7 +87,11 @@ function $(input: any) {
     if (typeof input === "string") {
         input = JSON.parse(input)
     }
-    return mcColor2ANSI(json2text(input) + '§r')
+    input = json2text(input) + '§r'
+    if (input.startsWith('§卐')) {
+        input = input.substring(2)
+    }
+    return mcColor2ANSI(input)
 }
 
 export {
