@@ -114,7 +114,7 @@ export class XMLHttpRequest {
         return this._statusText;
     }
     get response() {
-        return JSON.parse(this._response);
+        return this._response ? JSON.parse(this._response) : this._response;
     }
     get responseText() {
         return this._response;
@@ -174,6 +174,16 @@ export class XMLHttpRequest {
         if (!this._async) { future.get() }
         return future;
     }
+    get() {
+        switch (this._responseType) {
+            case "json":
+                return this.response;
+            case "text":
+                return this.responseText;
+            default:
+                throw Error(`Unsupport ResponseType: ${this._responseType} !`)
+        }
+    }
     abort() {
         this._connection.disconnect();
         this.onabort();
@@ -182,7 +192,6 @@ export class XMLHttpRequest {
     private _send(body?: string | object) {
         try {
             this._connection.connect();
-
             this.onloadstart();
             if (body) {
                 let bodyType = Object.prototype.toString.call(body);
@@ -204,14 +213,6 @@ export class XMLHttpRequest {
                 this._response = this.readOutput(this._connection.getErrorStream());
             }
             this.onloadend();
-            switch (this._responseType) {
-                case "json":
-                    return this.response;
-                case "text":
-                    return this.responseText;
-                default:
-                    throw Error(`Unsupport ResponseType: ${this._responseType} !`)
-            }
         } catch (ex) {
             if (ex instanceof SocketTimeoutException && this.ontimeout) {
                 return this.ontimeout(ex)
