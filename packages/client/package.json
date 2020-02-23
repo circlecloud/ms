@@ -1,4 +1,5 @@
 {
+    "private": true,
     "name": "@ms/client",
     "version": "0.1.0",
     "description": "MiaoScript client package",
