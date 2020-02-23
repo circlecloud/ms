@@ -7,6 +7,7 @@ import { interfaces, plugin, cmd, tab } from '@ms/plugin'
 let help = [
     '§6========= §6[§aMiaoScriptPackageManager§6] 帮助 §aBy §b喵♂呜 §6=========',
     '§6/mpm §ainstall §e<插件名称> §6- §3安装插件',
+    '§6/mpm §auninstall §e<插件名称> §6- §3卸载插件',
     '§6/mpm §alist [install]§6- §3列出仓库插件[已安装的插件]',
     '§6/mpm §aupdate §e<插件名称> §6- §3更新插件(无插件名称则更新源)',
     '§6/mpm §aupgrade §e<插件名称> §6- §3及时更新插件(update需要重启生效)',
@@ -68,6 +69,8 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
                 //     console.sender(sender, '§c请输入插件名称!')
                 // }
                 break;
+            case "uninstall":
+                break;
             case "update":
                 // if (args.length > 1) {
                 //     update(sender, args[1]);
@@ -87,6 +90,29 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
                 // } else {
                 //     console.sender(sender, '§c请输入插件名称!')
                 // }
+                break;
+            case "load":
+                if (args.length > 1) {
+                    var pname = args[1];
+                    if (!this.pluginManager.getPlugins().has(pname)) {
+                        this.logger.sender(sender, `§6插件 §b${pname} §c不存在!`)
+                        return
+                    }
+                    this.pluginManager.load(pname)
+                    this.pluginManager.enable(pname)
+                    this.logger.sender(sender, `§6插件 §b${pname} §a已加载!`)
+                }
+                break;
+            case "unload":
+                if (args.length > 1) {
+                    var pname = args[1];
+                    if (!this.pluginManager.getPlugins().has(pname)) {
+                        this.logger.sender(sender, `§6插件 §b${pname} §c不存在!`)
+                        return
+                    }
+                    this.pluginManager.disable(pname)
+                    this.logger.sender(sender, `§6插件 §b${pname} §a已卸载!`)
+                }
                 break;
             case "reload":
                 if (args.length > 1) {
@@ -155,6 +181,8 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
                     return this.packageNameCache;
                 case "update":
                 case "upgrade":
+                case "load":
+                case "unload":
                 case "reload":
                     return [...this.pluginManager.getPlugins().keys()];
             }
