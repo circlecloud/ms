@@ -1,6 +1,6 @@
 {
     "name": "@ms/sponge",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "description": "MiaoScript api package",
     "keywords": [
         "miaoscript",
@@ -27,9 +27,9 @@
         "typescript": "^3.7.5"
     },
     "dependencies": {
-        "@ms/api": "^0.1.1",
-        "@ms/common": "^0.1.0",
-        "@ms/container": "^0.1.0",
-        "@ms/types": "^0.1.1"
+        "@ms/api": "^0.2.0",
+        "@ms/common": "^0.2.0",
+        "@ms/container": "^0.2.0",
+        "@ms/types": "^0.2.0"
     }
 }

@@ -1,6 +1,6 @@
 {
     "name": "@ms/websocket",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "description": "MiaoScript api package",
     "keywords": [
         "miaoscript",
@@ -27,8 +27,8 @@
         "typescript": "^3.7.5"
     },
     "dependencies": {
-        "@ms/api": "^0.1.1",
-        "@ms/common": "^0.1.0"
+        "@ms/api": "^0.2.0",
+        "@ms/common": "^0.2.0"
     },
     "gitHead": "781524f83e52cad26d7c480513e3c525df867121"
 }
