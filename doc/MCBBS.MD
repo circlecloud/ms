@@ -91,13 +91,22 @@
     ├─api         全平台兼容的接口
     ├─core        核心代码 用于引导加载
     ├─common      公共类库代码 例如 http reflect 模块
+    ├─client      NodeJS的Minecraft客户端 用于调试插件
     ├─container   IOC容器 用于注入具体实现
+    ├─ployfill    Nashorn 的一些自定义增强
     ├─nashorn     Nashorn 的类型定义
+    ├─bungee      BungeeCordAPI内部实现
     ├─bukkit      BukkitAPI内部实现
     ├─sponge      SpongeAPI内部实现
     ├─ployfill    JS环境的相关环境补全
     ├─plugin      插件管理器
+    ├─type        Java的类型定义
+    |   ├─bungee  BungeeCord类型定义
+    |   ├─bukkit  Bukkit类型定义
+    |   └─sponge  Sponge类型定义
+    ├─websocket   Netty的WebSocket注入
     └─plugins     这里当然是插件啦
+        ├─bungee  只兼容BungeeCord的插件
         ├─bukkit  只兼容Bukkit的插件
         └─sponge  只兼容Sponge的插件
 ```
@@ -134,21 +143,27 @@ Github: https://github.com/circlecloud/ms
 先来一个 `HelloWorld.ts` 插件示范!
 
 ```ts
-/// <reference types="@ms/bukkit/dist/typings" />
-/// <reference types="@ms/sponge/dist/typings" />
+/// <reference types="@ms/types/dist/typings/bukkit" />
+/// <reference types="@ms/types/dist/typings/sponge" />
+/// <reference types="@ms/types/dist/typings/bungee" />
 
+import { server } from '@ms/api';
+import { inject } from '@ms/container';
 import { plugin, interfaces, cmd, listener, tab } from '@ms/plugin'
 
 @plugin({ name: 'HelloWorld', version: '1.0.0', author: 'MiaoWoo', source: __filename })
 export class HelloWorld extends interfaces.Plugin {
+    @inject(server.Server)
+    private Server: server.Server
+
     load() {
-        this.logger.log('Test Plugin load from MiaoScript Plugin System...');
+        this.logger.log('Plugin load from MiaoScript Plugin System...');
     }
     enable() {
-        this.logger.log('Test Plugin enable from MiaoScript Plugin System...');
+        this.logger.log('Plugin enable from MiaoScript Plugin System...');
     }
     disable() {
-        this.logger.log('Test Plugin disable from MiaoScript Plugin System...');
+        this.logger.log('Plugin disable from MiaoScript Plugin System...');
     }
 
     bukkitload() {
@@ -171,6 +186,16 @@ export class HelloWorld extends interfaces.Plugin {
         this.logger.log('Disable When ServerType is Sponge!')
     }
 
+    bungeeload() {
+        this.logger.log('Load When ServerType is BungeeCord!')
+    }
+    bungeeenable() {
+        this.logger.log('Enable When ServerType is BungeeCord!')
+    }
+    bungeedisable() {
+        this.logger.log('Disable When ServerType is BungeeCord!')
+    }
+
     @cmd()
     hello(sender: any, command: string, args: string[]) {
         this.logger.log(sender, command, args);
@@ -182,25 +207,37 @@ export class HelloWorld extends interfaces.Plugin {
         return ['world']
     }
 
-    @listener({ servertype: 'bukkit' })
-    playerjoin(event: org.bukkit.event.player.PlayerJoinEvent) {
+    @listener({ servers: ['bukkit'] })
+    PlayerJoin(event: org.bukkit.event.player.PlayerJoinEvent) {
         let plyaer = event.getPlayer();
-        this.logger.console(`§aBukkit PlayerJoinEvent: §b${plyaer.getName()}`)
-        setTimeout(() => this.logger.sender(plyaer, `§a欢迎来到 §bMiaoScript §a的世界!`), 10);
+        this.logger.console(`§cBukkit §aPlayerJoinEvent: §b${plyaer.getName()}`)
+        setTimeout(() => this.sendWelcome(plyaer), 10);
     }
 
-    @listener({ servertype: 'sponge' })
-    clientconnectionevent$join(event: org.spongepowered.api.event.network.ClientConnectionEvent.Join) {
-        this.logger.console(`§aSponge ClientConnectionEvent.Join: §b${event.getTargetEntity().getName()}`)
-        setTimeout(() => this.logger.sender(event.getTargetEntity(), `§a欢迎来到 §bMiaoScript §a的世界!`), 10);
+    @listener({ servers: ['sponge'] })
+    ClientConnectionEvent$Join(event: org.spongepowered.api.event.network.ClientConnectionEvent.Join) {
+        this.logger.console(`§cSponge §aClientConnectionEvent.Join: §b${event.getTargetEntity().getName()}`)
+        setTimeout(() => this.sendWelcome(event.getTargetEntity()), 10);
+    }
+
+    private sendWelcome(player: any) {
+        this.logger.sender(player, `§a欢迎来到 §bMiaoScript §a的世界!`)
+        this.logger.sender(player, `§6当前版本: §c${this.Server.getVersion()}`)
+    }
+
+    @listener({ servers: ['bungee'] })
+    ServerConnected(e: any) {
+        let event = e as net.md_5.bungee.api.event.ServerConnectedEvent
+        this.logger.console(`§cBungeeCord §aServerConnectedEvent: §b${event.getPlayer().getDisplayName()}`)
+        setTimeout(() => this.logger.sender(event.getPlayer(), `§a欢迎来到 §bMiaoScript §a的世界 §6来自 §cBungeeCord §6的问候!`), 10);
     }
 }
-
 ```
 
 - 进入 `ms`目录
 - 执行编译 `yarn build:plugins`
 - 从 `packages/plugins/dist` 中复制 `HelloWorld.js` 文件 到对应的插件目录
+  - Bungee: plugins/MiaoScript/plugins/
   - Bukkit: plugins/MiaoScript/plugins/
   - Sponge: config/miaoscript/plugins/
 - 重载 `MiaoScript`
@@ -275,12 +312,13 @@ MiaoScript针对不同的服务端 提供了扩展的周期
 命令 就是玩家在Minecraft中执行命令 下面是一个示例的命令
 
 - 命令是一个 `function` 通过 `@cmd` 注解注册
+- 由于不同的服务端有不同的逻辑 所以支持通过 `servers` 指定注册的类型 加上 `!` 代表不注册 不指定 `servers` 则注册所有的类型
 - 命令注册时默认使用方法名称为命令名称 当前你可以传入 name 参数指定命令名称 例如 `{name: 'test'}` 
 - 接受三个参数 `sender: any, command: string, args: string[]`
 - 分别代表 命令发送者 命令名称 命令参数
 
 ```ts
-@cmd()
+@cmd({ servers: ["bukkit", "sponge", "!bungee"] })
 hello(sender: any, command: string, args: string[]) {
     this.logger.log(sender, command, args);
     this.logger.sender(sender, JSON.stringify({ command, args }));
@@ -291,7 +329,7 @@ hello(sender: any, command: string, args: string[]) {
 
 补全就是 玩家在Minecraft执行命令时 使用 Tab键 补全
 
-- 补全是一个 `functio` 一般以 `tab` 开头 需要补全的命令结尾 通过 `@tab` 注解注册
+- 补全是一个 `function` 一般以 `tab` 开头 需要补全的命令结尾 通过 `@tab` 注解注册
 - 补全注册时默认使用方法名称为补全名称 当前你可以传入 name 参数指定命令名称 例如 `{name: 'test'}` 
 - 接受三个参数 `sender: any, command: string, args: string[]`
 - 分别代表 命令发送者 命令名称 命令参数
@@ -310,6 +348,7 @@ tabhello(_sender: any, _command: string, _args: string[]) {
 事件是指 Minecraft 中发生的各种事情
 
 - 监听事件是一个 `function` 通过 `@listener` 注册
+- 由于不同的服务端有不同的逻辑 所以支持通过 `servers` 指定注册的类型 加上 `!` 代表不注册 不指定 `servers` 则注册所有的类型
 - 事件名称默认为方法名称
   - 所有类型服务端的事件 MiaoScript 都会进行一次映射 方便使用
   - 例如 `PlayerJoinEvent` 会映射为 `PlayerJoinEvent, playerjoinevent, playerjoin` 等
@@ -319,16 +358,29 @@ tabhello(_sender: any, _command: string, _args: string[]) {
 - 事件监听方法的第一个参数就是本次事件的具体内容 (这里就需要自己去查询对应的JavaDoc了)
 
 ```ts
-@listener({ servertype: 'bukkit' })
-playerjoin(event: any) {
-    this.logger.console(`§aBukkit PlayerJoinEvent: §b${event.player.name}`)
-    setTimeout(() => this.logger.sender(event.player, `§a欢迎来到 §bMiaoScript §a的世界!`), 10);
+@listener({ servers: ['bukkit'] })
+PlayerJoin(event: org.bukkit.event.player.PlayerJoinEvent) {
+    let plyaer = event.getPlayer();
+    this.logger.console(`§cBukkit §aPlayerJoinEvent: §b${plyaer.getName()}`)
+    setTimeout(() => this.sendWelcome(plyaer), 10);
 }
 
-@listener({ servertype: 'sponge' })
-clientconnectionevent$join(event: any) {
-    this.logger.console(`§aSponge ClientConnectionEvent.Join: §b${event.targetEntity.name}`)
-    setTimeout(() => this.logger.sender(event.targetEntity, `§a欢迎来到 §bMiaoScript §a的世界!`), 10);
+@listener({ servers: ['sponge'] })
+ClientConnectionEvent$Join(event: org.spongepowered.api.event.network.ClientConnectionEvent.Join) {
+    this.logger.console(`§cSponge §aClientConnectionEvent.Join: §b${event.getTargetEntity().getName()}`)
+    setTimeout(() => this.sendWelcome(event.getTargetEntity()), 10);
+}
+
+private sendWelcome(player: any) {
+    this.logger.sender(player, `§a欢迎来到 §bMiaoScript §a的世界!`)
+    this.logger.sender(player, `§6当前版本: §c${this.Server.getVersion()}`)
+}
+
+@listener({ servers: ['bungee'] })
+ServerConnected(e: any) {
+    let event = e as net.md_5.bungee.api.event.ServerConnectedEvent
+    this.logger.console(`§cBungeeCord §aServerConnectedEvent: §b${event.getPlayer().getDisplayName()}`)
+    setTimeout(() => this.logger.sender(event.getPlayer(), `§a欢迎来到 §bMiaoScript §a的世界 §6来自 §cBungeeCord §6的问候!`), 10);
 }
 ```
 
