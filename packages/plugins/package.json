@@ -1,7 +1,7 @@
 {
     "private": true,
     "name": "@ms/plugins",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "description": "MiaoScript plugins package",
     "keywords": [
         "miaoscript",
@@ -28,7 +28,7 @@
         "typescript": "^3.7.5"
     },
     "dependencies": {
-        "@ms/plugin": "^0.1.1",
+        "@ms/plugin": "^0.2.0",
         "axios": "^0.19.2",
         "es6-map": "^0.1.5",
         "inversify": "^5.0.1"
