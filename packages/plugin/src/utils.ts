@@ -49,6 +49,14 @@ function getPluginListenerMetadata(target: any) {
     return listnerMetadata;
 }
 
+function getPluginConfigMetadata(target: any) {
+    let configMetadata: Map<string, interfaces.ConfigMetadata> = Reflect.getMetadata(
+        METADATA_KEY.config,
+        target.constructor
+    ) || new Map<string, interfaces.ConfigMetadata>();
+    return configMetadata;
+}
+
 export {
     getPlugin,
     getPlugins,
@@ -57,4 +65,5 @@ export {
     getPluginCommandMetadata,
     getPluginTabCompleterMetadata,
     getPluginListenerMetadata,
+    getPluginConfigMetadata
 }

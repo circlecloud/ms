@@ -3,4 +3,5 @@ export const METADATA_KEY = {
     cmd: "@ms/plugin:cmd",
     tab: "@ms/plugin:tab",
     listener: "@ms/plugin:listener",
+    config: "@ms/plugin:config",
 };

@@ -60,5 +60,8 @@ export namespace interfaces {
     }
     export interface ListenerMetadata extends ExecMetadata {
     }
+    export interface ConfigMetadata extends BaseMetadata {
+        version?: number;
+    }
     export type PluginLike = Plugin | string;
 }
