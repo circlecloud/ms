@@ -62,6 +62,11 @@ function detectServer() {
     } catch (ex) {
     }
     try {
+        Java.type("cn.nukkit.Nukkit");
+        return 'nukkit'
+    } catch (ex) {
+    }
+    try {
         Java.type("net.md_5.bungee.api.ProxyServer");
         return 'bungee'
     } catch (ex) {
