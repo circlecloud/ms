@@ -1,3 +1,5 @@
+.vscode
+.theia
 node_modules
 dist
 package-lock.json
