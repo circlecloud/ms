@@ -12,6 +12,8 @@ class MiaoScriptCore {
     private Console: Console;
     @inject(task.TaskManager)
     private taskManager: task.TaskManager;
+    @inject(plugin.PluginFolder)
+    private pluginFolder: string;
     @inject(plugin.PluginManager)
     private pluginManager: plugin.PluginManager;
 
@@ -38,7 +40,7 @@ class MiaoScriptCore {
     loadPlugins() {
         let loadPluginStartTime = new Date().getTime()
         console.log(`Initialization MiaoScript Plugin System. Please wait...`)
-        this.pluginManager.scan('plugins');
+        this.pluginManager.scan(this.pluginFolder);
         this.pluginManager.build();
         this.pluginManager.load();
         this.pluginManager.enable();
@@ -78,6 +80,7 @@ function initialize() {
     let corePackageStartTime = new Date().getTime()
     container.bind(ContainerInstance).toConstantValue(container);
     container.bind(plugin.PluginInstance).toConstantValue(base.getInstance());
+    container.bind(plugin.PluginFolder).toConstantValue('plugins');
     let type = detectServer();
     console.info(`Detect Compatible Server set ServerType to ${type} ...`)
     container.bind(server.ServerType).toConstantValue(type);
