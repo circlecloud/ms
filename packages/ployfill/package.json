@@ -1,6 +1,6 @@
 {
     "name": "@ms/ployfill",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "MiaoScript ployfill package",
     "author": "MiaoWoo <admin@yumc.pw>",
     "homepage": "https://github.com/circlecloud/ms.git",
@@ -17,7 +17,7 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
-        "@ms/nashorn": "^0.2.0",
+        "@ms/nashorn": "^0.2.1",
         "core-js": "^3.6.4"
     },
     "devDependencies": {
