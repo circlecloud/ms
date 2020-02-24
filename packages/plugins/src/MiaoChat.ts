@@ -2,7 +2,7 @@
 /// <reference types="@ms/types/dist/typings/sponge" />
 /// <reference types="@ms/types/dist/typings/bungee" />
 
-import { server, plugin as pluginApi } from '@ms/api'
+import { server, plugin as pluginApi, channel } from '@ms/api'
 import { inject } from '@ms/container';
 import { plugin, interfaces, cmd, listener, tab, config } from '@ms/plugin'
 import Tellraw from '@ms/common/dist/tellraw'
@@ -20,8 +20,6 @@ const BiConsumer = Java.type('java.util.function.BiConsumer')
 class MiaoMessage {
     // public static final String CHANNEL = "MiaoChat:Default".toLowerCase();
     public static CHANNEL: string = "MiaoChat:Default".toLowerCase()
-    // public static final String NORMAL_CHANNEL = "MiaoChat:Normal".toLowerCase();
-    public static NORMAL_CHANNEL: string = "MiaoChat:Normal".toLowerCase()
     // private static final int MAX_MESSAGE_LENGTH = 32000;
     private static MAX_MESSAGE_LENGTH = 32000;
 
@@ -60,9 +58,8 @@ export class MiaoChat extends interfaces.Plugin {
     private Server: server.Server
     @inject(server.ServerType)
     private ServerType: string
-
-    private spongeChannel: any;
-    private spongeListener: any;
+    @inject(channel.Channel)
+    private Channel: channel.Channel
 
     @config()
     private config = {
@@ -172,6 +169,9 @@ export class MiaoChat extends interfaces.Plugin {
                 return string;
             }
         }
+        this.Channel.listen(this, MiaoMessage.CHANNEL, (data) => {
+            this.sendChatAll(MiaoMessage.decode(data).json)
+        })
     }
 
     disable() {
@@ -186,20 +186,9 @@ export class MiaoChat extends interfaces.Plugin {
         } catch (ex) {
             this.logger.console("§cCan't found me.clip.placeholderapi.PlaceholderAPI variable will not be replaced! Err: " + ex)
         }
-        var Bukkit = org.bukkit.Bukkit;
-        var PluginMessageListener = Java.type("org.bukkit.plugin.messaging.PluginMessageListener")
-        Bukkit.getMessenger().registerIncomingPluginChannel(base.getInstance(), MiaoMessage.CHANNEL, new PluginMessageListener({
-            onPluginMessageReceived: (/**String */ var1, /**Player */ var2, /**byte[] */var3) => {
-                this.sendChatAll(MiaoMessage.decode(var3).json)
-            }
-        }));
-        Bukkit.getMessenger().registerOutgoingPluginChannel(base.getInstance(), MiaoMessage.CHANNEL);
     }
 
     bukkitdisable() {
-        var Bukkit = org.bukkit.Bukkit;
-        Bukkit.getMessenger().unregisterIncomingPluginChannel(base.getInstance(), MiaoMessage.CHANNEL)
-        Bukkit.getMessenger().unregisterOutgoingPluginChannel(base.getInstance(), MiaoMessage.CHANNEL)
     }
 
     spongeenable() {
@@ -218,32 +207,15 @@ export class MiaoChat extends interfaces.Plugin {
         } catch (ex) {
             this.logger.console("§cCan't found me.rojo8399.placeholderapi.PlaceholderService variable will not be replaced! Err: " + ex)
         }
-        var Sponge = org.spongepowered.api.Sponge
-        var RawDataListener = Java.type("org.spongepowered.api.network.RawDataListener")
-        var ChannelRegistrar = Sponge.getChannelRegistrar()
-        this.spongeChannel = ChannelRegistrar.getOrCreateRaw(base.getInstance(), MiaoMessage.CHANNEL)
-        this.spongeListener = new RawDataListener({
-            handlePayload: (/* ChannelBuf */ data, /**RemoteConnection */ connection, /**Platform.Type */ side) => {
-                this.sendChatAll(MiaoMessage.decode(data.readBytes(data.available())).json)
-            }
-        })
-        this.spongeChannel.addListener(this.spongeListener)
     }
 
     spongedisable() {
-        this.spongeChannel.removeListener(this.spongeListener)
     }
 
     bungeeenable() {
-        let bungee: net.md_5.bungee.api.ProxyServer = base.getInstance().getProxy()
-        bungee.registerChannel(MiaoMessage.CHANNEL);
-        bungee.registerChannel(MiaoMessage.NORMAL_CHANNEL);
     }
 
     bungeedisable() {
-        let bungee: net.md_5.bungee.api.ProxyServer = base.getInstance().getProxy()
-        bungee.unregisterChannel(MiaoMessage.CHANNEL);
-        bungee.unregisterChannel(MiaoMessage.NORMAL_CHANNEL);
     }
 
     @cmd({ servers: ["bungee"] })
@@ -289,7 +261,7 @@ export class MiaoChat extends interfaces.Plugin {
     PluginMessageEvent(e: any) {
         let bungee: net.md_5.bungee.api.ProxyServer = base.getInstance().getProxy()
         let event = e as net.md_5.bungee.api.event.PluginMessageEvent
-        if (event.getTag() == MiaoMessage.CHANNEL || event.getTag() == MiaoMessage.NORMAL_CHANNEL) {
+        if (event.getTag() == MiaoMessage.CHANNEL) {
             let origin = event.getSender().getAddress();
             bungee.getServers().forEach(new BiConsumer({
                 accept: (s, server) => {
@@ -361,27 +333,7 @@ export class MiaoChat extends interfaces.Plugin {
         });
         let json = tr.then(this.replace(player, plain)).json()
         this.sendChatAll(json)
-        let mm = MiaoMessage.encode(json);
-        switch (this.ServerType) {
-            case "bukkit":
-                if (mm == null) {
-                    player.sendPluginMessage(base.getInstance(), MiaoMessage.NORMAL_CHANNEL, MiaoMessage.encode(tr.string()));
-                } else {
-                    player.sendPluginMessage(base.getInstance(), MiaoMessage.CHANNEL, mm);
-                }
-                break;
-            case "sponge":
-                if (mm == null) {
-                    this.spongeChannel.sendTo(player, new Consumer({
-                        accept: (channelBuf) => channelBuf.writeBytes(MiaoMessage.encode(tr.string()))
-                    }))
-                } else {
-                    this.spongeChannel.sendTo(player, new Consumer({
-                        accept: (channelBuf) => channelBuf.writeBytes(mm)
-                    }))
-                }
-                break;
-        }
+        this.Channel.send(player, MiaoMessage.CHANNEL, MiaoMessage.encode(json))
     }
 
     sendChatAll(json: string) {
