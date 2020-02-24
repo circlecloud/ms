@@ -24,7 +24,6 @@ export function plugin(metadata: interfaces.PluginMetadata) {
  */
 export function cmd(metadata: interfaces.CommandMetadata = {}) {
     return function(target: any, key: string, value: any) {
-        checkFunction("command", target[key]);
         metadata.name = metadata.name || key;
         metadata.executor = key;
         metadata.paramtypes = Reflect.getMetadata("design:paramtypes", target, key)
@@ -40,7 +39,6 @@ export function cmd(metadata: interfaces.CommandMetadata = {}) {
  */
 export function tab(metadata: interfaces.TabCompleterMetadata = {}) {
     return function(target: any, key: string, value: any) {
-        checkFunction("tab", target[key]);
         metadata.name = metadata.name || (key.startsWith('tab') ? key.split('tab', 2)[1] : key);
         if (!metadata.name) { return; }
         metadata.executor = key;
@@ -57,7 +55,6 @@ export function tab(metadata: interfaces.TabCompleterMetadata = {}) {
  */
 export function listener(metadata: interfaces.ListenerMetadata = {}) {
     return function(target: any, key: string, value: any) {
-        checkFunction("listener", target[key]);
         metadata.name = metadata.name || key;
         metadata.executor = key;
         const previousMetadata: interfaces.ListenerMetadata[] = getPluginListenerMetadata(target)
@@ -65,20 +62,12 @@ export function listener(metadata: interfaces.ListenerMetadata = {}) {
     };
 }
 
-export function config(metadata: interfaces.ConfigMetadata = { version: 1 }) {
-    return function(target: any, key: string, value: any) {
-        if (typeof value === "function") {
-            throw new Error(`decorate config must config at prototype but is a ${typeof value}!`)
-        }
+export function config(metadata: interfaces.ConfigMetadata = { version: 1, format: 'yml' }) {
+    return function(target: any, key: string) {
         metadata.name = metadata.name || key;
+        metadata.variable = key;
         const previousMetadata: Map<string, interfaces.ConfigMetadata> = getPluginConfigMetadata(target)
         previousMetadata.set(metadata.name, metadata);
         Reflect.defineMetadata(METADATA_KEY.config, previousMetadata, target.constructor);
-    }
-}
-
-function checkFunction(type: string, value: any) {
-    if (typeof value !== "function") {
-        throw new Error(`decorate ${type} must config at function but is a ${typeof value}!`)
     }
 }
