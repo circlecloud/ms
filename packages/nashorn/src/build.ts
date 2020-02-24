@@ -178,7 +178,7 @@ typeMap['Matrix4d'] = 'any /*Matrix4d*/'
 function mappingType(type: string): string {
     let outType = typeMap[type] || type || 'any';
     if (outType.indexOf('.') != -1) {
-        if (outType.startsWith('java.') || outType.startsWith('org.') || outType.startsWith('net.')) {
+        if (outType.startsWith('java.') || outType.startsWith('org.') || outType.startsWith('net.') || outType.startsWith('cn.')) {
 
         } else {
             outType = `any /*${outType}*/`
