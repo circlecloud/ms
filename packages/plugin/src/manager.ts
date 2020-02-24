@@ -4,6 +4,7 @@ import * as fs from '@ms/common/dist/fs'
 
 import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPlugin, getPluginTabCompleterMetadata, getPluginConfigMetadata } from './utils'
 import { interfaces } from './interfaces'
+import { getConfigLoader } from './config'
 
 @injectable()
 export class PluginManagerImpl implements plugin.PluginManager {
@@ -11,6 +12,8 @@ export class PluginManagerImpl implements plugin.PluginManager {
     private container: Container
     @inject(plugin.PluginInstance)
     private pluginInstance: any
+    @inject(plugin.PluginFolder)
+    private pluginFolder: string;
     @inject(server.ServerType)
     private serverType: string
     @inject(command.Command)
@@ -51,9 +54,9 @@ export class PluginManagerImpl implements plugin.PluginManager {
     load(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
             this.logStage(plugin, "Loading")
+            this.loadConfig(plugin)
             this.runCatch(plugin, 'load')
             this.runCatch(plugin, `${this.serverType}load`)
-            this.loadConfig(plugin)
         })
     }
 
@@ -197,9 +200,19 @@ export class PluginManagerImpl implements plugin.PluginManager {
         }
     }
 
-    private loadConfig(pluginInstance: interfaces.Plugin) {
-        let configs = getPluginConfigMetadata(pluginInstance);
-
+    private loadConfig(plugin: interfaces.Plugin) {
+        let configs = getPluginConfigMetadata(plugin);
+        for (let [_, config] of configs) {
+            let configFile = fs.concat(root, this.pluginFolder, plugin.description.name, config.name + '.' + config.format)
+            console.log(configFile)
+            let configFactory = getConfigLoader(config.format);
+            if (!fs.exists(configFile)) {
+                base.save(configFile, configFactory.dump(plugin[config.variable]))
+                console.log(`[${plugin.description.name}] config ${config.name}.${config.format} don't exists auto create from default variable...`)
+            } else {
+                plugin[config.variable] = configFactory.load(base.read(configFile));
+            }
+        }
     }
 
     private registryCommand(pluginInstance: interfaces.Plugin) {

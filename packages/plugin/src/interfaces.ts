@@ -62,6 +62,8 @@ export namespace interfaces {
     }
     export interface ConfigMetadata extends BaseMetadata {
         version?: number;
+        variable?: string;
+        format?: string;
     }
     export type PluginLike = Plugin | string;
 }
