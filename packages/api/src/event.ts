@@ -115,7 +115,7 @@ export namespace event {
         * @param priority {string} [LOWEST,LOW,NORMAL,HIGH,HIGHEST,MONITOR]
         * @param ignoreCancel
         */
-        listen(plugin: any, event: string, exec: () => void, priority: EventPriority = EventPriority.NORMAL, ignoreCancel = false) {
+        listen(plugin: any, event: string, exec: (event: any) => void, priority: EventPriority = EventPriority.NORMAL, ignoreCancel = false) {
             if (!plugin || !plugin.description || !plugin.description.name) throw new TypeError('插件名称为空 请检查传入参数!');
             var name = plugin.description.name;
             var eventCls = this.name2Class(name, event);
