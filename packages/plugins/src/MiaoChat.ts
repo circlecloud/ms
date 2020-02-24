@@ -4,7 +4,7 @@
 
 import { server, plugin as pluginApi } from '@ms/api'
 import { inject } from '@ms/container';
-import { plugin, interfaces, cmd, listener, tab } from '@ms/plugin'
+import { plugin, interfaces, cmd, listener, tab, config } from '@ms/plugin'
 import Tellraw from '@ms/common/dist/tellraw'
 
 const ByteArrayInputStream = Java.type("java.io.ByteArrayInputStream");
@@ -64,8 +64,9 @@ export class MiaoChat extends interfaces.Plugin {
     private spongeChannel: any;
     private spongeListener: any;
 
+    @config()
     private config = {
-        Version: "1.8.5",
+        Version: "1.0.0",
         BungeeCord: true,
         Server: "生存服",
         ChatFormats: {
