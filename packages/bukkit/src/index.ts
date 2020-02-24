@@ -1,12 +1,13 @@
 /// <reference types="@ms/types/dist/typings/bukkit" />
 
-import { server, command, event, task } from '@ms/api'
+import { server, command, event, channel, task } from '@ms/api'
 import { Container } from '@ms/container'
 
 import { BukkitConsole } from './console';
 import { BukkitEvent } from './event';
 import { BukkitServer } from './server';
 import { BukkitCommand } from './command';
+import { BukkitChannel } from './channel';
 import { BukkitTaskManager } from './task';
 
 export default function BukkitImpl(container: Container) {
@@ -14,5 +15,6 @@ export default function BukkitImpl(container: Container) {
     container.bind(event.Event).to(BukkitEvent).inSingletonScope();
     container.bind(server.Server).to(BukkitServer).inSingletonScope();
     container.bind(command.Command).to(BukkitCommand).inSingletonScope();
+    container.bind(channel.Channel).to(BukkitChannel).inSingletonScope();
     container.bind(task.TaskManager).to(BukkitTaskManager).inSingletonScope();
 }
