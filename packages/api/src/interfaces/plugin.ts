@@ -1,20 +1,22 @@
-import { Container } from "@ms/container";
-
 export namespace plugin {
     /**
      * MiaoScript Plugin
      */
     export const Plugin = Symbol("Plugin");
     /**
+     * MiaoScript Plugin
+     */
+    export const PluginFolder = Symbol("PluginFolder");
+    /**
      * Runtime Plugin Instance
      */
     export const PluginInstance = Symbol("PluginInstance");
     /**
-     * MiaoScript Plugin Manager
+     * MiaoScript Plugin Manager Symbol
      */
     export const PluginManager = Symbol("PluginManager");
     /**
-     * MiaoScript Plugin Manager
+     * MiaoScript Plugin Manager Interface
      */
     export interface PluginManager {
         scan(folder: string): void;
