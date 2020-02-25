@@ -20,7 +20,13 @@ export namespace interfaces {
         public disable() { }
     }
     interface BaseMetadata {
+        /**
+         * 名称 为空则为对象名称
+         */
         name?: string;
+        /**
+         * 支持的服务器列表 为空则代表所有
+         */
         servers?: string[];
     }
     export interface PluginMetadata extends BaseMetadata {
@@ -50,19 +56,37 @@ export namespace interfaces {
         target?: any;
     }
     interface ExecMetadata extends BaseMetadata {
+        /**
+         * 执行器
+         */
         executor?: string;
     }
     export interface CommandMetadata extends ExecMetadata {
+        /**
+         * 参数列表
+         */
         paramtypes?: string[];
     }
     export interface TabCompleterMetadata extends ExecMetadata {
+        /**
+         * 参数列表
+         */
         paramtypes?: string[];
     }
     export interface ListenerMetadata extends ExecMetadata {
     }
     export interface ConfigMetadata extends BaseMetadata {
+        /**
+         * 配置文件版本号
+         */
         version?: number;
+        /**
+         * 实体变量名称
+         */
         variable?: string;
+        /**
+         * 配置文件格式 默认 yml
+         */
         format?: string;
     }
     export type PluginLike = Plugin | string;
