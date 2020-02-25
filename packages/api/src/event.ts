@@ -77,7 +77,7 @@ export namespace event {
         }
 
         name2Class(name: any, event: string) {
-            var eventCls = this.mapEvent[event.toLowerCase()] || this.mapEvent[event.toLowerCase() + 'event'];
+            let eventCls = this.mapEvent[event.toLowerCase()] || this.mapEvent[event.toLowerCase() + 'event'];
             if (!eventCls) {
                 try {
                     eventCls = base.getClass(eventCls);
@@ -94,11 +94,14 @@ export namespace event {
         execute(name, exec, eventCls) {
             return (...args: any[]) => {
                 try {
-                    var time = new Date().getTime()
-                    exec(args[args.length - 1]);
-                    var cost = new Date().getTime() - time;
-                    if (cost > 20) {
-                        console.console(`§c注意! §6插件 §b${name} §6处理 §d${this.class2Name(eventCls)} §6事件 §c耗时 §4${cost}ms !`)
+                    let event = args[args.length - 1];
+                    if (eventCls.isAssignableFrom(event.getClass())) {
+                        let time = Date.now()
+                        exec(event);
+                        let cost = Date.now() - time;
+                        if (cost > 20) {
+                            console.console(`§c注意! §6插件 §b${name} §6处理 §d${this.class2Name(eventCls)} §6事件 §c耗时 §4${cost}ms !`)
+                        }
                     }
                 } catch (ex) {
                     console.console(`§6插件 §b${name} §6处理 §d${this.class2Name(eventCls)} §6事件时发生异常 §4${ex}`);

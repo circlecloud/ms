@@ -48,6 +48,7 @@ class MiaoScriptCore {
     }
 
     disable() {
+        console.log("Disable MiaoScript Engine...")
         this.pluginManager.disable();
     }
 }
