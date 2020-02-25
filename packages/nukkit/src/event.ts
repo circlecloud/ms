@@ -42,6 +42,6 @@ export class NukkitEvent extends event.Event {
         return listener;
     }
     unregister(event: any, listener: any): void {
-        event.getHandlers().unregister(listener);
+        event.getMethod('getHandlers').invoke(null).unregister(listener);
     }
 }
