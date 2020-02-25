@@ -98,7 +98,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
         try {
             if (pl[func]) pl[func].call(pl)
         } catch (ex) {
-            console.console(`§6插件 §b${pl.description.name} §6执行 §d${func} §6方法时发生错误 §4${ex}`)
+            console.console(`§6Plugin §b${pl.description.name} §6exec §d${func} §6function error §4${ex}`)
             console.ex(ex)
         }
     }
@@ -146,7 +146,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
             this.updatePlugin(file)
             this.createPlugin(file)
         } catch (ex) {
-            console.console(`§6插件 §b${file.name} §6初始化时发生错误 §4${ex.message}`)
+            console.console(`§6Plugin §b${file.name} §6initialize error §4${ex.message}`)
             console.ex(ex)
         }
     }
