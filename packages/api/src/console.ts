@@ -1,3 +1,4 @@
+import i18m from '@ms/i18n'
 import { SourceMapBuilder } from 'source-map-builder'
 
 const Arrays = Java.type('java.util.Arrays');
@@ -78,6 +79,9 @@ export class MiaoScriptConsole implements Console {
     console(...args) {
         this.info(args)
     }
+    i18n(name: string, param?: { [key: string]: any }) {
+        this.log(i18m.translate(name, param))
+    }
     object(obj) {
         for (var i in obj) {
             this.info(i, '=>', obj[i])
@@ -101,9 +105,9 @@ export class MiaoScriptConsole implements Console {
                 if (this.sourceMaps[fileName]) {
                     var sourceMapping = this.sourceMaps[fileName].getSource(lineNumber, 0);
                     if (sourceMapping) {
-                        if(lineNumber != sourceMapping.mapping.sourceLine){
-                        fileName = fileName.replace(".js", ".ts");
-                        lineNumber = sourceMapping.mapping.sourceLine;
+                        if (lineNumber != sourceMapping.mapping.sourceLine) {
+                            fileName = fileName.replace(".js", ".ts");
+                            lineNumber = sourceMapping.mapping.sourceLine;
                         }
                     }
                 }
