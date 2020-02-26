@@ -1,3 +1,4 @@
+import i18n from '@ms/i18n'
 import { plugin, server, command, event } from '@ms/api'
 import { inject, provideSingleton, postConstruct, Container, ContainerInstance } from '@ms/container'
 import * as fs from '@ms/common/dist/fs'
@@ -27,9 +28,9 @@ export class PluginManagerImpl implements plugin.PluginManager {
     initialize() {
         if (this.pluginInstance !== null) {
             // 如果plugin不等于null 则代表是正式环境
-            console.info(`Initialization MiaoScript Plugin System: ${this.pluginInstance} ...`)
+            console.i18n('ms.plugin.initialize', { plugin: this.pluginInstance })
             this.pluginMap = new Map()
-            console.info(`${this.EventManager.mapEventName().toFixed(0)} ${this.serverType} Event Mapping Complate...`)
+            console.i18n('ms.plugin.event.map', { count: this.EventManager.mapEventName().toFixed(0), type: this.serverType });
         }
     }
 
@@ -37,9 +38,9 @@ export class PluginManagerImpl implements plugin.PluginManager {
         var plugin = fs.file(root, folder)
         var files = []
             // load common plugin
-            .concat(this.scanFloder(plugin))
+            .concat(this.scanFolder(plugin))
             // load space plugin
-            .concat(this.scanFloder(fs.file(plugin, this.serverType)))
+            .concat(this.scanFolder(fs.file(plugin, this.serverType)))
         this.loadPlugins(files)
     }
 
@@ -53,7 +54,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
     load(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
-            this.logStage(plugin, "Loading")
+            this.logStage(plugin, i18n.translate("ms.plugin.stage.load"))
             this.loadConfig(plugin)
             this.runCatch(plugin, 'load')
             this.runCatch(plugin, `${this.serverType}load`)
@@ -62,7 +63,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
     enable(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
-            this.logStage(plugin, "Enabling")
+            this.logStage(plugin, i18n.translate("ms.plugin.stage.enable"))
             this.runCatch(plugin, 'enable')
             this.runCatch(plugin, `${this.serverType}enable`)
             this.registryCommand(plugin)
@@ -72,7 +73,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
     disable(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
-            this.logStage(plugin, "Disabling")
+            this.logStage(plugin, i18n.translate("ms.plugin.stage.disable"))
             this.runCatch(plugin, 'disable')
             this.runCatch(plugin, `${this.serverType}disable`)
             this.unregistryCommand(plugin)
@@ -110,12 +111,12 @@ export class PluginManagerImpl implements plugin.PluginManager {
         throw new Error(`Plugin ${JSON.stringify(name)} not exist!`)
     }
 
-    private scanFloder(plugin: any): string[] {
+    private scanFolder(folder: any): string[] {
         var files = []
-        console.info(`Scanning Plugins in ${plugin} ...`)
-        this.checkUpdateFolder(plugin)
+        console.i18n('ms.plugin.manager.scan', { folder })
+        this.checkUpdateFolder(folder)
         // must check file is exist maybe is a illegal symbolic link file
-        fs.list(plugin).forEach((file: any) => file.toFile().exists() ? files.push(file.toFile()) : void 0)
+        fs.list(folder).forEach((file: any) => file.toFile().exists() ? files.push(file.toFile()) : void 0)
         return files
     }
 

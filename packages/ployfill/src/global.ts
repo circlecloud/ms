@@ -27,6 +27,7 @@ declare global {
         stack(err: Error): string[];
         sender(...args: any): void;
         console(...args: any): void;
+        i18n(name: string, ...params: any[]);
     }
 }
 export { }
