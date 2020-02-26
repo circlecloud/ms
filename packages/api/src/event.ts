@@ -4,7 +4,7 @@
  */
 import '@ms/core'
 import '@ms/nashorn'
-import { injectable } from '@ms/container'
+import { injectable, unmanaged } from '@ms/container'
 
 const Thread = Java.type('java.lang.Thread');
 
@@ -25,7 +25,7 @@ export namespace event {
 
         protected baseEventDir = '';
 
-        constructor(baseEventDir: string) {
+        constructor(@unmanaged() baseEventDir: string) {
             this.baseEventDir = baseEventDir;
         }
 
