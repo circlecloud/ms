@@ -1,11 +1,11 @@
 import { server } from '@ms/api'
-import { injectable } from '@ms/container';
+import { provideSingleton } from '@ms/container';
 
 import chat from './enhance/chat'
 
 let Bukkit = org.bukkit.Bukkit;
 
-@injectable()
+@provideSingleton(server.Server)
 export class BukkitServer implements server.Server {
     getPlayer(name: string) {
         return Bukkit.getPlayer(name)

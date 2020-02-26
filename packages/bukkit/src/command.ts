@@ -2,14 +2,14 @@ import '@ms/nashorn'
 
 import { command, plugin } from '@ms/api'
 import * as reflect from '@ms/common/dist/reflect'
-import { injectable, postConstruct, inject } from '@ms/container'
+import { provideSingleton, postConstruct, inject } from '@ms/container'
 
 let Bukkit = org.bukkit.Bukkit;
 let TabCompleter = Java.type('org.bukkit.command.TabCompleter');
 let PluginCommand = Java.type('org.bukkit.command.PluginCommand');
 let CommandExecutor = Java.type('org.bukkit.command.CommandExecutor');
 
-@injectable()
+@provideSingleton(command.Command)
 export class BukkitCommand extends command.Command {
     @inject(plugin.PluginInstance)
     private pluginInstance: any

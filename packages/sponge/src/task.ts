@@ -1,5 +1,5 @@
 import { task, plugin } from '@ms/api'
-import { injectable, inject } from '@ms/container';
+import { inject, provideSingleton } from '@ms/container';
 
 const Sponge = Java.type("org.spongepowered.api.Sponge");
 const Task = Java.type("org.spongepowered.api.scheduler.Task");
@@ -7,7 +7,7 @@ const Consumer = Java.type('java.util.function.Consumer');
 const Callable = Java.type('java.util.concurrent.Callable');
 const TimeUnit = Java.type('java.util.concurrent.TimeUnit');
 
-@injectable()
+@provideSingleton(task.TaskManager)
 export class SpongeTaskManager implements task.TaskManager {
     @inject(plugin.PluginInstance)
     private pluginInstance: any;

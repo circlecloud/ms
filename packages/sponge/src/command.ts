@@ -1,14 +1,42 @@
 import { command, plugin } from "@ms/api";
-import { inject, injectable } from "@ms/container";
+import { inject, provideSingleton } from "@ms/container";
 
 let Sponge = Java.type('org.spongepowered.api.Sponge');
-
+let Text = Java.type('org.spongepowered.api.text.Text');
 var CommandCallable = Java.type('org.spongepowered.api.command.CommandCallable');
 var CommandResult = Java.type('org.spongepowered.api.command.CommandResult');
-
-let Text = Java.type('org.spongepowered.api.text.Text');
-
 var Optional = Java.type('java.util.Optional');
+
+@provideSingleton(command.Command)
+export class SpongeCommand extends command.Command {
+    @inject(plugin.PluginInstance)
+    private pluginInstance: any
+    private commandMapping: any[] = [];
+
+    create(plugin: any, command: string) {
+        let commandKey = this.getCommandKey(plugin, command);
+        let commandCallable = new SimpleCommandCallable(command);
+        this.commandMapping[commandKey] = Sponge.getCommandManager().register(this.pluginInstance, commandCallable.callable, command, commandKey).orElse(null);
+        return commandCallable;
+    }
+    remove(plugin: any, command: string) {
+        var commandKey = this.getCommandKey(plugin, command);
+        if (this.commandMapping[commandKey]) {
+            Sponge.getCommandManager().removeMapping(this.commandMapping[commandKey]);
+            delete this.commandMapping[commandKey];
+        }
+    }
+    onCommand(plugin: any, command: any, executor: Function) {
+        command.setExecutor(super.setExecutor(plugin, command, executor));
+    }
+    onTabComplete(plugin: any, command: any, tabCompleter: Function) {
+        command.setTabCompleter(super.setTabCompleter(plugin, command, tabCompleter));
+    }
+
+    private getCommandKey(plugin: any, command: string) {
+        return plugin.description.name.toLowerCase() + ":" + command;
+    }
+}
 
 class SimpleCommandCallable {
     public callable: any;
@@ -49,35 +77,4 @@ class SimpleCommandCallable {
     setExecutor = (executor: Function) => this.executor = executor;
     setTabCompleter = (tabCompleter: Function) => this.tabCompleter = tabCompleter;
     toString = () => `Sponge SimpleCommandCallable(${this.name})`
-}
-
-@injectable()
-export class SpongeCommand extends command.Command {
-    @inject(plugin.PluginInstance)
-    private pluginInstance: any
-    private commandMapping: any[] = [];
-
-    create(plugin: any, command: string) {
-        let commandKey = this.getCommandKey(plugin, command);
-        let commandCallable = new SimpleCommandCallable(command);
-        this.commandMapping[commandKey] = Sponge.getCommandManager().register(this.pluginInstance, commandCallable.callable, command, commandKey).orElse(null);
-        return commandCallable;
-    }
-    remove(plugin: any, command: string) {
-        var commandKey = this.getCommandKey(plugin, command);
-        if (this.commandMapping[commandKey]) {
-            Sponge.getCommandManager().removeMapping(this.commandMapping[commandKey]);
-            delete this.commandMapping[commandKey];
-        }
-    }
-    onCommand(plugin: any, command: any, executor: Function) {
-        command.setExecutor(super.setExecutor(plugin, command, executor));
-    }
-    onTabComplete(plugin: any, command: any, tabCompleter: Function) {
-        command.setTabCompleter(super.setTabCompleter(plugin, command, tabCompleter));
-    }
-
-    private getCommandKey(plugin: any, command: string) {
-        return plugin.description.name.toLowerCase() + ":" + command;
-    }
 }

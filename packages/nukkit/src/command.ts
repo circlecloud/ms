@@ -1,12 +1,12 @@
 import '@ms/nashorn'
 
 import { command, plugin } from '@ms/api'
-import { injectable, postConstruct, inject } from '@ms/container'
+import { inject, provideSingleton, postConstruct } from '@ms/container'
 
 let PluginCommand = Java.type('cn.nukkit.command.PluginCommand');
 let CommandExecutor = Java.type('cn.nukkit.command.CommandExecutor');
 
-@injectable()
+@provideSingleton(command.Command)
 export class NukkitCommand extends command.Command {
     @inject(plugin.PluginInstance)
     private pluginInstance: any
@@ -30,7 +30,6 @@ export class NukkitCommand extends command.Command {
         }
     }
     onCommand(plugin: any, command: any, executor: Function) {
-        // 必须指定需要实现的接口类型 否则MOD服会报错
         command.setExecutor(new CommandExecutor({
             onCommand: super.setExecutor(plugin, command, executor)
         }));
