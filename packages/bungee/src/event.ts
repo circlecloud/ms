@@ -1,5 +1,5 @@
-import { event, plugin } from '@ms/api'
-import { injectable, inject, postConstruct } from '@ms/container'
+import { event } from '@ms/api'
+import { provideSingleton, postConstruct } from '@ms/container'
 import * as reflect from '@ms/common/dist/reflect'
 
 const Bungee: net.md_5.bungee.api.ProxyServer = base.getInstance().getProxy();
@@ -21,10 +21,8 @@ EventPriority[event.EventPriority.HIGHEST] = Byte.valueOf(64);
 /**
  * Bungee Event Impl
  */
-@injectable()
+@provideSingleton(event.Event)
 export class BungeeEvent extends event.Event {
-    @inject(plugin.PluginInstance)
-    private pluginInstance: any;
     private pluginManager = Bungee.getPluginManager()
 
     // EventBus

@@ -1,9 +1,9 @@
-import { channel, plugin, event } from '@ms/api'
-import { inject, injectable } from '@ms/container'
+import { channel } from '@ms/api'
+import { provideSingleton } from '@ms/container'
 
 const Bungee: net.md_5.bungee.api.ProxyServer = base.getInstance().getProxy()
 
-@injectable()
+@provideSingleton(channel.Channel)
 export class BungeeChannel extends channel.Channel {
     send(player: any, channel: string, data: any) {
         throw new Error("Method not implemented.");

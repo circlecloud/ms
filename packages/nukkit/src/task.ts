@@ -1,11 +1,9 @@
 import { task, plugin } from '@ms/api'
-import { injectable, inject } from '@ms/container';
+import { inject, provideSingleton } from '@ms/container';
 
-const Nukkit: cn.nukkit.Server = base.getInstance().getServer();
 const NukkitRunnable = Java.type('cn.nukkit.scheduler.NukkitRunnable');
-const Callable = Java.type('java.util.concurrent.Callable')
 
-@injectable()
+@provideSingleton(task.TaskManager)
 export class NukkitTaskManager implements task.TaskManager {
     @inject(plugin.PluginInstance)
     private pluginInstance: any;

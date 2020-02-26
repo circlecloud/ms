@@ -90,17 +90,21 @@ export class MiaoScriptConsole implements Console {
         try {
             if (fileName.endsWith('js')) {
                 var file = Paths.get(fileName + '.map');
-                if (!this.sourceMaps[fileName]) {
+                if (this.sourceMaps[fileName] === undefined) {
                     if (file.toFile().exists()) {
                         var sourceMapObj = JSON.parse(new JavaString(Files.readAllBytes(file), "UTF-8"))
                         this.sourceMaps[fileName] = new SourceMapBuilder(sourceMapObj)
+                    } else {
+                        this.sourceMaps[fileName] = null;
                     }
                 }
                 if (this.sourceMaps[fileName]) {
-                    var sourceMapping = this.sourceMaps[fileName].getSource(lineNumber, lineNumber);
+                    var sourceMapping = this.sourceMaps[fileName].getSource(lineNumber, 0);
                     if (sourceMapping) {
+                        if(lineNumber != sourceMapping.mapping.sourceLine){
                         fileName = fileName.replace(".js", ".ts");
                         lineNumber = sourceMapping.mapping.sourceLine;
+                        }
                     }
                 }
             }

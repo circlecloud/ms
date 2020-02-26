@@ -1,5 +1,5 @@
-import { event, server, plugin } from '@ms/api'
-import { injectable, inject } from '@ms/container'
+import { event, plugin } from '@ms/api'
+import { inject, provideSingleton } from '@ms/container'
 
 const Nukkit: cn.nukkit.Server = base.getInstance().getServer();
 const Event = Java.type("cn.nukkit.event.Event");
@@ -8,7 +8,7 @@ const Listener = Java.type("cn.nukkit.event.Listener");
 const EventPriority = Java.type("cn.nukkit.event.EventPriority");
 const EventExecutor = Java.type("cn.nukkit.plugin.EventExecutor");
 
-@injectable()
+@provideSingleton(event.Event)
 export class NukkitEvent extends event.Event {
     @inject(plugin.PluginInstance)
     private pluginInstance: any
