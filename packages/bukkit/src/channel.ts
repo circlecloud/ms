@@ -1,11 +1,11 @@
 import { channel, plugin } from '@ms/api'
-import { inject, injectable } from '@ms/container'
+import { inject, provideSingleton } from '@ms/container'
 
 const Bukkit = org.bukkit.Bukkit
 const PluginMessageListener = Java.type("org.bukkit.plugin.messaging.PluginMessageListener")
 const Messenger = Bukkit.getMessenger()
 
-@injectable()
+@provideSingleton(channel.Channel)
 export class BukkitChannel extends channel.Channel {
     @inject(plugin.PluginInstance)
     private pluginInstance: any;

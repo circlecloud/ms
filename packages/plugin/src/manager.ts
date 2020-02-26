@@ -1,12 +1,12 @@
 import { plugin, server, command, event } from '@ms/api'
-import { injectable, inject, postConstruct, Container, ContainerInstance } from '@ms/container'
+import { inject, provideSingleton, postConstruct, Container, ContainerInstance } from '@ms/container'
 import * as fs from '@ms/common/dist/fs'
 
 import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPlugin, getPluginTabCompleterMetadata, getPluginConfigMetadata } from './utils'
 import { interfaces } from './interfaces'
 import { getConfigLoader } from './config'
 
-@injectable()
+@provideSingleton(plugin.PluginManager)
 export class PluginManagerImpl implements plugin.PluginManager {
     @inject(ContainerInstance)
     private container: Container

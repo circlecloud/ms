@@ -1,10 +1,10 @@
 import { task, plugin } from '@ms/api'
-import { injectable, inject } from '@ms/container';
+import { inject, provideSingleton } from '@ms/container';
 
 var Runnable = Java.type('java.lang.Runnable')
 let TimeUnit = Java.type('java.util.concurrent.TimeUnit')
 
-@injectable()
+@provideSingleton(task.TaskManager)
 export class BungeeTaskManager implements task.TaskManager {
     @inject(plugin.PluginInstance)
     private pluginInstance: any;

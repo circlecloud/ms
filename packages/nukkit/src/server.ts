@@ -1,9 +1,9 @@
 import { server } from '@ms/api'
-import { injectable } from '@ms/container';
+import { provideSingleton } from '@ms/container';
 
 let Nukkit: cn.nukkit.Server = base.getInstance().getServer();
 
-@injectable()
+@provideSingleton(server.Server)
 export class NukkitServer implements server.Server {
     getPlayer(name: string) {
         return Nukkit.getPlayer(name)

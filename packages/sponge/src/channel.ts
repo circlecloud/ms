@@ -1,12 +1,12 @@
 import { channel, plugin } from '@ms/api'
-import { inject, injectable } from '@ms/container'
+import { inject, provideSingleton } from '@ms/container'
 
 const Sponge = org.spongepowered.api.Sponge
 const RawDataListener = Java.type("org.spongepowered.api.network.RawDataListener")
 const ChannelRegistrar = Sponge.getChannelRegistrar()
 const Consumer = Java.type("java.util.function.Consumer");
 
-@injectable()
+@provideSingleton(channel.Channel)
 export class SpongeChannel extends channel.Channel {
     @inject(plugin.PluginInstance)
     private pluginInstance: any;

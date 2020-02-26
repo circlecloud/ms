@@ -1,5 +1,5 @@
-import { event, server, plugin } from '@ms/api'
-import { injectable, inject } from '@ms/container';
+import { event, plugin } from '@ms/api'
+import { inject, provideSingleton } from '@ms/container';
 import * as reflect from '@ms/common/dist/reflect'
 
 const Bukkit = Java.type("org.bukkit.Bukkit");
@@ -9,7 +9,7 @@ const Listener = Java.type("org.bukkit.event.Listener");
 const EventPriority = Java.type("org.bukkit.event.EventPriority");
 const EventExecutor = Java.type("org.bukkit.plugin.EventExecutor");
 
-@injectable()
+@provideSingleton(event.Event)
 export class BukkitEvent extends event.Event {
     @inject(plugin.PluginInstance)
     private pluginInstance: any

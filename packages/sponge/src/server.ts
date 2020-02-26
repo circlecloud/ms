@@ -1,10 +1,10 @@
 import { server } from '@ms/api'
-import { injectable } from '@ms/container';
+import { provideSingleton } from '@ms/container';
 
 let Sponge = org.spongepowered.api.Sponge;
 let TextSerializers = org.spongepowered.api.text.serializer.TextSerializers;
 
-@injectable()
+@provideSingleton(server.Server)
 export class SpongeServer implements server.Server {
     getPlayer(name: string) {
         return Sponge.getServer().getPlayer(name).orElse(null)

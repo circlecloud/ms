@@ -1,5 +1,5 @@
 import { event, plugin } from '@ms/api'
-import { injectable, inject } from '@ms/container';
+import { inject, provideSingleton } from '@ms/container';
 
 let Modifier = Java.type("java.lang.reflect.Modifier");
 let Order = Java.type("org.spongepowered.api.event.Order");
@@ -19,7 +19,7 @@ let priorityMap = {
 /**
  * Sponge Event Impl
  */
-@injectable()
+@provideSingleton(event.Event)
 export class SpongeEvent extends event.Event {
     @inject(plugin.PluginInstance)
     private pluginInstance: any;
