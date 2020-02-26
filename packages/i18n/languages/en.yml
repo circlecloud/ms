@@ -1,0 +1,20 @@
+ms.ployfill.initialize: "Initialization Java Nashorn ployfill. Please wait..."
+ms.ployfill.completed: "Java Nashorn ployfill loading completed... Cost ({time}s)!"
+
+ms.core.ioc.initialize: "Initialization MiaoScript IOC Container @ms/container. Please wait..."
+ms.core.ioc.completed: "MiaoScript IOC Container @ms/container loading completed({time}s)!"
+ms.core.initialize.detect: "Detect Compatible Server set ServerType to {type} ..."
+ms.core.package.initialize: "Initialization MiaoScript Package @ms/core @ms/{type} @ms/plugin. Please wait..."
+ms.core.package.completed: "MiaoScript Package @ms/core @ms/{type} @ms/plugin loading completed({time}s)!"
+ms.core.plugin.initialize: "Initialization MiaoScript Plugin System. Please wait..."
+ms.core.plugin.completed: "MiaoScript Plugin System loading completed({time}s)!"
+ms.core.engine.completed: "MiaoScript ScriptEngine loading completed... Done({time}s)!"
+ms.core.engine.disable: "Disable MiaoScript Engine..."
+
+ms.plugin.initialize: "Initialization MiaoScript Plugin System: {plugin} ..."
+ms.plugin.event.map: "Total {count} {type} Event Mapping Complate..."
+ms.plugin.manager.scan: "Scanning Plugins in {folder} ..."
+ms.plugin.manager.stage:
+  load: "加载"
+  enable: "启用"
+  disable: "关闭"
