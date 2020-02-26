@@ -98,11 +98,9 @@ export namespace event {
                     if (eventCls.isAssignableFrom(event.getClass())) {
                         let time = Date.now()
                         exec(event);
-                        if (event.isAsynchronous()) {
-                            let cost = Date.now() - time;
-                            if (cost > 20) {
-                                console.console(`§c注意! §6插件 §b${name} §6处理 §d${this.class2Name(eventCls)} §6事件 §c耗时 §4${cost}ms !`)
-                            }
+                        let cost = Date.now() - time;
+                        if (cost > 20) {
+                            console.console(`§c注意! §6插件 §b${name} §6处理 §d${this.class2Name(eventCls)} §6事件 §c耗时 §4${cost}ms !`)
                         }
                     }
                 } catch (ex) {
