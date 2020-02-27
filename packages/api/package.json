@@ -1,6 +1,6 @@
 {
     "name": "@ms/api",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "description": "MiaoScript api package",
     "keywords": [
         "miaoscript",
@@ -22,8 +22,8 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
-        "@ms/container": "^0.2.1",
-        "@ms/ployfill": "^0.2.1",
+        "@ms/container": "^0.3.0",
+        "@ms/ployfill": "^0.3.0",
         "source-map-builder": "^0.0.7"
     },
     "devDependencies": {
