@@ -23,33 +23,43 @@ export class HelloWorld extends interfaces.Plugin {
     }
 
     bukkitload() {
-        this.logger.log('Load When ServerType is Bukkit!')
+        this.logger.log('Plugin Load When ServerType is Bukkit!')
     }
     bukkitenable() {
-        this.logger.log('Enable When ServerType is Bukkit!')
+        this.logger.log('Plugin Enable When ServerType is Bukkit!')
     }
     bukkitdisable() {
-        this.logger.log('Disable When ServerType is Bukkit!')
+        this.logger.log('Plugin Disable When ServerType is Bukkit!')
     }
 
     spongeload() {
-        this.logger.log('Load When ServerType is Sponge!')
+        this.logger.log('Plugin Load When ServerType is Sponge!')
     }
     spongeenable() {
-        this.logger.log('Enable When ServerType is Sponge!')
+        this.logger.log('Plugin Enable When ServerType is Sponge!')
     }
     spongedisable() {
-        this.logger.log('Disable When ServerType is Sponge!')
+        this.logger.log('Plugin Disable When ServerType is Sponge!')
     }
 
     bungeeload() {
-        this.logger.log('Load When ServerType is BungeeCord!')
+        this.logger.log('Plugin Load When ServerType is BungeeCord!')
     }
     bungeeenable() {
-        this.logger.log('Enable When ServerType is BungeeCord!')
+        this.logger.log('Plugin Enable When ServerType is BungeeCord!')
     }
     bungeedisable() {
-        this.logger.log('Disable When ServerType is BungeeCord!')
+        this.logger.log('Plugin Disable When ServerType is BungeeCord!')
+    }
+
+    nukkitload() {
+        this.logger.log('Plugin Load When ServerType is Nukkit!')
+    }
+    nukkitenable() {
+        this.logger.log('Plugin Enable When ServerType is Nukkit!')
+    }
+    nukkitdisable() {
+        this.logger.log('Plugin Disable When ServerType is Nukkit!')
     }
 
     @cmd()
