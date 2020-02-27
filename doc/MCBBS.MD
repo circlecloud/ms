@@ -13,8 +13,8 @@
 ## 插件简介
 
 - 此插件可以实现跨端使用 `TypeScript` 开发 脚本插件
-- 目前已经兼容 `Spigot` `Sponge`
-- 后续计划兼容 `BungeeCord` `Nukkit`
+- 目前已经兼容 `Spigot` `Sponge` `Paper` `CatServer` `BungeeCord` `Nukkit`
+- 后续计划兼容 暂无
 
 ## 起源 (可以略过)
 
@@ -103,17 +103,20 @@
     ├─type        Java的类型定义
     |   ├─bungee  BungeeCord类型定义
     |   ├─bukkit  Bukkit类型定义
-    |   └─sponge  Sponge类型定义
+    |   ├─sponge  Sponge类型定义
+    |   └─nukkit  Nukkit类型定义
     ├─websocket   Netty的WebSocket注入
     └─plugins     这里当然是插件啦
         ├─bungee  只兼容BungeeCord的插件
         ├─bukkit  只兼容Bukkit的插件
-        └─sponge  只兼容Sponge的插件
+        ├─sponge  只兼容Sponge的插件
+        └─nukkit  只兼容Nukkit的插件
 ```
 
 详细的内容就不逼逼了 自己看代码吧
 
 Github: https://github.com/circlecloud/ms
+YUMC: https://git.yumc.pw/circlecloud/ms
 
 ## 插件开发基础
 
@@ -146,6 +149,7 @@ Github: https://github.com/circlecloud/ms
 /// <reference types="@ms/types/dist/typings/bukkit" />
 /// <reference types="@ms/types/dist/typings/sponge" />
 /// <reference types="@ms/types/dist/typings/bungee" />
+/// <reference types="@ms/types/dist/typings/nukkit" />
 
 import { server } from '@ms/api';
 import { inject } from '@ms/container';
@@ -196,6 +200,16 @@ export class HelloWorld extends interfaces.Plugin {
         this.logger.log('Disable When ServerType is BungeeCord!')
     }
 
+    nukkitload() {
+        this.logger.log('Load When ServerType is Nukkit!')
+    }
+    nukkitenable() {
+        this.logger.log('Enable When ServerType is Nukkit!')
+    }
+    nukkitdisable() {
+        this.logger.log('Disable When ServerType is Nukkit!')
+    }
+
     @cmd()
     hello(sender: any, command: string, args: string[]) {
         this.logger.log(sender, command, args);
@@ -207,7 +221,8 @@ export class HelloWorld extends interfaces.Plugin {
         return ['world']
     }
 
-    @listener({ servers: ['bukkit'] })
+    // bukkit nukkit 大部分API神似 可以直接用
+    @listener({ servers: ['bukkit', 'nukkit'] })
     PlayerJoin(event: org.bukkit.event.player.PlayerJoinEvent) {
         let plyaer = event.getPlayer();
         this.logger.console(`§cBukkit §aPlayerJoinEvent: §b${plyaer.getName()}`)
@@ -236,10 +251,11 @@ export class HelloWorld extends interfaces.Plugin {
 
 - 进入 `ms`目录
 - 执行编译 `yarn build:plugins`
-- 从 `packages/plugins/dist` 中复制 `HelloWorld.js` 文件 到对应的插件目录
+- 从 `packages/plugins/dist` 中复制 `HelloWorld.js` 和 `HelloWorld.js.map`(可选 用于显示插件原有行数) 文件 到对应的插件目录
   - Bungee: plugins/MiaoScript/plugins/
   - Bukkit: plugins/MiaoScript/plugins/
   - Sponge: config/miaoscript/plugins/
+  - Nukkit: plugins/MiaoScript/plugins/
 - 重载 `MiaoScript`
 - 打开客户端进入游戏 预览一下效果
 - 从 Spigot 服务端进入
@@ -358,7 +374,8 @@ tabhello(_sender: any, _command: string, _args: string[]) {
 - 事件监听方法的第一个参数就是本次事件的具体内容 (这里就需要自己去查询对应的JavaDoc了)
 
 ```ts
-@listener({ servers: ['bukkit'] })
+// bukkit nukkit 大部分API神似 可以直接用
+@listener({ servers: ['bukkit', 'nukkit'] })
 PlayerJoin(event: org.bukkit.event.player.PlayerJoinEvent) {
     let plyaer = event.getPlayer();
     this.logger.console(`§cBukkit §aPlayerJoinEvent: §b${plyaer.getName()}`)
