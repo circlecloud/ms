@@ -1,5 +1,5 @@
-import '@ms/ployfill'
-import i18n from '@ms/i18n'
+/// <reference types="@ms/nashorn" />
+import '@ms/i18n'
 
 let containerStartTime = Date.now();
 console.i18n("ms.core.ioc.initialize");
@@ -92,7 +92,7 @@ function initialize() {
     container.load(buildProviderModule());
     console.i18n("ms.core.package.completed", { type, time: (Date.now() - corePackageStartTime) / 1000 });
     let disable = container.get<MiaoScriptCore>(MiaoScriptCore).enable()
-    console.i18n("ms.core.engine.completed", { time: (Date.now() - corePackageStartTime) / 1000 });
+    console.i18n("ms.core.engine.completed", { time: (Date.now() - global.NashornEngineStartTime) / 1000 });
     return disable;
 }
 
