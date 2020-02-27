@@ -160,10 +160,16 @@ export class PluginManagerImpl implements plugin.PluginManager {
         }
     }
 
-    private checkServers(servers: string[]) {
-        if (!servers) { return true }
-        if (servers.indexOf(`!${this.serverType}`) != -1) { return false }
-        return servers?.indexOf(this.serverType) != -1
+    private allowProcess(servers: string[]) {
+        // Not set servers allow
+        if (!servers) return true
+        // include !type deny
+        let denyServers = servers.filter(svr => svr.startsWith("!"))
+        if (denyServers.length !== 0) {
+            return !denyServers.includes(`!${this.serverType}`)
+        } else {
+            return servers.includes(this.serverType)
+        }
     }
 
     private createPlugin(file: string) {
@@ -174,7 +180,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     private buildPlugins() {
         let pluginMetadatas = getPluginMetadatas()
         for (const [_, metadata] of pluginMetadatas) {
-            if (!this.checkServers(metadata.servers)) { continue }
+            if (!this.allowProcess(metadata.servers)) { continue }
             this.buildPlugin(metadata)
         }
     }
@@ -221,7 +227,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
         let tabs = getPluginTabCompleterMetadata(pluginInstance)
         for (const [_, cmd] of cmds) {
             let tab = tabs.get(cmd.name)
-            if (!this.checkServers(cmd.servers)) { continue }
+            if (!this.allowProcess(cmd.servers)) { continue }
             this.CommandManager.on(pluginInstance, cmd.name, {
                 cmd: pluginInstance[cmd.executor].bind(pluginInstance),
                 tab: tab ? pluginInstance[tab.executor].bind(pluginInstance) : undefined
@@ -233,7 +239,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
         let events = getPluginListenerMetadata(pluginInstance)
         for (const event of events) {
             // ignore space listener
-            if (!this.checkServers(event.servers)) { continue }
+            if (!this.allowProcess(event.servers)) { continue }
             // here must bind this to pluginInstance
             this.EventManager.listen(pluginInstance, event.name, pluginInstance[event.executor].bind(pluginInstance))
         }
