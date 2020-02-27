@@ -1,6 +1,6 @@
 /// <reference types="@ms/types/dist/typings/bungee" />
 
-import { server, command, event, channel, task } from '@ms/api'
+import { server } from '@ms/api'
 import { Container } from '@ms/container'
 
 import { BungeeConsole } from './console';
