@@ -15,8 +15,8 @@ export class BukkitChannel extends channel.Channel {
     }
     register(channel: string, listener: channel.ChannelListener) {
         Messenger.registerIncomingPluginChannel(this.pluginInstance, channel, new PluginMessageListener({
-            onPluginMessageReceived: (/**String */ var1, /**Player */ var2, /**byte[] */var3) => {
-                listener(var3)
+            onPluginMessageReceived: (/**String */ channel, /**Player */ player, /**byte[] */data) => {
+                listener(data, { channel, player, data })
             }
         }));
         Messenger.registerOutgoingPluginChannel(this.pluginInstance, channel);
