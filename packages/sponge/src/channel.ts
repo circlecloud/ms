@@ -25,7 +25,7 @@ export class SpongeChannel extends channel.Channel {
         }
         let innerListener = new RawDataListener({
             handlePayload: (/* ChannelBuf */ data: any, /**RemoteConnection */ connection: any, /**Platform.Type */ side: any) => {
-                listener(data.readBytes(data.available()))
+                listener(data.readBytes(data.available()), { data, connection, side })
             }
         })
         this.channelMap.get(channel).addListener(innerListener);

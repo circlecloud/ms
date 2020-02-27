@@ -5,7 +5,7 @@ export namespace channel {
     * handle plugin message
     * @param data byte[]
     */
-    export type ChannelListener = (data: any) => void
+    export type ChannelListener = (data: any, exts?: any) => void
 
     @injectable()
     export abstract class Channel {
