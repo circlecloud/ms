@@ -49,12 +49,12 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     private logStage(plugin: interfaces.Plugin, stage: string) {
-        console.log(`[${plugin.description.name}] ${stage} ${plugin.description.name} version ${plugin.description.version} by ${plugin.description.author || 'Unknow'}`)
+        console.i18n("ms.plugin.manager.stage", { stage, plugin: plugin.description.name, version: plugin.description.version, author: plugin.description.author })
     }
 
     load(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
-            this.logStage(plugin, i18n.translate("ms.plugin.stage.load"))
+            this.logStage(plugin, i18n.translate("ms.plugin.manager.stage.load"))
             this.loadConfig(plugin)
             this.runCatch(plugin, 'load')
             this.runCatch(plugin, `${this.serverType}load`)
@@ -63,7 +63,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
     enable(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
-            this.logStage(plugin, i18n.translate("ms.plugin.stage.enable"))
+            this.logStage(plugin, i18n.translate("ms.plugin.manager.stage.enable"))
             this.runCatch(plugin, 'enable')
             this.runCatch(plugin, `${this.serverType}enable`)
             this.registryCommand(plugin)
@@ -73,7 +73,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
     disable(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
-            this.logStage(plugin, i18n.translate("ms.plugin.stage.disable"))
+            this.logStage(plugin, i18n.translate("ms.plugin.manager.stage.disable"))
             this.runCatch(plugin, 'disable')
             this.runCatch(plugin, `${this.serverType}disable`)
             this.unregistryCommand(plugin)
@@ -147,7 +147,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
             this.updatePlugin(file)
             this.createPlugin(file)
         } catch (ex) {
-            console.console(`§6Plugin §b${file.name} §6initialize error §4${ex.message}`)
+            console.i18n("ms.plugin.manager.initialize.error", { name: file.name, ex })
             console.ex(ex)
         }
     }
@@ -155,14 +155,15 @@ export class PluginManagerImpl implements plugin.PluginManager {
     private updatePlugin(file: any) {
         var update = fs.file(fs.file(file.parentFile, 'update'), file.name)
         if (update.exists()) {
-            console.info(`Auto Update Plugin ${file.name} ...`)
+            console.i18n("ms.plugin.manager.build.update", { name: file.name })
             fs.move(update, file, true)
         }
     }
 
     private checkServers(servers: string[]) {
         if (!servers) { return true }
-        return servers?.indexOf(this.serverType) != -1 && servers?.indexOf(`!${this.serverType}`) == -1
+        if (servers.indexOf(`!${this.serverType}`) != -1) { return false }
+        return servers?.indexOf(this.serverType) != -1
     }
 
     private createPlugin(file: string) {
@@ -182,7 +183,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
         this.bindPlugin(metadata)
         let pluginInstance = this.container.getNamed<interfaces.Plugin>(plugin.Plugin, metadata.name)
         if (!(pluginInstance instanceof interfaces.Plugin)) {
-            console.console(`§4found error plugin §b${metadata.source} §4it's not extends interfaces.Plugin, the plugin will be ignore!`)
+            console.i18n('ms.plugin.manager.build.not.extends', { source: metadata.source })
             return
         }
         this.pluginMap.set(metadata.name, pluginInstance)
@@ -193,7 +194,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
         try {
             let pluginInstance = this.container.getNamed<interfaces.Plugin>(plugin.Plugin, metadata.name)
             if (pluginInstance.description.source + '' !== metadata.source + '') {
-                console.console(`§4found duplicate plugin §b${pluginInstance.description.source} §4and §b${metadata.source}§4. the first plugin will be ignore!`)
+                console.i18n('ms.plugin.manager.build.duplicate', { exists: pluginInstance.description.source, source: metadata.source })
             }
             this.container.rebind(plugin.Plugin).to(metadata.target).inSingletonScope().whenTargetNamed(metadata.name)
         } catch{
@@ -205,11 +206,10 @@ export class PluginManagerImpl implements plugin.PluginManager {
         let configs = getPluginConfigMetadata(plugin);
         for (let [_, config] of configs) {
             let configFile = fs.concat(root, this.pluginFolder, plugin.description.name, config.name + '.' + config.format)
-            console.log(configFile)
             let configFactory = getConfigLoader(config.format);
             if (!fs.exists(configFile)) {
                 base.save(configFile, configFactory.dump(plugin[config.variable]))
-                console.log(`[${plugin.description.name}] config ${config.name}.${config.format} don't exists auto create from default variable...`)
+                console.i18n("ms.plugin.manager.config.save.default", { plugin: plugin.description.name, name: config.name, format: config.format })
             } else {
                 plugin[config.variable] = configFactory.load(base.read(configFile));
             }

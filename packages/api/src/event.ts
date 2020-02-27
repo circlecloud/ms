@@ -1,9 +1,9 @@
-'use strict';
+/// <reference types='@ms/nashorn' />
+
 /**
  * MiaoScript Event处理类
  */
-import '@ms/core'
-import '@ms/nashorn'
+import i18n from '@ms/i18n'
 import { injectable, unmanaged } from '@ms/container'
 
 const Thread = Java.type('java.lang.Thread');
@@ -35,9 +35,7 @@ export namespace event {
          *     org.spongepowered.api.event.game.GameRegistryEvent.Register => gameregistryevent$register
          */
         mapEventName() {
-            if (this.baseEventDir === "") {
-                throw new Error("base event dir is empty, can't map event name !");
-            }
+            if (this.baseEventDir === "") { throw new Error(i18n.translate('ms.api.event.empty.event.dir')); }
             let count = 0;
             let jar = this.getJarFile(this.baseEventDir);
             let entries = jar.entries();
@@ -51,7 +49,7 @@ export namespace event {
                         let clazz = base.getClass(qualifiedName.substring(0, qualifiedName.length - 6));
                         if (this.isValidEvent(clazz)) {
                             let simpleName = this.class2Name(clazz).toLowerCase();
-                            console.trace(`Mapping Event [${clazz.canonicalName}] => ${simpleName}`);
+                            console.trace(i18n.translate("ms.api.event.mapping", { canonicalName: clazz.canonicalName, simpleName }));
                             this.mapEvent[simpleName] = clazz;
                             count++;
                         }
@@ -69,7 +67,7 @@ export namespace event {
                 let url = dirs.nextElement();
                 if (url.protocol === "jar") { return url.openConnection().jarFile; }
             }
-            throw new Error(`Can't Mapping Event Because not found Resources ${resource}!`)
+            throw new Error(i18n.translate("ms.api.event.resource.not.found", { resource }))
         }
 
         class2Name(clazz: any) {
@@ -83,8 +81,7 @@ export namespace event {
                     eventCls = base.getClass(eventCls);
                     this.mapEvent[event] = eventCls;
                 } catch (ex) {
-                    console.console(`§6插件 §b${name} §6注册事件 §c${event} §6失败 §4事件未找到!`);
-                    console.ex(new Error(`Plugin ${name} register event error ${event} not found!`));
+                    console.i18n("ms.api.event.not.found", { name, event })
                     return;
                 }
             }
@@ -100,11 +97,11 @@ export namespace event {
                         exec(event);
                         let cost = Date.now() - time;
                         if (cost > 20) {
-                            console.console(`§c注意! §6插件 §b${name} §6处理 §d${this.class2Name(eventCls)} §6事件 §c耗时 §4${cost}ms !`)
+                            console.i18n("ms.api.event.execute.slow", { name, event: this.class2Name(eventCls), cost })
                         }
                     }
                 } catch (ex) {
-                    console.console(`§6插件 §b${name} §6处理 §d${this.class2Name(eventCls)} §6事件时发生异常 §4${ex}`);
+                    console.i18n("ms.api.event.execute.error", { name, event: this.class2Name(eventCls), ex })
                     console.ex(ex);
                 }
             }
@@ -119,7 +116,7 @@ export namespace event {
         * @param ignoreCancel
         */
         listen(plugin: any, event: string, exec: (event: any) => void, priority: EventPriority = EventPriority.NORMAL, ignoreCancel = false) {
-            if (!plugin || !plugin.description || !plugin.description.name) throw new TypeError('插件名称为空 请检查传入参数!');
+            if (!plugin || !plugin.description || !plugin.description.name) throw new TypeError(i18n.translate("ms.api.event.listen.plugin.name.empty"));
             var name = plugin.description.name;
             var eventCls = this.name2Class(name, event);
             if (!eventCls) { return; }
@@ -136,7 +133,7 @@ export namespace event {
             if (!listenerMap[name]) listenerMap[name] = [];
             var offExec = () => {
                 this.unregister(eventCls, listener);
-                console.debug(`[${name}] unregister event ${this.class2Name(eventCls)}`);
+                console.debug(i18n.translate("ms.api.event.unregister", { name, event: this.class2Name(eventCls) }));
             };
             var off = {
                 event: eventCls,
@@ -145,7 +142,7 @@ export namespace event {
             };
             listenerMap[name].push(off);
             // noinspection JSUnresolvedVariable
-            console.debug(`[${name}] register event ${this.class2Name(eventCls)} => ${exec.name || '[anonymous]'}`);
+            console.debug(i18n.translate("ms.api.event.register", { name, event: this.class2Name(eventCls) }));
             return off;
         }
 
