@@ -1,3 +1,4 @@
+import i18n from '@ms/i18n'
 import { injectable } from "@ms/container";
 
 export namespace command {
@@ -5,18 +6,18 @@ export namespace command {
     export abstract class Command {
         on(plugin: any, name: string, exec: { cmd: Function, tab?: Function }) {
             var cmd = this.create(plugin, name);
-            console.debug(`[${plugin.description.name}] register command ${name}(${cmd})...`)
+            console.debug(i18n.translate("ms.api.command.register", { plugin: plugin.description.name, name, cmd }))
             if (exec.cmd && typeof exec.cmd === "function") {
                 this.onCommand(plugin, cmd, exec.cmd);
             } else {
-                throw Error("CommandExec Must be a function... Input: " + exec.cmd)
+                throw Error(i18n.translate("ms.api.command.register.input.error", { exec: exec.cmd }))
             }
             if (exec.tab && typeof exec.tab === "function") {
                 this.onTabComplete(plugin, cmd, exec.tab);
             }
         }
         off(plugin: any, name: string) {
-            console.debug(`[${plugin.description.name}] unregister command ${name}...`)
+            console.debug(i18n.translate("ms.api.command.unregister", { plugin: plugin.description.name, name }))
             this.remove(plugin, name);
         }
         /**
