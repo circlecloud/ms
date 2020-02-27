@@ -1,6 +1,6 @@
 {
     "name": "@ms/i18n",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "description": "MiaoScript i18n package",
     "keywords": [
         "miaoscript",
@@ -28,9 +28,9 @@
         "typescript": "^3.8.2"
     },
     "dependencies": {
-        "@ms/common": "^0.2.1",
-        "@ms/container": "^0.2.1",
-        "@ms/ployfill": "^0.2.1",
+        "@ms/common": "^0.3.0",
+        "@ms/container": "^0.3.0",
+        "@ms/ployfill": "^0.3.0",
         "js-yaml": "^3.13.1"
     },
     "gitHead": "781524f83e52cad26d7c480513e3c525df867121"
