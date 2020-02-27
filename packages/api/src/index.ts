@@ -1,4 +1,4 @@
-/// <reference types='@ms/ployfill' />
+import "@ms/ployfill"
 export * from './task'
 export * from './event'
 export * from './console'
