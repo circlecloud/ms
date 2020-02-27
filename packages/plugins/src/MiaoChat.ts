@@ -3,7 +3,7 @@
 /// <reference types="@ms/types/dist/typings/bungee" />
 
 import { server, plugin as pluginApi, channel } from '@ms/api'
-import { inject } from '@ms/container';
+import { inject, optional } from '@ms/container';
 import { plugin, interfaces, cmd, listener, tab, config } from '@ms/plugin'
 import Tellraw from '@ms/common/dist/tellraw'
 
@@ -56,10 +56,10 @@ class MiaoMessage {
 export class MiaoChat extends interfaces.Plugin {
     @inject(server.Server)
     private Server: server.Server
-    @inject(server.ServerType)
-    private ServerType: string
     @inject(channel.Channel)
-    private Channel: channel.Channel
+    @optional() private Channel: channel.Channel
+
+    private channelOff: { off: () => void };
 
     @config()
     private config = {
@@ -169,12 +169,10 @@ export class MiaoChat extends interfaces.Plugin {
                 return string;
             }
         }
-        this.Channel.listen(this, MiaoMessage.CHANNEL, (data) => {
-            this.sendChatAll(MiaoMessage.decode(data).json)
-        })
     }
 
     disable() {
+        this.channelOff?.off()
     }
 
     bukkitenable() {
@@ -186,9 +184,9 @@ export class MiaoChat extends interfaces.Plugin {
         } catch (ex) {
             this.logger.console("§cCan't found me.clip.placeholderapi.PlaceholderAPI variable will not be replaced! Err: " + ex)
         }
-    }
-
-    bukkitdisable() {
+        this.channelOff = this.Channel?.listen(this, MiaoMessage.CHANNEL, (data) => {
+            this.sendChatAll(MiaoMessage.decode(data).json)
+        })
     }
 
     spongeenable() {
@@ -207,15 +205,25 @@ export class MiaoChat extends interfaces.Plugin {
         } catch (ex) {
             this.logger.console("§cCan't found me.rojo8399.placeholderapi.PlaceholderService variable will not be replaced! Err: " + ex)
         }
-    }
-
-    spongedisable() {
+        this.channelOff = this.Channel?.listen(this, MiaoMessage.CHANNEL, (data) => {
+            this.sendChatAll(MiaoMessage.decode(data).json)
+        })
     }
 
     bungeeenable() {
-    }
-
-    bungeedisable() {
+        this.channelOff = this.Channel?.listen(this, MiaoMessage.CHANNEL, (data, event: net.md_5.bungee.api.event.PluginMessageEvent) => {
+            let bungee: net.md_5.bungee.api.ProxyServer = base.getInstance().getProxy()
+            if (event.getTag() == MiaoMessage.CHANNEL) {
+                let origin = event.getSender().getAddress();
+                bungee.getServers().forEach(new BiConsumer({
+                    accept: (s, server) => {
+                        if (server.getAddress() != origin && server.getPlayers().size() > 0) {
+                            server.sendData(event.getTag(), event.getData())
+                        }
+                    }
+                }))
+            }
+        })
     }
 
     @cmd({ servers: ["bungee"] })
@@ -257,22 +265,6 @@ export class MiaoChat extends interfaces.Plugin {
         });
     }
 
-    @listener({ servers: ['bungee'] })
-    PluginMessageEvent(e: any) {
-        let bungee: net.md_5.bungee.api.ProxyServer = base.getInstance().getProxy()
-        let event = e as net.md_5.bungee.api.event.PluginMessageEvent
-        if (event.getTag() == MiaoMessage.CHANNEL) {
-            let origin = event.getSender().getAddress();
-            bungee.getServers().forEach(new BiConsumer({
-                accept: (s, server) => {
-                    if (server.getAddress() != origin && server.getPlayers().size() > 0) {
-                        server.sendData(event.getTag(), event.getData())
-                    }
-                }
-            }))
-        }
-    }
-
     initFormat(chatFormats: any[]) {
         chatFormats.forEach(chatFormat => {
             var chat_format_str = chatFormat.format;
@@ -308,7 +300,7 @@ export class MiaoChat extends interfaces.Plugin {
         chat_format.format_list.forEach((format) => {
             var style = this.styleFormats[format];
             if (style) {
-                tr.then(this.replace(player, style.text));
+                tr.then(this.replace(player, style.text.replace(/&(\w)/g, '§$1')));
                 if (style.hover) {
                     tr.tip(this.replace(player, style.hover.join('\n')));
                 }
@@ -333,7 +325,7 @@ export class MiaoChat extends interfaces.Plugin {
         });
         let json = tr.then(this.replace(player, plain)).json()
         this.sendChatAll(json)
-        this.Channel.send(player, MiaoMessage.CHANNEL, MiaoMessage.encode(json))
+        this.Channel?.send(player, MiaoMessage.CHANNEL, MiaoMessage.encode(json))
     }
 
     sendChatAll(json: string) {
