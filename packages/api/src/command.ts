@@ -33,9 +33,9 @@ export namespace command {
                 try {
                     return executor(sender, command, Java.from(args));
                 } catch (ex) {
-                    console.console(`§6玩家 §a${sender.name} §6执行 §b${plugin.description.name} §6插件 §d${command} ${Java.from(args).join(' ')} §6命令时发生异常 §4${ex}`);
+                    console.i18n("ms.api.command.execute.error", { sender: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex })
                     console.ex(ex);
-                    console.sender(sender, [`§6执行 §b${plugin.description.name} §6插件 §d${command} ${Java.from(args).join(' ')} §6命令时发生异常`, ...console.stack(ex)])
+                    console.sender(sender, [i18n.translate("ms.api.command.execute.error", { sender: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex }), ...console.stack(ex)])
                     return true;
                 }
             }
@@ -48,9 +48,9 @@ export namespace command {
                     var complete = tabCompleter(sender, command, Java.from(args)) || [];
                     return this.copyPartialMatches(complete, token);
                 } catch (ex) {
-                    console.console(`§6玩家 §a${sender.name} §6执行 §b${plugin.description.name} §6插件 §d${command} ${Java.from(args).join(' ')} §6补全时发生异常 §4${ex}`);
+                    console.i18n("ms.api.command.tab.completer.error", { sender: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex })
                     console.ex(ex);
-                    console.sender(sender, [`§6执行 §b${plugin.description.name} §6插件 §d${command} ${Java.from(args).join(' ')} §6补全时发生异常 §4${ex}`, ...console.stack(ex)]);
+                    console.sender(sender, [i18n.translate("ms.api.command.tab.completer.error", { sender: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex }), ...console.stack(ex)]);
                     return [];
                 }
             }
