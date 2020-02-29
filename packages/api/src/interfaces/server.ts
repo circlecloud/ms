@@ -26,6 +26,7 @@ export namespace server {
         getService(service: string): any;
         dispatchCommand(sender: string | any, command: string): boolean;
         dispatchConsoleCommand(command: string): boolean;
+        getPluginsFolder(): string;
         sendJson(sender: string | any, json: object | string): void;
     }
 }

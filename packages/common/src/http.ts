@@ -1,5 +1,10 @@
 import '@ms/api'
 
+const URL = Java.type('java.net.URL')
+const Paths = Java.type('java.nio.file.Paths');
+const Files = Java.type('java.nio.file.Files');
+const StandardCopyOption = Java.type('java.nio.file.StandardCopyOption');
+
 export type Method =
     | 'get' | 'GET'
     | 'delete' | 'DELETE'
@@ -31,8 +36,12 @@ function request(config: RequestConfig) {
     return xhr.get();
 }
 
+function download(url: string, target: string) {
+    Files.copy(new URL(url).openStream(), Paths.get(target), StandardCopyOption.REPLACE_EXISTING);
+}
+
 function _proxy(method: Method) {
-    return function(url: string, data?: any, config?: RequestConfig) {
+    return function (url: string, data?: any, config?: RequestConfig) {
         return request({ url, method, data, ...config });
     }
 }
@@ -40,5 +49,6 @@ function _proxy(method: Method) {
 export default {
     get: _proxy('GET'),
     post: _proxy('POST'),
-    request
+    request,
+    download
 }

@@ -31,6 +31,9 @@ export class BukkitServer implements server.Server {
     dispatchConsoleCommand(command: string): boolean {
         return Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command)
     }
+    getPluginsFolder(): string {
+        return Bukkit.getUpdateFolderFile().getParentFile().getCanonicalPath();
+    }
     sendJson(sender: string | any, json: object | string): void {
         if (typeof sender === "string") {
             sender = this.getPlayer(sender)

@@ -29,6 +29,9 @@ export class BungeeServer implements server.Server {
     dispatchConsoleCommand(command: string): boolean {
         return Bungee.getPluginManager().dispatchCommand(Bungee.getConsole(), command)
     }
+    getPluginsFolder(): string {
+        return Bungee.getPluginsFolder().getCanonicalPath();
+    }
     sendJson(sender: string | any, json: string): void {
         throw new Error("Method not implemented.");
     }
