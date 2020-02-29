@@ -1,8 +1,12 @@
 import { server } from '@ms/api'
 import { provideSingleton } from '@ms/container';
 
-let Sponge = org.spongepowered.api.Sponge;
-let TextSerializers = org.spongepowered.api.text.serializer.TextSerializers;
+import * as fs from '@ms/common/dist/fs'
+
+const Sponge = org.spongepowered.api.Sponge;
+const TextSerializers = org.spongepowered.api.text.serializer.TextSerializers;
+const URL = Java.type("java.net.URL");
+const File = Java.type("java.io.File");
 
 @provideSingleton(server.Server)
 export class SpongeServer implements server.Server {
@@ -29,6 +33,10 @@ export class SpongeServer implements server.Server {
     }
     dispatchConsoleCommand(command: string): boolean {
         return Sponge.getCommandManager().process(Sponge.getServer().getConsole(), command).getQueryResult()
+    }
+    getPluginsFolder(): string {
+        let pluginFile = new URL(base.getInstance().getClass().getProtectionDomain().getCodeSource().getLocation().getPath().split("!")[0]).path
+        return new File(pluginFile).getParentFile().getCanonicalPath()
     }
     sendJson(sender: string | any, json: string): void {
         if (typeof sender === "string") {

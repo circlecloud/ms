@@ -4,7 +4,7 @@ export namespace plugin {
      */
     export const Plugin = Symbol("Plugin");
     /**
-     * MiaoScript Plugin
+     * MiaoScript Plugin Folder
      */
     export const PluginFolder = Symbol("PluginFolder");
     /**
