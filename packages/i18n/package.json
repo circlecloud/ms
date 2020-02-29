@@ -25,7 +25,7 @@
         "@types/js-yaml": "^3.12.2",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
-        "typescript": "^3.8.2"
+        "typescript": "^3.8.3"
     },
     "dependencies": {
         "@ms/common": "^0.3.0",
