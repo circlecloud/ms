@@ -44,7 +44,7 @@ export class SpongeServer implements server.Server {
         return this.pluginsFolder;
     }
     getNativePluginManager() {
-        throw new Error("Method not implemented.");
+        return Sponge.getPluginManager() as any;
     }
     sendJson(sender: string | any, json: string): void {
         if (typeof sender === "string") {

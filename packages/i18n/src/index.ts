@@ -1,7 +1,9 @@
-import '@ms/ployfill'
+/// <reference types="@ms/types/dist/typings/nashorn" />
+/// <reference types="@ms/ployfill" />
 import * as yaml from 'js-yaml'
 
-import * as fs from '@ms/common/dist/fs'
+const File = Java.type("java.io.File");
+const separatorChar = File.separatorChar;
 
 let langMap = {};
 let fallbackMap = {};
@@ -18,16 +20,24 @@ function translate(name: string, param?: TranslateParam) {
 }
 
 function initialize(lang: string = 'zh_cn', fallback: string = 'zh_cn') {
-    langMap = readYamlFile(root, lang) || readYamlFile(fs.concat(__dirname, '..'), lang)
-    fallbackMap = readYamlFile(root, fallback) || readYamlFile(fs.concat(__dirname, '..'), fallback)
+    langMap = readYamlFile(root, lang) || readYamlFile(concat(__dirname, '..'), lang)
+    fallbackMap = readYamlFile(root, fallback) || readYamlFile(concat(__dirname, '..'), fallback)
     console.i18n = function i18n(name: string, param?: TranslateParam) {
         console.log(translate(name, param))
     }
 }
 
 function readYamlFile(dir: string, name: string) {
-    let langFile = fs.concat(dir, 'languages', name + '.yml');
-    return fs.exists(langFile) && yaml.safeLoad(base.read(langFile))
+    let langFile = concat(dir, 'languages', name + '.yml');
+    return exists(langFile) && yaml.safeLoad(base.read(langFile))
+}
+
+function concat(...args: string[]) {
+    return args.join(separatorChar)
+}
+
+function exists(path: string) {
+    return new File(path).exists()
 }
 
 declare global {

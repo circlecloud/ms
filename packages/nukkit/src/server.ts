@@ -40,7 +40,7 @@ export class NukkitServer implements server.Server {
         return this.pluginsFolder;
     }
     getNativePluginManager() {
-        throw new Error("Method not implemented.");
+        return Nukkit.getPluginManager() as any;
     }
     sendJson(sender: string | any, json: object | string): void {
         throw new Error("Method not implemented.");
