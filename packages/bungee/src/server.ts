@@ -39,7 +39,7 @@ export class BungeeServer implements server.Server {
         return this.pluginsFolder;
     }
     getNativePluginManager() {
-        throw new Error("Method not implemented.");
+        return Bungee.getPluginManager() as any
     }
     sendJson(sender: string | any, json: string): void {
         throw new Error("Method not implemented.");

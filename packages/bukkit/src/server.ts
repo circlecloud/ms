@@ -41,7 +41,7 @@ export class BukkitServer implements server.Server {
         return this.pluginsFolder;
     }
     getNativePluginManager() {
-        throw new Error("Method not implemented.");
+        return Bukkit.getPluginManager() as any;
     }
     sendJson(sender: string | any, json: object | string): void {
         if (typeof sender === "string") {

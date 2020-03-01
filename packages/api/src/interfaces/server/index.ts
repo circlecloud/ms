@@ -1,3 +1,5 @@
+import { NativePluginManager } from './native_plugin'
+
 export namespace server {
     /**
      * Runtime ServerType
