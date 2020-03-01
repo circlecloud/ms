@@ -29,7 +29,6 @@
     "dependencies": {
         "@ms/api": "^0.3.0",
         "@ms/common": "^0.3.0",
-        "@ms/container": "^0.3.0",
-        "@ms/types": "^0.3.0"
+        "@ms/container": "^0.3.0"
     }
 }

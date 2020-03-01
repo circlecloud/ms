@@ -1,5 +1,5 @@
-/// <reference path="./global.ts" />
-/// <reference types='@ms/nashorn' />
+/// <reference types="@ms/nashorn" />
+
 import i18n from '@ms/i18n'
 let ployfillStartTime = new Date().getTime();
 i18n.initialize();

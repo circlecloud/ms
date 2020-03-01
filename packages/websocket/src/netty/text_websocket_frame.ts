@@ -1,5 +1,3 @@
-/// <reference types="@ms/ployfill" />
-
 const TypeParameterMatcher = Java.type('io.netty.util.internal.TypeParameterMatcher')
 const TextWebSocketFrameMatcher = TypeParameterMatcher.get(base.getClass('io.netty.handler.codec.http.websocketx.TextWebSocketFrame'))
 const SimpleChannelInboundHandler = Java.type('io.netty.channel.SimpleChannelInboundHandler')

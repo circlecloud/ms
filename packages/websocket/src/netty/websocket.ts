@@ -1,5 +1,3 @@
-import '@ms/api'
-
 const MiaoWebSocket = 'miaowebsocket'
 const CharsetUtil = Java.type('io.netty.util.CharsetUtil')
 const ChannelInboundHandlerAdapter = Java.type('io.netty.channel.ChannelInboundHandlerAdapter')

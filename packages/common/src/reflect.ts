@@ -1,4 +1,3 @@
-import '@ms/core'
 /**
  * 反射工具类
  * Created by MiaoWoo on 2017/2/9 0009.

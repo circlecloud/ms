@@ -1,1 +1,1 @@
-import '@ms/nashorn'
+/// <reference types="@ms/nashorn" />
