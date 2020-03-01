@@ -1,5 +1,3 @@
-/// <reference types="@ms/ployfill" />
-
 const TypeParameterMatcher = Java.type('io.netty.util.internal.TypeParameterMatcher')
 const SimpleChannelInboundHandler = Java.type('io.netty.channel.SimpleChannelInboundHandler')
 const FullHttpRequestMatcher = TypeParameterMatcher.get(base.getClass('io.netty.handler.codec.http.FullHttpRequest'))

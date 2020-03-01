@@ -1,5 +1,4 @@
-/// <reference types="@ms/types/dist/typings/nashorn" />
-/// <reference types="@ms/ployfill" />
+/// <reference types="@ms/nashorn" />
 import * as yaml from 'js-yaml'
 
 const File = Java.type("java.io.File");
