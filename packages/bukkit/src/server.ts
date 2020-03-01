@@ -7,6 +7,12 @@ let Bukkit = org.bukkit.Bukkit;
 
 @provideSingleton(server.Server)
 export class BukkitServer implements server.Server {
+    private pluginsFolder: string;
+
+    constructor() {
+        this.pluginsFolder = Bukkit.getUpdateFolderFile().getParentFile().getCanonicalPath();
+    }
+
     getPlayer(name: string) {
         return Bukkit.getPlayer(name)
     }
@@ -32,7 +38,10 @@ export class BukkitServer implements server.Server {
         return Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command)
     }
     getPluginsFolder(): string {
-        return Bukkit.getUpdateFolderFile().getParentFile().getCanonicalPath();
+        return this.pluginsFolder;
+    }
+    getNativePluginManager() {
+        throw new Error("Method not implemented.");
     }
     sendJson(sender: string | any, json: object | string): void {
         if (typeof sender === "string") {

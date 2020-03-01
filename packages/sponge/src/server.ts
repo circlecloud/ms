@@ -10,6 +10,12 @@ const File = Java.type("java.io.File");
 
 @provideSingleton(server.Server)
 export class SpongeServer implements server.Server {
+    private pluginsFolder: string;
+
+    constructor() {
+        this.pluginsFolder = new File(base.getInstance().getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getCanonicalPath()
+    }
+
     getPlayer(name: string) {
         return Sponge.getServer().getPlayer(name).orElse(null)
     }
@@ -35,8 +41,10 @@ export class SpongeServer implements server.Server {
         return Sponge.getCommandManager().process(Sponge.getServer().getConsole(), command).getQueryResult()
     }
     getPluginsFolder(): string {
-        let pluginFile = new URL(base.getInstance().getClass().getProtectionDomain().getCodeSource().getLocation().getPath().split("!")[0]).path
-        return new File(pluginFile).getParentFile().getCanonicalPath()
+        return this.pluginsFolder;
+    }
+    getNativePluginManager() {
+        throw new Error("Method not implemented.");
     }
     sendJson(sender: string | any, json: string): void {
         if (typeof sender === "string") {
