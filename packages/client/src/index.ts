@@ -29,19 +29,29 @@ client.on('end', (resone) => {
 const rl = createInterface({
     input: process.stdin,
     output: process.stdout,
+    completer: (line, func) => {
+        let args = line.split(' ')
+        let comp = args[args.length - 1]
+        client.once('tab_complete', (msg) => {
+            let mcts = msg.matches.filter(s => s)
+            func(null, [mcts, comp])
+        })
+        client.write('tab_complete', {
+            text: line
+        })
+    },
     terminal: true,
     prompt: ''
 })
 
-rl.on('line', function(line) {
+rl.on('line', function (line) {
     switch (line) {
         case "":
             break;
+        case "write":
+            break;
         case "/respawn":
             client.write('client_command', { payload: 0 })
-            // client.write("respawn", {
-
-            // })
             break;
         case "//reco":
             client.end("")
