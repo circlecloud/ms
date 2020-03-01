@@ -1,4 +1,4 @@
-interface NativePluginManager {
+export interface NativePluginManager {
     load(name: string): boolean;
     unload(name: string): boolean;
     reload(name: string): boolean;
