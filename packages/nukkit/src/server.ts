@@ -2,9 +2,16 @@ import { server } from '@ms/api'
 import { provideSingleton } from '@ms/container';
 
 let Nukkit: cn.nukkit.Server = base.getInstance().getServer();
+const File = Java.type("java.io.File");
 
 @provideSingleton(server.Server)
 export class NukkitServer implements server.Server {
+    private pluginsFolder: string;
+
+    constructor() {
+        this.pluginsFolder = new File(base.getInstance().getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getCanonicalPath()
+    }
+
     getPlayer(name: string) {
         return Nukkit.getPlayer(name)
     }
@@ -28,6 +35,12 @@ export class NukkitServer implements server.Server {
     }
     dispatchConsoleCommand(command: string): boolean {
         return Nukkit.dispatchCommand(Nukkit.getConsoleSender(), command)
+    }
+    getPluginsFolder(): string {
+        return this.pluginsFolder;
+    }
+    getNativePluginManager() {
+        throw new Error("Method not implemented.");
     }
     sendJson(sender: string | any, json: object | string): void {
         throw new Error("Method not implemented.");

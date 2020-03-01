@@ -27,6 +27,7 @@ export namespace server {
         dispatchCommand(sender: string | any, command: string): boolean;
         dispatchConsoleCommand(command: string): boolean;
         getPluginsFolder(): string;
+        getNativePluginManager(): NativePluginManager;
         sendJson(sender: string | any, json: object | string): void;
     }
 }
