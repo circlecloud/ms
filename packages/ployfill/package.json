@@ -17,6 +17,7 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
+        "@ms/i18n": "^0.3.0",
         "@ms/nashorn": "^0.3.0",
         "core-js": "^3.6.4"
     },
