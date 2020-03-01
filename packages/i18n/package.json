@@ -28,7 +28,8 @@
         "typescript": "^3.8.3"
     },
     "dependencies": {
-        "js-yaml": "^3.13.1"
+        "js-yaml": "^3.13.1",
+        "@ms/nashorn": "^0.3.0"
     },
     "gitHead": "781524f83e52cad26d7c480513e3c525df867121"
 }

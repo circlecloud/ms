@@ -28,9 +28,8 @@
         "typescript": "^3.8.3"
     },
     "dependencies": {
-        "@ms/plugin": "^0.3.0",
-        "axios": "^0.19.2",
-        "es6-map": "^0.1.5",
-        "inversify": "^5.0.1"
+        "@ms/api": "^0.3.0",
+        "@ms/container": "^0.3.0",
+        "@ms/plugin": "^0.3.0"
     }
 }

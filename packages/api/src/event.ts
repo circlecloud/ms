@@ -1,5 +1,3 @@
-/// <reference types='@ms/nashorn' />
-
 /**
  * MiaoScript Event处理类
  */

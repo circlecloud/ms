@@ -1,5 +1,3 @@
-import '@ms/api'
-
 const URL = Java.type('java.net.URL')
 const Paths = Java.type('java.nio.file.Paths');
 const Files = Java.type('java.nio.file.Files');
@@ -37,7 +35,9 @@ function request(config: RequestConfig) {
 }
 
 function download(url: string, target: string) {
+    console.debug(`Start Download file ${target} from ${url}....`)
     Files.copy(new URL(url).openStream(), Paths.get(target), StandardCopyOption.REPLACE_EXISTING);
+    console.debug(`File ${target} Download Complate...`)
 }
 
 function _proxy(method: Method) {

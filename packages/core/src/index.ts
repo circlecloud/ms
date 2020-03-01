@@ -1,6 +1,3 @@
-/// <reference types="@ms/nashorn" />
-import '@ms/i18n'
-
 let containerStartTime = Date.now();
 console.i18n("ms.core.ioc.initialize");
 import { plugin, server, task } from '@ms/api'

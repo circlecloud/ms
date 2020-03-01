@@ -28,11 +28,7 @@
     },
     "dependencies": {
         "@ms/api": "^0.3.0",
-        "@ms/bukkit": "^0.3.0",
-        "@ms/common": "^0.3.0",
-        "@ms/container": "^0.3.0",
-        "@ms/plugin": "^0.3.0",
-        "@ms/sponge": "^0.3.0"
+        "@ms/container": "^0.3.0"
     },
     "gitHead": "781524f83e52cad26d7c480513e3c525df867121"
 }
