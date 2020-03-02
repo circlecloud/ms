@@ -1,5 +1,4 @@
 {
-    "private": true,
     "name": "@ms/types",
     "version": "0.3.0",
     "description": "MiaoScript types package",
