@@ -21,6 +21,10 @@ function createConnection(host: string, port: number, username: string) {
     return client;
 }
 
+client.on('error', (error) => {
+    console.log("Client Error", error)
+})
+
 client.on('end', (resone) => {
     console.log("Client End Resone:", resone)
     client = createConnection('192.168.2.5', 25577, username)
@@ -47,6 +51,8 @@ const rl = createInterface({
 rl.on('line', function (line) {
     switch (line) {
         case "":
+            break;
+        case "eval":
             break;
         case "write":
             break;
