@@ -8,22 +8,29 @@
 
 ```txt
 └─packages
+└─packages
     ├─api         全平台兼容的接口
     ├─core        核心代码 用于引导加载
     ├─common      公共类库代码 例如 http reflect 模块
-    ├─compile     实时编译模块 自动编译TS文件为js
+    ├─client      NodeJS的Minecraft客户端 用于调试插件
     ├─container   IOC容器 用于注入具体实现
+    ├─ployfill    Nashorn 的一些自定义增强
     ├─nashorn     Nashorn 的类型定义
-    ├─ployfill    Java Nashorn的补丁
     ├─bungee      BungeeCordAPI内部实现
     ├─bukkit      BukkitAPI内部实现
     ├─sponge      SpongeAPI内部实现
+    ├─nukkit      NukkitAPI内部实现
+    ├─ployfill    JS环境的相关环境补全
     ├─plugin      插件管理器
-    ├─manager     插件管理中心后端服务
-    ├─types       Java在TypeScript的类型定义文件
-    ├─websocket   Netty的WebSocket的MiaoScript实现(兼容socket.io)
+    ├─websocket   Netty的WebSocket注入
+    ├─type        Java的类型定义
+    |   ├─bungee  BungeeCord类型定义
+    |   ├─bukkit  Bukkit类型定义
+    |   ├─sponge  Sponge类型定义
+    |   └─nukkit  Nukkit类型定义
     └─plugins     这里当然是插件啦
         ├─bungee  只兼容BungeeCord的插件
         ├─bukkit  只兼容Bukkit的插件
-        └─sponge  只兼容Sponge的插件
+        ├─sponge  只兼容Sponge的插件
+        └─nukkit  只兼容Nukkit的插件
 ```
