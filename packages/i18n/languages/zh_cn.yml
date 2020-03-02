@@ -1,4 +1,4 @@
-ms.ployfill.initialize: "初始化 Java Nashorn 补丁. 请稍候..."
+ms.ployfill.initialize: "加载 Java Nashorn 补丁. 请稍候..."
 ms.ployfill.completed: "Java Nashorn 补丁 加载完成... 耗时 ({time}s)!"
 
 ms.core.ioc.initialize: "初始化 MiaoScript IOC 容器 @ms/container. 请稍候..."
