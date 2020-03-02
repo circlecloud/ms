@@ -65,6 +65,8 @@
   - 完整的服务端Java类自动补全
   - 全新的 IOC容器 注入功能
   - 注解式 注册命令 注册事件
+- 2020年3月2日 发布0.3.0版本
+  - 支持 Bukkit Nukkit BungeeCord Sponge
 
 ### 进展
 
@@ -98,14 +100,15 @@
     ├─bungee      BungeeCordAPI内部实现
     ├─bukkit      BukkitAPI内部实现
     ├─sponge      SpongeAPI内部实现
+    ├─nukkit      NukkitAPI内部实现
     ├─ployfill    JS环境的相关环境补全
     ├─plugin      插件管理器
+    ├─websocket   Netty的WebSocket注入
     ├─type        Java的类型定义
     |   ├─bungee  BungeeCord类型定义
     |   ├─bukkit  Bukkit类型定义
     |   ├─sponge  Sponge类型定义
     |   └─nukkit  Nukkit类型定义
-    ├─websocket   Netty的WebSocket注入
     └─plugins     这里当然是插件啦
         ├─bungee  只兼容BungeeCord的插件
         ├─bukkit  只兼容Bukkit的插件
@@ -132,8 +135,12 @@ YUMC: https://git.yumc.pw/circlecloud/ms
 - 进入目录 `ms`
 - 安装 npm 包
   - `yarn`
+- 建立内部依赖链接
+  - `yarn bs`
 - 编译一次生成对应的类库
   - `yarn build`
+- 编译插件
+  - `yarn build:plugins`
 
 ### 直接在 MiaoScript Online WebIDE 开发
 
@@ -146,10 +153,7 @@ YUMC: https://git.yumc.pw/circlecloud/ms
 先来一个 `HelloWorld.ts` 插件示范!
 
 ```ts
-/// <reference types="@ms/types/dist/typings/bukkit" />
-/// <reference types="@ms/types/dist/typings/sponge" />
-/// <reference types="@ms/types/dist/typings/bungee" />
-/// <reference types="@ms/types/dist/typings/nukkit" />
+/// <reference types="@ms/types" />
 
 import { server } from '@ms/api';
 import { inject } from '@ms/container';
@@ -276,6 +280,10 @@ export interface PluginMetadata {
         */
     name: string;
     /**
+     * 支持的服务器列表 为空则代表所有
+     */
+    servers?: string[];
+    /**
         * 前缀
         */
     prefix?: string;
@@ -300,10 +308,10 @@ export interface PluginMetadata {
 
 ### 插件生命周期
 
-MiaoScript的生命周期遵循了 Bukkit 的生命周期
+MiaoScript 的生命周期遵循了 Bukkit 的生命周期
 
-MiaoScript针对不同的服务端 提供了扩展的周期
-以服务端类型开头阶段名结束 例如 `bukkitload` `spongeenbale`
+MiaoScript 针对不同的服务端 提供了扩展的周期
+以服务端类型开头阶段名结束 例如 `bukkitload` `spongeenbale` `bungeedisable`
 扩展的生命周期只会在特定的服务器执行
 
 ### load 加载阶段
