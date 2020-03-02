@@ -13,6 +13,7 @@
     "homepage": "https://github.com/circlecloud/ms.git",
     "license": "ISC",
     "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "publishConfig": {
         "registry": "https://repo.yumc.pw/repository/npm-hosted/"
     }
