@@ -1,0 +1,26 @@
+{
+    "name": "ms-docs",
+    "version": "0.3.1",
+    "description": "MiaoScript docs package",
+    "keywords": [
+        "miaoscript",
+        "minecraft",
+        "bukkit",
+        "sponge"
+    ],
+    "author": "MiaoWoo <admin@yumc.pw>",
+    "homepage": "https://github.com/circlecloud/ms.git",
+    "license": "ISC",
+    "publishConfig": {
+        "registry": "https://repo.yumc.pw/repository/npm-hosted/"
+    },
+    "scripts": {
+        "dev": "gitbook serve",
+        "gi": "gitbook install",
+        "build": "gitbook build"
+    },
+    "devDependencies": {
+        "gitbook-cli": "^2.3.2"
+    },
+    "dependencies": {}
+}
