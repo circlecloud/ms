@@ -1,0 +1,27 @@
+@startuml MiaoScript 生命周期
+
+start
+
+:扫描 plugins 路径;
+:循环加载插件脚本;
+:扫描 @plugin 注解;
+:构建插件实例;
+:判断 servers 参数 获得可加载的插件;
+:扫描 @config 注解 注入配置或保存默认配置;
+:执行 Load 阶段;
+:执行 扩展 Load 阶段;
+:扫描 @cmd/@tab 注解 注册命令/补全;
+:扫描 @listener 注解 注册事件监听;
+:执行 Enable 阶段;
+:执行 扩展 Enable 阶段;
+:进入运行阶段;
+:进入关闭阶段;
+:保存 配置到配置文件;
+:注销 插件命令;
+:注销 事件监听;
+:执行 Disable 阶段;
+:执行 扩展 Disable 阶段;
+
+end
+
+@endum
