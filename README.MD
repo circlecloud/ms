@@ -8,7 +8,6 @@
 
 ```txt
 └─packages
-└─packages
     ├─api         全平台兼容的接口
     ├─core        核心代码 用于引导加载
     ├─common      公共类库代码 例如 http reflect 模块
@@ -20,7 +19,7 @@
     ├─bukkit      BukkitAPI内部实现
     ├─sponge      SpongeAPI内部实现
     ├─nukkit      NukkitAPI内部实现
-    ├─ployfill    JS环境的相关环境补全
+
     ├─plugin      插件管理器
     ├─websocket   Netty的WebSocket注入
     ├─type        Java的类型定义
