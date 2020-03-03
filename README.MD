@@ -19,7 +19,6 @@
     ├─bukkit      BukkitAPI内部实现
     ├─sponge      SpongeAPI内部实现
     ├─nukkit      NukkitAPI内部实现
-
     ├─plugin      插件管理器
     ├─websocket   Netty的WebSocket注入
     ├─type        Java的类型定义
