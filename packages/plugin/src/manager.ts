@@ -64,20 +64,20 @@ export class PluginManagerImpl implements plugin.PluginManager {
     enable(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
             this.logStage(plugin, i18n.translate("ms.plugin.manager.stage.enable"))
-            this.runCatch(plugin, 'enable')
-            this.runCatch(plugin, `${this.serverType}enable`)
             this.registryCommand(plugin)
             this.registryListener(plugin)
+            this.runCatch(plugin, 'enable')
+            this.runCatch(plugin, `${this.serverType}enable`)
         })
     }
 
     disable(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
             this.logStage(plugin, i18n.translate("ms.plugin.manager.stage.disable"))
-            this.runCatch(plugin, 'disable')
-            this.runCatch(plugin, `${this.serverType}disable`)
             this.unregistryCommand(plugin)
             this.unregistryListener(plugin)
+            this.runCatch(plugin, 'disable')
+            this.runCatch(plugin, `${this.serverType}disable`)
         })
     }
 
