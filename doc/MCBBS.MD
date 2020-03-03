@@ -5,10 +5,55 @@
 
 ### 更新日志
 
+- 2020-03-03
+  - 发布 `v0.3.1` 版本
+- 2020-03-02
+  - 杂项 更新文档以及示例插件
+- 2020-03-01
+  - 修复 多个包之间的循环依赖问题
+  - 优化 `@ms/types` 的引用逻辑
+- 2020-02-29
+  - 更新 `TypeScript` 版本为 `3.8.3`
+  - 新增 `@ms/common` 的 `http` 下载功能
+- 2020-02-27
+  - 发布 `v0.3.0` 版本
+  - 新增 `@ms/i18n` 国际化包的支持
+  - 修复 `@ms/plugin` 对 `servers` 相关处理异常
+  - 优化 `@ms/api` 的 `Channel` 处理增加 扩展原始数据
+- 2020-02-26
+  - 优化 `@ms/container` 使用 `autoProvide` 自动注入依赖
+- 2020-02-25
+  - 修复 `@ms/api` 对 `evnet` 的类型处理异常
+- 2020-02-24
+  - 发布 `v0.2.1` 版本
+  - 完善 对 `Nukkit` 端的支持
+  - 新增 `@ms/api` 通道相关的支持
+- 2020-02-23
+  - 新增 `@ms/nukkit` 包 对 `Nukkit` 端的支持
+  - 新增 `@ms/type` 的 `nukkit` 类型自动补全
+- 2020-02-22
+  - 发布 `v0.2.0` 版本
+  - 新增 `@ms/plugin` 的 `@config` 注解 目前支持 `json` `yml` 格式的配置
+- 2020-02-15
+  - 新增 `SourceMap` 的支持 用于跟踪源代码行数
+- 2020-02-09
+  - 新增 `core-js` 用于支持大部分新ES语法
+- 2020-01-31
+  - 优化 `@ms/ployfill` 全局处理
+- 2020-01-15
+  - 新增 `@ms/bungee` 包 对 `BungeeCord` 端的支持
+- 2020-01-14
+  - 新增 `@ms/type` 的 `bungee` 类型自动补全
+- 2019-11-10
+  - 新增 `WebSocket` 的注入支持
+- 2019-11-07
+  - 新增 `@ms/type` 的 `jdk` 类型自动补全
+- 2019-09-27
+  - 新增 `CatServer` MOD端的支持
 - 2019-09-25
-  - 完善 `Sponge` 类型自动补全
+  - 新增 `@ms/type` 的 `sponge` 类型自动补全
 - 2019-09-24
-  - 完善 `Bukkit` 类型自动补全
+  - 新增 `@ms/type` 的 `bukkit` 类型自动补全
 
 ## 插件简介
 
@@ -163,6 +208,10 @@ import { plugin, interfaces, cmd, listener, tab } from '@ms/plugin'
 export class HelloWorld extends interfaces.Plugin {
     @inject(server.Server)
     private Server: server.Server
+    @config()
+    private config = {
+        version: 1.0.0
+    }
 
     load() {
         this.logger.log('Plugin load from MiaoScript Plugin System...');
@@ -406,6 +455,19 @@ ServerConnected(e: any) {
     let event = e as net.md_5.bungee.api.event.ServerConnectedEvent
     this.logger.console(`§cBungeeCord §aServerConnectedEvent: §b${event.getPlayer().getDisplayName()}`)
     setTimeout(() => this.logger.sender(event.getPlayer(), `§a欢迎来到 §bMiaoScript §a的世界 §6来自 §cBungeeCord §6的问候!`), 10);
+}
+```
+
+## 配置文件
+
+配置文件 默认读取的是 `MiaoScript根目录/plugins/插件名称/配置名称.配置格式`
+
+例如下面文件 默认处理的是 `plugins/MiaoScript/plugins/HelloWorld/config.yml`
+
+```ts
+@config()
+private config = {
+    version: 1.0.0
 }
 ```
 

@@ -27,6 +27,7 @@
         "typescript": "^3.8.3"
     },
     "dependencies": {
+        "inversify": "^5.0.1",
         "inversify-binding-decorators": "^4.0.0"
     }
 }
