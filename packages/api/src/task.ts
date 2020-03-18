@@ -1,5 +1,3 @@
-import { injectable, DefaultContainer as container } from "@ms/container";
-
 export namespace task {
     export const TaskManager = Symbol('TaskManager')
     export interface TaskManager {
