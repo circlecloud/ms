@@ -146,7 +146,7 @@ export class MiaoScriptConsole implements Console {
                         }
                     }
                 }
-                cache.push(`    §e->§c ${className}.${trace.methodName}(§4${fileName}:${trace.lineNumber}§c)`);
+                cache.push(`    §e->§c ${className}.${trace.methodName}(§4${fileName}:${lineNumber}§c)`);
             }
         });
         return cache;
