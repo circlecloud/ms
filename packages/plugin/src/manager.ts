@@ -186,14 +186,19 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     private buildPlugin(metadata: interfaces.PluginMetadata) {
-        this.bindPlugin(metadata)
-        let pluginInstance = this.container.getNamed<interfaces.Plugin>(plugin.Plugin, metadata.name)
-        if (!(pluginInstance instanceof interfaces.Plugin)) {
-            console.i18n('ms.plugin.manager.build.not.extends', { source: metadata.source })
-            return
+        try {
+            this.bindPlugin(metadata)
+            let pluginInstance = this.container.getNamed<interfaces.Plugin>(plugin.Plugin, metadata.name)
+            if (!(pluginInstance instanceof interfaces.Plugin)) {
+                console.i18n('ms.plugin.manager.build.not.extends', { source: metadata.source })
+                return
+            }
+            this.pluginMap.set(metadata.name, pluginInstance)
+            return pluginInstance;
+        } catch (ex) {
+            console.i18n("ms.plugin.manager.initialize.error", { name: metadata.name, ex })
+            console.ex(ex)
         }
-        this.pluginMap.set(metadata.name, pluginInstance)
-        return pluginInstance
     }
 
     private bindPlugin(metadata: interfaces.PluginMetadata) {
