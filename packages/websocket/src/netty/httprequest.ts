@@ -2,17 +2,18 @@ const TypeParameterMatcher = Java.type('io.netty.util.internal.TypeParameterMatc
 const SimpleChannelInboundHandler = Java.type('io.netty.channel.SimpleChannelInboundHandler')
 const FullHttpRequestMatcher = TypeParameterMatcher.get(base.getClass('io.netty.handler.codec.http.FullHttpRequest'))
 
-export default abstract class HttpRequestHandlerAdapter {
+export abstract class HttpRequestHandlerAdapter {
     private _Handler;
     constructor() {
-        this._Handler == Java.extend(SimpleChannelInboundHandler, {
+        let HttpRequestHandlerAdapterImpl = Java.extend(SimpleChannelInboundHandler, {
             acceptInboundMessage: (msg: any) => {
                 return FullHttpRequestMatcher.match(msg)
             },
-            channelRead0: this.channelRead0
+            channelRead0: this.channelRead0.bind(this)
         })
+        this._Handler = new HttpRequestHandlerAdapterImpl();
     }
-    abstract channelRead0(ctx: any, msg: any);
+    abstract channelRead0(ctx: any, request: any);
     getHandler() {
         return this._Handler;
     }

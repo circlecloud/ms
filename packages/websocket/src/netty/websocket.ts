@@ -1,15 +1,14 @@
-const MiaoWebSocket = 'miaowebsocket'
-const CharsetUtil = Java.type('io.netty.util.CharsetUtil')
 const ChannelInboundHandlerAdapter = Java.type('io.netty.channel.ChannelInboundHandlerAdapter')
 
-export default abstract class WebSocketHandlerAdapter {
+export abstract class WebSocketHandlerAdapter {
     private _Handler;
     constructor() {
-        this._Handler = Java.extend(ChannelInboundHandlerAdapter, {
-            channelRead: this.channelRead
+        let ChannelInboundHandlerAdapterImpl = Java.extend(ChannelInboundHandlerAdapter, {
+            channelRead: this.channelRead.bind(this)
         })
+        this._Handler = new ChannelInboundHandlerAdapterImpl()
     }
-    abstract channelRead(ctx: any, msg: any);
+    abstract channelRead(ctx: any, channel: any);
     getHandler() {
         return this._Handler;
     }

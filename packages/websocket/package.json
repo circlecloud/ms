@@ -27,7 +27,9 @@
         "typescript": "^3.8.3"
     },
     "dependencies": {
-        "@ms/nashorn": "^0.3.1"
+        "@ms/container": "^0.3.2",
+        "@ms/nashorn": "^0.3.1",
+        "socket.io-parser": "^3.4.0"
     },
     "gitHead": "781524f83e52cad26d7c480513e3c525df867121"
 }
