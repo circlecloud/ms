@@ -8,8 +8,8 @@
     "scripts": {
         "bs": "lerna bootstrap",
         "clean": "lerna run clean",
-        "watch": "lerna run watch --parallel --scope=\"@ms/!(manager)\"",
-        "build": "lerna run build --scope=\"@ms/!(plugins|manager)\"",
+        "watch": "lerna run watch --parallel",
+        "build": "lerna run build --scope=\"@ms/!(plugins)\"",
         "build:plugins": "lerna run build --scope=\"@ms/plugins\"",
         "ug": "yarn upgrade-interactive --latest",
         "lp": "lerna publish"
