@@ -1,12 +1,13 @@
 import { TextWebSocketFrameHandlerAdapter } from '../netty'
 import { EventEmitter } from 'events'
 import { ServerEvent } from './constants'
+import { NettyWebSocketServerOptions } from './config';
 
 export class TextWebSocketFrameHandler extends TextWebSocketFrameHandlerAdapter {
     private event: EventEmitter;
-    constructor(event: EventEmitter) {
+    constructor(options: NettyWebSocketServerOptions) {
         super()
-        this.event = event;
+        this.event = options.event;
     }
     userEventTriggered(ctx: any, evt: any) {
         if (evt == 'HANDSHAKE_COMPLETE') {
