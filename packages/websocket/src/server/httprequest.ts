@@ -1,4 +1,5 @@
 import { HttpRequestHandlerAdapter } from '../netty'
+import { Keys, AttributeKeys } from './constants'
 
 const DefaultHttpResponse = Java.type('io.netty.handler.codec.http.DefaultHttpResponse')
 const DefaultFullHttpResponse = Java.type('io.netty.handler.codec.http.DefaultFullHttpResponse')
@@ -31,6 +32,7 @@ export class HttpRequestHandler extends HttpRequestHandlerAdapter {
     }
     channelRead0(ctx: any, request: any) {
         if (request.getUri().startsWith(this.ws)) {
+            ctx.channel().attr(AttributeKeys.Request).set(request);
             ctx.fireChannelRead(request.retain())
         } else {
             ctx.executor().execute(new Runnable({

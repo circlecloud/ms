@@ -6,31 +6,41 @@ import { ServerEvent } from '../server';
 import { Socket } from './socket';
 import { Adapter } from './adapter';
 import { Server } from './index'
+import { Packet } from './packet';
+import { SubPacketTypes } from './types';
 
 export class Namespace extends EventEmitter implements SocketIO.Namespace {
     name: string;
     server: Server;
-    sockets: { [id: string]: SocketIO.Socket; };
-    connected: { [id: string]: SocketIO.Socket; };
+    sockets: { [id: string]: Socket; };
+    connected: { [id: string]: Socket; };
     adapter: SocketIO.Adapter;
     json: SocketIO.Namespace;
 
-    constructor(name: string) {
+    constructor(name: string, server: Server) {
         super();
         this.name = name;
+        this.server = server;
         this.sockets = {};
         this.connected = {};
         this.adapter = new Adapter(this);
     }
     initAdapter() {
-        let adp = this.server.adapter()
-        this.adapter = new adp()
+        // @ts-ignore
+        this.adapter = new (this.server.adapter())()
     }
-    add(client: Client) {
-        let nameClient = new Socket(this, client, {});
-        this.sockets[client.id] = nameClient;
-        client.nsps[this.name] = nameClient;
-        this.onconnection(nameClient);
+    add(client: Client, query?: any, callback?: () => void) {
+        // client.conn.request.url();
+        let socket = new Socket(this, client, {});
+        this.sockets[client.id] = socket;
+        client.nsps[this.name] = socket;
+        this.onconnection(socket);
+        return socket;
+    }
+    del(client: Client) {
+        let socket = this.sockets[client.id];
+        socket.disconnect();
+        delete this.sockets[client.id];
     }
     use(fn: (socket: SocketIO.Socket, fn: (err?: any) => void) => void): SocketIO.Namespace {
         // TODO
@@ -55,6 +65,26 @@ export class Namespace extends EventEmitter implements SocketIO.Namespace {
     }
     compress(compress: boolean): SocketIO.Namespace {
         throw new Error("Method not implemented.");
+    }
+    process(packet: Packet, client: Client) {
+        switch (packet.sub_type) {
+            case SubPacketTypes.CONNECT:
+                this.add(client);
+                break;
+            case SubPacketTypes.DISCONNECT:
+                this.del(client);
+                break;
+            case SubPacketTypes.EVENT:
+                this.sockets[client.id].onpacket(packet);
+                break;
+        }
+    }
+    remove(socket: Socket) {
+        if (this.sockets.hasOwnProperty(socket.id)) {
+            delete this.sockets[socket.id];
+        } else {
+            // debug('ignoring remove for %s', socket.id);
+        }
     }
     private onconnection(socket: any) {
         let client = socket as Socket;

@@ -1,54 +1,104 @@
 import { EventEmitter } from 'events'
 import { Parser } from './parser'
 import { Packet } from './packet';
-import { PacketTypes, SubPacketTypes } from './types';
-import { ServerEvent, NettyClient } from '../server';
+import { NettyClient } from '../server';
 import { SocketIO } from './interfaces'
+import { Server, Socket } from './index';
+import { PacketTypes, SubPacketTypes } from './types';
 
 const parser = new Parser();
 
 export class Client extends EventEmitter implements SocketIO.Client {
-    private nettyClient: NettyClient;
-    private event: EventEmitter;
-    private _id: string;
-
-    server: SocketIO.Server;
-    conn: SocketIO.EngineSocket;
+    server: Server;
+    conn: NettyClient;
     request: any;
-    sockets: { [id: string]: SocketIO.Socket; };
+    sockets: { [id: string]: Socket; };
     nsps: { [nsp: string]: SocketIO.Socket; };
+    connectBuffer: any;
 
-    constructor(server: SocketIO.Server, nettyClient: NettyClient) {
+    constructor(server: Server, nettyClient: NettyClient) {
         super();
         this.server = server;
-        this.event = new EventEmitter();
         this.conn = nettyClient;
-        this.nettyClient = nettyClient;
-        this._id = this.nettyClient.id;
+        this.request = nettyClient.request;
+        this.sockets = {};
+        this.nsps = {};
     }
     get id() {
-        return this._id;
+        return this.conn.id;
     }
-    on(event: string, callback: (...args: any[]) => void) {
-        this.event.on(event, callback);
-        return this
-    }
-    emit(event: string, ...args: any[]): boolean {
-        this.packet({
-            type: PacketTypes.MESSAGE,
-            sub_type: SubPacketTypes.EVENT,
-            name: event,
-            data: args[0]
+    connect(name, query) {
+        if (this.server.nsps[name]) {
+            // console.debug(`connecting to namespace ${name}`);
+            return this.doConnect(name, query);
+        }
+        this.server.checkNamespace(name, query, (dynamicNsp) => {
+            if (dynamicNsp) {
+                // console.debug('dynamic namespace %s was created', dynamicNsp.name);
+                this.doConnect(name, query);
+            } else {
+                // console.debug('creation of namespace %s was denied', name);
+                this.packet({
+                    type: PacketTypes.MESSAGE,
+                    sub_type: SubPacketTypes.ERROR,
+                    nsp: name,
+                    data: 'Invalid namespace'
+                });
+            }
         })
-        return true;
     }
-    send(data: any) {
-        this.emit("message", data);
-    }
-    process(packet: Packet) {
-        this.event.emit(packet.name, packet.data);
+    doConnect(name, query) {
+        var nsp = this.server.of(name);
+        if ('/' != name && !this.nsps['/']) {
+            this.connectBuffer.push(name);
+            return;
+        }
+        var socket = nsp.add(this, query, () => {
+            this.sockets[socket.id] = socket;
+            this.nsps[nsp.name] = socket;
+
+            if ('/' == nsp.name && this.connectBuffer.length > 0) {
+                this.connectBuffer.forEach(this.connect, this);
+                this.connectBuffer = [];
+            }
+        });
     }
     packet(packet: Packet) {
-        this.nettyClient.send(parser.encode(packet))
+        this.conn.send(parser.encode(packet))
     }
+    onclose(reason: string) {
+        // debug('client close with reason %s', reason);
+        // ignore a potential subsequent `close` event
+        this.destroy();
+        // `nsps` and `sockets` are cleaned up seamlessly
+        for (var id in this.sockets) {
+            if (this.sockets.hasOwnProperty(id)) {
+                this.sockets[id].onclose(reason);
+            }
+        }
+        this.sockets = {};
+        // this.decoder.destroy(); // clean up decoder
+    };
+    close() {
+        // if ('open' == this.conn.readyState) {
+        // debug('forcing transport close');
+        this.conn.close();
+        this.onclose('forced server close');
+        // }
+    }
+    remove(socket: Socket) {
+        if (this.sockets.hasOwnProperty(socket.id)) {
+            var nsp = this.sockets[socket.id].nsp.name;
+            delete this.sockets[socket.id];
+            delete this.nsps[nsp];
+        } else {
+            // debug('ignoring remove for %s', socket.id);
+        }
+    }
+    destroy() {
+        // this.conn.removeListener('data', this.ondata);
+        // this.conn.removeListener('error', this.onerror);
+        // this.conn.removeListener('close', this.onclose);
+        // this.decoder.removeListener('decoded', this.ondecoded);
+    };
 }
