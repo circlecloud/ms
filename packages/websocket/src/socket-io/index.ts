@@ -32,7 +32,7 @@ class Server implements SocketIO.Server {
         this.event = new EventEmitter();
         this.allClients = {};
         this.nsps = {};
-        this.sockets = new Namespace('/');
+        this.sockets = new Namespace('/', this);
         this.nsps['/'] = this.sockets;
         this.initNettyServer(pipeline, options);
     }
@@ -84,6 +84,7 @@ class Server implements SocketIO.Server {
         throw new Error("Method not implemented.");
     }
     onconnection(socket: any): SocketIO.Server {
+        this.allClients[socket.id] = socket;
         socket.packet({
             type: PacketTypes.OPEN,
             data: {
@@ -96,9 +97,9 @@ class Server implements SocketIO.Server {
         this.sockets.add(socket);
         return this;
     }
-    of(nsp: string): SocketIO.Namespace {
+    of(nsp: string): Namespace {
         if (!this.nsps[nsp]) {
-            this.nsps[nsp] = new Namespace(nsp);
+            this.nsps[nsp] = new Namespace(nsp, this);
         }
         return this.nsps[nsp];
     }
@@ -140,6 +141,12 @@ class Server implements SocketIO.Server {
     compress(...args: any[]): SocketIO.Namespace {
         throw new Error("Method not implemented.");
     }
+
+    // ===============================
+    checkNamespace(name, query, fn) {
+        fn(false);
+    };
+
     disable() {
         this.nettyServer.disable();
     }
@@ -176,18 +183,22 @@ class Server implements SocketIO.Server {
     }
 
     private processSubPacket(packet: Packet, client: Client) {
-        switch (packet.sub_type) {
-            case SubPacketTypes.CONNECT:
-                client.packet(packet);
-                break;
-            case SubPacketTypes.EVENT:
-                client.process(packet);
-                break;
+        let namespace = this.nsps[packet.nsp]
+        if (!namespace) {
+            client.packet({
+                type: PacketTypes.MESSAGE,
+                sub_type: SubPacketTypes.ERROR,
+                data: 'not support dynamic namespace'
+            });
+            client.close();
+            return;
         }
+        namespace.process(packet, client);
     }
 }
 export {
     Server,
+    Socket,
     Server as SocketIOServer,
     Client as SocketIOClient
 }

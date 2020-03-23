@@ -36,6 +36,9 @@ class NettyWebSocketServer {
         if (this.pipeline.names().contains(Keys.Detect)) {
             this.pipeline.remove(Keys.Detect)
         }
+        Object.values(this.allClients).forEach(client => {
+            client.close();
+        })
     }
 
     on(event: string, listener: (...args: any[]) => void) {
