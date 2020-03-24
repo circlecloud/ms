@@ -3,8 +3,9 @@ import { PacketTypes, SubPacketTypes } from "./types";
 
 export class Parser {
     encode(packet: Packet): string {
+        let origin = JSON.stringify(packet)
         // first is type
-        var str = '' + packet.type;
+        let str = '' + packet.type;
         if (packet.type == PacketTypes.PONG) {
             if (packet.data) { str += packet.data };
             return str;
@@ -26,18 +27,19 @@ export class Parser {
             str += packet.id;
         }
         if (packet.sub_type == SubPacketTypes.EVENT) {
+            if (packet.name == undefined) { throw new Error(`SubPacketTypes.EVENT name can't be empty!`) }
             packet.data = [packet.name, packet.data]
         }
         // json data
         if (null != packet.data) {
-            var payload = this.tryStringify(packet.data);
+            let payload = this.tryStringify(packet.data);
             if (payload !== false) {
                 str += payload;
             } else {
                 return '4"encode error"'
             }
         }
-        console.debug(`encoded ${JSON.stringify(packet)} as ${str}`);
+        console.debug(`encoded ${origin} as ${str}`);
         return str;
     }
     tryStringify(str) {
@@ -48,14 +50,14 @@ export class Parser {
         }
     }
     decode(str: string): Packet {
-        var i = 0;
+        let i = 0;
         // ignore parse binary
         // if ((frame.getByte(0) == 'b' && frame.getByte(1) == '4')
         //     || frame.getByte(0) == 4 || frame.getByte(0) == 1) {
         //     return parseBinary(head, frame);
         // }
         // look up type
-        var p: Packet = {
+        let p: Packet = {
             type: Number(str.charAt(i))
         };
         if (null == PacketTypes[p.type]) {
@@ -77,7 +79,7 @@ export class Parser {
         }
         // look up attachments if type binary
         if ([SubPacketTypes.BINARY_ACK, SubPacketTypes.BINARY_EVENT].includes(p.sub_type)) {
-            var buf = '';
+            let buf = '';
             while (str.charAt(++i) !== '-') {
                 buf += str.charAt(i);
                 if (i == str.length) break;
@@ -92,7 +94,7 @@ export class Parser {
         if ('/' === str.charAt(i + 1)) {
             p.nsp = '';
             while (++i) {
-                var c = str.charAt(i);
+                let c = str.charAt(i);
                 if (',' === c) break;
                 p.nsp += c;
                 if (i === str.length) break;
@@ -102,11 +104,11 @@ export class Parser {
         }
 
         // look up id
-        var next = str.charAt(i + 1);
+        let next = str.charAt(i + 1);
         if ('' !== next && Number.isNaN(Number(next))) {
-            var id = ''
+            let id = ''
             while (++i) {
-                var c = str.charAt(i);
+                let c = str.charAt(i);
                 if (null == c || Number.isNaN(Number(c))) {
                     --i;
                     break;
@@ -128,8 +130,8 @@ export class Parser {
 
         // look up json data
         if (str.charAt(++i)) {
-            var payload = this.tryParse(str.substr(i));
-            var isPayloadValid = payload !== false && (p.sub_type == SubPacketTypes.ERROR || Array.isArray(payload));
+            let payload = this.tryParse(str.substr(i));
+            let isPayloadValid = payload !== false && (p.sub_type == SubPacketTypes.ERROR || Array.isArray(payload));
             if (isPayloadValid) {
                 p.name = payload[0];
                 p.data = payload[1];

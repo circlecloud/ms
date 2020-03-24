@@ -10,12 +10,14 @@ export abstract class TextWebSocketFrameHandlerAdapter {
             acceptInboundMessage: (msg: any) => {
                 return TextWebSocketFrameMatcher.match(msg)
             },
-            channelRead0: this.channelRead0.bind(this)
+            channelRead0: this.channelRead0.bind(this),
+            exceptionCaught: this.exceptionCaught.bind(this)
         })
         this._Handler = new TextWebSocketFrameHandlerAdapterImpl();
     }
     abstract userEventTriggered(ctx: any, evt: any);
     abstract channelRead0(ctx: any, msg: any);
+    abstract exceptionCaught(ctx: any, cause: Error);
     getHandler() {
         return this._Handler;
     }

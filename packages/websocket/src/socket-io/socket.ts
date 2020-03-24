@@ -7,8 +7,6 @@ import { Client } from './client';
 import { Namespace } from './namespace';
 
 export class Socket extends EventEmitter implements SocketIO.Socket {
-    private event: EventEmitter;
-
     nsp: Namespace;
     server: SocketIO.Server;
     adapter: SocketIO.Adapter;
@@ -21,11 +19,18 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
     connected: boolean;
     disconnected: boolean;
     handshake: SocketIO.Handshake;
-    json: SocketIO.Socket;
-    volatile: SocketIO.Socket;
-    broadcast: SocketIO.Socket;
     fns: any[];
+    flags: { [key: string]: boolean };
     _rooms: string[];
+
+    private events = [
+        'error',
+        'connect',
+        'disconnect',
+        'disconnecting',
+        'newListener',
+        'removeListener'
+    ]
 
     constructor(nsp: Namespace, client: Client, query = {}) {
         super();
@@ -42,10 +47,26 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
         this.disconnected = false;
         // this.handshake = this.buildHandshake(query);
         this.fns = [];
-        // this.flags = {};
+        this.flags = {};
         this._rooms = [];
+    }
 
-        this.event = new EventEmitter();
+    get json() {
+        this.flags.json = true;
+        return this
+    }
+
+    get volatile() {
+        this.flags.volatile = true;
+        return this
+    }
+    get broadcast() {
+        this.flags.broadcast = true;
+        return this
+    }
+    get local() {
+        this.flags.local = true;
+        return this
     }
 
     to(room: string): SocketIO.Socket {
@@ -95,11 +116,10 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
         throw new Error("Method not implemented.");
     }
     error(err: any): void {
-        throw new Error("Method not implemented.");
+        this.packet({ type: PacketTypes.MESSAGE, sub_type: SubPacketTypes.ERROR, data: err });
     }
 
     // ==========================================
-
     buildHandshake(query): SocketIO.Handshake {
         let requestQuery = this.request.uri();
         return {
@@ -113,29 +133,61 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
             query: Object.assign(query, requestQuery)
         }
     }
-
-    on(event: string, callback: (...args: any[]) => void) {
-        this.event.on(event, callback);
-        return this
-    }
     emit(event: string, ...args: any[]): boolean {
-        this.packet({
+        if (~this.events.indexOf(event)) {
+            super.emit(event, ...args);
+            // @ts-ignore
+            return this;
+        }
+
+        let packet: Packet = {
             type: PacketTypes.MESSAGE,
-            sub_type: SubPacketTypes.EVENT,
+            sub_type: (this.flags.binary !== undefined ? this.flags.binary : this.hasBin(args)) ? SubPacketTypes.BINARY_EVENT : SubPacketTypes.EVENT,
             name: event,
             data: args[0]
-        })
-        return true;
+        }
+
+        // access last argument to see if it's an ACK callback
+        if (typeof args[args.length - 1] === 'function') {
+            if (this._rooms.length || this.flags.broadcast) {
+                throw new Error('Callbacks are not supported when broadcasting');
+            }
+            // debug('emitting packet with ack id %d', this.nsp.ids);
+            this.acks[this.nsp.ids] = args.pop();
+            packet.id = this.nsp.ids++;
+        }
+
+        let rooms = this._rooms.slice(0);
+        let flags = Object.assign({}, this.flags);
+
+        // reset flags
+        this._rooms = [];
+        this.flags = {};
+
+        if (rooms.length || flags.broadcast) {
+            this.adapter.broadcast(packet, {
+                except: [this.id],
+                rooms: rooms,
+                flags: flags
+            });
+        } else {
+            // dispatch packet
+            this.packet(packet, flags);
+        }
+        // @ts-ignore
+        return this;
     }
-    packet(packet: Packet) {
+    packet(packet: Packet, opts?: any) {
         packet.nsp = this.nsp.name;
-        this.client.packet(packet);
+        opts = opts || {};
+        opts.compress = false !== opts.compress;
+        this.client.packet(packet, opts);
     }
     onconnect() {
         this.nsp.connected[this.id] = this;
         this.client.sockets[this.id] = this;
         this.join(this.id);
-        // var skip = this.nsp.name === '/' && this.nsp.fns.length === 0;
+        // let skip = this.nsp.name === '/' && this.nsp.fns.length === 0;
         // if (skip) {
         // debug('packet already sent in initial handshake');
         // } else {
@@ -145,7 +197,7 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
         });
         // }
     }
-    onclose(reason) {
+    onclose(reason?: string) {
         if (!this.connected) return this;
         // debug('closing socket - reason %s', reason);
         this.emit('disconnecting', reason);
@@ -156,7 +208,7 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
         this.disconnected = true;
         delete this.nsp.connected[this.id];
         this.emit('disconnect', reason);
-    };
+    }
     onpacket(packet: Packet) {
         switch (packet.sub_type) {
             case SubPacketTypes.EVENT:
@@ -178,11 +230,16 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
                 this.onerror(new Error(packet.data));
         }
     }
-    onerror(error: Error) {
-
+    onerror(err: Error) {
+        if (this.listeners('error').length) {
+            this.emit('error', err);
+        } else {
+            console.error('Missing error handler on `socket`.');
+            console.error(err.stack);
+        }
     }
     ondisconnect() {
-        this.onclose
+        this.onclose('client namespace disconnect')
     }
     onevent(packet: Packet) {
         // console.debug('emitting event %j', args);
@@ -191,9 +248,9 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
             this.dispatch(packet, this.ack(packet.id))
         }
         this.dispatch(packet);
-    };
+    }
     ack(id: number) {
-        var sent = false;
+        let sent = false;
         return (...args: any[]) => {
             if (sent) return;
             this.packet({
@@ -206,7 +263,7 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
         }
     }
     onack(packet: Packet) {
-        var ack = this.acks[packet.id];
+        let ack = this.acks[packet.id];
         if ('function' == typeof ack) {
             // debug('calling ack %s with %j', packet.id, packet.data);
             ack.apply(this, packet.data);
@@ -217,7 +274,7 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
     }
     dispatch(packet: Packet, ack?: Function) {
         if (ack) { this.acks[packet.id] = ack; }
-        this.event.emit(packet.name, packet.data)
+        super.emit(packet.name, packet.data)
     }
     private hasBin(obj: any) {
         return false;

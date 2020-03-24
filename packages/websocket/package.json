@@ -1,7 +1,7 @@
 {
     "name": "@ms/websocket",
     "version": "0.3.1",
-    "description": "MiaoScript api package",
+    "description": "MiaoScript websocket package",
     "keywords": [
         "miaoscript",
         "minecraft",
@@ -27,9 +27,6 @@
         "typescript": "^3.8.3"
     },
     "dependencies": {
-        "@ms/container": "^0.3.2",
-        "@ms/nashorn": "^0.3.1",
-        "socket.io-parser": "^3.4.0"
-    },
-    "gitHead": "781524f83e52cad26d7c480513e3c525df867121"
+        "@ms/nashorn": "^0.3.1"
+    }
 }

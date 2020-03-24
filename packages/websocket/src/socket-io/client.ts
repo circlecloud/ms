@@ -9,6 +9,7 @@ import { PacketTypes, SubPacketTypes } from './types';
 const parser = new Parser();
 
 export class Client extends EventEmitter implements SocketIO.Client {
+    id: string;
     server: Server;
     conn: NettyClient;
     request: any;
@@ -20,12 +21,10 @@ export class Client extends EventEmitter implements SocketIO.Client {
         super();
         this.server = server;
         this.conn = nettyClient;
+        this.id = this.conn.id + '';
         this.request = nettyClient.request;
         this.sockets = {};
         this.nsps = {};
-    }
-    get id() {
-        return this.conn.id;
     }
     connect(name, query) {
         if (this.server.nsps[name]) {
@@ -63,7 +62,7 @@ export class Client extends EventEmitter implements SocketIO.Client {
             }
         });
     }
-    packet(packet: Packet) {
+    packet(packet: Packet, opts?: any) {
         this.conn.send(parser.encode(packet))
     }
     onclose(reason: string) {

@@ -17,4 +17,7 @@ export class TextWebSocketFrameHandler extends TextWebSocketFrameHandlerAdapter 
     channelRead0(ctx: any, msg: any) {
         this.event.emit(ServerEvent.message, ctx, msg)
     }
+    exceptionCaught(ctx: any, cause: Error) {
+        console.ex(cause)
+    }
 }
