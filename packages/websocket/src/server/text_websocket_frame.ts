@@ -1,11 +1,11 @@
 import { TextWebSocketFrameHandlerAdapter } from '../netty'
 import { EventEmitter } from 'events'
 import { ServerEvent } from './constants'
-import { NettyWebSocketServerOptions } from './config';
+import { ServerOptions } from '../socket-io';
 
 export class TextWebSocketFrameHandler extends TextWebSocketFrameHandlerAdapter {
     private event: EventEmitter;
-    constructor(options: NettyWebSocketServerOptions) {
+    constructor(options: ServerOptions) {
         super()
         this.event = options.event;
     }
@@ -18,6 +18,6 @@ export class TextWebSocketFrameHandler extends TextWebSocketFrameHandlerAdapter 
         this.event.emit(ServerEvent.message, ctx, msg)
     }
     exceptionCaught(ctx: any, cause: Error) {
-        console.ex(cause)
+        this.event.emit(ServerEvent.error, ctx, cause)
     }
 }

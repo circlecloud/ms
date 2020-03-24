@@ -4,7 +4,7 @@ import { Keys } from './constants'
 import { WebSocketHandlerAdapter } from "../netty"
 import { HttpRequestHandler } from './httprequest'
 import { TextWebSocketFrameHandler } from './text_websocket_frame'
-import { NettyWebSocketServerOptions } from './config'
+import { ServerOptions } from '../socket-io'
 
 const CharsetUtil = Java.type('io.netty.util.CharsetUtil')
 
@@ -14,8 +14,8 @@ const HttpObjectAggregator = Java.type('io.netty.handler.codec.http.HttpObjectAg
 const WebSocketServerProtocolHandler = Java.type('io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler')
 
 export class WebSocketHandler extends WebSocketHandlerAdapter {
-    private options: NettyWebSocketServerOptions;
-    constructor(options: NettyWebSocketServerOptions) {
+    private options: ServerOptions;
+    constructor(options: ServerOptions) {
         super()
         this.options = options;
     }
@@ -32,7 +32,7 @@ export class WebSocketHandler extends WebSocketHandlerAdapter {
             pipeline.addLast('http', new HttpServerCodec())
             pipeline.addLast('chunk', new ChunkedWriteHandler())
             pipeline.addLast('httpobj', new HttpObjectAggregator(64 * 1024))
-            pipeline.addLast('http_request', new HttpRequestHandler().getHandler())
+            pipeline.addLast('http_request', new HttpRequestHandler(this.options).getHandler())
             pipeline.addLast('websocket', new WebSocketServerProtocolHandler(this.options.path, true))
             pipeline.addLast('websocket_handler', new TextWebSocketFrameHandler(this.options).getHandler())
         }
