@@ -10,7 +10,12 @@ export namespace channel {
     @injectable()
     export abstract class Channel {
         private listenerMap = [];
-
+        /**
+         * 注册通道
+         * @param plugin 插件
+         * @param channel 通道
+         * @param exec 执行器
+         */
         listen(plugin: any, channel: string, exec: ChannelListener) {
             if (!plugin || !plugin.description || !plugin.description.name) throw new TypeError('Plugin can\'t be undefiend!');
             let name = plugin.description.name;
@@ -29,6 +34,10 @@ export namespace channel {
             console.debug(`[${name}] register channel ${channel} => ${exec.name || '[anonymous]'}`);
             return off;
         }
+        /**
+         * 关闭插件注册的通道
+         * @param plugin 插件
+         */
         disable(plugin: any) {
             var channelCache = this.listenerMap[plugin.description.name];
             if (channelCache) {
@@ -36,7 +45,6 @@ export namespace channel {
                 delete this.listenerMap[plugin.description.name];
             }
         }
-
         /**
          * Send Channel Message
          * @param player recover target

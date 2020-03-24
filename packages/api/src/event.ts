@@ -7,6 +7,9 @@ import { injectable, unmanaged } from '@ms/container'
 const Thread = Java.type('java.lang.Thread');
 
 export namespace event {
+    /**
+     * 事件监听优先级
+     */
     export enum EventPriority {
         LOWEST = "LOWEST",
         LOW = "LOW",
@@ -144,6 +147,10 @@ export namespace event {
             return off;
         }
 
+        /**
+         * 关闭插件监听任务
+         * @param plugin 插件
+         */
         disable(plugin: any) {
             var eventCache = this.listenerMap[plugin.description.name];
             if (eventCache) {
@@ -152,8 +159,24 @@ export namespace event {
             }
         }
 
+        /**
+         * 判断
+         * @param clazz 事件类
+         */
         abstract isValidEvent(clazz: any): boolean;
+        /**
+         * 注册事件
+         * @param eventCls 事件类
+         * @param exec 执行器
+         * @param priority 优先级
+         * @param ignoreCancel 是否忽略已取消的事件
+         */
         abstract register(eventCls: any, exec: Function, priority: any, ignoreCancel: boolean): any;
+        /**
+         * 取消监听事件
+         * @param event 事件
+         * @param listener 监听器
+         */
         abstract unregister(event: any, listener: any): void;
     }
 }
