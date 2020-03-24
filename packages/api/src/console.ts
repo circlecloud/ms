@@ -103,7 +103,7 @@ export class MiaoScriptConsole implements Console {
                     }
                 }
                 if (this.sourceMaps[fileName]) {
-                    var sourceMapping = this.sourceMaps[fileName].getSource(lineNumber, lineNumber);
+                    var sourceMapping = this.sourceMaps[fileName].getSource(lineNumber, 25, true);
                     if (sourceMapping) {
                         if (lineNumber != sourceMapping.mapping.sourceLine) {
                             fileName = fileName.replace(".js", ".ts");
