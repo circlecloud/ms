@@ -83,7 +83,7 @@ class Server implements SocketIO.Server {
     bind(srv: any): SocketIO.Server {
         throw new Error("Method not implemented.");
     }
-    onconnection(socket: any): SocketIO.Server {
+    onconnection(socket: Client): SocketIO.Server {
         this.allClients[socket.id] = socket;
         socket.packet({
             type: PacketTypes.OPEN,
@@ -104,52 +104,46 @@ class Server implements SocketIO.Server {
         return this.nsps[nsp];
     }
     close(fn?: () => void): void {
-        throw new Error("Method not implemented.");
+        for (let socket in this.sockets.sockets) {
+            this.sockets.sockets[socket].onclose()
+        }
+        this.nettyServer.close();
     }
     on(event: "connection", listener: (socket: SocketIO.Socket) => void): SocketIO.Namespace;
     on(event: "connect", listener: (socket: SocketIO.Socket) => void): SocketIO.Namespace;
     on(event: string, listener: Function): SocketIO.Namespace;
     on(event: any, listener: any): SocketIO.Namespace {
-        this.event.on(event, listener);
-        return this.sockets;
+        return this.sockets.on(event, listener);
     }
     to(room: string): SocketIO.Namespace {
-        throw new Error("Method not implemented.");
+        return this.sockets.to(room);
     }
     in(room: string): SocketIO.Namespace {
-        throw new Error("Method not implemented.");
+        return this.sockets.in(room);
     }
     use(fn: (socket: SocketIO.Socket, fn: (err?: any) => void) => void): SocketIO.Namespace {
-        throw new Error("Method not implemented.");
+        return this.sockets.use(fn);
     }
     emit(event: string, ...args: any[]): SocketIO.Namespace {
-        this.sockets.emit(event, ...args);
-        return this.sockets;
+        // @ts-ignore
+        return this.sockets.emit(event, ...args);
     }
     send(...args: any[]): SocketIO.Namespace {
-        this.sockets.send(...args);
-        return this.sockets;
+        return this.sockets.send(...args);
     }
     write(...args: any[]): SocketIO.Namespace {
-        this.sockets.write(...args);
-        return this.sockets;
+        return this.sockets.write(...args);
     }
     clients(...args: any[]): SocketIO.Namespace {
-        this.sockets.clients(args[0]);
-        return this.sockets;
+        return this.sockets.clients(args[0]);
     }
     compress(...args: any[]): SocketIO.Namespace {
-        throw new Error("Method not implemented.");
+        return this.sockets.compress(args[0])
     }
-
     // ===============================
     checkNamespace(name, query, fn) {
         fn(false);
     };
-
-    disable() {
-        this.nettyServer.disable();
-    }
 
     private initNettyServer(pipeline, options) {
         this.nettyServer = new NettyWebSocketServer(pipeline, {

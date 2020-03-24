@@ -6,13 +6,12 @@ import { WebSocketHandler } from './websocket_handler'
 import { NettyClient } from './client'
 import { NettyWebSocketServerOptions } from './config'
 
-class NettyWebSocketServer {
-    private event: EventEmitter
+class NettyWebSocketServer extends EventEmitter {
     private pipeline: any;
     private allClients: { [key: string]: NettyClient };
 
     constructor(pipeline: any, options: NettyWebSocketServerOptions) {
-        this.event = new EventEmitter();
+        super()
         this.allClients = {};
         this.pipeline = pipeline;
         let connectEvent = options.event;
@@ -24,25 +23,18 @@ class NettyWebSocketServer {
         connectEvent.on(ServerEvent.connect, (ctx) => {
             let nettyClient = new NettyClient(this, ctx.channel());
             this.allClients[nettyClient.id] = nettyClient;
-            this.event.emit(ServerEvent.connect, nettyClient);
+            this.emit(ServerEvent.connect, nettyClient);
         })
         connectEvent.on(ServerEvent.message, (ctx, msg) => {
             let channel = ctx.channel();
-            this.event.emit(ServerEvent.message, this.allClients[channel.id()], msg.text())
+            this.emit(ServerEvent.message, this.allClients[channel.id()], msg.text())
         })
     }
-
-    disable() {
+    close() {
         if (this.pipeline.names().contains(Keys.Detect)) {
             this.pipeline.remove(Keys.Detect)
         }
-        Object.values(this.allClients).forEach(client => {
-            client.close();
-        })
-    }
-
-    on(event: string, listener: (...args: any[]) => void) {
-        this.event.on(event, listener)
+        Object.values(this.allClients).forEach(client => client.close())
     }
 }
 

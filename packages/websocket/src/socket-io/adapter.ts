@@ -2,14 +2,18 @@ import { EventEmitter } from 'events'
 import { SocketIO } from './interfaces';
 import { Namespace } from './namespace';
 import { Parser } from './parser';
+import { Socket } from './socket';
 
 export class Adapter extends EventEmitter implements SocketIO.Adapter {
-    nsp: SocketIO.Namespace;
+    nsp: Namespace;
     rooms: Rooms;
     sids: { [id: string]: { [room: string]: boolean; }; };
     parser: Parser
     constructor(nsp: Namespace) {
         super()
+        this.nsp = nsp;
+        this.rooms = new Rooms();
+        this.sids = {};
         this.parser = nsp.server.parser;
     }
     add(id: string, room: string, callback?: (err?: any) => void): void {
@@ -23,7 +27,7 @@ export class Adapter extends EventEmitter implements SocketIO.Adapter {
      * @param {Function} callback
      * @api public
      */
-    addAll(id, rooms, fn) {
+    addAll(id: string, rooms: string | any[], fn: { (err?: any): void; bind?: any; }) {
         for (var i = 0; i < rooms.length; i++) {
             var room = rooms[i];
             this.sids[id] = this.sids[id] || {};
@@ -42,7 +46,6 @@ export class Adapter extends EventEmitter implements SocketIO.Adapter {
         }
         callback && callback.bind(null, null)
     }
-
     delAll(id: string): void {
         var rooms = this.sids[id];
         if (rooms) {
@@ -66,10 +69,10 @@ export class Adapter extends EventEmitter implements SocketIO.Adapter {
         };
         var ids = {};
         var self = this;
-        var socket;
+        var socket: Socket;
 
         packet.nsp = this.nsp.name;
-        let encodedPackets = this.parser.encode(packet)
+        // let encodedPackets = this.parser.encode(packet)
         if (rooms.length) {
             for (var i = 0; i < rooms.length; i++) {
                 var room = self.rooms[rooms[i]];
@@ -80,7 +83,7 @@ export class Adapter extends EventEmitter implements SocketIO.Adapter {
                         if (ids[id] || ~except.indexOf(id)) continue;
                         socket = self.nsp.connected[id];
                         if (socket) {
-                            socket.packet(encodedPackets, packetOpts);
+                            socket.packet(packet, packetOpts);
                             ids[id] = true;
                         }
                     }
@@ -91,7 +94,7 @@ export class Adapter extends EventEmitter implements SocketIO.Adapter {
                 if (self.sids.hasOwnProperty(id)) {
                     if (~except.indexOf(id)) continue;
                     socket = self.nsp.connected[id];
-                    if (socket) socket.packet(encodedPackets, packetOpts);
+                    if (socket) socket.packet(packet, packetOpts);
                 }
             }
         }

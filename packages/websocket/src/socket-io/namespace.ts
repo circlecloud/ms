@@ -17,12 +17,23 @@ export class Namespace extends EventEmitter implements SocketIO.Namespace {
     adapter: SocketIO.Adapter;
     json: SocketIO.Namespace;
 
+    fns: any[];
+    ids: number;
+    rooms: string[];
+    flags: { [key: string]: boolean };
+
+    private events = ['connect', 'connection', 'newListener']
+
     constructor(name: string, server: Server) {
         super();
         this.name = name;
         this.server = server;
         this.sockets = {};
         this.connected = {};
+        this.fns = [];
+        this.ids = 0;
+        this.rooms = [];
+        this.flags = {};
         this.adapter = new Adapter(this);
     }
     initAdapter() {
@@ -43,22 +54,54 @@ export class Namespace extends EventEmitter implements SocketIO.Namespace {
         delete this.sockets[client.id];
     }
     use(fn: (socket: SocketIO.Socket, fn: (err?: any) => void) => void): SocketIO.Namespace {
-        // TODO
-        return this;
+        throw new Error("Method not implemented.");
     }
     to(room: string): SocketIO.Namespace {
-        // TODO
+        if (!~this.rooms.indexOf(room)) this.rooms.push(room);
         return this;
     }
     in(room: string): SocketIO.Namespace {
         return this.to(room);
     }
     send(...args: any[]): SocketIO.Namespace {
-        // TODO
+        super.emit('message', ...args)
         return this;
     }
     write(...args: any[]): SocketIO.Namespace {
         return this.send(...args);
+    }
+    emit(event: string, ...args: any[]): boolean {
+        if (~this.events.indexOf(event)) {
+            super.emit(event, ...args);
+            // @ts-ignore
+            return this;
+        }
+        // set up packet object
+        var packet = {
+            type: (this.flags.binary !== undefined ? this.flags.binary : this.hasBin(args)) ? SubPacketTypes.BINARY_EVENT : SubPacketTypes.EVENT,
+            data: args
+        }
+
+        if ('function' == typeof args[args.length - 1]) {
+            throw new Error('Callbacks are not supported when broadcasting');
+        }
+
+        var rooms = this.rooms.slice(0);
+        var flags = Object.assign({}, this.flags);
+
+        // reset flags
+        this.rooms = [];
+        this.flags = {};
+
+        this.adapter.broadcast(packet, {
+            rooms: rooms,
+            flags: flags
+        });
+        // @ts-ignore
+        return this;
+    }
+    hasBin(args: any[]) {
+        return false;
     }
     clients(fn: Function): SocketIO.Namespace {
         return fn(Object.values(this.sockets))
