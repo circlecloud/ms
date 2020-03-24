@@ -122,7 +122,7 @@ export class MiaoScriptConsole implements Console {
     }
     stack(ex: Error): string[] {
         var stack = ex.getStackTrace();
-        var cache = ['§4' + ex];
+        var cache = ['§c' + ex];
         //@ts-ignore
         if (stack.class) {
             stack = Arrays.asList(stack)
