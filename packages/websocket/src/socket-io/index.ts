@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
 
-import { NettyWebSocketServer } from '../server'
+import { NettyWebSocketServer, NettyClient } from '../server'
 import { ServerEvent } from '../server/constants';
 
 import { Namespace } from './namespace';
@@ -11,6 +11,17 @@ import { PacketTypes, SubPacketTypes } from './types';
 import { Packet } from './packet';
 import { Socket } from './socket';
 import { Adapter } from './adapter';
+
+interface ServerOptions extends SocketIO.ServerOptions {
+    event?: EventEmitter;
+    root?: string;
+}
+
+const defaultOptions: ServerOptions = {
+    event: new EventEmitter(),
+    path: '/socket.io',
+    root: root + '/wwwroot'
+}
 
 class Server implements SocketIO.Server {
     private nettyServer: NettyWebSocketServer;
@@ -24,15 +35,15 @@ class Server implements SocketIO.Server {
     local: SocketIO.Server;
     parser = new Parser();
     _adapter: Adapter;
-    options: SocketIO.ServerOptions;
+    options: ServerOptions;
 
-    constructor(pipeline: any, options: SocketIO.ServerOptions) {
+    constructor(pipeline: any, options: ServerOptions) {
         if (!pipeline) { throw new Error('Netty Pipeline can\'t be undefiend!') }
         this.allClients = {};
         this.nsps = {};
         this.sockets = new Namespace('/', this);
         this.nsps['/'] = this.sockets;
-        this.initNettyServer(pipeline, options);
+        this.initNettyServer(pipeline, Object.assign(defaultOptions, options));
     }
 
     checkRequest(req: any, fn: (err: any, success: boolean) => void): void {
@@ -144,16 +155,17 @@ class Server implements SocketIO.Server {
     };
 
     private initNettyServer(pipeline, options) {
-        this.nettyServer = new NettyWebSocketServer(pipeline, {
-            event: new EventEmitter(),
-            path: options.path
-        });
-        this.nettyServer.on(ServerEvent.connect, (nettyClient) => {
+        this.nettyServer = new NettyWebSocketServer(pipeline, options);
+        this.nettyServer.on(ServerEvent.connect, (nettyClient: NettyClient) => {
             let client = new Client(this, nettyClient);
             this.onconnection(client);
         })
-        this.nettyServer.on(ServerEvent.message, (nettyClient, text) => {
+        this.nettyServer.on(ServerEvent.message, (nettyClient: NettyClient, text) => {
             this.processPacket(this.parser.decode(text), this.allClients[nettyClient.id]);
+        })
+        this.nettyServer.on(ServerEvent.error, (nettyClient: NettyClient, cause) => {
+            console.error(`Client ${nettyClient.id} cause error: ` + cause)
+            console.ex(cause)
         })
     }
 
@@ -193,6 +205,6 @@ class Server implements SocketIO.Server {
 export {
     Server,
     Socket,
-    Server as SocketIOServer,
-    Client as SocketIOClient
+    Client,
+    ServerOptions
 }
