@@ -114,10 +114,7 @@ export class Namespace extends EventEmitter implements SocketIO.Namespace {
             case SubPacketTypes.CONNECT:
                 this.add(client);
                 break;
-            case SubPacketTypes.DISCONNECT:
-                this.del(client);
-                break;
-            case SubPacketTypes.EVENT:
+            default:
                 this.sockets[client.id].onpacket(packet);
                 break;
         }

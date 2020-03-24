@@ -109,7 +109,13 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
         this.rooms = {};
     }
     disconnect(close?: boolean): SocketIO.Socket {
-        this.client.close();
+        if (!this.connected) return this;
+        if (close) {
+            this.client.disconnect();
+        } else {
+            this.packet({ type: PacketTypes.MESSAGE, sub_type: SubPacketTypes.DISCONNECT });
+            this.onclose('server namespace disconnect');
+        }
         return this;
     }
     compress(compress: boolean): SocketIO.Socket {
@@ -144,7 +150,7 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
             type: PacketTypes.MESSAGE,
             sub_type: (this.flags.binary !== undefined ? this.flags.binary : this.hasBin(args)) ? SubPacketTypes.BINARY_EVENT : SubPacketTypes.EVENT,
             name: event,
-            data: args[0]
+            data: args
         }
 
         // access last argument to see if it's an ACK callback
@@ -211,21 +217,27 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
     }
     onpacket(packet: Packet) {
         switch (packet.sub_type) {
+            // 2
             case SubPacketTypes.EVENT:
                 this.onevent(packet);
                 break;
+            // 5
             case SubPacketTypes.BINARY_EVENT:
                 this.onevent(packet);
                 break;
+            // 3
             case SubPacketTypes.ACK:
                 this.onack(packet);
                 break;
+            // 6
             case SubPacketTypes.BINARY_ACK:
                 this.onack(packet);
                 break;
+            // 1
             case SubPacketTypes.DISCONNECT:
                 this.ondisconnect();
                 break;
+            // 4
             case SubPacketTypes.ERROR:
                 this.onerror(new Error(packet.data));
         }
@@ -242,12 +254,12 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
         this.onclose('client namespace disconnect')
     }
     onevent(packet: Packet) {
-        // console.debug('emitting event %j', args);
         if (null != packet.id) {
-            // console.debug('attaching ack callback to event');
-            this.dispatch(packet, this.ack(packet.id))
+            // debug('attaching ack callback to event');
+            this.dispatch(packet, this.ack(packet.id));
+        } else {
+            this.dispatch(packet);
         }
-        this.dispatch(packet);
     }
     ack(id: number) {
         let sent = false;
@@ -274,7 +286,7 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
     }
     dispatch(packet: Packet, ack?: Function) {
         if (ack) { this.acks[packet.id] = ack; }
-        super.emit(packet.name, packet.data)
+        super.emit(packet.name, ...packet.data, ack)
     }
     private hasBin(obj: any) {
         return false;
