@@ -65,7 +65,7 @@ export class Client extends EventEmitter implements SocketIO.Client {
     packet(packet: Packet, opts?: any) {
         this.conn.send(parser.encode(packet))
     }
-    onclose(reason: string) {
+    onclose(reason?: string) {
         // debug('client close with reason %s', reason);
         // ignore a potential subsequent `close` event
         this.destroy();
@@ -77,8 +77,8 @@ export class Client extends EventEmitter implements SocketIO.Client {
         }
         this.sockets = {};
         // this.decoder.destroy(); // clean up decoder
-    };
-    close() {
+    }
+    disconnect() {
         // if ('open' == this.conn.readyState) {
         // debug('forcing transport close');
         this.conn.close();
