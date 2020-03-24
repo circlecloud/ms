@@ -1,5 +1,6 @@
 import { HttpRequestHandlerAdapter } from '../netty'
-import { Keys, AttributeKeys } from './constants'
+import { AttributeKeys } from './constants'
+import { ServerOptions } from 'socket-io'
 
 const DefaultHttpResponse = Java.type('io.netty.handler.codec.http.DefaultHttpResponse')
 const DefaultFullHttpResponse = Java.type('io.netty.handler.codec.http.DefaultFullHttpResponse')
@@ -14,21 +15,13 @@ const RandomAccessFile = Java.type('java.io.RandomAccessFile')
 const DefaultFileRegion = Java.type('io.netty.channel.DefaultFileRegion')
 const ChannelFutureListener = Java.type('io.netty.channel.ChannelFutureListener')
 
-export type HttpRequestConfig = {
-    root?: string;
-    ws?: string;
-}
-
 export class HttpRequestHandler extends HttpRequestHandlerAdapter {
     private ws: string;
     private root: string;
-    constructor(config: HttpRequestConfig = {
-        root: root + '/wwwroot',
-        ws: '/ws'
-    }) {
+    constructor(options: ServerOptions) {
         super()
-        this.root = config.root;
-        this.ws = config.ws;
+        this.root = options.root;
+        this.ws = options.path;
     }
     channelRead0(ctx: any, request: any) {
         if (request.getUri().startsWith(this.ws)) {
