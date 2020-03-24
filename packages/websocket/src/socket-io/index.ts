@@ -13,7 +13,6 @@ import { Socket } from './socket';
 import { Adapter } from './adapter';
 
 class Server implements SocketIO.Server {
-    private event: EventEmitter;
     private nettyServer: NettyWebSocketServer;
     private allClients: { [key: string]: Client };
 
@@ -29,7 +28,6 @@ class Server implements SocketIO.Server {
 
     constructor(pipeline: any, options: SocketIO.ServerOptions) {
         if (!pipeline) { throw new Error('Netty Pipeline can\'t be undefiend!') }
-        this.event = new EventEmitter();
         this.allClients = {};
         this.nsps = {};
         this.sockets = new Namespace('/', this);
@@ -173,6 +171,8 @@ class Server implements SocketIO.Server {
                 this.processSubPacket(packet, client);
                 break;
             case PacketTypes.CLOSE:
+                client.onclose()
+                break;
         }
     }
 
@@ -182,9 +182,9 @@ class Server implements SocketIO.Server {
             client.packet({
                 type: PacketTypes.MESSAGE,
                 sub_type: SubPacketTypes.ERROR,
-                data: 'not support dynamic namespace'
+                data: 'not support dynamic namespace: ' + packet.nsp
             });
-            client.close();
+            client.disconnect();
             return;
         }
         namespace.process(packet, client);

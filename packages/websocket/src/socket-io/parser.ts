@@ -28,7 +28,7 @@ export class Parser {
         }
         if (packet.sub_type == SubPacketTypes.EVENT) {
             if (packet.name == undefined) { throw new Error(`SubPacketTypes.EVENT name can't be empty!`) }
-            packet.data = [packet.name, packet.data]
+            packet.data = [packet.name, ...packet.data]
         }
         // json data
         if (null != packet.data) {
@@ -85,7 +85,7 @@ export class Parser {
                 if (i == str.length) break;
             }
             if (buf != `${Number(buf)}` || str.charAt(i) !== '-') {
-                throw new Error('Illegal attachments');
+                return this.error('Illegal attachments');
             }
             p.attachments = Number(buf);
         }
@@ -105,11 +105,11 @@ export class Parser {
 
         // look up id
         let next = str.charAt(i + 1);
-        if ('' !== next && Number.isNaN(Number(next))) {
+        if ('' !== next && !isNaN(Number(next))) {
             let id = ''
             while (++i) {
                 let c = str.charAt(i);
-                if (null == c || Number.isNaN(Number(c))) {
+                if (null == c || isNaN(Number(c))) {
                     --i;
                     break;
                 }
@@ -119,10 +119,6 @@ export class Parser {
             p.id = Number(id);
         }
 
-        // look up packet name
-        if (p.sub_type == SubPacketTypes.EVENT) {
-
-        }
         // ignore binary packet
         if (p.sub_type == SubPacketTypes.BINARY_EVENT) {
             return this.error('not support binary parse...')
@@ -134,9 +130,9 @@ export class Parser {
             let isPayloadValid = payload !== false && (p.sub_type == SubPacketTypes.ERROR || Array.isArray(payload));
             if (isPayloadValid) {
                 p.name = payload[0];
-                p.data = payload[1];
+                p.data = payload.slice(1);
             } else {
-                return this.error('invalid payload');
+                return this.error('invalid payload ' + str.substr(i));
             }
         }
 
