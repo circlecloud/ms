@@ -1,6 +1,6 @@
 {
     "name": "@ms/types",
-    "version": "0.3.1",
+    "version": "0.4.0",
     "description": "MiaoScript types package",
     "keywords": [
         "miaoscript",
