@@ -1,6 +1,6 @@
 {
     "name": "@ms/nashorn",
-    "version": "0.3.1",
+    "version": "0.4.0",
     "description": "MiaoScript api package",
     "keywords": [
         "miaoscript",
