@@ -1,6 +1,6 @@
 {
     "name": "@ms/websocket",
-    "version": "0.3.1",
+    "version": "0.4.0",
     "description": "MiaoScript websocket package",
     "keywords": [
         "miaoscript",
@@ -27,6 +27,6 @@
         "typescript": "^3.8.3"
     },
     "dependencies": {
-        "@ms/nashorn": "^0.3.1"
+        "@ms/nashorn": "^0.4.0"
     }
 }
