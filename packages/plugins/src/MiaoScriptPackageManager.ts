@@ -1,8 +1,11 @@
 import { plugin as pluginApi, task, server } from '@ms/api'
 
-import * as fs from '@ms/common/dist/fs'
+import { Translate } from '@ms/i18n'
 import { inject } from '@ms/container';
 import { interfaces, plugin, cmd, tab } from '@ms/plugin'
+
+import * as fs from '@ms/common/dist/fs'
+import http from '@ms/common/dist/http'
 
 let help = [
     '§6========= §6[§aMiaoScriptPackageManager§6] 帮助 §aBy §b喵♂呜 §6=========',
@@ -17,6 +20,20 @@ let help = [
     '§6/mpm §crestart §6- §4重启MiaoScript脚本引擎'
 ];
 
+let langMap = {
+    'list.header.install': '§6当前 §bMiaoScript §6已安装下列插件:',
+    'list.header': '§6当前 §bMiaoScriptPackageCenter §6中存在下列插件:',
+    'list.body': '§6插件名称: §b{name} §6版本: §a{version} §6作者: §3{author}',
+    'plugin.not.exists': '§6插件 §b{name} §c不存在!',
+    'plugin.unload.finish': '§6插件 §b{name} §a已卸载!',
+    'plugin.reload.finish': '§6插件 §b{name} §a重载完成!',
+    'plugin.name.empty': '§c请输入插件名称!',
+    'cloud.update.finish': '§6成功从 §aMiaoScriptPackageCenter §6获取到 §a{length} §6个插件!',
+    'cloud.not.exists': '§6当前 §aMiaoScriptPackageCenter §c不存在 §a{name} §c插件!'
+}
+
+let fallbackMap = langMap
+
 @plugin({ name: 'MiaoScriptPackageManager', prefix: 'PM', version: '1.0.0', author: 'MiaoWoo', source: __filename })
 export class MiaoScriptPackageManager extends interfaces.Plugin {
     @inject(pluginApi.PluginManager)
@@ -29,11 +46,16 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     private server: server.Server
 
     private packageCache: any[] = [];
-    private packageNameCache: any[] = [];
+    private packageNameCache: string[] = [];
+
+    private translate: Translate;
 
     load() {
-        this.taskManager.create(() => {
-        }).async().submit();
+        this.translate = new Translate({
+            langMap,
+            fallbackMap
+        })
+        this.updateRepo(this.server.getConsoleSender())
     }
 
     @cmd()
@@ -41,134 +63,96 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         this.taskManager.create(() => this.main(sender, command, args)).async().submit();
     }
 
+    i18n(sender: any, name: string, params?: any) {
+        this.logger.sender(sender, this.translate.translate(name, params))
+    }
+
     main(sender: any, command: string, args: string[]) {
-        if (!args[0] || args[1] === 'help') {
+        let cmdKey = 'cmd' + args[0]
+        if (!this[cmdKey] || args[0] === 'help') {
             this.logger.sender(sender, help);
             return;
         }
-        switch (args[0]) {
-            case "list":
-                if (args[1]) {
-                    this.logger.sender(sender, '§6当前 §bMiaoScript §6已安装下列插件:');
-                    this.pluginManager.getPlugins().forEach((plugin) => {
-                        var desc = plugin.description;
-                        this.logger.sender(sender, `§6插件名称: §b${desc.name} §6版本: §a${desc.version || '1.0'} §6作者: §3${desc.author || '未知'}`)
-                    })
-                } else {
-                    this.logger.sender(sender, '§6当前 §bMiaoScriptPackageCenter §6中存在下列插件:');
-                    for (var pkgName in this.packageCache) {
-                        var pkg = this.packageCache[pkgName];
-                        // console.sender(sender, '§6插件名称: §b%s §6版本: §a%s §6作者: §3%s'.format(pkg.name, pkg.version || '1.0', pkg.author || '未知'))
-                    }
-                }
-                break;
-            case "install":
-                // if (args.length > 1) {
-                //     download(sender, args[1]);
-                // } else {
-                //     console.sender(sender, '§c请输入插件名称!')
-                // }
-                break;
-            case "uninstall":
-                break;
-            case "update":
-                // if (args.length > 1) {
-                //     update(sender, args[1]);
-                // } else {
-                //     load();
-                //     console.sender(sender, "§a仓库缓存刷新成功 共存在 §b" + Object.keys(packageCache).length + " §a个插件!")
-                // }
-                break;
-            case "upgrade":
-                if (args[3] === "engine") {
-                    fs.del(fs.concat(root, '', ''))
-                }
-                break;
-            case "delete":
-                // if (args.length > 1) {
-                //     del(sender, args[1]);
-                // } else {
-                //     console.sender(sender, '§c请输入插件名称!')
-                // }
-                break;
-            case "load":
-                if (args.length > 1) {
-                    var pname = args[1];
-                    if (!this.pluginManager.getPlugins().has(pname)) {
-                        this.logger.sender(sender, `§6插件 §b${pname} §c不存在!`)
-                        return
-                    }
-                    this.pluginManager.load(pname)
-                    this.pluginManager.enable(pname)
-                    this.logger.sender(sender, `§6插件 §b${pname} §a已加载!`)
-                }
-                break;
-            case "unload":
-                if (args.length > 1) {
-                    var pname = args[1];
-                    if (!this.pluginManager.getPlugins().has(pname)) {
-                        this.logger.sender(sender, `§6插件 §b${pname} §c不存在!`)
-                        return
-                    }
-                    this.pluginManager.disable(pname)
-                    this.logger.sender(sender, `§6插件 §b${pname} §a已卸载!`)
-                }
-                break;
-            case "reload":
-                if (args.length > 1) {
-                    var pname = args[1];
-                    if (!this.pluginManager.getPlugins().has(pname)) {
-                        this.logger.sender(sender, `§6插件 §b${pname} §c不存在!`)
-                        return
-                    }
-                    this.pluginManager.reload(pname);
-                    this.logger.sender(sender, `§6插件 §b${pname} §a重载完成!`)
-                }
-                break;
-            case "restart":
-                if (this.serverType === "sponge") {
-                    setTimeout(() => this.server.dispatchConsoleCommand('sponge plugins reload'), 0)
-                    return
-                }
-                try {
-                    this.logger.sender(sender, '§6Reloading §3MiaoScript Engine...');
-                    ScriptEngineContextHolder.disableEngine();
-                    ScriptEngineContextHolder.enableEngine();
-                    this.logger.sender(sender, '§3MiaoScript Engine §6Reload §aSuccessful...');
-                } catch (ex) {
-                    this.logger.sender(sender, "§3MiaoScript Engine §6Reload §cError! ERR: " + ex);
-                    this.logger.sender(sender, this.logger.stack(ex));
-                }
-                break;
-            case "run":
-                args.shift();
-                try {
-                    var script = args.join(' ');
-                    this.logger.sender(sender, '§b运行脚本:§r', script);
-                    this.logger.sender(sender, '§a返回结果:§r', eval(script) || '§4没有返回结果!');
-                } catch (ex) {
-                    this.logger.sender(sender, this.logger.stack(ex));
-                }
-                break;
-            case "create":
-                this.logger.sender(sender, `§4当前暂不支持生成插件模板!`);
-                // var name = args[1];
-                // if (!name) {
-                //     this.logger.sender(sender, '§4参数错误 /mpm create <插件名称> [作者] [版本] [主命令]');
-                //     return;
-                // }
-                // // var result = template.create(http.get(self.config.template)).render({
-                // //     name: name,
-                // //     author: args[2] || 'MiaoWoo',
-                // //     version: args[3] || '1.0',
-                // //     command: args[4] || name.toLowerCase(),
-                // // });
-                // // fs.save(fs.file(__dirname, name + '.js'), result);
-                // this.logger.sender(sender, '§6插件 §a' + name + ' §6已生成到插件目录...');
-                break;
-            default:
-                this.logger.sender(sender, help);
-                break;
+        args.shift()
+        this[cmdKey](sender, ...args);
+    }
+
+    cmdlist(sender, type: string = 'cloud') {
+        if (type == "install") {
+            this.i18n(sender, 'list.header.install')
+            this.pluginManager.getPlugins().forEach((plugin) => {
+                this.i18n(sender, 'list.body', plugin.description);
+            })
+        } else {
+            this.i18n(sender, 'list.header')
+            for (var pkgName in this.packageCache) {
+                this.i18n(sender, 'list.body', this.packageCache[pkgName]);
+            }
+        }
+    }
+
+    cmdinstall(sender: any, name: string) {
+        if (!name) { return this.i18n(sender, 'plugin.name.empty') }
+        this.download(sender, name);
+    }
+
+    cmdupdate(sender: any, name: string) {
+        if (name) {
+            this.update(sender, name);
+        } else {
+            this.updateRepo(sender)
+        }
+    }
+
+    cmdunload(sender: any, name: string) {
+        if (this.checkPlugin(sender, name)) {
+            this.pluginManager.disable(name)
+            this.i18n(sender, 'plugin.unload.finish', { name })
+        }
+    }
+
+    cmdreload(sender: any, name: string) {
+        if (this.checkPlugin(sender, name)) {
+            this.pluginManager.reload(name);
+            this.i18n(sender, 'plugin.reload.finish', { name })
+        }
+    }
+
+    checkPlugin(sender: any, name: string) {
+        if (name && this.pluginManager.getPlugins().has(name)) { return true }
+        this.i18n(sender, 'plugin.not.exists', { name })
+        return false
+    }
+
+    cmdrestart(sender: any) {
+        if (this.serverType === "sponge") {
+            setTimeout(() => this.server.dispatchConsoleCommand('sponge plugins reload'), 0)
+            return
+        }
+        try {
+            this.logger.sender(sender, '§6Reloading §3MiaoScript Engine...');
+            ScriptEngineContextHolder.disableEngine();
+            ScriptEngineContextHolder.enableEngine();
+            this.logger.sender(sender, '§3MiaoScript Engine §6Reload §aSuccessful...');
+        } catch (ex) {
+            this.logger.sender(sender, "§3MiaoScript Engine §6Reload §cError! ERR: " + ex);
+            this.logger.sender(sender, this.logger.stack(ex));
+        }
+    }
+
+    cmdrun(sender, ...args: any[]) {
+        try {
+            var script = args.join(' ');
+            this.logger.sender(sender, '§b运行脚本:§r', script);
+            this.logger.sender(sender, '§a返回结果:§r', eval(script) || '§4没有返回结果!');
+        } catch (ex) {
+            this.logger.sender(sender, this.logger.stack(ex));
+        }
+    }
+
+    update(sender: any, name: string) {
+        if (!this.packageNameCache.includes(name)) {
+            this.i18n(sender, 'cloud.not.exists', { name })
         }
     }
 
@@ -177,6 +161,8 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         if (args.length === 1) return ['list', 'install', 'update', 'upgrade', 'reload', 'restart', 'run', 'help', 'create'];
         if (args.length > 1) {
             switch (args[0]) {
+                case "list":
+                    return ["install", "cloud"]
                 case "install":
                     return this.packageNameCache;
                 case "update":
@@ -187,5 +173,20 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
                     return [...this.pluginManager.getPlugins().keys()];
             }
         }
+    }
+
+    updateRepo(sender: any) {
+        this.taskManager.create(() => {
+            let result = http.get('http://ms.yumc.pw/api/plugin');
+            for (const pl of result.data) {
+                this.packageCache[pl.name] = pl;
+            }
+            this.packageNameCache = Object.keys(this.packageCache);
+            this.i18n(sender, 'cloud.update.finish', { length: this.packageNameCache.length })
+        }).async().submit();
+    }
+
+    download(sender, name) {
+
     }
 }
