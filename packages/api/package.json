@@ -1,6 +1,6 @@
 {
     "name": "@ms/api",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "description": "MiaoScript api package",
     "keywords": [
         "miaoscript",
@@ -23,7 +23,7 @@
     },
     "dependencies": {
         "@ms/container": "^0.4.0",
-        "@ms/ployfill": "^0.4.0",
+        "@ms/ployfill": "^0.4.1",
         "source-map-builder": "^0.0.7"
     },
     "devDependencies": {
