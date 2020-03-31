@@ -4,7 +4,7 @@ import { ServerEvent, Keys } from './constants'
 import { WebSocketDetect } from './websocket_detect'
 import { WebSocketHandler } from './websocket_handler'
 import { NettyClient } from './client'
-import { ServerOptions, Server } from '../socket-io'
+import { ServerOptions } from '../socket-io'
 
 class NettyWebSocketServer extends EventEmitter {
     private pipeline: any;

@@ -17,12 +17,6 @@ interface ServerOptions extends SocketIO.ServerOptions {
     root?: string;
 }
 
-const defaultOptions: ServerOptions = {
-    event: new EventEmitter(),
-    path: '/socket.io',
-    root: root + '/wwwroot'
-}
-
 class Server implements SocketIO.Server {
     private nettyServer: NettyWebSocketServer;
     private allClients: { [key: string]: Client };
@@ -43,7 +37,11 @@ class Server implements SocketIO.Server {
         this.nsps = {};
         this.sockets = new Namespace('/', this);
         this.nsps['/'] = this.sockets;
-        this.initNettyServer(pipeline, Object.assign(defaultOptions, options));
+        this.initNettyServer(pipeline, Object.assign({
+            event: new EventEmitter(),
+            path: '/socket.io',
+            root: root + '/wwwroot'
+        }, options));
     }
 
     checkRequest(req: any, fn: (err: any, success: boolean) => void): void {
