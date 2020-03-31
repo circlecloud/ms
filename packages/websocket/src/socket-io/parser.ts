@@ -39,10 +39,10 @@ export class Parser {
                 return '4"encode error"'
             }
         }
-        console.debug(`encoded ${origin} as ${str}`);
+        console.trace(`encoded ${origin} as ${str}`);
         return str;
     }
-    tryStringify(str) {
+    tryStringify(str: any) {
         try {
             return JSON.stringify(str);
         } catch (e) {
@@ -136,11 +136,11 @@ export class Parser {
             }
         }
 
-        console.debug(`decoded ${str} as ${JSON.stringify(p)}`);
+        console.trace(`decoded ${str} as ${JSON.stringify(p)}`);
         return p;
     }
 
-    tryParse(str) {
+    tryParse(str: string) {
         try {
             return JSON.parse(str);
         } catch (e) {

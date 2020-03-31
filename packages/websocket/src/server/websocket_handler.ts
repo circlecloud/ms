@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
 
-import { Keys } from './constants'
+import { Keys, ServerEvent } from './constants'
 import { WebSocketHandlerAdapter } from "../netty"
 import { HttpRequestHandler } from './httprequest'
 import { TextWebSocketFrameHandler } from './text_websocket_frame'
@@ -39,5 +39,8 @@ export class WebSocketHandler extends WebSocketHandlerAdapter {
         pipeline.remove(Keys.Handler)
         msg.resetReaderIndex()
         ctx.fireChannelRead(msg)
+    }
+    exceptionCaught(ctx: any, cause: Error) {
+        this.options.event.emit(ServerEvent.error, ctx, cause)
     }
 }

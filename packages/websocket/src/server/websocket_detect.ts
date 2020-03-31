@@ -11,4 +11,7 @@ export class WebSocketDetect extends WebSocketHandlerAdapter {
     channelRead(ctx: any, channel: any) {
         this.event.emit(ServerEvent.detect, ctx, channel);
     }
+    exceptionCaught(ctx: any, cause: Error) {
+        this.event.emit(ServerEvent.error, ctx, cause);
+    }
 }
