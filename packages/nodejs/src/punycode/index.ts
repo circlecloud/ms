@@ -4,7 +4,6 @@
 const maxInt = 2147483647; // aka. 0x7FFFFFFF or 2^31-1
 
 /** Bootstring parameters */
-//@ts-ignore
 const base = 36;
 const tMin = 1;
 const tMax = 26;
@@ -440,4 +439,4 @@ const punycode = {
     'toUnicode': toUnicode
 };
 
-module.exports = punycode;
+export = punycode;
