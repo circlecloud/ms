@@ -67,12 +67,6 @@ export namespace interfaces {
          */
         paramtypes?: string[];
     }
-    export interface TabCompleterMetadata extends ExecMetadata {
-        /**
-         * 参数列表
-         */
-        paramtypes?: string[];
-    }
     export interface ListenerMetadata extends ExecMetadata {
     }
     export interface ConfigMetadata extends BaseMetadata {

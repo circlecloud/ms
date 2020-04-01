@@ -37,13 +37,13 @@ export function cmd(metadata: interfaces.CommandMetadata = {}) {
  * MiaoScript TabComplete
  * @param metadata TabCompleterMetadata
  */
-export function tab(metadata: interfaces.TabCompleterMetadata = {}) {
+export function tab(metadata: interfaces.CommandMetadata = {}) {
     return function(target: any, key: string, value: any) {
         metadata.name = metadata.name || (key.startsWith('tab') ? key.split('tab', 2)[1] : key);
         if (!metadata.name) { return; }
         metadata.executor = key;
         metadata.paramtypes = Reflect.getMetadata("design:paramtypes", target, key)
-        const previousMetadata: Map<string, interfaces.TabCompleterMetadata> = getPluginTabCompleterMetadata(target)
+        const previousMetadata: Map<string, interfaces.CommandMetadata> = getPluginTabCompleterMetadata(target)
         previousMetadata.set(metadata.name, metadata)
         Reflect.defineMetadata(METADATA_KEY.tab, previousMetadata, target.constructor);
     };
