@@ -30,6 +30,7 @@ export namespace server {
         dispatchConsoleCommand(command: string): boolean;
         getPluginsFolder(): string;
         getNativePluginManager(): NativePluginManager;
+        getNettyPipeline(): any;
         sendJson(sender: string | any, json: object | string): void;
     }
 }

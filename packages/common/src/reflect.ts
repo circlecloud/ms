@@ -198,4 +198,4 @@ export = {
     accessible,
     declaredMethods,
     mapToObject
-};
+}
