@@ -1,14 +1,40 @@
-import { server } from '@ms/api'
-import { provideSingleton } from '@ms/container';
+import { server, task } from '@ms/api'
+import { provideSingleton, inject, postConstruct } from '@ms/container'
+
+import * as reflect from '@ms/common/dist/reflect'
 
 let Bungee: net.md_5.bungee.api.ProxyServer = base.getInstance().getProxy();
 
 @provideSingleton(server.Server)
 export class BungeeServer implements server.Server {
     private pluginsFolder: string;
+    private pipeline: any;
+
+    @inject(task.TaskManager)
+    private task: task.TaskManager
 
     constructor() {
         this.pluginsFolder = Bungee.getPluginsFolder().getCanonicalPath();
+    }
+
+    @postConstruct()
+    initialize() {
+        let count = 0;
+        let wait = this.task.create(() => {
+            try {
+                // @ts-ignore
+                this.pipeline = reflect.on(base.getInstance().getProxy()).get('listeners').get().toArray()[0].pipeline()
+                wait.cancel();
+            } catch (ex) {
+                count++
+                if (count > 50) {
+                    console.error('Reflect BungeeCord netty channel pipeline error time > 50times. Err: ' + ex)
+                    wait.cancel()
+                } else {
+                    console.warn('Wait BungeeCord start ready to get netty channel pipeline. Err: ' + ex)
+                }
+            }
+        }).later(10).timer(20).submit()
     }
 
     getPlayer(name: string) {
@@ -40,6 +66,9 @@ export class BungeeServer implements server.Server {
     }
     getNativePluginManager() {
         return Bungee.getPluginManager() as any
+    }
+    getNettyPipeline() {
+        return this.pipeline;
     }
     sendJson(sender: string | any, json: string): void {
         throw new Error("Method not implemented.");

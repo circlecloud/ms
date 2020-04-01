@@ -25,9 +25,9 @@ export class BungeeTask extends task.Task {
             return this.plugin.getProxy().getScheduler().runAsync(this.plugin, run)
         }
         if (this.interval) {
-            return this.plugin.getProxy().getScheduler().schedule(this.plugin, run, this.laterTime, this.interval, TimeUnit.MILLISECONDS)
+            return this.plugin.getProxy().getScheduler().schedule(this.plugin, run, this.laterTime * 50, this.interval * 50, TimeUnit.MILLISECONDS)
         } else {
-            return this.plugin.getProxy().getScheduler().schedule(this.plugin, run, this.laterTime, TimeUnit.MILLISECONDS)
+            return this.plugin.getProxy().getScheduler().schedule(this.plugin, run, this.laterTime * 50, TimeUnit.MILLISECONDS)
         }
     }
 }

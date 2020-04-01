@@ -42,6 +42,9 @@ export class NukkitServer implements server.Server {
     getNativePluginManager() {
         return Nukkit.getPluginManager() as any;
     }
+    getNettyPipeline() {
+        throw new Error("Method not implemented.");
+    }
     sendJson(sender: string | any, json: object | string): void {
         throw new Error("Method not implemented.");
     }
