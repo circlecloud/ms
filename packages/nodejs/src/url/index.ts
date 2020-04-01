@@ -21,8 +21,8 @@
 
 'use strict';
 
-var punycode = require('punycode');
-// @ts-ignore
+import * as punycode from 'punycode'
+
 var util = {
     isString: function (arg) {
         return typeof (arg) === 'string';
