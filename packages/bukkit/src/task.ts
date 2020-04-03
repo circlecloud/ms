@@ -17,6 +17,9 @@ export class BukkitTaskManager implements task.TaskManager {
     callSyncMethod(func: Function): any {
         return Bukkit.getScheduler().callSyncMethod(this.pluginInstance, new Callable({ call: () => func() })).get()
     }
+    disable() {
+        Bukkit.getScheduler().cancelTasks(this.pluginInstance);
+    }
 }
 
 export class BukkitTask extends task.Task {
