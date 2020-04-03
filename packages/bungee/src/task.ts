@@ -16,6 +16,9 @@ export class BungeeTaskManager implements task.TaskManager {
     callSyncMethod(func: Function): any {
         return func();
     }
+    disable() {
+        this.pluginInstance.getProxy().getScheduler().cancel(this.pluginInstance)
+    }
 }
 
 export class BungeeTask extends task.Task {

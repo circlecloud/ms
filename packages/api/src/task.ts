@@ -11,6 +11,10 @@ export namespace task {
          * @param func 执行内容
          */
         callSyncMethod(func: Function): any;
+        /**
+         * 关闭任务管理器
+         */
+        disable();
     }
     /**
      * 任务抽象
