@@ -15,6 +15,9 @@ export class NukkitTaskManager implements task.TaskManager {
     callSyncMethod(func: Function): any {
         return func()
     }
+    disable() {
+        base.getInstance().getServer().getScheduler().cancelTask(this.pluginInstance)
+    }
 }
 
 export class NukkitTask extends task.Task {

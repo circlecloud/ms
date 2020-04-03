@@ -48,6 +48,7 @@ class MiaoScriptCore {
     disable() {
         console.i18n("ms.core.engine.disable")
         this.pluginManager.disable();
+        this.taskManager.disable();
     }
 }
 
