@@ -41,9 +41,11 @@ export namespace command {
                 try {
                     return executor(sender, command, Java.from(args));
                 } catch (ex) {
-                    console.i18n("ms.api.command.execute.error", { sender: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex })
+                    console.i18n("ms.api.command.execute.error", { player: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex })
                     console.ex(ex);
-                    console.sender(sender, [i18n.translate("ms.api.command.execute.error", { sender: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex }), ...console.stack(ex)])
+                    if (sender.name != 'CONSOLE') {
+                        console.sender(sender, [i18n.translate("ms.api.command.execute.error", { player: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex }), ...console.stack(ex)])
+                    }
                     return true;
                 }
             }
