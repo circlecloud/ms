@@ -1,6 +1,6 @@
 {
     "name": "@ms/bungee",
-    "version": "0.4.1",
+    "version": "0.4.2",
     "description": "MiaoScript bungee package",
     "keywords": [
         "miaoscript",
@@ -27,8 +27,8 @@
         "typescript": "^3.8.3"
     },
     "dependencies": {
-        "@ms/api": "^0.4.1",
-        "@ms/common": "^0.4.0",
+        "@ms/api": "^0.4.2",
+        "@ms/common": "^0.4.2",
         "@ms/container": "^0.4.0"
     }
 }

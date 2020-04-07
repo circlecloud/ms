@@ -1,7 +1,7 @@
 {
     "private": true,
     "name": "@ms/plugins",
-    "version": "0.4.1",
+    "version": "0.4.2",
     "description": "MiaoScript plugins package",
     "keywords": [
         "miaoscript",
@@ -28,8 +28,8 @@
         "typescript": "^3.8.3"
     },
     "dependencies": {
-        "@ms/api": "^0.4.1",
+        "@ms/api": "^0.4.2",
         "@ms/container": "^0.4.0",
-        "@ms/plugin": "^0.4.1"
+        "@ms/plugin": "^0.4.2"
     }
 }
