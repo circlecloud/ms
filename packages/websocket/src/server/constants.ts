@@ -15,6 +15,8 @@ export enum Keys {
     Default = "DefaultChannelPipeline"
 }
 
+let RequestAttributeKey: any
+try { RequestAttributeKey = AttributeKey.valueOf('request') } catch (error) { }
 export enum AttributeKeys {
-    Request = AttributeKey.valueOf('request')
+    Request = RequestAttributeKey
 }

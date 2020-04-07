@@ -5,11 +5,12 @@ import { attachForge } from './forge'
 import { attachEvents } from './event'
 
 let username = process.argv[2] || 'Mr_jtb'
+let version = process.argv[3] || '1.12.2'
 let client = createConnection('192.168.2.5', 25577, username)
 
 function createConnection(host: string, port: number, username: string) {
     let client = createClient({
-        version: '1.12.2',
+        version,
         host,
         port,
         username,

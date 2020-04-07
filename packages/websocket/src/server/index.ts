@@ -22,6 +22,7 @@ class NettyWebSocketServer extends EventEmitter {
             ctx.fireChannelRead(channel)
         })
         connectEvent.on(ServerEvent.connect, (ctx) => {
+            console.log('NettyWebSocketServer ServerEvent.connect', ctx, ctx.channel().id(), ctx.channel().class.name)
             let nettyClient = new NettyClient(this, ctx.channel());
             this.allClients[nettyClient.id] = nettyClient;
             this.emit(ServerEvent.connect, nettyClient);
