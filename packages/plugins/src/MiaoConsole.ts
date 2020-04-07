@@ -4,101 +4,105 @@
 
 import { plugin as pluginApi, server, task } from '@ms/api'
 import { plugin, interfaces, cmd } from '@ms/plugin'
-import { inject, Container } from '@ms/container'
-import * as reflect from '@ms/common/dist/reflect'
-import { Server as SocketIOServer, Socket as SocketIOSocket } from '@ms/websocket'
-
-const refList: Array<{ server: string, future: string }> = [
-    { server: 'an', future: 'g' },//spigot 1.12.2
-    { server: 'getServerConnection', future: 'f' },//after spigot 1.14.4
-    { server: 'func_147137_ag', future: 'field_151274_e' }//catserver 1.12.2
-]
+import { inject, ContainerInstance, Container } from '@ms/container'
+import io, { Server as SocketIOServer, Socket as SocketIOSocket } from '@ms/websocket'
 
 @plugin({ name: 'MiaoConsole', version: '1.0.0', author: 'MiaoWoo', servers: ['!nukkit'], source: __filename })
 export class MiaoConsole extends interfaces.Plugin {
+    @inject(ContainerInstance)
+    private container: Container
     @inject(server.ServerType)
-    private ServerType: string
+    private serverType: string
     @inject(server.Server)
-    private Server: server.Server
+    private server: server.Server
     @inject(task.TaskManager)
-    private Task: task.TaskManager
+    private task: task.TaskManager
+    @inject(pluginApi.PluginManager)
+    private pluginManager: pluginApi.PluginManager
 
     private pipeline: any;
     private socketIOServer: SocketIOServer;
 
     @cmd()
     mconsole(sender: any, command: string, args: string[]) {
+        if (args[0] == 'reload') {
+            // @ts-ignore
+            require.clear('websocket');
+            this.pluginManager.reload(this);
+            return
+        }
+        let tfunc = new Function('pipeline', args.join(' '))
+        tfunc.apply(this, [this.pipeline])
+    }
+
+    enable() {
+        let count = 0;
+        let wait = this.task.create(() => {
+            this.pipeline = this.server.getNettyPipeline()
+            if (this.pipeline) {
+                wait.cancel()
+                this.createSocketIOServer()
+                this.startSocketIOServer()
+            }
+            if (count > 30) { wait.cancel() }
+            count++
+        }).later(20).timer(40).submit()
     }
 
     disable() {
         this.socketIOServer?.close()
-    }
-
-    bukkitenable() {
-        let Bukkit = Java.type('org.bukkit.Bukkit')
-        let consoleServer = reflect.on(Bukkit.getServer()).get('console').get()
-        this.reflectChannel(this.reflectPromise(consoleServer))
-        this.injectMiaoDetect()
-    }
-
-    spongeenable() {
-        let Sponge = Java.type('org.spongepowered.api.Sponge')
-        let consoleServer = reflect.on(Sponge.getServer()).get()
-        this.reflectChannel(this.reflectPromise(consoleServer))
-        this.injectMiaoDetect()
-    }
-
-    bungeeenable() {
-        let wait = this.Task.create(() => {
-            try {
-                // @ts-ignore
-                this.pipeline = reflect.on(base.getInstance().getProxy()).get('listeners').get().toArray()[0].pipeline()
-                this.injectMiaoDetect()
-                wait.cancel();
-            } catch (ex) {
-                this.logger.warn('Wait BungeeCord start ready to get netty channel pipeline. Err: ' + ex)
-            }
-        }).later(300).timer(500).submit()
-    }
-
-    reflectPromise(consoleServer: any) {
-        for (const ref of refList) {
-            try { return reflect.on(consoleServer).call(ref.server).get(ref.future).get().get(0) } catch (error) { }
+        if (this.container.isBound(io.Instance)) {
+            this.container.unbind(io.Instance)
         }
     }
 
-    reflectChannel(promise: any) {
-        if (!promise) { throw Error(`Can't found ServerConnection or ChannelFuture !`) }
-        this.pipeline = reflect.on(promise).get('channel').get().pipeline()
+    createSocketIOServer() {
+        this.socketIOServer = io(this.pipeline, {
+            path: '/ws',
+            root: '/home/project/TSWorkSpace/ms/packages/plugins/public'
+        });
+        this.container.bind(io.Instance).toConstantValue(this.socketIOServer)
     }
 
-    injectMiaoDetect() {
-        this.socketIOServer = new SocketIOServer(this.pipeline, {
-            path: '/ws'
-        });
+    startSocketIOServer() {
         let namespace = this.socketIOServer.of('/MiaoConsole')
         namespace.on('connect', (client: SocketIOSocket) => {
-            global.setGlobal('client', client);
+            this.logger.console(`§6客户端 §b${client.id} §a新建连接...`)
             client.on('type', (fn) => {
-                this.logger.console(`§6客户端 §b${client.id} §a新建连接...`)
-                fn && fn(this.ServerType)
-                client.emit('log', `Currect Server Version is ${this.Server.getVersion()}`)
+                fn && fn(this.serverType)
+                client.emit('log', `Currect Server Version is ${this.server.getVersion()}`)
             })
             client.on('command', (cmd) => {
-                setTimeout(() => this.Server.dispatchConsoleCommand(cmd), 0)
+                setTimeout(() => this.server.dispatchConsoleCommand(cmd), 0)
                 client.emit('log', `§6命令: §b${cmd} §a执行成功!`)
             })
             client.on('exec', (code) => {
                 try {
-                    client.emit('log', this.Task.callSyncMethod(() => eval(code)) + '')
+                    client.emit('log', this.runCode(code, namespace, client))
                 } catch (ex) {
                     client.emit('log', '§4代码执行异常\n' + console.stack(ex).join('\n'))
                 }
+            })
+            client.on('edit', (file: string, fn) => {
+                fn && fn(base.read(file), file.split('.', 2)[1])
             })
             client.on('disconnect', () => {
                 this.logger.console(`§6客户端 §b${client.id} §c断开连接...`)
             })
         })
         this.logger.info('Netty Channel Pipeline Inject MiaoDetectHandler Successful!')
+    }
+
+    private runCode(code: string, namespace, client) {
+        let tfunc = new Function('namespace', 'client', `
+        var reflect = require('@ms/common/dist/reflect');
+        var tempconcent = '';
+        function print(text) {
+            tempconcent += "\\n" + text
+        }
+        return eval(${JSON.stringify(code)}) + tempconcent
+        `)
+        console.log(tfunc)
+        return this.task.callSyncMethod(() => tfunc.apply(this, [namespace, client])) + ''
     }
 }
