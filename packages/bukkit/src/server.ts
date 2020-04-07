@@ -5,6 +5,7 @@ import * as reflect from '@ms/common/dist/reflect'
 import chat from './enhance/chat'
 
 const refList: Array<{ server: string, future: string }> = [
+    { server: 'aq', future: 'g' },//spigot 1.8.8
     { server: 'an', future: 'g' },//spigot 1.12.2
     { server: 'getServerConnection', future: 'f' },//after spigot 1.14.4
     { server: 'func_147137_ag', future: 'field_151274_e' }//catserver 1.12.2
@@ -74,7 +75,7 @@ export class BukkitServer implements server.Server {
             } catch (error) {
             }
         }
-        if (!promise) { throw Error(`Can't found ServerConnection or ChannelFuture !`) }
+        if (!promise) { console.error("Can't found ServerConnection or ChannelFuture !"); return }
         this.pipeline = reflect.on(promise).get('channel').get().pipeline()
     }
 }
