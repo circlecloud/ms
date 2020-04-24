@@ -1,7 +1,7 @@
-import { TextWebSocketFrameHandlerAdapter } from '../netty'
 import { EventEmitter } from 'events'
 import { ServerEvent } from './constants'
 import { ServerOptions } from '../socket-io';
+import { TextWebSocketFrameHandlerAdapter } from '../netty'
 
 export class TextWebSocketFrameHandler extends TextWebSocketFrameHandlerAdapter {
     private event: EventEmitter;
