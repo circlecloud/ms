@@ -7,6 +7,12 @@ import { plugin, interfaces, cmd } from '@ms/plugin'
 import { inject, ContainerInstance, Container } from '@ms/container'
 import io, { Server as SocketIOServer, Socket as SocketIOSocket } from '@ms/websocket'
 
+const suffixMap = {
+    ts: 'typescript',
+    js: 'javascript',
+    yml: 'yaml'
+}
+
 @plugin({ name: 'MiaoConsole', version: '1.0.0', author: 'MiaoWoo', servers: ['!nukkit'], source: __filename })
 export class MiaoConsole extends interfaces.Plugin {
     @inject(ContainerInstance)
@@ -84,7 +90,7 @@ export class MiaoConsole extends interfaces.Plugin {
                 }
             })
             client.on('edit', (file: string, fn) => {
-                fn && fn(base.read(file), file.split('.', 2)[1])
+                fn && fn(base.read(file), suffixMap[file.split('.', 2)[1]])
             })
             client.on('disconnect', () => {
                 this.logger.console(`§6客户端 §b${client.id} §c断开连接...`)
@@ -93,16 +99,16 @@ export class MiaoConsole extends interfaces.Plugin {
         this.logger.info('Netty Channel Pipeline Inject MiaoDetectHandler Successful!')
     }
 
-    private runCode(code: string, namespace, client) {
+    private runCode(code: string, namespace: any, client: any) {
         let tfunc = new Function('namespace', 'client', `
         var reflect = require('@ms/common/dist/reflect');
         var tempconcent = '';
         function print(text) {
-            tempconcent += "\\n" + text
+            tempconcent += text + "\\n"
         }
-        return eval(${JSON.stringify(code)}) + tempconcent
+        var result = eval(${JSON.stringify(code)});
+        return tempconcent + result
         `)
-        console.log(tfunc)
         return this.task.callSyncMethod(() => tfunc.apply(this, [namespace, client])) + ''
     }
 }
