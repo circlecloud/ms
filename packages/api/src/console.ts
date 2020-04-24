@@ -1,10 +1,9 @@
 import i18m from '@ms/i18n'
 import { SourceMapBuilder } from 'source-map-builder'
+import * as base64 from 'base64-js'
 
 const Arrays = Java.type('java.util.Arrays');
 const Level = Java.type('java.util.logging.Level');
-const JavaString = Java.type('java.lang.String');
-const Files = Java.type('java.nio.file.Files');
 const Paths = Java.type('java.nio.file.Paths');
 const ignoreLogPrefix = ['java.', 'net.minecraft.', 'org.bukkit.', 'jdk.nashorn.', 'io.netty.', 'org.spongepowered.'];
 
@@ -23,6 +22,7 @@ export class MiaoScriptConsole implements Console {
     Console: NodeJS.ConsoleConstructor;
 
     private sourceMaps: { [key: string]: SourceMapBuilder } = {};
+    private sourceFileMaps: { [key: string]: string } = {};
     private _name: string = '';
     private _level: LogLevel = LogLevel.INFO;
 
@@ -83,7 +83,7 @@ export class MiaoScriptConsole implements Console {
         this.console(i18m.translate(name, param))
     }
     object(obj) {
-        for (var i in obj) {
+        for (const i in obj) {
             this.info(i, '=>', obj[i])
         }
     }
@@ -93,23 +93,31 @@ export class MiaoScriptConsole implements Console {
     readSourceMap(fileName: string, lineNumber: number) {
         try {
             if (fileName.endsWith('js')) {
-                var file = Paths.get(fileName + '.map');
                 if (this.sourceMaps[fileName] === undefined) {
-                    if (file.toFile().exists()) {
-                        var sourceMapObj = JSON.parse(new JavaString(Files.readAllBytes(file), "UTF-8"))
-                        this.sourceMaps[fileName] = new SourceMapBuilder(sourceMapObj)
-                    } else {
-                        this.sourceMaps[fileName] = null;
+                    this.sourceMaps[fileName] = null
+                    let sourceLine = base.read(fileName).split('\n');
+                    let lastLine = sourceLine[sourceLine.length - 1]
+                    if (lastLine.startsWith('//# sourceMappingURL=')) {
+                        let sourceContent = null;
+                        let sourceMappingURL = lastLine.split('sourceMappingURL=', 2)[1];
+                        if (sourceMappingURL.startsWith('data:application/json;base64,')) {
+                            sourceContent = String.fromCharCode(...Array.from(base64.toByteArray(sourceMappingURL.split(',', 2)[1])))
+                        } else if (sourceMappingURL.startsWith('http')) {
+                            // TODO
+                        } else {
+                            let file = Paths.get(Paths.get(fileName, '..', sourceMappingURL).toFile().getCanonicalPath()).toFile();
+                            if (file.exists()) { sourceContent = base.read(file) }
+                        }
+                        if (sourceContent) {
+                            this.sourceMaps[fileName] = new SourceMapBuilder(JSON.parse(sourceContent))
+                            this.sourceFileMaps[fileName] = Paths.get(fileName, '..', this.sourceMaps[fileName].sources[0]).toFile().getCanonicalPath();
+                        }
                     }
                 }
                 if (this.sourceMaps[fileName]) {
-                    var sourceMapping = this.sourceMaps[fileName].getSource(lineNumber, 25, true);
-                    if (sourceMapping) {
-                        if (lineNumber != sourceMapping.mapping.sourceLine) {
-                            fileName = fileName.replace(".js", ".ts");
-                            lineNumber = sourceMapping.mapping.sourceLine;
-                        }
-                    }
+                    let sourceMapping = this.sourceMaps[fileName].getSource(lineNumber, 25, true, true);
+                    fileName = this.sourceFileMaps[fileName]
+                    if (sourceMapping && lineNumber != sourceMapping.mapping.sourceLine) { lineNumber = sourceMapping.mapping.sourceLine; }
                 }
             }
         } catch (error) {
@@ -121,26 +129,26 @@ export class MiaoScriptConsole implements Console {
         }
     }
     stack(ex: Error): string[] {
-        var stack = ex.getStackTrace();
-        var cache = ['§c' + ex];
+        let stack = ex.getStackTrace();
+        let cache = ['§c' + ex];
         //@ts-ignore
         if (stack.class) {
             stack = Arrays.asList(stack)
         }
         stack.forEach(trace => {
             if (trace.className.startsWith('<')) {
-                var { fileName, lineNumber } = this.readSourceMap(trace.fileName, trace.lineNumber)
+                let { fileName, lineNumber } = this.readSourceMap(trace.fileName, trace.lineNumber)
                 if (fileName.startsWith(root)) { fileName = fileName.split(root)[1] }
                 cache.push(`    §e->§c ${fileName} => §4${trace.methodName}:${lineNumber}`)
             } else {
-                var className = trace.className;
+                let className = trace.className;
                 var fileName = trace.fileName as string;
                 if (className.startsWith('jdk.nashorn.internal.scripts')) {
                     className = className.substr(className.lastIndexOf('$') + 1)
                     var { fileName, lineNumber } = this.readSourceMap(trace.fileName, trace.lineNumber)
                     if (fileName.startsWith(root)) { fileName = fileName.split(root)[1] }
                 } else {
-                    for (var prefix in ignoreLogPrefix) {
+                    for (let prefix in ignoreLogPrefix) {
                         if (className.startsWith(ignoreLogPrefix[prefix])) {
                             return;
                         }
