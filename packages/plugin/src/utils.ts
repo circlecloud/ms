@@ -57,6 +57,14 @@ function getPluginConfigMetadata(target: any) {
     return configMetadata;
 }
 
+function getPluginStageMetadata(target: any, stage: string) {
+    let stageMetadata: interfaces.ExecMetadata[] = Reflect.getMetadata(
+        METADATA_KEY.stage[stage],
+        target.constructor
+    ) || [];
+    return stageMetadata;
+}
+
 export {
     getPlugin,
     getPlugins,
@@ -65,5 +73,6 @@ export {
     getPluginCommandMetadata,
     getPluginTabCompleterMetadata,
     getPluginListenerMetadata,
-    getPluginConfigMetadata
+    getPluginConfigMetadata,
+    getPluginStageMetadata
 }

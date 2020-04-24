@@ -1,14 +1,14 @@
 import { injectable, decorate } from "@ms/container";
 import { interfaces } from './interfaces'
 import { METADATA_KEY } from './constants'
-import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPluginTabCompleterMetadata, getPluginConfigMetadata } from './utils'
+import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPluginTabCompleterMetadata, getPluginConfigMetadata, getPluginStageMetadata } from './utils'
 
 /**
  * MiaoScript plugin
  * @param metadata PluginMetadata
  */
 export function plugin(metadata: interfaces.PluginMetadata) {
-    return function(target: any) {
+    return function (target: any) {
         metadata.target = target;
         decorate(injectable(), target);
         Reflect.defineMetadata(METADATA_KEY.plugin, metadata, target);
@@ -23,7 +23,7 @@ export function plugin(metadata: interfaces.PluginMetadata) {
  * @param metadata CommandMetadata
  */
 export function cmd(metadata: interfaces.CommandMetadata = {}) {
-    return function(target: any, key: string, value: any) {
+    return function (target: any, key: string, value: any) {
         metadata.name = metadata.name || key;
         metadata.executor = key;
         metadata.paramtypes = Reflect.getMetadata("design:paramtypes", target, key)
@@ -38,7 +38,7 @@ export function cmd(metadata: interfaces.CommandMetadata = {}) {
  * @param metadata TabCompleterMetadata
  */
 export function tab(metadata: interfaces.CommandMetadata = {}) {
-    return function(target: any, key: string, value: any) {
+    return function (target: any, key: string, value: any) {
         metadata.name = metadata.name || (key.startsWith('tab') ? key.split('tab', 2)[1] : key);
         if (!metadata.name) { return; }
         metadata.executor = key;
@@ -54,7 +54,7 @@ export function tab(metadata: interfaces.CommandMetadata = {}) {
  * @param metadata ListenerMetadata
  */
 export function listener(metadata: interfaces.ListenerMetadata = {}) {
-    return function(target: any, key: string, value: any) {
+    return function (target: any, key: string, value: any) {
         metadata.name = metadata.name || key;
         metadata.executor = key;
         const previousMetadata: interfaces.ListenerMetadata[] = getPluginListenerMetadata(target)
@@ -63,11 +63,32 @@ export function listener(metadata: interfaces.ListenerMetadata = {}) {
 }
 
 export function config(metadata: interfaces.ConfigMetadata = { version: 1, format: 'yml' }) {
-    return function(target: any, key: string) {
+    return function (target: any, key: string) {
         metadata.name = metadata.name || key;
         metadata.variable = key;
         const previousMetadata: Map<string, interfaces.ConfigMetadata> = getPluginConfigMetadata(target)
         previousMetadata.set(metadata.name, metadata);
         Reflect.defineMetadata(METADATA_KEY.config, previousMetadata, target.constructor);
     }
+}
+
+function stage(metadata: interfaces.ExecMetadata = {}, stage: string) {
+    return function (target: any, key: string, value: any) {
+        metadata.name = metadata.name || key;
+        metadata.executor = key;
+        const previousMetadata: interfaces.ExecMetadata[] = getPluginStageMetadata(target, stage)
+        Reflect.defineMetadata(METADATA_KEY.stage[stage], [metadata, ...previousMetadata], target.constructor);
+    };
+}
+
+export function load(metadata: interfaces.ExecMetadata = {}) {
+    return stage(metadata, 'load')
+}
+
+export function enable(metadata: interfaces.ExecMetadata = {}) {
+    return stage(metadata, 'enable')
+}
+
+export function disable(metadata: interfaces.ExecMetadata = {}) {
+    return stage(metadata, 'disable')
 }

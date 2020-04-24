@@ -1,11 +1,13 @@
 import i18n from '@ms/i18n'
 import { plugin, server, command, event } from '@ms/api'
-import { inject, provideSingleton, postConstruct, Container, ContainerInstance } from '@ms/container'
+import { inject, provideSingleton, Container, ContainerInstance } from '@ms/container'
 import * as fs from '@ms/common/dist/fs'
 
-import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPlugin, getPluginTabCompleterMetadata, getPluginConfigMetadata } from './utils'
+import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPlugin, getPluginTabCompleterMetadata, getPluginConfigMetadata, getPluginStageMetadata } from './utils'
 import { interfaces } from './interfaces'
 import { getConfigLoader } from './config'
+
+const Thread = Java.type('java.lang.Thread')
 
 @provideSingleton(plugin.PluginManager)
 export class PluginManagerImpl implements plugin.PluginManager {
@@ -22,25 +24,23 @@ export class PluginManagerImpl implements plugin.PluginManager {
     @inject(event.Event)
     private EventManager: event.Event
 
+    private initialized: boolean = false
     private pluginMap: Map<string, interfaces.Plugin>
 
-    @postConstruct()
     initialize() {
-        if (this.pluginInstance !== null) {
+        if (this.pluginInstance !== null && this.initialized !== true) {
             // 如果plugin不等于null 则代表是正式环境
-            console.i18n('ms.plugin.initialize', { plugin: this.pluginInstance })
+            console.i18n('ms.plugin.initialize', { plugin: this.pluginInstance, loader: Thread.currentThread().contextClassLoader })
             this.pluginMap = new Map()
             console.i18n('ms.plugin.event.map', { count: this.EventManager.mapEventName().toFixed(0), type: this.serverType });
+            this.initialized = true;
         }
     }
 
     scan(folder: string): void {
+        this.initialize()
         var plugin = fs.file(root, folder)
-        var files = []
-            // load common plugin
-            .concat(this.scanFolder(plugin))
-            // load space plugin
-            .concat(this.scanFolder(fs.file(plugin, this.serverType)))
+        var files = this.scanFolder(plugin)
         this.loadPlugins(files)
     }
 
@@ -58,6 +58,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
             this.loadConfig(plugin)
             this.runCatch(plugin, 'load')
             this.runCatch(plugin, `${this.serverType}load`)
+            this.execPluginStage(plugin, 'load')
         })
     }
 
@@ -68,6 +69,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
             this.registryListener(plugin)
             this.runCatch(plugin, 'enable')
             this.runCatch(plugin, `${this.serverType}enable`)
+            this.execPluginStage(plugin, 'enable')
         })
     }
 
@@ -78,6 +80,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
             this.unregistryListener(plugin)
             this.runCatch(plugin, 'disable')
             this.runCatch(plugin, `${this.serverType}disable`)
+            this.execPluginStage(plugin, 'disable')
         })
     }
 
@@ -162,7 +165,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
     private allowProcess(servers: string[]) {
         // Not set servers allow
-        if (!servers) return true
+        if (!servers || !servers.length) return true
         // include !type deny
         let denyServers = servers.filter(svr => svr.startsWith("!"))
         if (denyServers.length !== 0) {
@@ -259,5 +262,14 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
     private unregistryListener(pluginInstance: interfaces.Plugin) {
         this.EventManager.disable(pluginInstance)
+    }
+
+    private execPluginStage(pluginInstance: interfaces.Plugin, stageName: string) {
+        let stages = getPluginStageMetadata(pluginInstance, stageName);
+        for (const stage of stages) {
+            if (!this.allowProcess(stage.servers)) { continue }
+            console.i18n("ms.plugin.manager.stage.exec", { plugin: pluginInstance.description.name, name: stage.executor, stage: stageName, servers: stage.servers })
+            pluginInstance[stage.executor].apply(pluginInstance)
+        }
     }
 }
