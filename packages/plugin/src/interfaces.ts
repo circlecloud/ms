@@ -1,4 +1,4 @@
-import { server, MiaoScriptConsole } from "@ms/api";
+import { server, MiaoScriptConsole, event } from "@ms/api";
 import { METADATA_KEY } from './constants'
 import { injectable, inject, postConstruct } from "@ms/container";
 import { getPluginMetadata } from "./utils";
@@ -55,7 +55,7 @@ export namespace interfaces {
          */
         target?: any;
     }
-    interface ExecMetadata extends BaseMetadata {
+    export interface ExecMetadata extends BaseMetadata {
         /**
          * 执行器
          */
@@ -68,6 +68,15 @@ export namespace interfaces {
         paramtypes?: string[];
     }
     export interface ListenerMetadata extends ExecMetadata {
+        /**
+         * 监听优先级
+         */
+        priority?: event.EventPriority;
+        /**
+         * 是否忽略已取消的事件
+         */
+        ignoreCancel?: boolean;
+
     }
     export interface ConfigMetadata extends BaseMetadata {
         /**
