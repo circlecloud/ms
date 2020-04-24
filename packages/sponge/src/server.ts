@@ -1,13 +1,7 @@
-import { server } from '@ms/api'
+import { server, constants } from '@ms/api'
 import { provideSingleton } from '@ms/container';
 
 import * as reflect from '@ms/common/dist/reflect'
-
-const refList: Array<{ server: string, future: string }> = [
-    { server: 'an', future: 'g' },//spigot 1.12.2
-    { server: 'getServerConnection', future: 'f' },//after spigot 1.14.4
-    { server: 'func_147137_ag', future: 'field_151274_e' }//catserver 1.12.2
-]
 
 const Sponge = org.spongepowered.api.Sponge;
 const TextSerializers = org.spongepowered.api.text.serializer.TextSerializers;
@@ -64,14 +58,24 @@ export class SpongeServer implements server.Server {
     }
     private reflectPipeline() {
         let consoleServer = reflect.on(Sponge.getServer()).get()
+        let connection: any;
         let promise: any;
-        for (const ref of refList) {
+        for (const method of constants.Reflect.Method.getServerConnection) {
             try {
-                promise = reflect.on(consoleServer).call(ref.server).get(ref.future).get().get(0); break;
-            } catch (error) {
-            }
+                connection = reflect.on(consoleServer).call(method).get()
+                if (connection.class.name.indexOf('ServerConnection') !== -1) { break; }
+                connection = undefined;
+            } catch (error) { }
         }
-        if (!promise) { throw Error(`Can't found ServerConnection or ChannelFuture !`) }
+        if (!connection) { console.error("Can't found ServerConnection!"); return }
+        for (const field of constants.Reflect.Field.listeningChannels) {
+            try {
+                promise = reflect.on(connection).get(field).get().get(0);
+                if (promise.class.name.indexOf('Promise') !== -1) { break; }
+                promise = undefined;
+            } catch (error) { }
+        }
+        if (!promise) { console.error("Can't found listeningChannels!"); return }
         this.pipeline = reflect.on(promise).get('channel').get().pipeline()
     }
 }

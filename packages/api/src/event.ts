@@ -62,8 +62,8 @@ export namespace event {
             return count;
         }
 
-        getJarFile(resource: string) {
-            let dirs = Thread.currentThread().getContextClassLoader().getResources(resource);
+        getJarFile(resource: string, loader?: any) {
+            let dirs = (loader || Thread.currentThread().getContextClassLoader()).getResources(resource);
             if (dirs.hasMoreElements()) {
                 let url = dirs.nextElement();
                 if (url.protocol === "jar") { return url.openConnection().jarFile; }
