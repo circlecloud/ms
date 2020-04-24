@@ -2,9 +2,9 @@
 /// <reference types="@ms/types/dist/typings/sponge" />
 /// <reference types="@ms/types/dist/typings/bungee" />
 
-import { server, plugin as pluginApi, channel } from '@ms/api'
+import { server, plugin as pluginApi, channel, constants } from '@ms/api'
 import { inject, optional } from '@ms/container';
-import { plugin, interfaces, cmd, listener, tab, config } from '@ms/plugin'
+import { plugin, interfaces, cmd, listener, tab, config, enable } from '@ms/plugin'
 import Tellraw from '@ms/common/dist/tellraw'
 
 const ByteArrayInputStream = Java.type("java.io.ByteArrayInputStream");
@@ -12,10 +12,8 @@ const ByteArrayOutputStream = Java.type("java.io.ByteArrayOutputStream");
 const StandardCharsets = Java.type("java.nio.charset.StandardCharsets");
 const GZIPInputStream = Java.type("java.util.zip.GZIPInputStream");
 const GZIPOutputStream = Java.type("java.util.zip.GZIPOutputStream");
-const Consumer = Java.type("java.util.function.Consumer");
-const ByteArray = Java.type("byte[]")
-
 const BiConsumer = Java.type('java.util.function.BiConsumer')
+const ByteArray = Java.type("byte[]")
 
 class MiaoMessage {
     // public static final String CHANNEL = "MiaoChat:Default".toLowerCase();
@@ -146,7 +144,7 @@ export class MiaoChat extends interfaces.Plugin {
     }
 
     private compare(prop: string) {
-        return function(obj1: { [x: string]: any; }, obj2: { [x: string]: any; }) {
+        return function (obj1: { [x: string]: any; }, obj2: { [x: string]: any; }) {
             var val1 = obj1[prop];
             var val2 = obj2[prop];
             if (!isNaN(Number(val1)) && !isNaN(Number(val2))) {
@@ -184,9 +182,6 @@ export class MiaoChat extends interfaces.Plugin {
         } catch (ex) {
             this.logger.console("§cCan't found me.clip.placeholderapi.PlaceholderAPI variable will not be replaced! Err: " + ex)
         }
-        this.channelOff = this.Channel?.listen(this, MiaoMessage.CHANNEL, (data) => {
-            this.sendChatAll(MiaoMessage.decode(data).json)
-        })
     }
 
     spongeenable() {
@@ -205,6 +200,10 @@ export class MiaoChat extends interfaces.Plugin {
         } catch (ex) {
             this.logger.console("§cCan't found me.rojo8399.placeholderapi.PlaceholderService variable will not be replaced! Err: " + ex)
         }
+    }
+
+    @enable({ servers: [constants.ServerType.Bukkit, constants.ServerType.Sponge] })
+    serverEnbale() {
         this.channelOff = this.Channel?.listen(this, MiaoMessage.CHANNEL, (data) => {
             this.sendChatAll(MiaoMessage.decode(data).json)
         })
@@ -244,7 +243,7 @@ export class MiaoChat extends interfaces.Plugin {
 
     @listener({ servers: ['bukkit'] })
     AsyncPlayerChatEvent(event: org.bukkit.event.player.AsyncPlayerChatEvent) {
-        this.sendChat(event.getPlayer(), event.getMessage(), function() {
+        this.sendChat(event.getPlayer(), event.getMessage(), function () {
             event.setCancelled(true);
         });
     }
@@ -260,7 +259,7 @@ export class MiaoChat extends interfaces.Plugin {
         if (plain.startsWith(Tellraw.duplicateChar)) {
             return;
         }
-        this.sendChat(player, plain, function() {
+        this.sendChat(player, plain, function () {
             event.setMessageCancelled(true)
         });
     }
