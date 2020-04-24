@@ -1,6 +1,6 @@
 let containerStartTime = Date.now();
 console.i18n("ms.core.ioc.initialize");
-import { plugin, server, task } from '@ms/api'
+import { plugin, server, task, constants } from '@ms/api'
 import { DefaultContainer as container, inject, provideSingleton, ContainerInstance, buildProviderModule } from '@ms/container'
 console.i18n("ms.core.ioc.completed", { time: (Date.now() - containerStartTime) / 1000 })
 
@@ -24,15 +24,13 @@ class MiaoScriptCore {
     }
 
     loadServerConsole() {
-        // @ts-ignore
-        console = new this.Console();
+        //@ts-ignore
+        global.setGlobal('console', new this.Console())
     }
 
     loadTaskFunction() {
-        //@ts-ignore
-        global.setTimeout = (func: Function, tick: number, async: boolean = false) => this.taskManager.create(func).later(tick).async(async).submit()
-        //@ts-ignore
-        global.setInterval = (func: Function, tick: number, async: boolean = false) => this.taskManager.create(func).timer(tick).async(async).submit()
+        global.setGlobal('setTimeout', (func: Function, tick: number, async: boolean = false) => this.taskManager.create(func).later(tick).async(async).submit())
+        global.setGlobal('setInterval', (func: Function, tick: number, async: boolean = false) => this.taskManager.create(func).timer(tick).async(async).submit())
     }
 
     loadPlugins() {
@@ -49,49 +47,57 @@ class MiaoScriptCore {
         console.i18n("ms.core.engine.disable")
         this.pluginManager.disable();
         this.taskManager.disable();
+        //@ts-ignore
+        require.disable()
     }
 }
 
-function detectServer() {
+function detectServer(): constants.ServerType {
     try {
         Java.type("org.bukkit.Bukkit");
-        return 'bukkit'
+        return constants.ServerType.Bukkit
     } catch (ex) {
     }
     try {
         Java.type("org.spongepowered.api.Sponge");
-        return 'sponge'
+        return constants.ServerType.Sponge
     } catch (ex) {
     }
     try {
         Java.type("cn.nukkit.Nukkit");
-        return 'nukkit'
+        return constants.ServerType.Nukkit
     } catch (ex) {
     }
     try {
         Java.type("net.md_5.bungee.api.ProxyServer");
-        return 'bungee'
+        return constants.ServerType.Bungee
     } catch (ex) {
     }
     throw Error('Unknow Server Type...')
 }
 
 function initialize() {
-    let corePackageStartTime = new Date().getTime()
-    container.bind(ContainerInstance).toConstantValue(container);
-    container.bind(plugin.PluginInstance).toConstantValue(base.getInstance());
-    container.bind(plugin.PluginFolder).toConstantValue('plugins');
-    let type = detectServer();
-    console.i18n("ms.core.initialize.detect", { type });
-    container.bind(server.ServerType).toConstantValue(type);
-    console.i18n("ms.core.package.initialize", { type });
-    require(`@ms/${type}`).default(container);
-    require('@ms/plugin')
-    container.load(buildProviderModule());
-    console.i18n("ms.core.package.completed", { type, time: (Date.now() - corePackageStartTime) / 1000 });
-    let disable = container.get<MiaoScriptCore>(MiaoScriptCore).enable()
-    console.i18n("ms.core.engine.completed", { time: (Date.now() - global.NashornEngineStartTime) / 1000 });
-    return disable;
+    try {
+        let corePackageStartTime = new Date().getTime()
+        container.bind(ContainerInstance).toConstantValue(container);
+        container.bind(plugin.PluginInstance).toConstantValue(base.getInstance());
+        container.bind(plugin.PluginFolder).toConstantValue('plugins');
+        let type = detectServer();
+        console.i18n("ms.core.initialize.detect", { type });
+        container.bind(server.ServerType).toConstantValue(type);
+        console.i18n("ms.core.package.initialize", { type });
+        require(`@ms/${type}`).default(container);
+        require('@ms/plugin')
+        container.load(buildProviderModule());
+        console.i18n("ms.core.package.completed", { type, time: (Date.now() - corePackageStartTime) / 1000 });
+        let disable = container.get<MiaoScriptCore>(MiaoScriptCore).enable()
+        console.i18n("ms.core.engine.completed", { time: (Date.now() - global.NashornEngineStartTime) / 1000 });
+        return disable;
+    } catch (error) {
+        console.i18n("ms.core.initialize.error", { error });
+        console.ex(error)
+        return () => console.i18n('ms.core.engine.disable.abnormal')
+    }
 }
 
 export default initialize();
