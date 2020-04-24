@@ -19,7 +19,7 @@ export class BukkitEvent extends event.Event {
     }
 
     getJarFile(resource: string) {
-        return super.getJarFile('org/bukkit/Bukkit.class')
+        return super.getJarFile('org/bukkit/Bukkit.class', Bukkit.class.classLoader)
     }
     isValidEvent(clazz: any): boolean {
         // 继承于 org.bukkit.event.Event
