@@ -1,6 +1,6 @@
 {
     "name": "@ms/common",
-    "version": "0.4.2",
+    "version": "0.5.0",
     "description": "MiaoScript api package",
     "keywords": [
         "miaoscript",
@@ -27,7 +27,7 @@
         "typescript": "^3.8.3"
     },
     "dependencies": {
-        "@ms/nashorn": "^0.4.0"
+        "@ms/nashorn": "^0.5.0"
     },
     "gitHead": "562e2d00175c9d3a99c8b672aa07e6d92706a027"
 }

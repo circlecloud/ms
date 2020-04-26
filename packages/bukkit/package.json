@@ -1,6 +1,6 @@
 {
     "name": "@ms/bukkit",
-    "version": "0.4.2",
+    "version": "0.5.0",
     "description": "MiaoScript bukkit package",
     "keywords": [
         "miaoscript",
@@ -27,8 +27,8 @@
         "typescript": "^3.8.3"
     },
     "dependencies": {
-        "@ms/api": "^0.4.2",
-        "@ms/common": "^0.4.2",
-        "@ms/container": "^0.4.0"
+        "@ms/api": "^0.5.0",
+        "@ms/common": "^0.5.0",
+        "@ms/container": "^0.5.0"
     }
 }
