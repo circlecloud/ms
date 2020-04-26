@@ -52,35 +52,36 @@ export class PluginManagerImpl implements plugin.PluginManager {
         console.i18n("ms.plugin.manager.stage", { stage, plugin: plugin.description.name, version: plugin.description.version, author: plugin.description.author })
     }
 
+    private runPluginStage(plugin: interfaces.Plugin, stage: string, ext: Function) {
+        this.logStage(plugin, i18n.translate(`ms.plugin.manager.stage.${stage}`))
+        this.runCatch(plugin, stage)
+        this.runCatch(plugin, `${this.serverType}${stage}`)
+        this.execPluginStage(plugin, stage)
+    }
+
     load(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
-            this.logStage(plugin, i18n.translate("ms.plugin.manager.stage.load"))
-            this.loadConfig(plugin)
-            this.runCatch(plugin, 'load')
-            this.runCatch(plugin, `${this.serverType}load`)
-            this.execPluginStage(plugin, 'load')
+            this.runPluginStage(plugin, 'load', () => {
+                this.loadConfig(plugin)
+            })
         })
     }
 
     enable(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
-            this.logStage(plugin, i18n.translate("ms.plugin.manager.stage.enable"))
-            this.registryCommand(plugin)
-            this.registryListener(plugin)
-            this.runCatch(plugin, 'enable')
-            this.runCatch(plugin, `${this.serverType}enable`)
-            this.execPluginStage(plugin, 'enable')
+            this.runPluginStage(plugin, 'enable', () => {
+                this.registryCommand(plugin)
+                this.registryListener(plugin)
+            })
         })
     }
 
     disable(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
-            this.logStage(plugin, i18n.translate("ms.plugin.manager.stage.disable"))
-            this.unregistryCommand(plugin)
-            this.unregistryListener(plugin)
-            this.runCatch(plugin, 'disable')
-            this.runCatch(plugin, `${this.serverType}disable`)
-            this.execPluginStage(plugin, 'disable')
+            this.runPluginStage(plugin, 'disable', () => {
+                this.unregistryCommand(plugin)
+                this.unregistryListener(plugin)
+            })
         })
     }
 
@@ -102,7 +103,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
         try {
             if (pl[func]) pl[func].call(pl)
         } catch (ex) {
-            console.console(`§6Plugin §b${pl.description.name} §6exec §d${func} §6function error §4${ex}`)
+            console.i18n("ms.plugin.manager.stage.exec.error", { plugin: pl.description.name, executor: func, error: ex })
             console.ex(ex)
         }
     }
@@ -269,7 +270,12 @@ export class PluginManagerImpl implements plugin.PluginManager {
         for (const stage of stages) {
             if (!this.allowProcess(stage.servers)) { continue }
             console.i18n("ms.plugin.manager.stage.exec", { plugin: pluginInstance.description.name, name: stage.executor, stage: stageName, servers: stage.servers })
-            pluginInstance[stage.executor].apply(pluginInstance)
+            try {
+                pluginInstance[stage.executor].apply(pluginInstance)
+            } catch (error) {
+                console.i18n("ms.plugin.manager.stage.exec.error", { plugin: pluginInstance.description.name, executor: stage.executor, error })
+                console.ex(error)
+            }
         }
     }
 }
