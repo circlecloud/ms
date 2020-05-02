@@ -1,4 +1,4 @@
-import i18m from '@ms/i18n'
+import i18m from '@ccms/i18n'
 import { SourceMapBuilder } from 'source-map-builder'
 import * as base64 from 'base64-js'
 

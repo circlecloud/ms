@@ -1,7 +1,7 @@
-/// <reference types="@ms/types/dist/typings/nukkit" />
+/// <reference types="@ccms/types/dist/typings/nukkit" />
 
-import { server } from '@ms/api'
-import { Container } from '@ms/container'
+import { server } from '@ccms/api'
+import { Container } from '@ccms/container'
 
 import { NukkitConsole } from './console';
 import './event';

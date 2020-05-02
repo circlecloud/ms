@@ -1,7 +1,7 @@
-import i18n from '@ms/i18n'
-import { plugin, server, command, event } from '@ms/api'
-import { inject, provideSingleton, Container, ContainerInstance } from '@ms/container'
-import * as fs from '@ms/common/dist/fs'
+import i18n from '@ccms/i18n'
+import { plugin, server, command, event } from '@ccms/api'
+import { inject, provideSingleton, Container, ContainerInstance } from '@ccms/container'
+import * as fs from '@ccms/common/dist/fs'
 
 import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPlugin, getPluginTabCompleterMetadata, getPluginConfigMetadata, getPluginStageMetadata } from './utils'
 import { interfaces } from './interfaces'
@@ -54,6 +54,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
     private runPluginStage(plugin: interfaces.Plugin, stage: string, ext: Function) {
         this.logStage(plugin, i18n.translate(`ms.plugin.manager.stage.${stage}`))
+        ext()
         this.runCatch(plugin, stage)
         this.runCatch(plugin, `${this.serverType}${stage}`)
         this.execPluginStage(plugin, stage)
@@ -178,7 +179,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
     private createPlugin(file: string) {
         //@ts-ignore
-        require(file, { cache: false })
+        require(file + '', { cache: false })
     }
 
     private buildPlugins() {

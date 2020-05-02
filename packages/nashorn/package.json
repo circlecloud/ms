@@ -1,5 +1,5 @@
 {
-    "name": "@ms/nashorn",
+    "name": "@ccms/nashorn",
     "version": "0.5.0",
     "description": "MiaoScript api package",
     "keywords": [
@@ -13,9 +13,6 @@
     "license": "ISC",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
-    "publishConfig": {
-        "registry": "https://repo.yumc.pw/repository/npm-hosted/"
-    },
     "scripts": {
         "clean": "rimraf dist",
         "watch": "tsc --watch",

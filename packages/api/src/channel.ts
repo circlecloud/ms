@@ -1,4 +1,4 @@
-import { injectable } from "@ms/container";
+import { injectable } from "@ccms/container";
 
 export namespace channel {
     /**

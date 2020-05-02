@@ -1,7 +1,7 @@
-import { server, constants } from '@ms/api'
-import { provideSingleton } from '@ms/container';
+import { server, constants } from '@ccms/api'
+import { provideSingleton } from '@ccms/container';
 
-import * as reflect from '@ms/common/dist/reflect'
+import * as reflect from '@ccms/common/dist/reflect'
 
 const Sponge = org.spongepowered.api.Sponge;
 const TextSerializers = org.spongepowered.api.text.serializer.TextSerializers;

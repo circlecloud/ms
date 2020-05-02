@@ -1,7 +1,7 @@
-/// <reference types="@ms/types/dist/typings/bukkit" />
+/// <reference types="@ccms/types/dist/typings/bukkit" />
 
-import { server } from '@ms/api'
-import { Container } from '@ms/container'
+import { server } from '@ccms/api'
+import { Container } from '@ccms/container'
 
 import { BukkitConsole } from './console';
 import './event';

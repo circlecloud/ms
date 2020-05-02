@@ -1,5 +1,5 @@
 {
-    "name": "@ms/api",
+    "name": "@ccms/api",
     "version": "0.5.0",
     "description": "MiaoScript api package",
     "keywords": [
@@ -12,9 +12,6 @@
     "homepage": "https://github.com/circlecloud/ms.git",
     "license": "ISC",
     "main": "dist/index.js",
-    "publishConfig": {
-        "registry": "https://repo.yumc.pw/repository/npm-hosted/"
-    },
     "scripts": {
         "clean": "rimraf dist",
         "watch": "tsc --watch",
@@ -22,8 +19,8 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
-        "@ms/container": "^0.5.0",
-        "@ms/ployfill": "^0.5.0",
+        "@ccms/container": "^0.5.0",
+        "@ccms/ployfill": "^0.5.0",
         "base64-js": "^1.3.1",
         "source-map-builder": "^0.0.7"
     },

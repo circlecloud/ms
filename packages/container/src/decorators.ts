@@ -2,7 +2,7 @@ import { interfaces, Container } from "inversify";
 
 let _container: Container;
 
-const ContainerInstance = Symbol.for("@ms/ioc:Container");
+const ContainerInstance = Symbol.for("@ccms/ioc:Container");
 const INJECTION = Symbol.for("INJECTION");
 
 function _proxyGetter(

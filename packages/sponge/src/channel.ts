@@ -1,5 +1,5 @@
-import { channel, plugin } from '@ms/api'
-import { inject, provideSingleton } from '@ms/container'
+import { channel, plugin } from '@ccms/api'
+import { inject, provideSingleton } from '@ccms/container'
 
 const Sponge = org.spongepowered.api.Sponge
 const RawDataListener = Java.type("org.spongepowered.api.network.RawDataListener")

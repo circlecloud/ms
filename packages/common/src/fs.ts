@@ -1,4 +1,4 @@
-import '@ms/nashorn'
+import '@ccms/nashorn'
 
 /*global Java, base, module, exports, require, __FILE__*/
 const Path = Java.type("java.nio.file.Path");

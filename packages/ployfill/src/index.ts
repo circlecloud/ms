@@ -1,6 +1,6 @@
-/// <reference types="@ms/nashorn" />
+/// <reference types="@ccms/nashorn" />
 
-import i18n from '@ms/i18n'
+import i18n from '@ccms/i18n'
 let ployfillStartTime = new Date().getTime();
 i18n.initialize();
 console.i18n("ms.ployfill.initialize");

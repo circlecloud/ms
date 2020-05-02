@@ -1,5 +1,5 @@
-import { server } from '@ms/api'
-import { provideSingleton } from '@ms/container';
+import { server } from '@ccms/api'
+import { provideSingleton } from '@ccms/container';
 
 let Nukkit: cn.nukkit.Server = base.getInstance().getServer();
 const File = Java.type("java.io.File");

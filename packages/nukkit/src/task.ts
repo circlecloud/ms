@@ -1,5 +1,5 @@
-import { task, plugin } from '@ms/api'
-import { inject, provideSingleton } from '@ms/container';
+import { task, plugin } from '@ccms/api'
+import { inject, provideSingleton } from '@ccms/container';
 
 const NukkitRunnable = Java.type('cn.nukkit.scheduler.NukkitRunnable');
 

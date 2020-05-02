@@ -1,12 +1,12 @@
 export const METADATA_KEY = {
-    plugin: "@ms/plugin:plugin",
-    cmd: "@ms/plugin:cmd",
-    tab: "@ms/plugin:tab",
-    listener: "@ms/plugin:listener",
-    config: "@ms/plugin:config",
+    plugin: "@ccms/plugin:plugin",
+    cmd: "@ccms/plugin:cmd",
+    tab: "@ccms/plugin:tab",
+    listener: "@ccms/plugin:listener",
+    config: "@ccms/plugin:config",
     stage: {
-        load: "@ms/plugin:stage:load",
-        enable: "@ms/plugin:stage:enable",
-        disable: "@ms/plugin:stage:disable"
+        load: "@ccms/plugin:stage:load",
+        enable: "@ccms/plugin:stage:enable",
+        disable: "@ccms/plugin:stage:disable"
     }
 };

@@ -1,5 +1,5 @@
-import '@ms/nashorn'
-import { MiaoScriptConsole } from '@ms/api'
+import '@ccms/nashorn'
+import { MiaoScriptConsole } from '@ccms/api'
 
 let Sponge = Java.type('org.spongepowered.api.Sponge');
 var Text = Java.type('org.spongepowered.api.text.Text');

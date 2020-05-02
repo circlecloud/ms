@@ -1,7 +1,7 @@
-import { server, task } from '@ms/api'
-import { provideSingleton, inject, postConstruct } from '@ms/container'
+import { server, task } from '@ccms/api'
+import { provideSingleton, inject, postConstruct } from '@ccms/container'
 
-import * as reflect from '@ms/common/dist/reflect'
+import * as reflect from '@ccms/common/dist/reflect'
 
 let Bungee: net.md_5.bungee.api.ProxyServer = base.getInstance().getProxy();
 

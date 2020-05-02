@@ -1,7 +1,7 @@
-import '@ms/nashorn'
+import '@ccms/nashorn'
 
-import { command, plugin } from '@ms/api'
-import { inject, provideSingleton, postConstruct } from '@ms/container'
+import { command, plugin } from '@ccms/api'
+import { inject, provideSingleton, postConstruct } from '@ccms/container'
 
 let PluginCommand = Java.type('cn.nukkit.command.PluginCommand');
 let CommandExecutor = Java.type('cn.nukkit.command.CommandExecutor');

@@ -1,8 +1,8 @@
 let containerStartTime = Date.now();
-console.i18n("ms.core.ioc.initialize");
-import { plugin, server, task, constants } from '@ms/api'
-import { DefaultContainer as container, inject, provideSingleton, ContainerInstance, buildProviderModule } from '@ms/container'
-console.i18n("ms.core.ioc.completed", { time: (Date.now() - containerStartTime) / 1000 })
+console.i18n("ms.core.ioc.initialize", { scope: global.scope });
+import { plugin, server, task, constants } from '@ccms/api'
+import { DefaultContainer as container, inject, provideSingleton, ContainerInstance, buildProviderModule } from '@ccms/container'
+console.i18n("ms.core.ioc.completed", { scope: global.scope, time: (Date.now() - containerStartTime) / 1000 })
 
 @provideSingleton(MiaoScriptCore)
 class MiaoScriptCore {
@@ -83,13 +83,13 @@ function initialize() {
         container.bind(plugin.PluginInstance).toConstantValue(base.getInstance());
         container.bind(plugin.PluginFolder).toConstantValue('plugins');
         let type = detectServer();
-        console.i18n("ms.core.initialize.detect", { type });
+        console.i18n("ms.core.initialize.detect", { scope: global.scope, type });
         container.bind(server.ServerType).toConstantValue(type);
-        console.i18n("ms.core.package.initialize", { type });
-        require(`@ms/${type}`).default(container);
-        require('@ms/plugin')
+        console.i18n("ms.core.package.initialize", { scope: global.scope, type });
+        require(`${global.scope}/${type}`).default(container);
+        require(`${global.scope}/plugin`)
         container.load(buildProviderModule());
-        console.i18n("ms.core.package.completed", { type, time: (Date.now() - corePackageStartTime) / 1000 });
+        console.i18n("ms.core.package.completed", { scope: global.scope, type, time: (Date.now() - corePackageStartTime) / 1000 });
         let disable = container.get<MiaoScriptCore>(MiaoScriptCore).enable()
         console.i18n("ms.core.engine.completed", { time: (Date.now() - global.NashornEngineStartTime) / 1000 });
         return disable;

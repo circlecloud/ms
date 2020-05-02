@@ -1,5 +1,5 @@
-import { command, plugin } from "@ms/api";
-import { inject, provideSingleton } from "@ms/container";
+import { command, plugin } from "@ccms/api";
+import { inject, provideSingleton } from "@ccms/container";
 
 let Sponge = Java.type('org.spongepowered.api.Sponge');
 let Text = Java.type('org.spongepowered.api.text.Text');
