@@ -1,5 +1,5 @@
-import { event, plugin } from '@ms/api'
-import { inject, provideSingleton } from '@ms/container'
+import { event, plugin } from '@ccms/api'
+import { inject, provideSingleton } from '@ccms/container'
 
 const Nukkit: cn.nukkit.Server = base.getInstance().getServer();
 const Event = Java.type("cn.nukkit.event.Event");

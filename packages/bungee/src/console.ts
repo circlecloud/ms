@@ -1,6 +1,6 @@
-import '@ms/nashorn'
-import { plugin, MiaoScriptConsole } from '@ms/api'
-import { inject, injectable } from "@ms/container";
+import '@ccms/nashorn'
+import { plugin, MiaoScriptConsole } from '@ccms/api'
+import { inject, injectable } from "@ccms/container";
 
 let CommandSender = Java.type("net.md_5.bungee.api.CommandSender")
 

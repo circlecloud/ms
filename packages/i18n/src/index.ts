@@ -1,4 +1,4 @@
-/// <reference types="@ms/nashorn" />
+/// <reference types="@ccms/nashorn" />
 import * as yaml from 'js-yaml'
 
 const File = Java.type("java.io.File");
@@ -32,9 +32,9 @@ export class Translate {
 
     translate(name: string, param?: TranslateParam) {
         let langText: string = this.langMap[name] || this.fallbackMap[name];
-        if (!langText) { return '[WARN] @ms/i18n miss lang translate: ' + name }
+        if (!langText) { return '[WARN] @ccms/i18n miss lang translate: ' + name }
         for (const key in param) {
-            langText = langText.replace("{" + key + "}", param[key])
+            langText = langText.replace(new RegExp("{" + key + "}", 'gm'), param[key])
         }
         return langText;
     }

@@ -1,6 +1,6 @@
-import { server, MiaoScriptConsole, event } from "@ms/api";
+import { server, MiaoScriptConsole, event } from "@ccms/api";
 import { METADATA_KEY } from './constants'
-import { injectable, inject, postConstruct } from "@ms/container";
+import { injectable, inject, postConstruct } from "@ccms/container";
 import { getPluginMetadata } from "./utils";
 
 export namespace interfaces {

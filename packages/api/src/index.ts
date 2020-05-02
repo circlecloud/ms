@@ -1,4 +1,4 @@
-import "@ms/nashorn"
+import "@ccms/nashorn"
 export * from './task'
 export * from './event'
 export * from './console'

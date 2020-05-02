@@ -1,6 +1,6 @@
-import { event, plugin } from '@ms/api'
-import { inject, provideSingleton } from '@ms/container';
-import * as reflect from '@ms/common/dist/reflect'
+import { event, plugin } from '@ccms/api'
+import { inject, provideSingleton } from '@ccms/container';
+import * as reflect from '@ccms/common/dist/reflect'
 
 const Bukkit = Java.type("org.bukkit.Bukkit");
 const Event = Java.type("org.bukkit.event.Event");

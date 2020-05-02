@@ -1,11 +1,11 @@
-/// <reference types="@ms/types/dist/typings/bukkit" />
-/// <reference types="@ms/types/dist/typings/sponge" />
-/// <reference types="@ms/types/dist/typings/bungee" />
-/// <reference types="@ms/types/dist/typings/nukkit" />
+/// <reference types="@ccms/types/dist/typings/bukkit" />
+/// <reference types="@ccms/types/dist/typings/sponge" />
+/// <reference types="@ccms/types/dist/typings/bungee" />
+/// <reference types="@ccms/types/dist/typings/nukkit" />
 
-import { server } from '@ms/api';
-import { inject } from '@ms/container';
-import { plugin, interfaces, cmd, listener, tab } from '@ms/plugin'
+import { server } from '@ccms/api';
+import { inject } from '@ccms/container';
+import { plugin, interfaces, cmd, listener, tab } from '@ccms/plugin'
 
 @plugin({ name: 'HelloWorld', version: '1.0.0', author: 'MiaoWoo', source: __filename })
 export class HelloWorld extends interfaces.Plugin {

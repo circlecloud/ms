@@ -1,11 +1,11 @@
-import { plugin as pluginApi, task, server } from '@ms/api'
+import { plugin as pluginApi, task, server } from '@ccms/api'
 
-import { Translate } from '@ms/i18n'
-import { inject } from '@ms/container';
-import { interfaces, plugin, cmd, tab } from '@ms/plugin'
+import { Translate } from '@ccms/i18n'
+import { inject } from '@ccms/container';
+import { interfaces, plugin, cmd, tab } from '@ccms/plugin'
 
-import * as fs from '@ms/common/dist/fs'
-import http from '@ms/common/dist/http'
+import * as fs from '@ccms/common/dist/fs'
+import http from '@ccms/common/dist/http'
 
 let help = [
     '§6========= §6[§aMiaoScriptPackageManager§6] 帮助 §aBy §b喵♂呜 §6=========',

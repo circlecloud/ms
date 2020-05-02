@@ -1,5 +1,5 @@
-import { channel, plugin } from '@ms/api'
-import { inject, provideSingleton } from '@ms/container'
+import { channel, plugin } from '@ccms/api'
+import { inject, provideSingleton } from '@ccms/container'
 
 const Bukkit = org.bukkit.Bukkit
 const PluginMessageListener = Java.type("org.bukkit.plugin.messaging.PluginMessageListener")

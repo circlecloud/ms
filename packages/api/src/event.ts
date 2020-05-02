@@ -1,8 +1,8 @@
 /**
  * MiaoScript Event处理类
  */
-import i18n from '@ms/i18n'
-import { injectable, unmanaged } from '@ms/container'
+import i18n from '@ccms/i18n'
+import { injectable, unmanaged } from '@ccms/container'
 
 const Thread = Java.type('java.lang.Thread');
 

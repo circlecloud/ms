@@ -1,6 +1,6 @@
-import { event } from '@ms/api'
-import { provideSingleton, postConstruct } from '@ms/container'
-import * as reflect from '@ms/common/dist/reflect'
+import { event } from '@ccms/api'
+import { provideSingleton, postConstruct } from '@ccms/container'
+import * as reflect from '@ccms/common/dist/reflect'
 
 const Bungee: net.md_5.bungee.api.ProxyServer = base.getInstance().getProxy();
 const Event = Java.type("net.md_5.bungee.api.plugin.Event");

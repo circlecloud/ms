@@ -1,5 +1,5 @@
 {
-    "name": "@ms/common",
+    "name": "@ccms/common",
     "version": "0.5.0",
     "description": "MiaoScript api package",
     "keywords": [
@@ -12,9 +12,6 @@
     "homepage": "https://github.com/circlecloud/ms.git",
     "license": "ISC",
     "main": "dist/index.js",
-    "publishConfig": {
-        "registry": "https://repo.yumc.pw/repository/npm-hosted/"
-    },
     "scripts": {
         "clean": "rimraf dist",
         "watch": "tsc --watch",
@@ -27,7 +24,7 @@
         "typescript": "^3.8.3"
     },
     "dependencies": {
-        "@ms/nashorn": "^0.5.0"
+        "@ccms/nashorn": "^0.5.0"
     },
     "gitHead": "562e2d00175c9d3a99c8b672aa07e6d92706a027"
 }

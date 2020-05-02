@@ -1,4 +1,4 @@
-import '@ms/nashorn'
+import '@ccms/nashorn'
 
 const URL = Java.type("java.net.URL");
 const Files = Java.type("java.nio.file.Files");

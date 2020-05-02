@@ -1,11 +1,11 @@
-/// <reference types="@ms/types/dist/typings/bukkit" />
-/// <reference types="@ms/types/dist/typings/sponge" />
-/// <reference types="@ms/types/dist/typings/bungee" />
+/// <reference types="@ccms/types/dist/typings/bukkit" />
+/// <reference types="@ccms/types/dist/typings/sponge" />
+/// <reference types="@ccms/types/dist/typings/bungee" />
 
-import { plugin as pluginApi, server, task } from '@ms/api'
-import { plugin, interfaces, cmd } from '@ms/plugin'
-import { inject, ContainerInstance, Container } from '@ms/container'
-import io, { Server as SocketIOServer, Socket as SocketIOSocket } from '@ms/websocket'
+import { plugin as pluginApi, server, task } from '@ccms/api'
+import { plugin, interfaces, cmd } from '@ccms/plugin'
+import { inject, ContainerInstance, Container } from '@ccms/container'
+import io, { Server as SocketIOServer, Socket as SocketIOSocket } from '@ccms/websocket'
 
 const suffixMap = {
     ts: 'typescript',
@@ -101,7 +101,7 @@ export class MiaoConsole extends interfaces.Plugin {
 
     private runCode(code: string, namespace: any, client: any) {
         let tfunc = new Function('namespace', 'client', `
-        var reflect = require('@ms/common/dist/reflect');
+        var reflect = require('@ccms/common/dist/reflect');
         var tempconcent = '';
         function print(text) {
             tempconcent += text + "\\n"

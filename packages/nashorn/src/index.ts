@@ -41,6 +41,7 @@ declare global {
 
     namespace NodeJS {
         interface Global {
+            scope: string;
             logger: any;
             debug: boolean;
             level: string;

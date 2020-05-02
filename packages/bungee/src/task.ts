@@ -1,5 +1,5 @@
-import { task, plugin } from '@ms/api'
-import { inject, provideSingleton } from '@ms/container';
+import { task, plugin } from '@ccms/api'
+import { inject, provideSingleton } from '@ccms/container';
 
 var Runnable = Java.type('java.lang.Runnable')
 let TimeUnit = Java.type('java.util.concurrent.TimeUnit')

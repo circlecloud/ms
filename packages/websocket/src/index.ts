@@ -1,4 +1,4 @@
-/// <reference types="@ms/nashorn" />
+/// <reference types="@ccms/nashorn" />
 
 import { Server, ServerOptions } from './socket-io'
 
@@ -41,6 +41,6 @@ type SocketStatic = SocketIOStatic & { Instance?: symbol }
 let io: SocketStatic = function (pipeline: any, options: ServerOptions) {
     return new Server(pipeline, options)
 }
-io.Instance = Symbol("@ms/websocket")
+io.Instance = Symbol("@ccms/websocket")
 export default io
 export * from './socket-io'
