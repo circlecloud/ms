@@ -1,4 +1,4 @@
-import { injectable, decorate } from "@ms/container";
+import { injectable, decorate } from "@ccms/container";
 import { interfaces } from './interfaces'
 import { METADATA_KEY } from './constants'
 import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPluginTabCompleterMetadata, getPluginConfigMetadata, getPluginStageMetadata } from './utils'

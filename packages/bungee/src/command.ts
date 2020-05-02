@@ -1,5 +1,5 @@
-import { command, plugin } from "@ms/api";
-import { inject, provideSingleton } from "@ms/container";
+import { command, plugin } from "@ccms/api";
+import { inject, provideSingleton } from "@ccms/container";
 
 const Arrays = Java.type('java.util.Arrays')
 const Command = Java.extend(Java.type('net.md_5.bungee.api.plugin.Command'), Java.type('net.md_5.bungee.api.plugin.TabExecutor'));

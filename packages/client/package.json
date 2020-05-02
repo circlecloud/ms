@@ -1,6 +1,6 @@
 {
     "private": true,
-    "name": "@ms/client",
+    "name": "@ccms/client",
     "version": "0.5.0",
     "description": "MiaoScript client package",
     "keywords": [
@@ -13,9 +13,6 @@
     "homepage": "https://github.com/circlecloud/ms.git",
     "license": "ISC",
     "main": "dist/index.js",
-    "publishConfig": {
-        "registry": "https://repo.yumc.pw/repository/npm-hosted/"
-    },
     "scripts": {
         "dev": "ts-node-dev --respawn --debounce=1500 src/index.ts",
         "clean": "rimraf dist",

@@ -1,5 +1,5 @@
-import i18n from '@ms/i18n'
-import { injectable } from "@ms/container";
+import i18n from '@ccms/i18n'
+import { injectable } from "@ccms/container";
 
 export namespace command {
     @injectable()

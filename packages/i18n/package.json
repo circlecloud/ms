@@ -1,5 +1,5 @@
 {
-    "name": "@ms/i18n",
+    "name": "@ccms/i18n",
     "version": "0.5.0",
     "description": "MiaoScript i18n package",
     "keywords": [
@@ -12,9 +12,6 @@
     "homepage": "https://github.com/circlecloud/ms.git",
     "license": "ISC",
     "main": "dist/index.js",
-    "publishConfig": {
-        "registry": "https://repo.yumc.pw/repository/npm-hosted/"
-    },
     "scripts": {
         "clean": "rimraf dist",
         "watch": "tsc --watch",
@@ -28,7 +25,7 @@
         "typescript": "^3.8.3"
     },
     "dependencies": {
-        "@ms/nashorn": "^0.5.0",
+        "@ccms/nashorn": "^0.5.0",
         "js-yaml": "^3.13.1"
     },
     "gitHead": "781524f83e52cad26d7c480513e3c525df867121"

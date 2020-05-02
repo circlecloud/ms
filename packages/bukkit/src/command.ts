@@ -1,8 +1,8 @@
-import '@ms/nashorn'
+import '@ccms/nashorn'
 
-import { command, plugin } from '@ms/api'
-import * as reflect from '@ms/common/dist/reflect'
-import { provideSingleton, postConstruct, inject } from '@ms/container'
+import { command, plugin } from '@ccms/api'
+import * as reflect from '@ccms/common/dist/reflect'
+import { provideSingleton, postConstruct, inject } from '@ccms/container'
 
 let Bukkit = org.bukkit.Bukkit;
 let TabCompleter = Java.type('org.bukkit.command.TabCompleter');

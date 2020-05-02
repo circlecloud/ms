@@ -1,5 +1,5 @@
-import { channel, event } from '@ms/api'
-import { provideSingleton, inject } from '@ms/container'
+import { channel, event } from '@ccms/api'
+import { provideSingleton, inject } from '@ccms/container'
 
 const Bungee: net.md_5.bungee.api.ProxyServer = base.getInstance().getProxy()
 

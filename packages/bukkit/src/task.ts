@@ -1,5 +1,5 @@
-import { task, plugin } from '@ms/api'
-import { inject, provideSingleton } from '@ms/container';
+import { task, plugin } from '@ccms/api'
+import { inject, provideSingleton } from '@ccms/container';
 
 const Bukkit = Java.type('org.bukkit.Bukkit');
 const BukkitRunnable = Java.type('org.bukkit.scheduler.BukkitRunnable');

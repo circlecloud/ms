@@ -1,11 +1,11 @@
-/// <reference types="@ms/types" />
+/// <reference types="@ccms/types" />
 
-import { task, server } from "@ms/api";
-import { inject } from "@ms/container";
-import { plugin, interfaces, cmd } from "@ms/plugin";
+import { task, server } from "@ccms/api";
+import { inject } from "@ccms/container";
+import { plugin, interfaces, cmd } from "@ccms/plugin";
 
-import http from '@ms/common/dist/http'
-import * as fs from '@ms/common/dist/fs'
+import http from '@ccms/common/dist/http'
+import * as fs from '@ccms/common/dist/fs'
 
 @plugin({ name: 'MiaoPluginManager', prefix: 'MPM', version: '1.0.0', author: 'MiaoWoo', source: __filename })
 export class MiaoPluginManager extends interfaces.Plugin {

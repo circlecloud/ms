@@ -1,9 +1,9 @@
-import { plugin as pluginApi } from '@ms/api'
-import { plugin, interfaces, cmd, listener, tab } from '@ms/plugin'
-import { inject } from '@ms/container';
+import { plugin as pluginApi } from '@ccms/api'
+import { plugin, interfaces, cmd, listener, tab } from '@ccms/plugin'
+import { inject } from '@ccms/container';
 
-import * as reflect from '@ms/common/dist/reflect';
-import http from '@ms/common/dist/http';
+import * as reflect from '@ccms/common/dist/reflect';
+import http from '@ccms/common/dist/http';
 
 @plugin({ name: 'Test', version: '1.0.0', author: 'MiaoWoo', source: __filename })
 export class Test extends interfaces.Plugin {

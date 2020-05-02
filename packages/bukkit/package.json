@@ -1,5 +1,5 @@
 {
-    "name": "@ms/bukkit",
+    "name": "@ccms/bukkit",
     "version": "0.5.0",
     "description": "MiaoScript bukkit package",
     "keywords": [
@@ -12,9 +12,6 @@
     "homepage": "https://github.com/circlecloud/ms.git",
     "license": "ISC",
     "main": "dist/index.js",
-    "publishConfig": {
-        "registry": "https://repo.yumc.pw/repository/npm-hosted/"
-    },
     "scripts": {
         "clean": "rimraf dist",
         "watch": "tsc --watch",
@@ -27,8 +24,8 @@
         "typescript": "^3.8.3"
     },
     "dependencies": {
-        "@ms/api": "^0.5.0",
-        "@ms/common": "^0.5.0",
-        "@ms/container": "^0.5.0"
+        "@ccms/api": "^0.5.0",
+        "@ccms/common": "^0.5.0",
+        "@ccms/container": "^0.5.0"
     }
 }

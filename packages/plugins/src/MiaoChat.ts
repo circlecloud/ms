@@ -1,11 +1,11 @@
-/// <reference types="@ms/types/dist/typings/bukkit" />
-/// <reference types="@ms/types/dist/typings/sponge" />
-/// <reference types="@ms/types/dist/typings/bungee" />
+/// <reference types="@ccms/types/dist/typings/bukkit" />
+/// <reference types="@ccms/types/dist/typings/sponge" />
+/// <reference types="@ccms/types/dist/typings/bungee" />
 
-import { server, plugin as pluginApi, channel, constants } from '@ms/api'
-import { inject, optional } from '@ms/container';
-import { plugin, interfaces, cmd, listener, tab, config, enable } from '@ms/plugin'
-import Tellraw from '@ms/common/dist/tellraw'
+import { server, plugin as pluginApi, channel, constants } from '@ccms/api'
+import { inject, optional } from '@ccms/container';
+import { plugin, interfaces, cmd, listener, tab, config, enable } from '@ccms/plugin'
+import Tellraw from '@ccms/common/dist/tellraw'
 
 const ByteArrayInputStream = Java.type("java.io.ByteArrayInputStream");
 const ByteArrayOutputStream = Java.type("java.io.ByteArrayOutputStream");

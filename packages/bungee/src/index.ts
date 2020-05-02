@@ -1,7 +1,7 @@
-/// <reference types="@ms/types/dist/typings/bungee" />
+/// <reference types="@ccms/types/dist/typings/bungee" />
 
-import { server } from '@ms/api'
-import { Container } from '@ms/container'
+import { server } from '@ccms/api'
+import { Container } from '@ccms/container'
 
 import { BungeeConsole } from './console';
 import './event';

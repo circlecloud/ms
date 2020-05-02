@@ -9,8 +9,9 @@
         "bs": "lerna bootstrap",
         "clean": "lerna run clean",
         "watch": "lerna run watch --parallel",
-        "build": "lerna run build --scope=\"@ms/!(plugins)\"",
-        "build:plugins": "lerna run build --scope=\"@ms/plugins\"",
+        "build": "lerna run build --scope=\"@ccms/!(plugins)\"",
+        "build:plugins": "lerna run build --scope=\"@ccms/plugins\"",
+        "publish": "yarn lerna exec \"npm publish --access=public\" --scope=\"@ccms/!(plugins|client|types)\"",
         "ug": "yarn upgrade-interactive --latest",
         "lp": "lerna publish"
     },

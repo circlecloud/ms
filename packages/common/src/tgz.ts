@@ -1,4 +1,4 @@
-import '@ms/nashorn'
+import '@ccms/nashorn'
 
 let Files = Java.type("java.nio.file.Files");
 let Paths = Java.type("java.nio.file.Paths");

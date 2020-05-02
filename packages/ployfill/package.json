@@ -1,5 +1,5 @@
 {
-    "name": "@ms/ployfill",
+    "name": "@ccms/ployfill",
     "version": "0.5.0",
     "description": "MiaoScript ployfill package",
     "author": "MiaoWoo <admin@yumc.pw>",
@@ -7,9 +7,6 @@
     "license": "ISC",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
-    "publishConfig": {
-        "registry": "https://repo.yumc.pw/repository/npm-hosted/"
-    },
     "scripts": {
         "clean": "rimraf dist",
         "watch": "tsc --watch",
@@ -17,8 +14,8 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
-        "@ms/i18n": "^0.5.0",
-        "@ms/nashorn": "^0.5.0",
+        "@ccms/i18n": "^0.5.0",
+        "@ccms/nashorn": "^0.5.0",
         "core-js": "^3.6.4"
     },
     "devDependencies": {

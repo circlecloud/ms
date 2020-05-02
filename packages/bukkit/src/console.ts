@@ -1,4 +1,4 @@
-import { MiaoScriptConsole } from '@ms/api'
+import { MiaoScriptConsole } from '@ccms/api'
 
 let Bukkit = org.bukkit.Bukkit;
 

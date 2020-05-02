@@ -1,5 +1,5 @@
-import { task, plugin } from '@ms/api'
-import { inject, provideSingleton, postConstruct } from '@ms/container';
+import { task, plugin } from '@ccms/api'
+import { inject, provideSingleton, postConstruct } from '@ccms/container';
 
 const Sponge = Java.type("org.spongepowered.api.Sponge");
 const Task = Java.type("org.spongepowered.api.scheduler.Task");

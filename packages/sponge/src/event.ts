@@ -1,5 +1,5 @@
-import { event, plugin } from '@ms/api'
-import { inject, provideSingleton } from '@ms/container';
+import { event, plugin } from '@ccms/api'
+import { inject, provideSingleton } from '@ccms/container';
 
 let Modifier = Java.type("java.lang.reflect.Modifier");
 let Order = Java.type("org.spongepowered.api.event.Order");
