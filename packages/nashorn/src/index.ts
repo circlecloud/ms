@@ -30,13 +30,13 @@ declare global {
     }
 
     interface String {
-        trimLeft();
-        trimRight();
+        trimLeft(): string;
+        trimRight(): string;
     }
 
     interface Object {
-        setPrototypeOf(obj: object, prototype: object);
-        bindProperties(to: object, from: object);
+        setPrototypeOf(obj: object, prototype: object): void;
+        bindProperties(to: object, from: object): void;
     }
 
     namespace NodeJS {
@@ -68,7 +68,7 @@ declare global {
         stack(err: Error): string[];
         sender(...args: any): void;
         console(...args: any): void;
-        i18n(name: string, ...params: any[]);
+        i18n(name: string, ...params: any[]): void;
     }
 }
 
