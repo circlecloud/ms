@@ -21,9 +21,10 @@ let help = [
 ];
 
 let langMap = {
-    'list.header.install': '§6当前 §bMiaoScript §6已安装下列插件:',
+    'list.install.header': '§6当前 §bMiaoScript §6已安装下列插件:',
+    'list.install.body': '§6插件名称: §b{name} §6版本: §a{version} §6作者: §3{author}',
     'list.header': '§6当前 §bMiaoScriptPackageCenter §6中存在下列插件:',
-    'list.body': '§6插件名称: §b{name} §6版本: §a{version} §6作者: §3{author}',
+    'list.body': '§6插件名称: §b{name} §6版本: §a{version} §6作者: §3{author} §6更新时间: §9{updated_at}',
     'plugin.not.exists': '§6插件 §b{name} §c不存在!',
     'plugin.unload.finish': '§6插件 §b{name} §a已卸载!',
     'plugin.reload.finish': '§6插件 §b{name} §a重载完成!',
@@ -35,6 +36,8 @@ let langMap = {
     'download.finish': '§6插件 §b{name} §a下载完毕 开始加载 ...',
     'install.finish': '§6插件 §b{name} §a安装成功!',
     'update.finish': '§6插件 §b{name} §a更新成功!',
+    'deploy.success': '§6插件 §b{name} §a发布成功! §6服务器返回: §a{msg}',
+    'deploy.fail': '§6插件 §b{name} §c发布失败! §6服务器返回: §c{msg}',
 }
 
 let fallbackMap = langMap
@@ -56,8 +59,6 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     private packageNameCache: string[] = [];
 
     private translate: Translate;
-
-    private subCommnadNameCache: string[];
 
     load() {
         this.translate = new Translate({
@@ -88,9 +89,9 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
 
     cmdlist(sender: any, type: string = 'cloud') {
         if (type == "install") {
-            this.i18n(sender, 'list.header.install')
+            this.i18n(sender, 'list.install.header')
             this.pluginManager.getPlugins().forEach((plugin) => {
-                this.i18n(sender, 'list.body', plugin.description);
+                this.i18n(sender, 'list.install.body', plugin.description);
             })
         } else {
             this.i18n(sender, 'list.header')
@@ -110,6 +111,20 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
             this.update(sender, name);
         } else {
             this.updateRepo(sender)
+        }
+    }
+
+    cmdupgrade(sender: any, name: string) {
+        if (name == "system") {
+            let enginePath = fs.path(fs.file(fs.concat(root, 'node_modules', '@ccms')))
+            if (enginePath.startsWith(root)) {
+                base.delete(enginePath);
+                this.cmdrestart(sender);
+            }
+        }
+        if (this.checkPlugin(sender, name)) {
+            this.update(sender, name);
+            this.pluginManager.reload(name);
         }
     }
 
@@ -174,9 +189,9 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
                     name,
                     author: plugin.description.author,
                     version: plugin.description.version,
-                    source: base.read(plugin.description.source + '')
+                    source: base.read(plugin.description.source.toString())
                 })
-                this.logger.sender(sender, result);
+                this.i18n(sender, result.code == 200 ? 'deploy.success' : 'deploy.fail', { name, msg: result.msg })
             }
         }).async().submit()
     }
