@@ -9,6 +9,14 @@ function getPlugin(name: string) {
     return getPluginMetadatas().get(name);
 }
 
+function getPluginSources() {
+    let pluginSources: Map<string, interfaces.PluginMetadata> = Reflect.getMetadata(
+        METADATA_KEY.souece,
+        Reflect
+    ) || new Map<string, interfaces.PluginMetadata>();
+    return pluginSources;
+}
+
 function getPluginMetadatas() {
     let pluginMetadatas: Map<string, interfaces.PluginMetadata> = Reflect.getMetadata(
         METADATA_KEY.plugin,
@@ -68,6 +76,7 @@ function getPluginStageMetadata(target: any, stage: string) {
 export {
     getPlugin,
     getPlugins,
+    getPluginSources,
     getPluginMetadatas,
     getPluginMetadata,
     getPluginCommandMetadata,

@@ -3,7 +3,7 @@ import { plugin, server, command, event } from '@ccms/api'
 import { inject, provideSingleton, Container, ContainerInstance } from '@ccms/container'
 import * as fs from '@ccms/common/dist/fs'
 
-import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPlugin, getPluginTabCompleterMetadata, getPluginConfigMetadata, getPluginStageMetadata } from './utils'
+import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPlugin, getPluginTabCompleterMetadata, getPluginConfigMetadata, getPluginStageMetadata, getPluginSources } from './utils'
 import { interfaces } from './interfaces'
 import { getConfigLoader } from './config'
 
@@ -26,6 +26,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
     private initialized: boolean = false
     private pluginMap: Map<string, interfaces.Plugin>
+    private plugnMappings: Map<string, interfaces.PluginMetadata>
 
     initialize() {
         if (this.pluginInstance !== null && this.initialized !== true) {
@@ -34,6 +35,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
             this.pluginMap = new Map()
             console.i18n('ms.plugin.event.map', { count: this.EventManager.mapEventName().toFixed(0), type: this.serverType });
             this.initialized = true;
+            this.plugnMappings = getPluginSources()
         }
     }
 
@@ -58,6 +60,14 @@ export class PluginManagerImpl implements plugin.PluginManager {
         this.runCatch(plugin, stage)
         this.runCatch(plugin, `${this.serverType}${stage}`)
         this.execPluginStage(plugin, stage)
+    }
+
+    loadFromFile(file: string): interfaces.Plugin {
+        this.loadPlugin(file)
+        let plugin = this.buildPlugin(this.plugnMappings.get(file))
+        this.load(plugin)
+        this.enable(plugin)
+        return plugin;
     }
 
     load(...args: any[]): void {
@@ -89,10 +99,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     reload(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((pl: interfaces.Plugin) => {
             this.disable(pl)
-            this.loadPlugin(pl.description.source)
-            pl = this.buildPlugin(getPlugin(pl.description.name))
-            this.load(pl)
-            this.enable(pl)
+            this.loadFromFile(pl.description.source)
         })
     }
 
@@ -166,13 +173,14 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     private allowProcess(servers: string[]) {
-        // Not set servers allow
+        // Not set servers -> allow
         if (!servers || !servers.length) return true
-        // include !type deny
+        // include !type -> deny
         let denyServers = servers.filter(svr => svr.startsWith("!"))
         if (denyServers.length !== 0) {
             return !denyServers.includes(`!${this.serverType}`)
         } else {
+            // only include -> allow
             return servers.includes(this.serverType)
         }
     }
