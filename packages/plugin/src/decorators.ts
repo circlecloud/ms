@@ -1,7 +1,7 @@
 import { injectable, decorate } from "@ccms/container";
 import { interfaces } from './interfaces'
 import { METADATA_KEY } from './constants'
-import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPluginTabCompleterMetadata, getPluginConfigMetadata, getPluginStageMetadata } from './utils'
+import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPluginTabCompleterMetadata, getPluginConfigMetadata, getPluginStageMetadata, getPluginSources } from './utils'
 
 /**
  * MiaoScript plugin
@@ -10,11 +10,15 @@ import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata
 export function plugin(metadata: interfaces.PluginMetadata) {
     return function (target: any) {
         metadata.target = target;
+        metadata.source = metadata.source + '';
         decorate(injectable(), target);
         Reflect.defineMetadata(METADATA_KEY.plugin, metadata, target);
         const previousMetadata: Map<string, interfaces.PluginMetadata> = getPluginMetadatas();
         previousMetadata.set(metadata.name, metadata);
         Reflect.defineMetadata(METADATA_KEY.plugin, previousMetadata, Reflect);
+        const previousSources: Map<string, interfaces.PluginMetadata> = getPluginSources();
+        previousSources.set(metadata.source, metadata);
+        Reflect.defineMetadata(METADATA_KEY.souece, previousSources, Reflect);
     };
 }
 

@@ -87,7 +87,7 @@ export class XMLHttpRequest {
     private _statusText: string = null;
     private _response: any;
     private _responseURL: string;
-    private _responseHeaders: HttpHeader;
+    private _responseHeaders: HttpHeader = {};
 
     private _connection = null;
 
@@ -228,7 +228,7 @@ export class XMLHttpRequest {
 
     private setResponseHeaders(header: any) {
         this._responseHeaders = {};
-        header.forEach((key, value) => {
+        header.forEach((key: string | number, value: string | any[]) => {
             this._responseHeaders[key] = value[value.length - 1]
         });
     }

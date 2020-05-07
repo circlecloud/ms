@@ -1,12 +1,13 @@
 export const METADATA_KEY = {
-    plugin: "@ccms/plugin:plugin",
-    cmd: "@ccms/plugin:cmd",
-    tab: "@ccms/plugin:tab",
-    listener: "@ccms/plugin:listener",
-    config: "@ccms/plugin:config",
+    plugin: Symbol.for("@ccms/plugin:plugin"),
+    souece: Symbol.for("@ccms/plugin:souece"),
+    cmd: Symbol.for("@ccms/plugin:cmd"),
+    tab: Symbol.for("@ccms/plugin:tab"),
+    listener: Symbol.for("@ccms/plugin:listener"),
+    config: Symbol.for("@ccms/plugin:config"),
     stage: {
-        load: "@ccms/plugin:stage:load",
-        enable: "@ccms/plugin:stage:enable",
-        disable: "@ccms/plugin:stage:disable"
+        load: Symbol.for("@ccms/plugin:stage:load"),
+        enable: Symbol.for("@ccms/plugin:stage:enable"),
+        disable: Symbol.for("@ccms/plugin:stage:disable")
     }
 };
