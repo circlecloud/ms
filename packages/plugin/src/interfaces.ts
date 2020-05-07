@@ -1,5 +1,5 @@
 import { server, MiaoScriptConsole, event } from "@ccms/api";
-import { injectable, inject } from "@ccms/container";
+import { injectable, inject, postConstruct } from "@ccms/container";
 import { getPluginMetadata } from "./utils";
 
 export namespace interfaces {
@@ -7,11 +7,17 @@ export namespace interfaces {
     export abstract class Plugin {
         public description: PluginMetadata;
         public logger: Console;
+        @inject(server.Console)
+        private Console: MiaoScriptConsole;
 
-        constructor(@inject(server.Console) Console: MiaoScriptConsole) {
+        constructor() {
             this.description = getPluginMetadata(this)
+        }
+
+        @postConstruct()
+        private initialize() {
             // @ts-ignore
-            this.logger = new Console(this.description.prefix || this.description.name)
+            this.logger = new this.Console(this.description.prefix || this.description.name)
         }
 
         public load() { }

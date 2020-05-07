@@ -1,6 +1,8 @@
 import { interfaces } from './interfaces'
 import { METADATA_KEY } from './constants'
 
+const pluginSourceCache = new Map<string, interfaces.PluginMetadata>();
+
 function getPlugins() {
     return [...getPluginMetadatas().values()].map((target) => target.target);
 }
@@ -13,7 +15,7 @@ function getPluginSources() {
     let pluginSources: Map<string, interfaces.PluginMetadata> = Reflect.getMetadata(
         METADATA_KEY.souece,
         Reflect
-    ) || new Map<string, interfaces.PluginMetadata>();
+    ) || pluginSourceCache;
     return pluginSources;
 }
 

@@ -35,7 +35,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
             this.pluginMap = new Map()
             console.i18n('ms.plugin.event.map', { count: this.EventManager.mapEventName().toFixed(0), type: this.serverType });
             this.initialized = true;
-            this.plugnMappings = getPluginSources()
+            this.plugnMappings = getPluginSources();
         }
     }
 
@@ -62,9 +62,13 @@ export class PluginManagerImpl implements plugin.PluginManager {
         this.execPluginStage(plugin, stage)
     }
 
+    /**
+     * 从文件加载插件
+     * @param file java.io.File
+     */
     loadFromFile(file: string): interfaces.Plugin {
         this.loadPlugin(file)
-        let plugin = this.buildPlugin(this.plugnMappings.get(file))
+        let plugin = this.buildPlugin(this.plugnMappings.get(file.toString()))
         this.load(plugin)
         this.enable(plugin)
         return plugin;
