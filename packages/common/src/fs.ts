@@ -23,9 +23,7 @@ export function concat(...args: string[]) {
  * @returns {*}
  */
 export function file(...opts: any[]): any {
-    if (!opts[0]) {
-        console.warn("文件名称不得为 undefined 或者 null !");
-    }
+    if (!opts[0]) { throw new Error("文件名称不得为 undefined 或者 null !") }
     switch (opts.length) {
         case 1:
             var f = opts[0];
@@ -143,7 +141,7 @@ export function del(file) {
         return;
     }
     if (file.isDirectory()) {
-        Files.list(file.toPath()).collect(Collector.toList()).forEach(function(f) {
+        Files.list(file.toPath()).collect(Collector.toList()).forEach(function (f) {
             del(f);
         })
     }

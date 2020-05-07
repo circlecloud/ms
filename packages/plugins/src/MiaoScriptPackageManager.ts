@@ -34,6 +34,7 @@ let langMap = {
     'download.url': '§6插件下载地址: §b{url}',
     'download.finish': '§6插件 §b{name} §a下载完毕 开始加载 ...',
     'install.finish': '§6插件 §b{name} §a安装成功!',
+    'update.finish': '§6插件 §b{name} §a更新成功!',
 }
 
 let fallbackMap = langMap
@@ -55,6 +56,8 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     private packageNameCache: string[] = [];
 
     private translate: Translate;
+
+    private subCommnadNameCache: string[];
 
     load() {
         this.translate = new Translate({
@@ -118,6 +121,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     }
 
     cmdreload(sender: any, name: string) {
+        name = name || this.description.name
         if (this.checkPlugin(sender, name)) {
             this.pluginManager.reload(name);
             this.i18n(sender, 'plugin.reload.finish', { name })
@@ -179,13 +183,13 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
 
     update(sender: any, name: string) {
         if (this.checkCloudPlugin(sender, name)) {
-
+            this.download(sender, name, true);
         }
     }
 
     @tab()
     tabmpm(sender: any, command: any, args: string | any[]) {
-        if (args.length === 1) return ['list', 'install', 'update', 'upgrade', 'reload', 'restart', 'run', 'help', 'create'];
+        if (args.length === 1) { return ['list', 'install', 'update', 'upgrade', 'reload', 'restart', 'run', 'help', 'create', 'deploy'] }
         if (args.length > 1) {
             switch (args[0]) {
                 case "list":
@@ -197,6 +201,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
                 case "load":
                 case "unload":
                 case "reload":
+                case "deploy":
                     return [...this.pluginManager.getPlugins().keys()];
             }
         }
@@ -211,15 +216,15 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         }).async().submit();
     }
 
-    download(sender: any, name: string) {
+    download(sender: any, name: string, update: boolean = false) {
         this.taskManager.create(() => {
             this.i18n(sender, 'download.start', { name })
             this.i18n(sender, 'download.url', { url: this.packageCache[name].url })
-            let pluginFile = fs.concat(this.pluginFolder, name + '.js')
+            let pluginFile = update ? fs.concat(this.pluginFolder, 'update', name + '.js') : fs.concat(this.pluginFolder, name + '.js')
             http.download(this.packageCache[name].url, pluginFile)
             this.i18n(sender, 'download.finish', { name })
             this.pluginManager.loadFromFile(pluginFile)
-            this.i18n(sender, 'install.finish', { name })
+            this.i18n(sender, update ? 'update.finish' : 'install.finish', { name })
         }).async().submit()
     }
 }
