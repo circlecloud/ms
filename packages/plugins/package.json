@@ -1,7 +1,7 @@
 {
     "private": true,
     "name": "@ccms/plugins",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "description": "MiaoScript plugins package",
     "keywords": [
         "miaoscript",
@@ -25,8 +25,8 @@
         "typescript": "^3.8.3"
     },
     "dependencies": {
-        "@ccms/api": "^0.6.0",
+        "@ccms/api": "^0.6.1",
         "@ccms/container": "^0.6.0",
-        "@ccms/plugin": "^0.6.0"
+        "@ccms/plugin": "^0.6.1"
     }
 }
