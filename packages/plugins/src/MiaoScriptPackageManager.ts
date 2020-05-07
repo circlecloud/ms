@@ -8,7 +8,7 @@ import * as fs from '@ccms/common/dist/fs'
 import http from '@ccms/common/dist/http'
 
 let help = [
-    '§6========= §6[§aMiaoScriptPackageManager§6] 帮助 §aBy §b喵♂呜 §6=========',
+    '§6========= §6[§aMiaoScriptPackageManager§6] 帮助 §aBy §bMiaoWoo §6=========',
     '§6/mpm §ainstall §e<插件名称> §6- §3安装插件',
     '§6/mpm §auninstall §e<插件名称> §6- §3卸载插件',
     '§6/mpm §alist [install]§6- §3列出仓库插件[已安装的插件]',
@@ -16,7 +16,7 @@ let help = [
     '§6/mpm §aupgrade §e<插件名称> §6- §3及时更新插件(update需要重启生效)',
     '§6/mpm §areload §e<插件名称> §6- §3重载插件(无插件名称则重载自身)',
     '§6/mpm §arun §e<JS代码> §6- §3运行JS代码',
-    '§6/mpm §acreate §e<插件名称> [作者] [版本] [主命令] §6- §3通过模板创建名称',
+    '§6/mpm §adeploy §e<插件名称> §6- §3发布插件',
     '§6/mpm §crestart §6- §4重启MiaoScript脚本引擎'
 ];
 
@@ -29,7 +29,11 @@ let langMap = {
     'plugin.reload.finish': '§6插件 §b{name} §a重载完成!',
     'plugin.name.empty': '§c请输入插件名称!',
     'cloud.update.finish': '§6成功从 §aMiaoScriptPackageCenter §6获取到 §a{length} §6个插件!',
-    'cloud.not.exists': '§6当前 §aMiaoScriptPackageCenter §c不存在 §a{name} §c插件!'
+    'cloud.not.exists': '§6当前 §aMiaoScriptPackageCenter §c不存在 §a{name} §c插件!',
+    'download.start': '§6开始下载插件: §b{name}',
+    'download.url': '§6插件下载地址: §b{url}',
+    'download.finish': '§6插件 §b{name} §a下载完毕 开始加载 ...',
+    'install.finish': '§6插件 §b{name} §a安装成功!',
 }
 
 let fallbackMap = langMap
@@ -44,6 +48,8 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     private serverType: string;
     @inject(server.Server)
     private server: server.Server
+    @inject(pluginApi.PluginFolder)
+    private pluginFolder: string;
 
     private packageCache: any[] = [];
     private packageNameCache: string[] = [];
@@ -77,7 +83,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         this[cmdKey](sender, ...args);
     }
 
-    cmdlist(sender, type: string = 'cloud') {
+    cmdlist(sender: any, type: string = 'cloud') {
         if (type == "install") {
             this.i18n(sender, 'list.header.install')
             this.pluginManager.getPlugins().forEach((plugin) => {
@@ -124,6 +130,12 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         return false
     }
 
+    checkCloudPlugin(sender: any, name: string) {
+        if (name && this.packageNameCache.includes(name)) { return true }
+        this.i18n(sender, 'cloud.not.exists', { name })
+        return false
+    }
+
     cmdrestart(sender: any) {
         if (this.serverType === "sponge") {
             setTimeout(() => this.server.dispatchConsoleCommand('sponge plugins reload'), 0)
@@ -140,7 +152,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         }
     }
 
-    cmdrun(sender, ...args: any[]) {
+    cmdrun(sender: any, ...args: any[]) {
         try {
             var script = args.join(' ');
             this.logger.sender(sender, '§b运行脚本:§r', script);
@@ -150,14 +162,29 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         }
     }
 
+    cmddeploy(sender: any, name: any) {
+        this.taskManager.create(() => {
+            if (this.checkPlugin(sender, name)) {
+                let plugin: interfaces.Plugin = this.pluginManager.getPlugins().get(name);
+                let result = http.post("http://ms.yumc.pw/api/plugin/deploy", {
+                    name,
+                    author: plugin.description.author,
+                    version: plugin.description.version,
+                    source: base.read(plugin.description.source + '')
+                })
+                this.logger.sender(sender, result);
+            }
+        }).async().submit()
+    }
+
     update(sender: any, name: string) {
-        if (!this.packageNameCache.includes(name)) {
-            this.i18n(sender, 'cloud.not.exists', { name })
+        if (this.checkCloudPlugin(sender, name)) {
+
         }
     }
 
     @tab()
-    tabmpm(sender, command, args) {
+    tabmpm(sender: any, command: any, args: string | any[]) {
         if (args.length === 1) return ['list', 'install', 'update', 'upgrade', 'reload', 'restart', 'run', 'help', 'create'];
         if (args.length > 1) {
             switch (args[0]) {
@@ -177,16 +204,22 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
 
     updateRepo(sender: any) {
         this.taskManager.create(() => {
-            let result = http.get('http://ms.yumc.pw/api/plugin');
-            for (const pl of result.data) {
-                this.packageCache[pl.name] = pl;
-            }
+            let result = http.get('http://ms.yumc.pw/api/plugin/list');
+            for (const pl of result.data) { this.packageCache[pl.name] = pl; }
             this.packageNameCache = Object.keys(this.packageCache);
             this.i18n(sender, 'cloud.update.finish', { length: this.packageNameCache.length })
         }).async().submit();
     }
 
-    download(sender, name) {
-
+    download(sender: any, name: string) {
+        this.taskManager.create(() => {
+            this.i18n(sender, 'download.start', { name })
+            this.i18n(sender, 'download.url', { url: this.packageCache[name].url })
+            let pluginFile = fs.concat(this.pluginFolder, name + '.js')
+            http.download(this.packageCache[name].url, pluginFile)
+            this.i18n(sender, 'download.finish', { name })
+            this.pluginManager.loadFromFile(pluginFile)
+            this.i18n(sender, 'install.finish', { name })
+        }).async().submit()
     }
 }
