@@ -151,6 +151,8 @@ export class XMLHttpRequest {
         this._mimeType = mimeType;
     }
     open(method: RequestMethod, url: string, async: boolean = true, user?: string, password?: string) {
+        if (this._readyState !== ReadyState.UNSENT) { throw new Error(`Error Status ${this._readyState}!`) }
+
         this._method = method;
         this._url = url;
         this._async = async;
@@ -195,7 +197,7 @@ export class XMLHttpRequest {
             this.onloadstart();
             if (body) {
                 let bodyType = Object.prototype.toString.call(body);
-                if (bodyType !== '[object String]') { throw new Error(`body(${bodyType}) must be string!`) }
+                if (typeof body !== "string") { throw new Error(`body(${bodyType}) must be string!`) }
                 var out = this._connection.getOutputStream();
                 out.write(new JavaString(body).getBytes(UTF_8));
                 out.flush();
@@ -204,7 +206,6 @@ export class XMLHttpRequest {
             this.setReadyState(ReadyState.LOADING);
             this._status = this._connection.getResponseCode();
             this._statusText = this._connection.getResponseMessage();
-            this.setResponseHeaders(this._connection.getHeaderFields());
             if (this._status >= 0 && this._status < 300) {
                 this._response = this.readOutput(this._connection.getInputStream());
             } else if (this._status >= 300 && this._status < 400) {
@@ -212,6 +213,7 @@ export class XMLHttpRequest {
             } else {
                 this._response = this.readOutput(this._connection.getErrorStream());
             }
+            this.setResponseHeaders(this._connection.getHeaderFields());
             this.onloadend();
         } catch (ex) {
             if (ex instanceof SocketTimeoutException && this.ontimeout) {
@@ -227,7 +229,6 @@ export class XMLHttpRequest {
     }
 
     private setResponseHeaders(header: any) {
-        this._responseHeaders = {};
         header.forEach((key: string | number, value: string | any[]) => {
             this._responseHeaders[key] = value[value.length - 1]
         });

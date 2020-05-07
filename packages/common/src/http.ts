@@ -27,7 +27,7 @@ function request(config: RequestConfig) {
     for (const header in config.headers) {
         xhr.setRequestHeader(header, config.headers[header]);
     }
-    xhr.send(config.data);
+    xhr.send(typeof config.data === "string" ? config.data : JSON.stringify(config.data));
     if ((xhr.getResponseHeader("Content-Type") + '').indexOf('application/json') != -1) {
         xhr.responseType = "json"
     }
