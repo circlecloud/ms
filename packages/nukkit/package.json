@@ -1,6 +1,6 @@
 {
     "name": "@ccms/nukkit",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "description": "MiaoScript nukkit package",
     "keywords": [
         "miaoscript",
@@ -24,8 +24,8 @@
         "typescript": "^3.8.3"
     },
     "dependencies": {
-        "@ccms/api": "^0.6.0",
-        "@ccms/common": "^0.6.0",
+        "@ccms/api": "^0.6.1",
+        "@ccms/common": "^0.6.1",
         "@ccms/container": "^0.6.0"
     }
 }
