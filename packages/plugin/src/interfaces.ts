@@ -56,6 +56,10 @@ export namespace interfaces {
          */
         source: string;
         /**
+         * 插件类型 默认为 ioc 执行 MiaoScript 加载逻辑
+         */
+        type?: string;
+        /**
          * 插件本体
          */
         target?: any;
