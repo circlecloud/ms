@@ -6,6 +6,7 @@ import { plugin as pluginApi, server, task } from '@ccms/api'
 import { plugin, interfaces, cmd } from '@ccms/plugin'
 import { inject, ContainerInstance, Container } from '@ccms/container'
 import io, { Server as SocketIOServer, Socket as SocketIOSocket } from '@ccms/websocket'
+import * as fs from '@ccms/common/dist/fs'
 
 const suffixMap = {
     ts: 'typescript',
@@ -25,6 +26,8 @@ export class MiaoConsole extends interfaces.Plugin {
     private task: task.TaskManager
     @inject(pluginApi.PluginManager)
     private pluginManager: pluginApi.PluginManager
+    @inject(pluginApi.PluginFolder)
+    private pluginFolder: string;
 
     private pipeline: any;
     private socketIOServer: SocketIOServer;
@@ -91,6 +94,24 @@ export class MiaoConsole extends interfaces.Plugin {
             })
             client.on('edit', (file: string, fn) => {
                 fn && fn(base.read(file), suffixMap[file.split('.', 2)[1]])
+            })
+            client.on('save', (name: string, content: string, fn) => {
+                this.logger.console(`§6客户端 §b${client.id} §6请求更新插件 §a${name} §6...`)
+                let file = fs.concat(root, this.pluginFolder, name + '.js')
+                if (!fs.exists(file)) { return fn('§6插件 §a' + name + ' §6尚未安装 §c请先创建空文件 或安装插件!') }
+                try {
+                    base.save(file, content)
+                    this.pluginManager.reload(name);
+                    fn('§6插件 §a' + name + ' §6更新成功!')
+                } catch (error) {
+                    this.logger.error(error)
+                    fn('§6插件 §a' + name + ' §4更新异常 错误: ' + error)
+
+                }
+            })
+            client.on('error', (error) => {
+                this.logger.console(`§6客户端 §b${client.id} §c触发异常: ${error}`)
+                this.logger.error(error)
             })
             client.on('disconnect', () => {
                 this.logger.console(`§6客户端 §b${client.id} §c断开连接...`)
