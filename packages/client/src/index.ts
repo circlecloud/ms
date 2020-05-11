@@ -6,7 +6,9 @@ import { attachEvents } from './event'
 
 let username = process.argv[2] || 'Mr_jtb'
 let version = process.argv[3] || '1.12.2'
-let client = createConnection('192.168.2.5', 25577, username)
+let address = process.argv[4] || '192.168.2.5:25577'
+let realAddress = address.split(":");
+let client = createConnection(realAddress[0], parseInt(realAddress[1] || "25565"), username)
 
 function createConnection(host: string, port: number, username: string) {
     let client = createClient({
