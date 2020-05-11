@@ -46,7 +46,7 @@ declare global {
             debug: boolean;
             level: string;
             NashornEngineStartTime: number;
-            setGlobal: (key: string, value: any) => void;
+            setGlobal: (key: string, value: any, config?: PropertyDescriptor & ThisType<any>) => void;
             noop: () => void;
             console: Console;
         }

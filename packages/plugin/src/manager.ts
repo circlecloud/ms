@@ -122,10 +122,11 @@ export class PluginManagerImpl implements plugin.PluginManager {
         }
     }
 
-    private checkAndGet(name: string | interfaces.Plugin | undefined): Map<string, interfaces.Plugin> | interfaces.Plugin[] {
+    private checkAndGet(name: string | interfaces.Plugin | undefined | any): Map<string, interfaces.Plugin> | interfaces.Plugin[] {
         if (name == undefined) { return this.pluginInstanceMap }
         if (typeof name == 'string' && this.pluginInstanceMap.has(name)) { return [this.pluginInstanceMap.get(name)] }
         if (name instanceof interfaces.Plugin) { return [name as interfaces.Plugin] }
+        if (name.description || name.description.name) { return [name as interfaces.Plugin] }
         throw new Error(`Plugin ${JSON.stringify(name)} not exist!`)
     }
 
@@ -157,17 +158,19 @@ export class PluginManagerImpl implements plugin.PluginManager {
     * JS类型插件预加载
     */
     private loadJsPlugins(files: any[]) {
-        files.filter(file => file.name.endsWith(".js")).forEach(file => this.loadPlugin(file))
+        files.filter(file => file.name.endsWith(".js")).forEach(file => {
+            try {
+                this.loadPlugin(file)
+            } catch (ex) {
+                console.i18n("ms.plugin.manager.initialize.error", { name: file.name, ex })
+                console.ex(ex)
+            }
+        })
     }
 
     private loadPlugin(file: any) {
-        try {
-            this.updatePlugin(file)
-            return this.createPlugin(file.toString())
-        } catch (ex) {
-            console.i18n("ms.plugin.manager.initialize.error", { name: file.name, ex })
-            console.ex(ex)
-        }
+        this.updatePlugin(file)
+        return this.createPlugin(file.toString())
     }
 
     private updatePlugin(file: any) {
@@ -210,28 +213,29 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     private buildPlugin(metadata: interfaces.PluginMetadata) {
+        let pluginInstance: interfaces.Plugin;
         switch (metadata.type) {
             case "ioc":
                 try {
                     this.bindPlugin(metadata)
-                    let pluginInstance = this.container.getNamed<interfaces.Plugin>(plugin.Plugin, metadata.name)
+                    pluginInstance = this.container.getNamed<interfaces.Plugin>(plugin.Plugin, metadata.name)
                     if (!(pluginInstance instanceof interfaces.Plugin)) {
                         console.i18n('ms.plugin.manager.build.not.extends', { source: metadata.source })
                         return
                     }
-                    this.pluginInstanceMap.set(metadata.name, pluginInstance)
-                    return pluginInstance;
                 } catch (ex) {
                     console.i18n("ms.plugin.manager.initialize.error", { name: metadata.name, ex })
                     console.ex(ex)
                 }
                 break;
             case "basic":
-                this.pluginInstanceMap.set(metadata.name, this.pluginRequireMap.get(metadata.source.toString()))
+                pluginInstance = this.pluginRequireMap.get(metadata.source.toString())
                 break;
             default:
                 throw new Error('§4不支持的插件类型 请检查加载器是否正常启用!')
         }
+        this.pluginInstanceMap.set(metadata.name, pluginInstance)
+        return pluginInstance;
     }
 
     private bindPlugin(metadata: interfaces.PluginMetadata) {
