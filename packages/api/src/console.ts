@@ -136,7 +136,7 @@ export class MiaoScriptConsole implements Console {
             stack = Arrays.asList(stack)
         }
         stack.forEach(trace => {
-            if (trace.fileName.startsWith('jar:file:')) { return }
+            if (!trace.fileName || trace.fileName.startsWith('jar:file:')) { return }
             if (trace.className.startsWith('<')) {
                 let { fileName, lineNumber } = this.readSourceMap(trace.fileName, trace.lineNumber)
                 if (fileName.startsWith(root)) { fileName = fileName.split(root)[1] }
