@@ -45,6 +45,7 @@ export class Translate {
         console.i18n = (name: string, param?: TranslateParam) => {
             console.log(this.translate(name, param))
         }
+        console.i18n('ms.i18n.completed')
     }
 
     readYamlFile(dir: string, name: string) {
