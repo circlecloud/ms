@@ -9,18 +9,21 @@ import http from '@ccms/common/dist/http'
 
 let help = [
     '§6========= §6[§aMiaoScriptPackageManager§6] 帮助 §aBy §bMiaoWoo §6=========',
-    '§6/mpm §ainstall §e<插件名称> §6- §3安装插件',
-    '§6/mpm §auninstall §e<插件名称> §6- §3卸载插件',
-    '§6/mpm §alist [install]§6- §3列出仓库插件[已安装的插件]',
-    '§6/mpm §aupdate §e<插件名称> §6- §3更新插件(无插件名称则更新源)',
-    '§6/mpm §aupgrade §e<插件名称> §6- §3及时更新插件(update需要重启生效)',
-    '§6/mpm §areload §e<插件名称> §6- §3重载插件(无插件名称则重载自身)',
-    '§6/mpm §arun §e<JS代码> §6- §3运行JS代码',
-    '§6/mpm §adeploy §e<插件名称> §6- §3发布插件',
-    '§6/mpm §crestart §6- §4重启MiaoScript脚本引擎'
+    '§6/mpm §ainstall §e<插件名称>  §6-  §3安装仓库插件',
+    '§6/mpm §aload §e<插件名称>     §6-  §3安装本地插件',
+    '§6/mpm §aunload §e<插件名称>   §6-  §3卸载已安装插件',
+    '§6/mpm §areload §e<插件名称>   §6-  §3重载已安装插件(无名称则重载自身)',
+    '§6/mpm §alist [i]            §6-  §3列出仓库插件[已安装的插件]',
+    '§6/mpm §aupdate §e[插件名称]   §6-  §3更新插件(无名称则更新源)',
+    '§6/mpm §aupgrade §e[插件名称]  §6-  §3升级插件/框架(§4无名称则升级框架§3)',
+    '§6/mpm §arun §e<JS代码>        §6-  §3运行JS代码',
+    '§6/mpm §adeploy §e<插件名称>   §6-  §3发布插件',
+    '§6/mpm §crestart             §6-  §4重启MiaoScript脚本引擎'
 ];
 
 let langMap = {
+    'main.command.not.exists': '§4未知的子命令: §c{command}',
+    'main.command.help.tip': '§6请执行 §b/{command} §ahelp §6查看帮助!',
     'list.install.header': '§6当前 §bMiaoScript §6已安装下列插件:',
     'list.install.body': '§6插件名称: §b{name} §6版本: §a{version} §6作者: §3{author}',
     'list.header': '§6当前 §bMiaoScriptPackageCenter §6中存在下列插件:',
@@ -36,8 +39,12 @@ let langMap = {
     'download.finish': '§6插件 §b{name} §a下载完毕 开始加载 ...',
     'install.finish': '§6插件 §b{name} §a安装成功!',
     'update.finish': '§6插件 §b{name} §a更新成功!',
+    'deploy.token.not.exists': '§4请先配置发布Token!',
     'deploy.success': '§6插件 §b{name} §a发布成功! §6服务器返回: §a{msg}',
     'deploy.fail': '§6插件 §b{name} §c发布失败! §6服务器返回: §c{msg}',
+    'run.script': '§b运行脚本:§r {script}',
+    'run.result': '§a返回结果:§r {result}',
+    'run.noresult': '§4没有返回结果!',
 }
 
 let fallbackMap = langMap
@@ -80,22 +87,22 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     main(sender: any, command: string, args: string[]) {
         let cmdKey = 'cmd' + args[0]
         if (!this[cmdKey]) {
-            this.logger.sender(sender, '§4未知的子命令: §c' + args[0])
-            this.logger.sender(sender, '§6请执行 §b/' + command + ' §ahelp §6查看帮助!')
-            return;
-        }
-        if (args[0] === 'help') {
-            this.logger.sender(sender, help);
+            this.i18n(sender, 'main.command.not.exists', { command: args[0] })
+            this.i18n(sender, 'main.command.help.tip', { command })
             return;
         }
         args.shift()
         this[cmdKey](sender, ...args);
     }
 
+    cmdhelp(sender: any) {
+        this.logger.sender(sender, help);
+    }
+
     cmdload(sender: any, name: string) {
         let pluginFile = fs.concat(__dirname + '', name);
         if (!fs.exists(pluginFile)) {
-            this.logger.sender(sender, '§4插件 §c' + pluginFile + ' §4不存在!')
+            this.i18n(sender, 'plugin.not.exists', { name: `${name}(${pluginFile})` })
             return;
         }
         this.pluginManager.loadFromFile(fs.file(pluginFile));
@@ -189,18 +196,19 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     cmdrun(sender: any, ...args: any[]) {
         try {
             var script = args.join(' ');
-            this.logger.sender(sender, '§b运行脚本:§r', script);
-            this.logger.sender(sender, '§a返回结果:§r', eval(script) || '§4没有返回结果!');
+            this.i18n(sender, 'run.script', { script })
+            this.i18n(sender, 'run.result', { result: eval(script) || this.translate.translate('run.noresult') })
         } catch (ex) {
             this.logger.sender(sender, this.logger.stack(ex));
         }
     }
 
     cmddeploy(sender: any, name: any) {
+        if (!process.env.AccessToken) { return this.i18n(sender, 'deploy.token.not.exists') }
         this.taskManager.create(() => {
             if (this.checkPlugin(sender, name)) {
                 let plugin: interfaces.Plugin = this.pluginManager.getPlugins().get(name);
-                let result = http.post("http://ms.yumc.pw/api/plugin/deploy", {
+                let result = http.post("http://ms.yumc.pw/api/plugin/deploy?access_token=" + process.env.AccessToken, {
                     name,
                     author: plugin.description.author,
                     version: plugin.description.version,
