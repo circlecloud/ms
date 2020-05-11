@@ -82,6 +82,7 @@ export class XMLHttpRequest {
     private _url: string;
     private _async: boolean;
     private _mimeType: string;
+    private _requestHeaders: HttpHeader = {};
 
     private _status: number = 0;
     private _statusText: string = null;
@@ -126,17 +127,17 @@ export class XMLHttpRequest {
         return this._responseURL;
     }
 
-    onload() { }
-    onerror(ex: Error) { }
-    onabort() { }
-    onprogress() { }
-    ontimeout(ex: Error) { }
-    onloadend() { }
-    onloadstart() { }
-    onreadystatechange() { }
+    public onload: () => void;
+    public onerror: (ex: Error) => void;
+    public onabort: () => void;
+    public onprogress: () => void;
+    public ontimeout: (ex: Error) => void;
+    public onloadend: () => void;
+    public onloadstart: () => void;
+    public onreadystatechange: () => void;
 
     setRequestHeader(key: string, val: string) {
-        this._connection.setRequestProperty(key, val);
+        this._requestHeaders[key] = val;
     }
     getResponseHeader(key: string): string {
         return this._responseHeaders[key];
@@ -171,6 +172,9 @@ export class XMLHttpRequest {
         this.setReadyState(ReadyState.OPENED);
     }
     send(body?: string | object): Future<string> {
+        for (const header in this._requestHeaders) {
+            this._connection.setRequestProperty(header, this._requestHeaders[header]);
+        }
         if (this._readyState !== ReadyState.OPENED) { throw new Error(`Error Status ${this._readyState}!`) }
         let future = executor.submit(new Callable({ call: () => this._send(body) }));
         if (!this._async) { future.get() }
@@ -188,13 +192,13 @@ export class XMLHttpRequest {
     }
     abort() {
         this._connection.disconnect();
-        this.onabort();
+        this.onabort && this.onabort();
     }
 
     private _send(body?: string | object) {
         try {
             this._connection.connect();
-            this.onloadstart();
+            this.onloadstart && this.onloadstart();
             if (body) {
                 let bodyType = Object.prototype.toString.call(body);
                 if (typeof body !== "string") { throw new Error(`body(${bodyType}) must be string!`) }
@@ -214,7 +218,7 @@ export class XMLHttpRequest {
                 this._response = this.readOutput(this._connection.getErrorStream());
             }
             this.setResponseHeaders(this._connection.getHeaderFields());
-            this.onloadend();
+            this.onloadend && this.onloadend();
         } catch (ex) {
             if (ex instanceof SocketTimeoutException && this.ontimeout) {
                 return this.ontimeout(ex)
@@ -236,7 +240,7 @@ export class XMLHttpRequest {
 
     private setReadyState(state: ReadyState) {
         this._readyState = state;
-        this.onreadystatechange();
+        this.onreadystatechange && this.onreadystatechange();
     }
 
     private readOutput(input: any) {
