@@ -79,12 +79,26 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
 
     main(sender: any, command: string, args: string[]) {
         let cmdKey = 'cmd' + args[0]
-        if (!this[cmdKey] || args[0] === 'help') {
+        if (!this[cmdKey]) {
+            this.logger.sender(sender, '§4未知的子命令: §c' + args[0])
+            this.logger.sender(sender, '§6请执行 §b/' + command + ' §ahelp §6查看帮助!')
+            return;
+        }
+        if (args[0] === 'help') {
             this.logger.sender(sender, help);
             return;
         }
         args.shift()
         this[cmdKey](sender, ...args);
+    }
+
+    cmdload(sender: any, name: string) {
+        let pluginFile = fs.concat(__dirname + '', name);
+        if (!fs.exists(pluginFile)) {
+            this.logger.sender(sender, '§4插件 §c' + pluginFile + ' §4不存在!')
+            return;
+        }
+        this.pluginManager.loadFromFile(fs.file(pluginFile));
     }
 
     cmdlist(sender: any, type: string = 'cloud') {
@@ -163,6 +177,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         try {
             this.logger.sender(sender, '§6Reloading §3MiaoScript Engine...');
             ScriptEngineContextHolder.disableEngine();
+            Packages.java.lang.System.gc();
             ScriptEngineContextHolder.enableEngine();
             this.logger.sender(sender, '§3MiaoScript Engine §6Reload §aSuccessful...');
         } catch (ex) {
