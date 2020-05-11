@@ -1,3 +1,4 @@
+ms.i18n.completed: "国际化组件 初始化完成 当前语言: 简体中文"
 ms.ployfill.initialize: "加载 Java Nashorn 补丁. 请稍候..."
 ms.ployfill.completed: "Java Nashorn 补丁 加载完成... 耗时 ({time}s)!"
 
@@ -38,6 +39,7 @@ ms.plugin.manager.stage.exec.error: "§6插件 §b{plugin} §6执行 §d{executo
 ms.plugin.manager.stage.load: "加载"
 ms.plugin.manager.stage.enable: "启用"
 ms.plugin.manager.stage.disable: "关闭"
+ms.plugin.manager.build.error: "§6从文件 §b{file} §6加载插件失败 §4错误: §c{error}"
 ms.plugin.manager.build.update: "自动更新插件 {name} ..."
 ms.plugin.manager.build.not.extends: "§4发现错误的插件 §b{source} §4未继承接口 interfaces.Plugin, 将不会被载入到服务器!"
 ms.plugin.manager.build.duplicate: "§4发现已存在插件 §b{exists} §4和 §b{source}§4 存在冲突. 已存在插件将会被替换!"
