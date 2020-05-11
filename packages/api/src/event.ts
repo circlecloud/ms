@@ -21,6 +21,9 @@ export namespace event {
 
     @injectable()
     export abstract class Event {
+        // export EventPriority to blockly
+        public EventPriority = EventPriority;
+
         private mapEvent = [];
         private listenerMap = [];
 
