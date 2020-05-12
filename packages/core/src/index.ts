@@ -43,14 +43,14 @@ class MiaoScriptCore {
         console.i18n("ms.core.plugin.initialize")
         this.pluginManager.scan(this.pluginFolder)
         this.pluginManager.build()
-        this.pluginManager.load()
-        this.pluginManager.enable()
+        this.pluginManager.load(this.pluginManager.getPlugins())
+        this.pluginManager.enable(this.pluginManager.getPlugins())
         console.i18n("ms.core.plugin.completed", { time: (new Date().getTime() - loadPluginStartTime) / 1000 })
     }
 
     disable() {
         console.i18n("ms.core.engine.disable")
-        this.pluginManager.disable()
+        this.pluginManager.disable(this.pluginManager.getPlugins())
         this.taskManager.disable()
         //@ts-ignore
         require.disable()

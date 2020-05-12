@@ -123,7 +123,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     private checkAndGet(name: string | interfaces.Plugin | undefined | any): Map<string, interfaces.Plugin> | interfaces.Plugin[] {
-        if (name == undefined) { return this.pluginInstanceMap }
+        if (name == this.pluginInstanceMap) { return this.pluginInstanceMap }
         if (typeof name == 'string' && this.pluginInstanceMap.has(name)) { return [this.pluginInstanceMap.get(name)] }
         if (name instanceof interfaces.Plugin) { return [name as interfaces.Plugin] }
         if (name.description || name.description.name) { return [name as interfaces.Plugin] }
