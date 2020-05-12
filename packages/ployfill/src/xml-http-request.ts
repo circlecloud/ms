@@ -87,6 +87,7 @@ export class XMLHttpRequest {
     private _status: number = 0;
     private _statusText: string = null;
     private _response: any;
+    private _responseText: any;
     private _responseURL: string;
     private _responseHeaders: HttpHeader = {};
 
@@ -115,10 +116,10 @@ export class XMLHttpRequest {
         return this._statusText;
     }
     get response() {
-        return this._response ? JSON.parse(this._response) : this._response;
+        return this._response || this.get();
     }
     get responseText() {
-        return this._response;
+        return this._responseText;
     }
     get responseXML() {
         return this._response;
@@ -181,14 +182,17 @@ export class XMLHttpRequest {
         return future;
     }
     get() {
-        switch (this._responseType) {
-            case "json":
-                return this.response;
-            case "text":
-                return this.responseText;
-            default:
-                throw Error(`Unsupport ResponseType: ${this._responseType} !`)
+        if (this._response === undefined) {
+            switch (this._responseType) {
+                case "json":
+                    return this._response = JSON.parse(this._responseText);
+                case "text":
+                    return this._response = this._responseText;
+                default:
+                    throw Error(`Unsupport ResponseType: ${this._responseType} !`)
+            }
         }
+        return this._response;
     }
     abort() {
         this._connection.disconnect();
@@ -211,11 +215,11 @@ export class XMLHttpRequest {
             this._status = this._connection.getResponseCode();
             this._statusText = this._connection.getResponseMessage();
             if (this._status >= 0 && this._status < 300) {
-                this._response = this.readOutput(this._connection.getInputStream());
+                this._responseText = this.readOutput(this._connection.getInputStream());
             } else if (this._status >= 300 && this._status < 400) {
                 this._responseURL = this.getResponseHeader('Location');
             } else {
-                this._response = this.readOutput(this._connection.getErrorStream());
+                this._responseText = this.readOutput(this._connection.getErrorStream());
             }
             this.setResponseHeaders(this._connection.getHeaderFields());
             this.onloadend && this.onloadend();
