@@ -1,6 +1,6 @@
 {
     "name": "@ccms/ployfill",
-    "version": "0.6.4",
+    "version": "0.6.5",
     "description": "MiaoScript ployfill package",
     "author": "MiaoWoo <admin@yumc.pw>",
     "homepage": "https://github.com/circlecloud/ms.git",
