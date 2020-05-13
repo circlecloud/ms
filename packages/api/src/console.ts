@@ -21,8 +21,8 @@ enum LogLevel {
 export class MiaoScriptConsole implements Console {
     Console: NodeJS.ConsoleConstructor;
 
-    private sourceMaps: { [key: string]: SourceMapBuilder } = {};
-    private sourceFileMaps: { [key: string]: string } = {};
+    private static sourceMaps: { [key: string]: SourceMapBuilder } = {};
+    private static sourceFileMaps: { [key: string]: string } = {};
     private _name: string = '';
     private _level: LogLevel = LogLevel.INFO;
 
@@ -93,8 +93,8 @@ export class MiaoScriptConsole implements Console {
     readSourceMap(fileName: string, lineNumber: number) {
         try {
             if (fileName.endsWith('js')) {
-                if (this.sourceMaps[fileName] === undefined) {
-                    this.sourceMaps[fileName] = null
+                if (MiaoScriptConsole.sourceMaps[fileName] === undefined) {
+                    MiaoScriptConsole.sourceMaps[fileName] = null
                     let sourceLine = base.read(fileName).split('\n');
                     let lastLine = sourceLine[sourceLine.length - 1]
                     if (lastLine.startsWith('//# sourceMappingURL=')) {
@@ -109,14 +109,14 @@ export class MiaoScriptConsole implements Console {
                             if (file.exists()) { sourceContent = base.read(file) }
                         }
                         if (sourceContent) {
-                            this.sourceMaps[fileName] = new SourceMapBuilder(JSON.parse(sourceContent))
-                            this.sourceFileMaps[fileName] = Paths.get(fileName, '..', this.sourceMaps[fileName].sources[0]).toFile().getCanonicalPath();
+                            MiaoScriptConsole.sourceMaps[fileName] = new SourceMapBuilder(JSON.parse(sourceContent))
+                            MiaoScriptConsole.sourceFileMaps[fileName] = Paths.get(fileName, '..', MiaoScriptConsole.sourceMaps[fileName].sources[0]).toFile().getCanonicalPath();
                         }
                     }
                 }
-                if (this.sourceMaps[fileName]) {
-                    let sourceMapping = this.sourceMaps[fileName].getSource(lineNumber, 25, true, true);
-                    fileName = this.sourceFileMaps[fileName]
+                if (MiaoScriptConsole.sourceMaps[fileName]) {
+                    let sourceMapping = MiaoScriptConsole.sourceMaps[fileName].getSource(lineNumber, 25, true, true);
+                    fileName = MiaoScriptConsole.sourceFileMaps[fileName]
                     if (sourceMapping && lineNumber != sourceMapping.mapping.sourceLine) { lineNumber = sourceMapping.mapping.sourceLine; }
                 }
             }
