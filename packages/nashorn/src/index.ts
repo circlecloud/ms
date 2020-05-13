@@ -45,6 +45,7 @@ declare global {
             logger: any;
             debug: boolean;
             level: string;
+            eventCenter: EventEmitter;
             NashornEngineStartTime: number;
             setGlobal: (key: string, value: any, config?: PropertyDescriptor & ThisType<any>) => void;
             noop: () => void;
@@ -69,6 +70,9 @@ declare global {
         sender(...args: any): void;
         console(...args: any): void;
         i18n(name: string, ...params: any[]): void;
+    }
+    interface ProxyConstructor {
+        newProxy<T extends object>(target: T, handler: ProxyHandler<T>): T;
     }
 }
 
