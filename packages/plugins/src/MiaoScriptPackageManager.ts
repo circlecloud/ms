@@ -39,6 +39,7 @@ let langMap = {
     'download.finish': '§6插件 §b{name} §a下载完毕 开始加载 ...',
     'install.finish': '§6插件 §b{name} §a安装成功!',
     'update.finish': '§6插件 §b{name} §a更新成功!',
+    'upgrade.confirm': '§6您正在尝试升级 §bMiaoScript §c核心 §6请执行 §b/mpm §aupgrade §cconfirm §6确认执行!',
     'deploy.token.not.exists': '§4请先配置发布Token!',
     'deploy.success': '§6插件 §b{name} §a发布成功! §6服务器返回: §a{msg}',
     'deploy.fail': '§6插件 §b{name} §c发布失败! §6服务器返回: §c{msg}',
@@ -49,7 +50,7 @@ let langMap = {
 
 let fallbackMap = langMap
 
-@plugin({ name: 'MiaoScriptPackageManager', prefix: 'PM', version: '1.0.0', author: 'MiaoWoo', source: __filename })
+@plugin({ name: 'MiaoScriptPackageManager', prefix: 'PM', version: '1.0.1', author: 'MiaoWoo', source: __filename })
 export class MiaoScriptPackageManager extends interfaces.Plugin {
     @inject(pluginApi.PluginManager)
     private pluginManager: pluginApi.PluginManager;
@@ -85,7 +86,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     }
 
     main(sender: any, command: string, args: string[]) {
-        let cmdKey = 'cmd' + args[0]
+        let cmdKey = 'cmd' + (args[0] || 'help')
         if (!this[cmdKey]) {
             this.i18n(sender, 'main.command.not.exists', { command: args[0] })
             this.i18n(sender, 'main.command.help.tip', { command })
@@ -109,7 +110,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     }
 
     cmdlist(sender: any, type: string = 'cloud') {
-        if (type == "install") {
+        if (type == "i" || type == "install") {
             this.i18n(sender, 'list.install.header')
             this.pluginManager.getPlugins().forEach((plugin) => {
                 this.i18n(sender, 'list.install.body', plugin.description);
@@ -136,7 +137,8 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     }
 
     cmdupgrade(sender: any, name: string) {
-        if (name == "system") {
+        if (!name) { return this.i18n(sender, 'upgrade.confirm'); }
+        if (name == "comfirm") {
             let enginePath = fs.path(fs.file(fs.concat(root, 'node_modules', '@ccms')))
             if (enginePath.startsWith(root)) {
                 base.delete(enginePath);
@@ -195,9 +197,10 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
 
     cmdrun(sender: any, ...args: any[]) {
         try {
-            var script = args.join(' ');
+            let script = args.join(' ');
             this.i18n(sender, 'run.script', { script })
-            this.i18n(sender, 'run.result', { result: eval(script) || this.translate.translate('run.noresult') })
+            let result = eval(script);
+            this.i18n(sender, 'run.result', { result: result == undefined ? this.translate.translate('run.noresult') : result + '' })
         } catch (ex) {
             this.logger.sender(sender, this.logger.stack(ex));
         }
@@ -258,11 +261,15 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         this.taskManager.create(() => {
             this.i18n(sender, 'download.start', { name })
             this.i18n(sender, 'download.url', { url: this.packageCache[name].url })
-            let pluginFile = update ? fs.concat(this.pluginFolder, 'update', name + '.js') : fs.concat(this.pluginFolder, name + '.js')
+            let pluginFile = update ? fs.concat(root, this.pluginFolder, 'update', name + '.js') : fs.concat(root, this.pluginFolder, name + '.js')
             http.download(this.packageCache[name].url, pluginFile)
             this.i18n(sender, 'download.finish', { name })
-            this.pluginManager.loadFromFile(pluginFile)
-            this.i18n(sender, update ? 'update.finish' : 'install.finish', { name })
+            if (!update) {
+                this.pluginManager.loadFromFile(fs.file(pluginFile))
+                this.i18n(sender, 'install.finish', { name })
+            } else {
+                this.i18n(sender, 'update.finish', { name })
+            }
         }).async().submit()
     }
 }
