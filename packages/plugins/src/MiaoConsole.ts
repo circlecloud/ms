@@ -7,6 +7,7 @@ import { plugin, interfaces, cmd } from '@ccms/plugin'
 import { inject, ContainerInstance, Container } from '@ccms/container'
 import io, { Server as SocketIOServer, Socket as SocketIOSocket } from '@ccms/websocket'
 import * as fs from '@ccms/common/dist/fs'
+import * as reflect from '@ccms/common/dist/reflect'
 
 const suffixMap = {
     ts: 'typescript',
@@ -31,6 +32,8 @@ export class MiaoConsole extends interfaces.Plugin {
 
     private pipeline: any;
     private socketIOServer: SocketIOServer;
+    private rootLogger: any;
+    private tempAppender: any;
 
     @cmd()
     mconsole(sender: any, command: string, args: string[]) {
@@ -56,12 +59,40 @@ export class MiaoConsole extends interfaces.Plugin {
             if (count > 30) { wait.cancel() }
             count++
         }).later(20).timer(40).submit()
+        try {
+            let server = Java.type('net.minecraft.server.v1_12_R1.MinecraftServer');
+            this.rootLogger = server.LOGGER.parent;
+        } catch (error) {
+            try {
+                this.rootLogger = reflect.on(org.spongepowered.api.Sponge.getServer()).get('field_147145_h').get();
+                this.rootLogger = this.rootLogger.parent.parent;
+            } catch (ex) {
+                console.error('§6初始化日志代理器失败 §4错误: §c' + ex)
+                console.ex(ex);
+            }
+        }
+        if (this.rootLogger) {
+            let AbstractAppender = Java.type('org.apache.logging.log4j.core.appender.AbstractAppender');
+            let ProxyAppender = Java.extend(AbstractAppender, {
+                append: (logEvent) => global.eventCenter.emit('log', logEvent.getMessage().getFormattedMessage())
+            })
+            this.tempAppender = new ProxyAppender("ProxyLogger", null, null)
+            this.tempAppender.start();
+            this.rootLogger.addAppender(this.tempAppender);
+            this.rootLogger.setAdditive(true);
+        }
     }
 
     disable() {
         this.socketIOServer?.close()
         if (this.container.isBound(io.Instance)) {
             this.container.unbind(io.Instance)
+        }
+        try {
+            this.tempAppender.stop();
+            this.rootLogger.removeAppender(this.tempAppender);
+        } catch (error) {
+            console.ex(error);
         }
     }
 
@@ -76,6 +107,7 @@ export class MiaoConsole extends interfaces.Plugin {
     startSocketIOServer() {
         let namespace = this.socketIOServer.of('/MiaoConsole')
         namespace.on('connect', (client: SocketIOSocket) => {
+            global.eventCenter.on('log', (msg) => client.emit('log', msg))
             this.logger.console(`§6客户端 §b${client.id} §a新建连接...`)
             client.on('type', (fn) => {
                 fn && fn(this.serverType)
@@ -106,7 +138,6 @@ export class MiaoConsole extends interfaces.Plugin {
                 } catch (error) {
                     this.logger.error(error)
                     fn('§6插件 §a' + name + ' §4更新异常 错误: ' + error)
-
                 }
             })
             client.on('error', (error) => {
