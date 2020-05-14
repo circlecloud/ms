@@ -60,12 +60,10 @@ export class MiaoConsole extends interfaces.Plugin {
             count++
         }).later(20).timer(40).submit()
         try {
-            let server = Java.type('net.minecraft.server.v1_12_R1.MinecraftServer');
-            this.rootLogger = server.LOGGER.parent;
+            this.rootLogger = reflect.on(org.bukkit.Bukkit.getServer()).get('console').get('LOGGER').get().parent;
         } catch (error) {
             try {
-                this.rootLogger = reflect.on(org.spongepowered.api.Sponge.getServer()).get('field_147145_h').get();
-                this.rootLogger = this.rootLogger.parent.parent;
+                this.rootLogger = reflect.on(org.spongepowered.api.Sponge.getServer()).get('field_147145_h').get().parent;
             } catch (ex) {
                 console.error('§6初始化日志代理器失败 §4错误: §c' + ex)
                 console.ex(ex);
@@ -84,7 +82,10 @@ export class MiaoConsole extends interfaces.Plugin {
     }
 
     disable() {
-        this.socketIOServer?.close()
+        if (this.socketIOServer) {
+            this.socketIOServer.close()
+            global.eventCenter.removeAllListeners('log');
+        }
         if (this.container.isBound(io.Instance)) {
             this.container.unbind(io.Instance)
         }
@@ -106,9 +107,15 @@ export class MiaoConsole extends interfaces.Plugin {
 
     startSocketIOServer() {
         let namespace = this.socketIOServer.of('/MiaoConsole')
+        global.eventCenter.on('log', (msg) => namespace.emit('log', msg))
         namespace.on('connect', (client: SocketIOSocket) => {
-            global.eventCenter.on('log', (msg) => client.emit('log', msg))
-            this.logger.console(`§6客户端 §b${client.id} §a新建连接...`)
+            this.logger.console(`§6客户端 §b${client.id} §a请求链接 §4Token: §c${client.handshake.query.token} ...`)
+            if (!client.handshake.query.token) {
+                client.emit('log', `§4无效的请求 请提供Token后再次登录!`)
+                client.disconnect(true);
+                return;
+            }
+            this.logger.console(`§6客户端 §b${client.id} §a新建连接 接受日志转发...`)
             client.on('type', (fn) => {
                 fn && fn(this.serverType)
                 client.emit('log', `Currect Server Version is ${this.server.getVersion()}`)
