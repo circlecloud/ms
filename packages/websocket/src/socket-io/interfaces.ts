@@ -727,6 +727,16 @@ export declare namespace SocketIO {
 		 */
         del(id: string, room: string, callback?: (err?: any) => void): void;
 
+        /**
+         * Adds a socket to a list of room.
+         *
+         * @param {String} socket id
+         * @param {String} rooms
+         * @param {Function} callback
+         * @api public
+         */
+        addAll(id: string, rooms: string | any[], fn: { (err?: any): void; bind?: any; });
+
 		/**
 		 * Removes a socket from all the rooms that it's joined
 		 * @param id The ID of the socket that we're removing

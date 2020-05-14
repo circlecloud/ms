@@ -72,7 +72,7 @@ export class Adapter extends EventEmitter implements SocketIO.Adapter {
         var socket: Socket;
 
         packet.nsp = this.nsp.name;
-        // let encodedPackets = this.parser.encode(packet)
+        let encodedPackets = this.parser.encode(packet)
         if (rooms.length) {
             for (var i = 0; i < rooms.length; i++) {
                 var room = self.rooms[rooms[i]];
@@ -83,7 +83,7 @@ export class Adapter extends EventEmitter implements SocketIO.Adapter {
                         if (ids[id] || ~except.indexOf(id)) continue;
                         socket = self.nsp.connected[id];
                         if (socket) {
-                            socket.packet(packet, packetOpts);
+                            socket.packet(encodedPackets as any, packetOpts);
                             ids[id] = true;
                         }
                     }
@@ -94,7 +94,7 @@ export class Adapter extends EventEmitter implements SocketIO.Adapter {
                 if (self.sids.hasOwnProperty(id)) {
                     if (~except.indexOf(id)) continue;
                     socket = self.nsp.connected[id];
-                    if (socket) socket.packet(packet, packetOpts);
+                    if (socket) socket.packet(encodedPackets as any, packetOpts);
                 }
             }
         }

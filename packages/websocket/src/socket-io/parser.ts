@@ -103,6 +103,11 @@ export class Parser {
             p.nsp = '/';
         }
 
+        // handle namespace query
+        if (p.nsp.indexOf('?') !== -1) {
+            p.nsp = p.nsp.split('?')[0];
+        }
+
         // look up id
         let next = str.charAt(i + 1);
         if ('' !== next && !isNaN(Number(next))) {

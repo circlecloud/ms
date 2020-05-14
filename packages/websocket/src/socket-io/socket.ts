@@ -5,6 +5,7 @@ import { Packet } from './packet';
 import { PacketTypes, SubPacketTypes } from './types';
 import { Client } from './client';
 import { Namespace } from './namespace';
+import * as querystring from 'querystring'
 
 export class Socket extends EventEmitter implements SocketIO.Socket {
     nsp: Namespace;
@@ -45,7 +46,7 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
         this.acks = {};
         this.connected = true;
         this.disconnected = false;
-        // this.handshake = this.buildHandshake(query);
+        this.handshake = this.buildHandshake(query);
         this.fns = [];
         this.flags = {};
         this._rooms = [];
@@ -97,6 +98,14 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
             fn && fn(null);
             return this;
         }
+        this.adapter.addAll(this.id, rooms, (err) => {
+            if (err) return fn && fn(err);
+            // debug('joined room %s', rooms);
+            (rooms as Array<string>).forEach((room) => {
+                this.rooms[room] = room;
+            });
+            fn && fn(null);
+        });
         return this;
     }
     leave(name: string, fn?: Function): SocketIO.Socket {
@@ -127,16 +136,21 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
 
     // ==========================================
     buildHandshake(query): SocketIO.Handshake {
-        let requestQuery = this.request.uri();
+        let requestUri = this.request.uri();
+        let headers = {};
+        let nativeHeaders = this.request.headers();
+        nativeHeaders.forEach(function (header) {
+            headers[header.getKey()] = header.getValue();
+        })
         return {
-            headers: this.request.headers(),
+            headers: headers,
             time: (new Date) + '',
-            address: this.conn.remoteAddress,
-            xdomain: !!this.request.headers.origin,
-            secure: !!this.request.connection.encrypted,
+            address: this.conn.remoteAddress + '',
+            xdomain: !!headers['origin'],
+            secure: false,
             issued: +(new Date),
-            url: this.request.url,
-            query: Object.assign(query, requestQuery)
+            url: requestUri,
+            query: Object.assign(query, querystring.parse(requestUri.indexOf('?') != -1 ? requestUri.split('?')[1] : ''))
         }
     }
     emit(event: string, ...args: any[]): boolean {
@@ -183,10 +197,11 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
         // @ts-ignore
         return this;
     }
-    packet(packet: Packet, opts?: any) {
-        packet.nsp = this.nsp.name;
-        opts = opts || {};
-        opts.compress = false !== opts.compress;
+    packet(packet: Packet, opts: any = { preEncoded: false }) {
+        if (!opts.preEncoded) {
+            packet.nsp = this.nsp.name;
+            opts.compress = false !== opts.compress;
+        }
         this.client.packet(packet, opts);
     }
     onconnect() {
