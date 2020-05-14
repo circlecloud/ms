@@ -7,7 +7,7 @@ import { Socket } from './socket';
 import { Adapter } from './adapter';
 import { Server } from './index'
 import { Packet } from './packet';
-import { SubPacketTypes } from './types';
+import { PacketTypes, SubPacketTypes } from './types';
 
 export class Namespace extends EventEmitter implements SocketIO.Namespace {
     name: string;
@@ -78,7 +78,9 @@ export class Namespace extends EventEmitter implements SocketIO.Namespace {
         }
         // set up packet object
         var packet = {
-            type: (this.flags.binary !== undefined ? this.flags.binary : this.hasBin(args)) ? SubPacketTypes.BINARY_EVENT : SubPacketTypes.EVENT,
+            type: PacketTypes.MESSAGE,
+            sub_type: (this.flags.binary !== undefined ? this.flags.binary : this.hasBin(args)) ? SubPacketTypes.BINARY_EVENT : SubPacketTypes.EVENT,
+            name: event,
             data: args
         }
 
