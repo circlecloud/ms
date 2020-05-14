@@ -1,13 +1,10 @@
-import { EventEmitter } from 'events'
-
-import { Keys, ServerEvent } from './constants'
-import { WebSocketHandlerAdapter } from "../netty"
-import { HttpRequestHandler } from './httprequest'
-import { TextWebSocketFrameHandler } from './text_websocket_frame'
 import { ServerOptions } from '../socket-io'
+import { Keys, ServerEvent } from './constants'
+import { HttpRequestHandler } from './httprequest'
+import { WebSocketHandlerAdapter } from "../netty"
+import { TextWebSocketFrameHandler } from './text_websocket_frame'
 
 const CharsetUtil = Java.type('io.netty.util.CharsetUtil')
-
 const HttpServerCodec = Java.type('io.netty.handler.codec.http.HttpServerCodec')
 const ChunkedWriteHandler = Java.type('io.netty.handler.stream.ChunkedWriteHandler')
 const HttpObjectAggregator = Java.type('io.netty.handler.codec.http.HttpObjectAggregator')
