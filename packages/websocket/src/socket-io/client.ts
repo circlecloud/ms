@@ -62,8 +62,8 @@ export class Client extends EventEmitter implements SocketIO.Client {
             }
         });
     }
-    packet(packet: Packet, opts?: any) {
-        this.conn.send(parser.encode(packet))
+    packet(packet: Packet, opts: any = { preEncoded: false }) {
+        this.conn.send(opts.preEncoded ? packet as unknown as string : parser.encode(packet))
     }
     onclose(reason?: string) {
         // debug('client close with reason %s', reason);
