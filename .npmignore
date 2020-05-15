@@ -20,3 +20,4 @@ wallaby.js
 .vscode
 .theia
 type_definitions
+tsconfig.tsbuildinfo
