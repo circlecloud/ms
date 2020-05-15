@@ -1,6 +1,6 @@
 {
     "name": "@ccms/container",
-    "version": "0.6.0",
+    "version": "0.6.6",
     "description": "MiaoScript container package",
     "keywords": [
         "miaoscript",
