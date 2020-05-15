@@ -100,6 +100,10 @@ export namespace interfaces {
          * 配置文件格式 默认 yml
          */
         format?: string;
+        /**
+         * 是否为只读(关闭时将不会自动保存)
+         */
+        readonly?: boolean;
     }
     export type PluginLike = Plugin | string;
 }
