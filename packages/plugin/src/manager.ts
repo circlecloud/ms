@@ -16,7 +16,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     @inject(plugin.PluginInstance)
     private pluginInstance: any
     @inject(plugin.PluginFolder)
-    private pluginFolder: string;
+    private pluginFolder: string
     @inject(server.ServerType)
     private serverType: string
     @inject(command.Command)
@@ -33,11 +33,11 @@ export class PluginManagerImpl implements plugin.PluginManager {
         if (this.pluginInstance !== null && this.initialized !== true) {
             // 如果plugin不等于null 则代表是正式环境
             console.i18n('ms.plugin.initialize', { plugin: this.pluginInstance, loader: Thread.currentThread().contextClassLoader })
-            console.i18n('ms.plugin.event.map', { count: this.EventManager.mapEventName().toFixed(0), type: this.serverType });
+            console.i18n('ms.plugin.event.map', { count: this.EventManager.mapEventName().toFixed(0), type: this.serverType })
             this.pluginRequireMap = new Map()
             this.pluginInstanceMap = new Map()
-            this.pluginMetadataMap = getPluginSources();
-            this.initialized = true;
+            this.pluginMetadataMap = getPluginSources()
+            this.initialized = true
         }
     }
 
@@ -69,11 +69,11 @@ export class PluginManagerImpl implements plugin.PluginManager {
      * @param file java.io.File
      */
     loadFromFile(file: string): interfaces.Plugin {
-        let metadata = this.loadPlugin(file);
+        let metadata = this.loadPlugin(file)
         let plugin = this.buildPlugin(metadata && metadata.description ? metadata.description : this.pluginMetadataMap.get(file.toString()))
         this.load(plugin)
         this.enable(plugin)
-        return plugin;
+        return plugin
     }
 
     load(...args: any[]): void {
@@ -96,6 +96,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     disable(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
             this.runPluginStage(plugin, 'disable', () => {
+                this.saveConfig(plugin)
                 this.unregistryCommand(plugin)
                 this.unregistryListener(plugin)
             })
@@ -197,14 +198,14 @@ export class PluginManagerImpl implements plugin.PluginManager {
     private createPlugin(file: string) {
         //@ts-ignore
         let instance = require(file, { cache: false })
-        this.pluginRequireMap.set(file, instance);
-        return instance;
+        this.pluginRequireMap.set(file, instance)
+        return instance
     }
 
     private buildPlugins() {
-        let metadatas = [];
+        let metadatas = []
         let pluginMetadatas = getPluginMetadatas()
-        for (const [_, metadata] of pluginMetadatas) { metadatas.push(metadata); }
+        for (const [_, metadata] of pluginMetadatas) { metadatas.push(metadata) }
         for (const [_, instance] of this.pluginRequireMap) { if (instance.description) { this.buildPlugin(instance.description) } }
         for (const metadata of metadatas) {
             if (!this.allowProcess(metadata.servers)) { continue }
@@ -213,7 +214,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     private buildPlugin(metadata: interfaces.PluginMetadata) {
-        let pluginInstance: interfaces.Plugin;
+        let pluginInstance: interfaces.Plugin
         switch (metadata.type) {
             case "ioc":
                 try {
@@ -227,15 +228,15 @@ export class PluginManagerImpl implements plugin.PluginManager {
                     console.i18n("ms.plugin.manager.initialize.error", { name: metadata.name, ex })
                     console.ex(ex)
                 }
-                break;
+                break
             case "basic":
                 pluginInstance = this.pluginRequireMap.get(metadata.source.toString())
-                break;
+                break
             default:
                 throw new Error('§4不支持的插件类型 请检查加载器是否正常启用!')
         }
         this.pluginInstanceMap.set(metadata.name, pluginInstance)
-        return pluginInstance;
+        return pluginInstance
     }
 
     private bindPlugin(metadata: interfaces.PluginMetadata) {
@@ -251,15 +252,35 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     private loadConfig(plugin: interfaces.Plugin) {
-        let configs = getPluginConfigMetadata(plugin);
+        let configs = getPluginConfigMetadata(plugin)
         for (let [_, config] of configs) {
-            let configFile = fs.concat(root, this.pluginFolder, plugin.description.name, config.name + '.' + config.format)
-            let configFactory = getConfigLoader(config.format);
-            if (!fs.exists(configFile)) {
-                base.save(configFile, configFactory.dump(plugin[config.variable]))
-                console.i18n("ms.plugin.manager.config.save.default", { plugin: plugin.description.name, name: config.name, format: config.format })
-            } else {
-                plugin[config.variable] = configFactory.load(base.read(configFile));
+            try {
+                let configFile = fs.concat(root, this.pluginFolder, plugin.description.name, config.name + '.' + config.format)
+                let configFactory = getConfigLoader(config.format)
+                if (!fs.exists(configFile)) {
+                    base.save(configFile, configFactory.dump(plugin[config.variable]))
+                    console.i18n("ms.plugin.manager.config.save.default", { plugin: plugin.description.name, name: config.name, format: config.format })
+                } else {
+                    plugin[config.variable] = configFactory.load(base.read(configFile))
+                    plugin[config.variable].save = () => base.save(configFile, configFactory.dump(plugin[config.variable]))
+                }
+            } catch (error) {
+                console.i18n("ms.plugin.manager.config.load.error", { plugin: plugin.description.name, name: config.name, format: config.format, error })
+                console.ex(error)
+            }
+        }
+    }
+
+    private saveConfig(plugin: interfaces.Plugin) {
+        let configs = getPluginConfigMetadata(plugin)
+        for (let [_, config] of configs) {
+            try {
+                let configFile = fs.concat(root, this.pluginFolder, plugin.description.name, config.name + '.' + config.format)
+                let configFactory = getConfigLoader(config.format)
+                if (!config.readonly) { base.save(configFile, configFactory.dump(plugin[config.variable])) }
+            } catch (error) {
+                console.i18n("ms.plugin.manager.config.save.error", { plugin: plugin.description.name, name: config.name, format: config.format, error })
+                console.ex(error)
             }
         }
     }
@@ -299,7 +320,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     private execPluginStage(pluginInstance: interfaces.Plugin, stageName: string) {
-        let stages = getPluginStageMetadata(pluginInstance, stageName);
+        let stages = getPluginStageMetadata(pluginInstance, stageName)
         for (const stage of stages) {
             if (!this.allowProcess(stage.servers)) { continue }
             console.i18n("ms.plugin.manager.stage.exec", { plugin: pluginInstance.description.name, name: stage.executor, stage: stageName, servers: stage.servers })

@@ -43,4 +43,6 @@ ms.plugin.manager.build.error: "§6Load Plugin From §b{file} §6failed. §4Erro
 ms.plugin.manager.build.update: "Auto Update Plugin {name} ..."
 ms.plugin.manager.build.not.extends: "§4Found error plugin §b{source} §4it's not extends interfaces.Plugin, the plugin will be ignore!"
 ms.plugin.manager.build.exists: "§4Found duplicate plugin §b{exists} §4and §b{source}§4. the first plugin will be ignore!"
+ms.plugin.manager.config.load.error: "[{plugin}] config {name}.{format} load failed. Error: {error}"
+ms.plugin.manager.config.save.error: "[{plugin}] config {name}.{format} save failed. Error: {error}"
 ms.plugin.manager.config.save.default: "[{plugin}] config {name}.{format} not exists. auto create from default variable..."
