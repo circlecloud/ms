@@ -45,6 +45,9 @@ export class NukkitServer implements server.Server {
     getNettyPipeline() {
         throw new Error("Method not implemented.");
     }
+    getRootLogger() {
+        return Packages.org.apache.logging.log4j.LogManager.getRootLogger()
+    }
     sendJson(sender: string | any, json: object | string): void {
         throw new Error("Method not implemented.");
     }
