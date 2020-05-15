@@ -2,8 +2,8 @@
 /// <reference types="@ccms/types/dist/typings/sponge" />
 /// <reference types="@ccms/types/dist/typings/bungee" />
 
-import { plugin as pluginApi, server, task } from '@ccms/api'
-import { plugin, interfaces, cmd, tab, config } from '@ccms/plugin'
+import { plugin as pluginApi, server, task, constants } from '@ccms/api'
+import { plugin, interfaces, cmd, tab, enable, config, disable } from '@ccms/plugin'
 import { inject, ContainerInstance, Container } from '@ccms/container'
 import io, { Server as SocketIOServer, Socket as SocketIOSocket } from '@ccms/websocket'
 import * as fs from '@ccms/common/dist/fs'
@@ -19,7 +19,7 @@ let help = [
     '§6========= §6[§aMiaoConsole§6] 帮助 §aBy §bMiaoWoo §6=========',
     '§6/mconsole §atoken [set] §e<Token>  §6-  §3生成/设置 登录Token',
     '§6/mconsole §areload               §6-  §3重载插件',
-];
+]
 
 @plugin({ name: 'MiaoConsole', prefix: 'Console', version: '1.0.0', author: 'MiaoWoo', servers: ['!nukkit'], source: __filename })
 export class MiaoConsole extends interfaces.Plugin {
@@ -34,20 +34,21 @@ export class MiaoConsole extends interfaces.Plugin {
     @inject(pluginApi.PluginManager)
     private pluginManager: pluginApi.PluginManager
     @inject(pluginApi.PluginFolder)
-    private pluginFolder: string;
+    private pluginFolder: string
 
-    private token: string;
-    private pipeline: any;
-    private socketIOServer: SocketIOServer;
-    private rootLogger: any;
-    private tempAppender: any;
+    private token: string
+    private pipeline: any
+    private socketIOServer: SocketIOServer
+    private rootLogger: any
+    private appender: any
+    private handler: any
 
     @config()
     private secret = { token: undefined }
 
     load() {
         if (this.secret.token) {
-            this.token = this.secret.token;
+            this.token = this.secret.token
             this.logger.console(`§4已从配置文件加载永久Token 请注意服务器安全!`)
         } else {
             this.token = Java.type('java.util.UUID').randomUUID().toString()
@@ -61,28 +62,28 @@ export class MiaoConsole extends interfaces.Plugin {
         if (!this[cmdKey]) {
             console.sender(sender, '§4未知的子命令: §c' + cmdKey)
             console.sender(sender, `§6请执行 §b/${command} §ahelp §6查看帮助!`)
-            return;
+            return
         }
         args.shift()
-        this[cmdKey](sender, ...args);
+        this[cmdKey](sender, ...args)
     }
 
     cmdhelp(sender: any) {
-        this.logger.sender(sender, help);
+        this.logger.sender(sender, help)
     }
 
     cmdreload(sender: any) {
         // @ts-ignore
-        require.clear('websocket');
-        this.pluginManager.reload(this);
+        require.clear('websocket')
+        this.pluginManager.reload(this)
         return
     }
 
     cmdtoken(sender: any, sub: string, token: string) {
         if (sub == "set") {
-            this.secret.token = this.token = token;
+            this.secret.token = this.token = token
             this.logger.sender(sender, '§a已保存§6服务器登录Token:§3', this.token, '§4请勿分享给其他人 防止服务器被攻击!')
-            return;
+            return
         }
         this.token = Java.type('java.util.UUID').randomUUID().toString()
         this.logger.sender(sender, '§a已刷新§6服务器登录Token:§3', this.token, '§4请勿分享给其他人 防止服务器被攻击!')
@@ -95,7 +96,7 @@ export class MiaoConsole extends interfaces.Plugin {
     }
 
     enable() {
-        let count = 0;
+        let count = 0
         let wait = this.task.create(() => {
             this.pipeline = this.server.getNettyPipeline()
             if (this.pipeline) {
@@ -106,41 +107,63 @@ export class MiaoConsole extends interfaces.Plugin {
             if (count > 30) { wait.cancel() }
             count++
         }).later(20).timer(40).submit()
-        try {
-            this.rootLogger = reflect.on(org.bukkit.Bukkit.getServer()).get('console').get('LOGGER').get().parent;
-        } catch (error) {
-            try {
-                this.rootLogger = reflect.on(org.spongepowered.api.Sponge.getServer()).get('field_147145_h').get().parent;
-            } catch (ex) {
-                console.error('§6初始化日志代理器失败 §4错误: §c' + ex)
-                console.ex(ex);
-            }
-        }
+        this.rootLogger = this.server.getRootLogger()
+    }
+
+    @enable({ servers: [constants.ServerType.Bukkit, constants.ServerType.Sponge] })
+    addLog4jForward() {
         if (this.rootLogger) {
-            let AbstractAppender = Java.type('org.apache.logging.log4j.core.appender.AbstractAppender');
+            let AbstractAppender = Java.type('org.apache.logging.log4j.core.appender.AbstractAppender')
             let ProxyAppender = Java.extend(AbstractAppender, {
                 append: (logEvent) => global.eventCenter.emit('log', logEvent.getMessage().getFormattedMessage())
             })
-            this.tempAppender = new ProxyAppender("ProxyLogger", null, null)
-            this.tempAppender.start();
-            this.rootLogger.addAppender(this.tempAppender);
-            this.rootLogger.setAdditive(true);
+            this.appender = new ProxyAppender("ProxyLogger", null, null)
+            this.appender.start()
+            this.rootLogger.addAppender(this.appender)
+            this.rootLogger.setAdditive(true)
+        }
+    }
+
+    @enable({ servers: [constants.ServerType.Bungee] })
+    addJavaLoggerForward() {
+        if (this.rootLogger) {
+            let AbstractHandler = Java.type('java.util.logging.Handler')
+            let ProxyHandler = Java.extend(AbstractHandler, {
+                publish: (record) => global.eventCenter.emit('log', record.getMessage()),
+                flush: () => { },
+                close: () => { }
+            })
+            this.handler = new ProxyHandler()
+            this.rootLogger.addHandler(this.handler)
         }
     }
 
     disable() {
         if (this.socketIOServer) {
             this.socketIOServer.close()
-            global.eventCenter.removeAllListeners('log');
+            global.eventCenter.removeAllListeners('log')
         }
         if (this.container.isBound(io.Instance)) {
             this.container.unbind(io.Instance)
         }
+    }
+
+    @disable({ servers: [constants.ServerType.Bukkit, constants.ServerType.Sponge] })
+    removeLog4jForward() {
         try {
-            this.tempAppender.stop();
-            this.rootLogger.removeAppender(this.tempAppender);
+            this.appender.stop()
+            this.rootLogger.removeAppender(this.appender)
         } catch (error) {
-            console.ex(error);
+            console.ex(error)
+        }
+    }
+
+    @disable({ servers: [constants.ServerType.Bungee] })
+    removeJavaLoggerForward() {
+        try {
+            this.rootLogger.removeHandler(this.handler)
+        } catch (error) {
+            console.ex(error)
         }
     }
 
@@ -148,7 +171,7 @@ export class MiaoConsole extends interfaces.Plugin {
         this.socketIOServer = io(this.pipeline, {
             path: '/ws',
             root: fs.concat(root, 'wwwroot')
-        });
+        })
         this.container.bind(io.Instance).toConstantValue(this.socketIOServer)
     }
 
@@ -157,16 +180,17 @@ export class MiaoConsole extends interfaces.Plugin {
         global.eventCenter.on('log', (msg) => namespace.emit('log', msg))
         namespace.on('connect', (client: SocketIOSocket) => {
             if (!this.token) {
-                this.logger.console(`§6客户端 §b${client.id} §a请求连接 §4服务器尚未设置 Token 无法连接!`);
-                client.emit('unauthorized', '§4服务器尚未设置 Token 无法连接!');
-                client.disconnect(true);
-                return;
+                this.logger.console(`§6客户端 §b${client.id} §a请求连接 §4服务器尚未设置 Token 无法连接!`)
+                client.emit('unauthorized')
+                client.disconnect(true)
+                return
             }
             this.logger.console(`§6客户端 §b${client.id} §a请求连接 §4Token: §c********`)
             if (this.token != client.handshake.query.token) {
-                client.emit('unauthorized', `§4无效的请求 请提供正确Token后再次连接!`)
-                client.disconnect(true);
-                return;
+                this.logger.console(`§6客户端 §b${client.id} §4无效请求 请提供正确Token后再次连接!`)
+                client.emit('unauthorized')
+                client.disconnect(true)
+                return
             }
             this.logger.console(`§6客户端 §b${client.id} §a新建连接 ${this.rootLogger ? '启动日志转发' : '§4转发日志启动失败'}...`)
             client.on('type', (fn) => {
@@ -193,7 +217,7 @@ export class MiaoConsole extends interfaces.Plugin {
                 if (!fs.exists(file)) { return fn('§6插件 §a' + name + ' §6尚未安装 §c请先创建空文件 或安装插件!') }
                 try {
                     base.save(file, content)
-                    this.pluginManager.reload(name);
+                    this.pluginManager.reload(name)
                     fn('§6插件 §a' + name + ' §6更新成功!')
                 } catch (error) {
                     this.logger.error(error)
