@@ -1,6 +1,6 @@
 {
     "name": "@ccms/nodejs",
-    "version": "0.6.4",
+    "version": "0.6.6",
     "description": "MiaoScript nodejs package",
     "keywords": [
         "miaoscript",
@@ -24,7 +24,7 @@
         "typescript": "^3.9.2"
     },
     "dependencies": {
-        "@ccms/nashorn": "^0.6.4"
+        "@ccms/nashorn": "^0.6.6"
     },
     "gitHead": "781524f83e52cad26d7c480513e3c525df867121"
 }
