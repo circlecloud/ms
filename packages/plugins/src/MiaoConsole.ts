@@ -3,7 +3,7 @@
 /// <reference types="@ccms/types/dist/typings/bungee" />
 
 import { plugin as pluginApi, server, task } from '@ccms/api'
-import { plugin, interfaces, cmd } from '@ccms/plugin'
+import { plugin, interfaces, cmd, tab, config } from '@ccms/plugin'
 import { inject, ContainerInstance, Container } from '@ccms/container'
 import io, { Server as SocketIOServer, Socket as SocketIOSocket } from '@ccms/websocket'
 import * as fs from '@ccms/common/dist/fs'
@@ -15,7 +15,13 @@ const suffixMap = {
     yml: 'yaml'
 }
 
-@plugin({ name: 'MiaoConsole', version: '1.0.0', author: 'MiaoWoo', servers: ['!nukkit'], source: __filename })
+let help = [
+    '§6========= §6[§aMiaoConsole§6] 帮助 §aBy §bMiaoWoo §6=========',
+    '§6/mconsole §atoken [set] §e<Token>  §6-  §3生成/设置 登录Token',
+    '§6/mconsole §areload               §6-  §3重载插件',
+];
+
+@plugin({ name: 'MiaoConsole', prefix: 'Console', version: '1.0.0', author: 'MiaoWoo', servers: ['!nukkit'], source: __filename })
 export class MiaoConsole extends interfaces.Plugin {
     @inject(ContainerInstance)
     private container: Container
@@ -30,21 +36,62 @@ export class MiaoConsole extends interfaces.Plugin {
     @inject(pluginApi.PluginFolder)
     private pluginFolder: string;
 
+    private token: string;
     private pipeline: any;
     private socketIOServer: SocketIOServer;
     private rootLogger: any;
     private tempAppender: any;
 
+    @config()
+    private secret = { token: undefined }
+
+    load() {
+        if (this.secret.token) {
+            this.token = this.secret.token;
+            this.logger.console(`§4已从配置文件加载永久Token 请注意服务器安全!`)
+        } else {
+            this.token = Java.type('java.util.UUID').randomUUID().toString()
+            this.logger.console(`§6已生成随机Token: §3${this.token} §c重启后或重新生成后失效!`)
+        }
+    }
+
     @cmd()
     mconsole(sender: any, command: string, args: string[]) {
-        if (args[0] == 'reload') {
-            // @ts-ignore
-            require.clear('websocket');
-            this.pluginManager.reload(this);
-            return
+        let cmdKey = 'cmd' + (args[0] || 'help')
+        if (!this[cmdKey]) {
+            console.sender(sender, '§4未知的子命令: §c' + cmdKey)
+            console.sender(sender, `§6请执行 §b/${command} §ahelp §6查看帮助!`)
+            return;
         }
-        let tfunc = new Function('pipeline', args.join(' '))
-        tfunc.apply(this, [this.pipeline])
+        args.shift()
+        this[cmdKey](sender, ...args);
+    }
+
+    cmdhelp(sender: any) {
+        this.logger.sender(sender, help);
+    }
+
+    cmdreload(sender: any) {
+        // @ts-ignore
+        require.clear('websocket');
+        this.pluginManager.reload(this);
+        return
+    }
+
+    cmdtoken(sender: any, sub: string, token: string) {
+        if (sub == "set") {
+            this.secret.token = this.token = token;
+            this.logger.sender(sender, '§a已保存§6服务器登录Token:§3', this.token, '§4请勿分享给其他人 防止服务器被攻击!')
+            return;
+        }
+        this.token = Java.type('java.util.UUID').randomUUID().toString()
+        this.logger.sender(sender, '§a已刷新§6服务器登录Token:§3', this.token, '§4请勿分享给其他人 防止服务器被攻击!')
+    }
+
+    @tab()
+    tabmconsole(sender: any, command: string, args: string[]) {
+        if (args.length === 1) { return ["reload", "token"] }
+        if (args[0] == "token") { return ["set"] }
     }
 
     enable() {
@@ -100,7 +147,7 @@ export class MiaoConsole extends interfaces.Plugin {
     createSocketIOServer() {
         this.socketIOServer = io(this.pipeline, {
             path: '/ws',
-            root: '/home/project/TSWorkSpace/ms/packages/plugins/public'
+            root: fs.concat(root, 'wwwroot')
         });
         this.container.bind(io.Instance).toConstantValue(this.socketIOServer)
     }
@@ -109,13 +156,19 @@ export class MiaoConsole extends interfaces.Plugin {
         let namespace = this.socketIOServer.of('/MiaoConsole')
         global.eventCenter.on('log', (msg) => namespace.emit('log', msg))
         namespace.on('connect', (client: SocketIOSocket) => {
-            this.logger.console(`§6客户端 §b${client.id} §a请求链接 §4Token: §c${client.handshake.query.token} ...`)
-            if (!client.handshake.query.token) {
-                client.emit('log', `§4无效的请求 请提供Token后再次登录!`)
+            if (!this.token) {
+                this.logger.console(`§6客户端 §b${client.id} §a请求连接 §4服务器尚未设置 Token 无法连接!`);
+                client.emit('unauthorized', '§4服务器尚未设置 Token 无法连接!');
                 client.disconnect(true);
                 return;
             }
-            this.logger.console(`§6客户端 §b${client.id} §a新建连接 接受日志转发...`)
+            this.logger.console(`§6客户端 §b${client.id} §a请求连接 §4Token: §c********`)
+            if (this.token != client.handshake.query.token) {
+                client.emit('unauthorized', `§4无效的请求 请提供正确Token后再次连接!`)
+                client.disconnect(true);
+                return;
+            }
+            this.logger.console(`§6客户端 §b${client.id} §a新建连接 ${this.rootLogger ? '启动日志转发' : '§4转发日志启动失败'}...`)
             client.on('type', (fn) => {
                 fn && fn(this.serverType)
                 client.emit('log', `Currect Server Version is ${this.server.getVersion()}`)
@@ -128,7 +181,7 @@ export class MiaoConsole extends interfaces.Plugin {
                 try {
                     client.emit('log', this.runCode(code, namespace, client))
                 } catch (ex) {
-                    client.emit('log', '§4代码执行异常\n' + console.stack(ex).join('\n'))
+                    client.emit('log', `§4代码执行异常 错误: ${ex}\n${console.stack(ex).join('\n')}`)
                 }
             })
             client.on('edit', (file: string, fn) => {
