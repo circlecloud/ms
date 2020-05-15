@@ -31,6 +31,7 @@ export namespace server {
         getPluginsFolder(): string;
         getNativePluginManager(): NativePluginManager;
         getNettyPipeline(): any;
+        getRootLogger(): any;
         sendJson(sender: string | any, json: object | string): void;
     }
 }

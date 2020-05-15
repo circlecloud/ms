@@ -11,10 +11,11 @@ const File = Java.type("java.io.File");
 export class SpongeServer implements server.Server {
     private pluginsFolder: string;
     private pipeline: any;
+    private rootLogger: any;
 
     constructor() {
         this.pluginsFolder = new File(base.getInstance().getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getCanonicalPath()
-        this.reflectPipeline()
+        this.reflect()
     }
 
     getPlayer(name: string) {
@@ -50,20 +51,27 @@ export class SpongeServer implements server.Server {
     getNettyPipeline() {
         return this.pipeline;
     }
+    getRootLogger() {
+        return this.rootLogger;
+    }
     sendJson(sender: string | any, json: string): void {
         if (typeof sender === "string") {
             sender = this.getPlayer(sender)
         }
         sender.sendMessage(TextSerializers.JSON.deserialize(json))
     }
-    private reflectPipeline() {
+    private reflect() {
         let consoleServer = reflect.on(Sponge.getServer()).get()
+        this.reflectPipeline(consoleServer)
+        this.reflectRootLogger(consoleServer)
+    }
+    private reflectPipeline(consoleServer: any) {
         let connection: any;
         let promise: any;
         for (const method of constants.Reflect.Method.getServerConnection) {
             try {
                 connection = reflect.on(consoleServer).call(method).get()
-                if (connection.class.name.indexOf('ServerConnection') !== -1) { break; }
+                if (connection.class.name.indexOf('NetworkSystem') !== -1) { break; }
                 connection = undefined;
             } catch (error) { }
         }
@@ -77,5 +85,12 @@ export class SpongeServer implements server.Server {
         }
         if (!promise) { console.error("Can't found listeningChannels!"); return }
         this.pipeline = reflect.on(promise).get('channel').get().pipeline()
+    }
+    private reflectRootLogger(consoleServer: any) {
+        try {
+            this.rootLogger = reflect.on(consoleServer).get('LOGGER').get().parent
+        } catch (error) {
+            console.error("Can't found rootLogger!")
+        }
     }
 }

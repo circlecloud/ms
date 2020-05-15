@@ -9,6 +9,7 @@ let Bungee: net.md_5.bungee.api.ProxyServer = base.getInstance().getProxy();
 export class BungeeServer implements server.Server {
     private pluginsFolder: string;
     private pipeline: any;
+    private rootLogger: any;
 
     @inject(task.TaskManager)
     private task: task.TaskManager
@@ -35,6 +36,11 @@ export class BungeeServer implements server.Server {
                 }
             }
         }).later(10).timer(20).submit()
+        try {
+            this.rootLogger = Bungee.getLogger()
+        } catch (error) {
+            console.error("Can't found rootLogger!")
+        }
     }
 
     getPlayer(name: string) {
@@ -69,6 +75,9 @@ export class BungeeServer implements server.Server {
     }
     getNettyPipeline() {
         return this.pipeline;
+    }
+    getRootLogger() {
+        return this.rootLogger;
     }
     sendJson(sender: string | any, json: string): void {
         throw new Error("Method not implemented.");

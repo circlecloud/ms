@@ -10,10 +10,11 @@ let Bukkit = org.bukkit.Bukkit;
 export class BukkitServer implements server.Server {
     private pluginsFolder: string;
     private pipeline: any;
+    private rootLogger: any;
 
     constructor() {
         this.pluginsFolder = Bukkit.getUpdateFolderFile().getParentFile().getCanonicalPath();
-        this.reflectPipeline()
+        this.reflect()
     }
 
     getPlayer(name: string) {
@@ -49,6 +50,9 @@ export class BukkitServer implements server.Server {
     getNettyPipeline() {
         return this.pipeline;
     }
+    getRootLogger() {
+        return this.rootLogger;
+    }
     sendJson(sender: string | any, json: object | string): void {
         if (typeof sender === "string") {
             sender = this.getPlayer(sender)
@@ -59,14 +63,20 @@ export class BukkitServer implements server.Server {
         }
     }
 
-    private reflectPipeline() {
+    private reflect() {
         let consoleServer = reflect.on(Bukkit.getServer()).get('console').get()
+        this.reflectPipeline(consoleServer)
+        this.reflectRootLogger(consoleServer)
+    }
+
+    private reflectPipeline(consoleServer: any) {
         let connection: any;
         let promise: any;
         for (const method of constants.Reflect.Method.getServerConnection) {
             try {
                 connection = reflect.on(consoleServer).call(method).get()
-                if (connection.class.name.indexOf('ServerConnection') !== -1) { break; }
+                if (connection.class.name.indexOf('ServerConnection') !== -1
+                    || connection.class.name.indexOf('NetworkSystem') !== -1) { break; }
                 connection = undefined;
             } catch (error) { }
         }
@@ -80,5 +90,13 @@ export class BukkitServer implements server.Server {
         }
         if (!promise) { console.error("Can't found listeningChannels!"); return }
         this.pipeline = reflect.on(promise).get('channel').get().pipeline()
+    }
+
+    private reflectRootLogger(consoleServer: any) {
+        try {
+            this.rootLogger = reflect.on(consoleServer).get('LOGGER').get().parent
+        } catch (error) {
+            console.error("Can't found rootLogger!")
+        }
     }
 }
