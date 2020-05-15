@@ -10,7 +10,7 @@ export class YamlPluginConfig implements PluginConfigLoader {
         return yaml.safeLoad(content);
     }
     dump(variable: any): string {
-        return yaml.safeDump(variable);
+        return yaml.safeDump(variable, { skipInvalid: true });
     }
 }
 
