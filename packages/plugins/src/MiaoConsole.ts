@@ -37,7 +37,7 @@ export class MiaoConsole extends interfaces.Plugin {
     private pluginFolder: string
 
     private token: string
-    private pipeline: any
+    private instance: any
     private socketIOServer: SocketIOServer
     private rootLogger: any
     private appender: any
@@ -49,7 +49,7 @@ export class MiaoConsole extends interfaces.Plugin {
     load() {
         if (this.secret.token) {
             this.token = this.secret.token
-            this.logger.console(`§4已从配置文件加载永久Token 请注意服务器安全!`)
+            this.logger.console(`§c已从配置文件加载永久Token §4请注意服务器安全!`)
         } else {
             this.token = Java.type('java.util.UUID').randomUUID().toString()
             this.logger.console(`§6已生成随机Token: §3${this.token} §c重启后或重新生成后失效!`)
@@ -98,14 +98,17 @@ export class MiaoConsole extends interfaces.Plugin {
     enable() {
         let count = 0
         let wait = this.task.create(() => {
-            this.pipeline = this.server.getNettyPipeline()
-            if (this.pipeline) {
-                wait.cancel()
+            this.instance = this.server.getNettyPipeline()
+            if (this.instance) {
+                wait?.cancel()
                 this.createSocketIOServer()
                 this.startSocketIOServer()
             }
-            if (count > 30) { wait.cancel() }
-            count++
+            if (count++ > 30) {
+                wait?.cancel()
+                this.logger.console('§cNetty通道注入失败 §4所有功能将无法使用！')
+                return
+            }
         }).later(20).timer(40).submit()
         this.rootLogger = this.server.getRootLogger()
     }
@@ -125,7 +128,7 @@ export class MiaoConsole extends interfaces.Plugin {
     }
 
     @enable({ servers: [constants.ServerType.Bungee] })
-    addJavaLoggerForward() {
+    addLoggerForward() {
         if (this.rootLogger) {
             let AbstractHandler = Java.type('java.util.logging.Handler')
             let ProxyHandler = Java.extend(AbstractHandler, {
@@ -135,6 +138,20 @@ export class MiaoConsole extends interfaces.Plugin {
             })
             this.handler = new ProxyHandler()
             this.rootLogger.addHandler(this.handler)
+        }
+    }
+
+    @enable({ servers: [constants.ServerType.Spring] })
+    addLogbackForward() {
+        if (this.rootLogger) {
+            let AppenderBase = Java.type('ch.qos.logback.core.AppenderBase')
+            let ProxyAppender = Java.extend(AppenderBase, {
+                append: (logEvent) => global.eventCenter.emit('log', logEvent.getFormattedMessage())
+            })
+            this.appender = new ProxyAppender()
+            this.appender.setName("NashornProxyAppender")
+            this.appender.setContext(this.rootLogger.getLoggerContext())
+            this.rootLogger.addAppender(this.appender)
         }
     }
 
@@ -159,7 +176,7 @@ export class MiaoConsole extends interfaces.Plugin {
     }
 
     @disable({ servers: [constants.ServerType.Bungee] })
-    removeJavaLoggerForward() {
+    removeLoggerForward() {
         try {
             this.rootLogger.removeHandler(this.handler)
         } catch (error) {
@@ -167,8 +184,17 @@ export class MiaoConsole extends interfaces.Plugin {
         }
     }
 
+    @disable({ servers: [constants.ServerType.Spring] })
+    removeLogbackForward() {
+        try {
+            this.rootLogger.detachAppender("NashornProxyAppender")
+        } catch (error) {
+            console.ex(error)
+        }
+    }
+
     createSocketIOServer() {
-        this.socketIOServer = io(this.pipeline, {
+        this.socketIOServer = io(this.instance, {
             path: '/ws',
             root: fs.concat(root, 'wwwroot')
         })
@@ -224,6 +250,13 @@ export class MiaoConsole extends interfaces.Plugin {
                     fn('§6插件 §a' + name + ' §4更新异常 错误: ' + error)
                 }
             })
+            client.on('ls', (file: string, fn) => {
+                let dir = fs.file(file);
+                if (!dir.isDirectory()) {
+                    return fn(undefined, `${file} 不是一个目录!`)
+                }
+                fn(fs.list(dir))
+            })
             client.on('error', (error) => {
                 this.logger.console(`§6客户端 §b${client.id} §c触发异常: ${error}`)
                 this.logger.error(error)
@@ -232,7 +265,6 @@ export class MiaoConsole extends interfaces.Plugin {
                 this.logger.console(`§6客户端 §b${client.id} §c断开连接...`)
             })
         })
-        this.logger.info('Netty Channel Pipeline Inject MiaoDetectHandler Successful!')
     }
 
     private runCode(code: string, namespace: any, client: any) {
@@ -243,7 +275,7 @@ export class MiaoConsole extends interfaces.Plugin {
             tempconcent += text + "\\n"
         }
         var result = eval(${JSON.stringify(code)});
-        return tempconcent + result
+        return tempconcent + '§a返回结果: §r'+ result
         `)
         return this.task.callSyncMethod(() => tfunc.apply(this, [namespace, client])) + ''
     }
