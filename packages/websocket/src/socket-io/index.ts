@@ -1,8 +1,6 @@
 import { EventEmitter } from 'events'
 
-import { NettyWebSocketServer, NettyClient } from '../server'
-import { ServerEvent } from '../server/constants';
-
+import { ServerEvent } from './constants';
 import { Namespace } from './namespace';
 import { Client } from './client';
 import { SocketIO } from './interfaces'
@@ -17,8 +15,12 @@ interface ServerOptions extends SocketIO.ServerOptions {
     root?: string;
 }
 
+interface WebSocketServer extends EventEmitter {
+    close(): void
+}
+
 class Server implements SocketIO.Server {
-    private nettyServer: NettyWebSocketServer;
+    private websocketServer: WebSocketServer;
     private allClients: { [key: string]: Client };
 
     engine: { ws: any; };
@@ -31,17 +33,24 @@ class Server implements SocketIO.Server {
     _adapter: Adapter;
     options: ServerOptions;
 
-    constructor(pipeline: any, options: ServerOptions) {
-        if (!pipeline) { throw new Error('Netty Pipeline can\'t be undefiend!') }
+    constructor(instance: any, options: ServerOptions) {
+        if (!instance) { throw new Error('instance can\'t be undefiend!') }
         this.allClients = {};
         this.nsps = {};
         this.sockets = new Namespace('/', this);
         this.nsps['/'] = this.sockets;
-        this.initNettyServer(pipeline, Object.assign({
-            event: new EventEmitter(),
-            path: '/socket.io',
-            root: root + '/wwwroot'
-        }, options));
+        if (instance.class.name.startsWith('io.netty.channel')) {
+            let { NettyWebSocketServer } = require("../server")
+            this.websocketServer = new NettyWebSocketServer(instance, Object.assign({
+                event: new EventEmitter(),
+                path: '/socket.io',
+                root: root + '/wwwroot'
+            }, options));
+        } else {
+            let { TomcatWebSocketServer } = require("../tomcat/server")
+            this.websocketServer = new TomcatWebSocketServer(instance, options);
+        }
+        this.initServer()
     }
 
     checkRequest(req: any, fn: (err: any, success: boolean) => void): void {
@@ -114,7 +123,7 @@ class Server implements SocketIO.Server {
         for (let socket in this.sockets.sockets) {
             this.sockets.sockets[socket].onclose()
         }
-        this.nettyServer.close();
+        this.websocketServer.close();
     }
     on(event: "connection", listener: (socket: SocketIO.Socket) => void): SocketIO.Namespace;
     on(event: "connect", listener: (socket: SocketIO.Socket) => void): SocketIO.Namespace;
@@ -152,17 +161,16 @@ class Server implements SocketIO.Server {
         fn(false);
     };
 
-    private initNettyServer(pipeline, options) {
-        this.nettyServer = new NettyWebSocketServer(pipeline, options);
-        this.nettyServer.on(ServerEvent.connect, (nettyClient: NettyClient) => {
-            let client = new Client(this, nettyClient);
+    private initServer() {
+        this.websocketServer.on(ServerEvent.connect, (socket: SocketIO.EngineSocket) => {
+            let client = new Client(this, socket);
             this.onconnection(client);
         })
-        this.nettyServer.on(ServerEvent.message, (nettyClient: NettyClient, text) => {
-            this.processPacket(this.parser.decode(text), this.allClients[nettyClient.id]);
+        this.websocketServer.on(ServerEvent.message, (socket: SocketIO.EngineSocket, text) => {
+            this.processPacket(this.parser.decode(text), this.allClients[socket.id]);
         })
-        this.nettyServer.on(ServerEvent.error, (nettyClient: NettyClient, cause) => {
-            console.error(`Client ${nettyClient.id} cause error: ` + cause)
+        this.websocketServer.on(ServerEvent.error, (socket: SocketIO.EngineSocket, cause) => {
+            console.error(`Client ${socket.id} cause error: ` + cause)
             console.ex(cause)
         })
     }

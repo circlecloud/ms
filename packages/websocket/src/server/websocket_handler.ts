@@ -1,5 +1,7 @@
 import { ServerOptions } from '../socket-io'
-import { Keys, ServerEvent } from './constants'
+import { ServerEvent } from '../socket-io/constants'
+
+import { Keys } from './constants'
 import { HttpRequestHandler } from './httprequest'
 import { WebSocketHandlerAdapter } from "../netty"
 import { TextWebSocketFrameHandler } from './text_websocket_frame'

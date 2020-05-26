@@ -2,7 +2,7 @@ import { EventEmitter } from 'events'
 
 import { Client } from './client'
 import { SocketIO } from './interfaces';
-import { ServerEvent } from '../server';
+import { ServerEvent } from './constants';
 import { Socket } from './socket';
 import { Adapter } from './adapter';
 import { Server } from './index'

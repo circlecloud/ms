@@ -1,8 +1,10 @@
 import { EventEmitter } from 'events'
 
-import { NettyClient } from './client'
 import { ServerOptions } from '../socket-io'
-import { ServerEvent, Keys } from './constants'
+import { ServerEvent } from '../socket-io/constants'
+
+import { NettyClient } from './client'
+import { Keys } from './constants'
 import { WebSocketDetect } from './websocket_detect'
 import { WebSocketHandler } from './websocket_handler'
 
