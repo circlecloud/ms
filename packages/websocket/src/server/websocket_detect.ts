@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
 import { WebSocketHandlerAdapter } from "../netty"
-import { ServerEvent } from './constants'
+import { ServerEvent } from '../socket-io/constants'
 
 export class WebSocketDetect extends WebSocketHandlerAdapter {
     private event: EventEmitter;

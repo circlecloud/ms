@@ -1,30 +1,34 @@
 import { EventEmitter } from 'events'
 import { Parser } from './parser'
 import { Packet } from './packet';
-import { NettyClient } from '../server';
 import { SocketIO } from './interfaces'
 import { Server, Socket } from './index';
 import { PacketTypes, SubPacketTypes } from './types';
+import { ServerEvent } from './constants';
 
 const parser = new Parser();
 
 export class Client extends EventEmitter implements SocketIO.Client {
     id: string;
     server: Server;
-    conn: NettyClient;
+    conn: SocketIO.EngineSocket;
     request: any;
     sockets: { [id: string]: Socket; };
     nsps: { [nsp: string]: SocketIO.Socket; };
     connectBuffer: any;
 
-    constructor(server: Server, nettyClient: NettyClient) {
+    constructor(server: Server, engine: SocketIO.EngineSocket) {
         super();
         this.server = server;
-        this.conn = nettyClient;
+        this.conn = engine;
         this.id = this.conn.id + '';
-        this.request = nettyClient.request;
+        this.request = engine.request;
         this.sockets = {};
         this.nsps = {};
+
+        this.conn.on(ServerEvent.disconnect, (reason) => {
+            this.onclose(reason)
+        })
     }
     connect(name, query) {
         if (this.server.nsps[name]) {
@@ -79,11 +83,11 @@ export class Client extends EventEmitter implements SocketIO.Client {
         // this.decoder.destroy(); // clean up decoder
     }
     disconnect() {
-        // if ('open' == this.conn.readyState) {
-        // debug('forcing transport close');
-        this.conn.close();
-        this.onclose('forced server close');
-        // }
+        if ('open' == this.conn.readyState) {
+            // debug('forcing transport close');
+            this.conn.close();
+            this.onclose('forced server close');
+        }
     }
     remove(socket: Socket) {
         if (this.sockets.hasOwnProperty(socket.id)) {

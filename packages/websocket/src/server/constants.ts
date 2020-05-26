@@ -1,12 +1,3 @@
-export enum ServerEvent {
-    detect = 'detect',
-    connect = 'connect',
-    connection = 'connection',
-    message = 'message',
-    error = 'error',
-    disconnect = 'disconnect'
-}
-
 const AttributeKey = Java.type('io.netty.util.AttributeKey');
 
 export enum Keys {
