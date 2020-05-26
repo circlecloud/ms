@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events'
-import { SocketIO } from 'socket-io/interfaces';
+import { SocketIO } from '../socket-io/interfaces';
 import { AttributeKeys } from './constants';
 
 const TextWebSocketFrame = Java.type('io.netty.handler.codec.http.websocketx.TextWebSocketFrame')

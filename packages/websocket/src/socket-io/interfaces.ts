@@ -830,5 +830,15 @@ export declare namespace SocketIO {
 		 * (Transport): transport reference
 		 */
         transport: any;
+
+        /**
+         * send
+         */
+        send(text: string);
+
+        /**
+         * close
+         */
+        close();
     }
 }
