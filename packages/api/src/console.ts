@@ -140,7 +140,7 @@ export class MiaoScriptConsole implements Console {
             if (trace.className.startsWith('<')) {
                 let { fileName, lineNumber } = this.readSourceMap(trace.fileName, trace.lineNumber)
                 if (fileName.startsWith(root)) { fileName = fileName.split(root)[1] }
-                cache.push(`    §e->§c ${fileName} => §4${trace.methodName}:${lineNumber}`)
+                cache.push(`    §e->§c ${fileName}:${lineNumber} => §4${trace.methodName}`)
             } else {
                 let className = trace.className;
                 var fileName = trace.fileName as string;
