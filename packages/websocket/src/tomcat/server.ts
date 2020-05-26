@@ -31,15 +31,13 @@ class TomcatWebSocketServer extends EventEmitter {
                 this.allClients[tomcatClient.id] = tomcatClient
                 this.emit(ServerEvent.connect, tomcatClient)
             },
-            onMessage: (message: any, session: TomcatWebSocketSession) => {
-                this.executor.execute(() => {
-                    this.emit(ServerEvent.message, this.allClients[session.getId()], message)
-                })
+            onMessage: (session: TomcatWebSocketSession, message: string) => {
+                this.executor.execute(() => this.emit(ServerEvent.message, this.allClients[session.getId()], message))
             },
             onClose: (session: TomcatWebSocketSession, reason: any) => {
                 this.emit(ServerEvent.disconnect, this.allClients[session.getId()], reason)
             },
-            onError: (session: TomcatWebSocketSession, error: any) => {
+            onError: (session: TomcatWebSocketSession, error: Error) => {
                 this.emit(ServerEvent.error, this.allClients[session.getId()], error)
             },
         })
