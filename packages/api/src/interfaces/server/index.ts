@@ -33,5 +33,6 @@ export namespace server {
         getNettyPipeline(): any;
         getRootLogger(): any;
         sendJson(sender: string | any, json: object | string): void;
+        tabComplete?(sender: string | any, input: string, index?: number);
     }
 }

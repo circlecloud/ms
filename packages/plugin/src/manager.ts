@@ -30,8 +30,8 @@ export class PluginManagerImpl implements plugin.PluginManager {
     private pluginMetadataMap: Map<string, interfaces.PluginMetadata>
 
     initialize() {
-        if (this.pluginInstance !== null && this.initialized !== true) {
-            // 如果plugin不等于null 则代表是正式环境
+        if (this.pluginInstance === undefined) { throw new Error("Can't found Plugin Instance!") }
+        if (this.initialized !== true) {
             console.i18n('ms.plugin.initialize', { plugin: this.pluginInstance, loader: Thread.currentThread().contextClassLoader })
             console.i18n('ms.plugin.event.map', { count: this.EventManager.mapEventName().toFixed(0), type: this.serverType })
             this.pluginRequireMap = new Map()
@@ -262,7 +262,12 @@ export class PluginManagerImpl implements plugin.PluginManager {
                     console.i18n("ms.plugin.manager.config.save.default", { plugin: plugin.description.name, name: config.name, format: config.format })
                 } else {
                     plugin[config.variable] = configFactory.load(base.read(configFile))
-                    plugin[config.variable].save = () => base.save(configFile, configFactory.dump(plugin[config.variable]))
+                    plugin[config.variable].save = () => {
+                        let result = configFactory.dump(plugin[config.variable])
+                        base.save(configFile, result)
+                        console.debug(`[${plugin.description.name}] Save Config ${config.variable} to file ${configFile} result ${result}`)
+                    }
+                    console.debug(`[${plugin.description.name}] Load Config ${config.variable} from file ${configFile} result ${JSON.stringify(plugin[config.variable])}`)
                 }
             } catch (error) {
                 console.i18n("ms.plugin.manager.config.load.error", { plugin: plugin.description.name, name: config.name, format: config.format, error })

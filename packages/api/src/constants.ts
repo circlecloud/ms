@@ -11,6 +11,7 @@ export namespace constants {
         Bukkit = 'bukkit',
         Sponge = 'sponge',
         Nukkit = 'nukkit',
-        Bungee = 'bungee'
+        Bungee = 'bungee',
+        Spring = 'spring'
     }
 }

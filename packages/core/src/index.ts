@@ -80,6 +80,11 @@ function detectServer(): constants.ServerType {
         return constants.ServerType.Bungee
     } catch (ex) {
     }
+    try {
+        Java.type("org.springframework.boot.SpringApplication")
+        return constants.ServerType.Spring
+    } catch (ex) {
+    }
     throw Error('Unknow Server Type...')
 }
 
