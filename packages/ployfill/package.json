@@ -1,6 +1,6 @@
 {
     "name": "@ccms/ployfill",
-    "version": "0.6.7",
+    "version": "0.7.0",
     "description": "MiaoScript ployfill package",
     "author": "MiaoWoo <admin@yumc.pw>",
     "homepage": "https://github.com/circlecloud/ms.git",
@@ -14,8 +14,8 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
-        "@ccms/i18n": "^0.6.7",
-        "@ccms/nashorn": "^0.6.7",
+        "@ccms/i18n": "^0.7.0",
+        "@ccms/nashorn": "^0.7.0",
         "core-js": "^3.6.5"
     },
     "devDependencies": {
