@@ -58,9 +58,9 @@ export namespace task {
             return this;
         }
 
-        protected run(): void {
+        protected run(...args: any[]): void {
             try {
-                this.func();
+                this.func(...args);
             } catch (ex) {
                 console.console('§4插件执行任务时发生错误', ex)
                 console.ex(ex);
@@ -69,8 +69,9 @@ export namespace task {
 
         /**
          * 提交任务
+         * @param args 任务参数
          */
-        abstract submit(): Cancelable;
+        abstract submit(...args: any[]): Cancelable;
     }
     /**
      * 返可取消的对象

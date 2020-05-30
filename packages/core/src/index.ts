@@ -32,11 +32,11 @@ class MiaoScriptCore {
     }
 
     loadTaskFunction() {
-        global.setGlobal('setTimeout', (func: Function, tick: number, async: boolean = false) => {
-            this.taskManager.create(func).later(tick).async(async).submit()
+        global.setGlobal('setTimeout', (func: Function, tick: number, ...args: any[]) => {
+            this.taskManager.create(func).later(tick).submit(...args)
         }, { writable: false, configurable: false })
-        global.setGlobal('setInterval', (func: Function, tick: number, async: boolean = false) => {
-            this.taskManager.create(func).timer(tick).async(async).submit()
+        global.setGlobal('setInterval', (func: Function, tick: number, ...args: any[]) => {
+            this.taskManager.create(func).timer(tick).submit(...args)
         }, { writable: false, configurable: false })
     }
 

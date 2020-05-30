@@ -21,10 +21,8 @@ export class NukkitTaskManager implements task.TaskManager {
 }
 
 export class NukkitTask extends task.Task {
-    submit(): task.Cancelable {
-        let run = new NukkitRunnable({
-            run: () => this.run()
-        })
+    submit(...args: any[]): task.Cancelable {
+        let run = new NukkitRunnable({ run: () => this.run(...args) })
         let funcName = `runTask${this.interval ? 'Timer' : 'Later'}${this.isAsync ? 'Asynchronously' : ''}`
         if (this.interval) {
             run[funcName](this.plugin, this.laterTime, this.interval);
