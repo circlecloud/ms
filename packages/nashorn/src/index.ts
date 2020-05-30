@@ -16,6 +16,7 @@ declare global {
         function from(javaObj: any): any[];
         function to(array: any[]): any;
         function extend(...parentTypes: any[]);
+        function synchronized(func: () => void, lock: any);
         //@ts-ignore
         // function super(type: any);
     }

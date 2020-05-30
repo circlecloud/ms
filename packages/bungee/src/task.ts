@@ -22,8 +22,8 @@ export class BungeeTaskManager implements task.TaskManager {
 }
 
 export class BungeeTask extends task.Task {
-    submit(): task.Cancelable {
-        let run = new Runnable({ run: () => this.run() })
+    submit(...args: any[]): task.Cancelable {
+        let run = new Runnable({ run: () => this.run(...args) })
         if (this.isAsync) {
             return this.plugin.getProxy().getScheduler().runAsync(this.plugin, run)
         }

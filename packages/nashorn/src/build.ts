@@ -19,9 +19,9 @@ function convertJson2TypeDefiend(infile: string, outDir: string) {
     let isInterface = classModifier.includes('interface')
     let safeInterface = [];
     for (const ifs of obj.interfaces) {
-        if (!ifs.qualifiedName.startsWith('java')) {
-            safeInterface.push(ifs)
-        }
+        // if (!ifs.qualifiedName.startsWith('java')) {
+        safeInterface.push(ifs)
+        // }
     }
     if (isInterface) {
         if (safeInterface.length > 0) {

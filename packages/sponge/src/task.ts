@@ -1,17 +1,17 @@
 import { task, plugin } from '@ccms/api'
-import { inject, provideSingleton, postConstruct } from '@ccms/container';
+import { inject, provideSingleton, postConstruct } from '@ccms/container'
 
-const Sponge = Java.type("org.spongepowered.api.Sponge");
-const Task = Java.type("org.spongepowered.api.scheduler.Task");
-const Consumer = Java.type('java.util.function.Consumer');
-const Callable = Java.type('java.util.concurrent.Callable');
-const TimeUnit = Java.type('java.util.concurrent.TimeUnit');
+const Sponge = Java.type("org.spongepowered.api.Sponge")
+const Task = Java.type("org.spongepowered.api.scheduler.Task")
+const Consumer = Java.type('java.util.function.Consumer')
+const Callable = Java.type('java.util.concurrent.Callable')
+const TimeUnit = Java.type('java.util.concurrent.TimeUnit')
 
 @provideSingleton(task.TaskManager)
 export class SpongeTaskManager implements task.TaskManager {
     @inject(plugin.PluginInstance)
-    private pluginInstance: any;
-    private syncExecutor: any;
+    private pluginInstance: any
+    private syncExecutor: any
 
     @postConstruct()
     initialize() {
@@ -19,8 +19,8 @@ export class SpongeTaskManager implements task.TaskManager {
     }
 
     create(func: Function): task.Task {
-        if (Object.prototype.toString.call(func) !== "[object Function]") { throw TypeError('第一个参数 Task 必须为 function !'); };
-        return new SpongeTask(this.pluginInstance, func);
+        if (Object.prototype.toString.call(func) !== "[object Function]") { throw TypeError('第一个参数 Task 必须为 function !') }
+        return new SpongeTask(this.pluginInstance, func)
     }
     callSyncMethod(func: Function): any {
         // @ts-ignore
@@ -32,10 +32,8 @@ export class SpongeTaskManager implements task.TaskManager {
 }
 
 export class SpongeTask extends task.Task {
-    submit(): task.Cancelable {
-        let run = Task.builder().execute(new Consumer({
-            accept: () => this.run()
-        }));
+    submit(...args: any[]): task.Cancelable {
+        let run = Task.builder().execute(new Consumer({ accept: () => this.run(...args) }))
         if (this.isAsync) { run.async() }
         if (this.laterTime) { run.delayTicks(this.laterTime) }
         if (this.interval) { run.intervalTicks(this.interval) }

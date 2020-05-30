@@ -23,10 +23,8 @@ export class BukkitTaskManager implements task.TaskManager {
 }
 
 export class BukkitTask extends task.Task {
-    submit(): task.Cancelable {
-        let run = new BukkitRunnable({
-            run: () => this.run()
-        })
+    submit(...args: any[]): task.Cancelable {
+        let run = new BukkitRunnable({ run: () => this.run(...args) })
         let funcName = `runTask${this.interval ? 'Timer' : 'Later'}${this.isAsync ? 'Asynchronously' : ''}`
         if (this.interval) {
             return run[funcName](this.plugin, this.laterTime, this.interval)
