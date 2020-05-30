@@ -6,7 +6,7 @@ import { SocketIO } from '../socket-io/interfaces'
 import { ProxyBeanName } from './constants'
 import { TomcatClient } from './client'
 
-const WebSocketServerProxy = Java.type("com.sixi.framework.scriptservice.websocket.WebSocketServerProxy")
+const WebSocketServerProxy = Java.type("pw.yumc.MiaoScript.websocket.WebSocketProxy")
 const ThreadPoolExecutor = Java.type('java.util.concurrent.ThreadPoolExecutor')
 const ThreadPoolTaskExecutor = Java.type('org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor')
 

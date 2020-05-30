@@ -36,7 +36,7 @@ export class TomcatClient extends EventEmitter implements SocketIO.EngineSocket 
         return this._id;
     }
     send(text: string) {
-        this.session.getBasicRemote().sendText(text)
+        Java.synchronized(() => this.session.getBasicRemote().sendText(text), this.session)()
     }
     close() {
         this.session.close();
