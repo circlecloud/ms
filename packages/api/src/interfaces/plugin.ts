@@ -26,7 +26,8 @@ export namespace plugin {
         enable(...args: any[]): void;
         disable(...args: any[]): void;
         reload(...args: any[]): void;
-        getPlugins(): Map<string, any>;
+        getPlugin(name: string): plugin.Plugin;
+        getPlugins(): Map<string, plugin.Plugin>;
     }
     export interface Plugin {
         description: PluginMetadata;
