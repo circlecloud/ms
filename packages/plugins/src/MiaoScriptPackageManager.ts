@@ -210,7 +210,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         if (!process.env.AccessToken) { return this.i18n(sender, 'deploy.token.not.exists') }
         this.taskManager.create(() => {
             if (this.checkPlugin(sender, name)) {
-                let plugin: interfaces.Plugin = this.pluginManager.getPlugins().get(name);
+                let plugin: pluginApi.Plugin = this.pluginManager.getPlugins().get(name);
                 let result = http.post("http://ms.yumc.pw/api/plugin/deploy?access_token=" + process.env.AccessToken, {
                     name,
                     author: plugin.description.author,
