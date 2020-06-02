@@ -43,6 +43,8 @@ export class MiaoConsole extends interfaces.Plugin {
     private appender: any
     private handler: any
 
+    private logCache: string[] = []
+
     @config()
     private secret = { token: undefined }
 
@@ -54,6 +56,12 @@ export class MiaoConsole extends interfaces.Plugin {
             this.token = Java.type('java.util.UUID').randomUUID().toString()
             this.logger.console(`§6已生成随机Token: §3${this.token} §c重启后或重新生成后失效!`)
         }
+        global.eventCenter.on('log', (msg) => {
+            this.logCache.push(msg)
+            if (this.logCache.length > 30) {
+                this.logCache = this.logCache.slice(this.logCache.length - 30, this.logCache.length)
+            }
+        })
     }
 
     @cmd()
@@ -103,13 +111,14 @@ export class MiaoConsole extends interfaces.Plugin {
                 wait?.cancel()
                 this.createSocketIOServer()
                 this.startSocketIOServer()
+                return
             }
-            if (count++ > 30) {
+            if (count++ > 5) {
                 wait?.cancel()
                 this.logger.console('§cNetty通道注入失败 §4所有功能将无法使用！')
                 return
             }
-        }).later(20).timer(40).submit()
+        }).later(20).timer(20).submit()
         this.rootLogger = this.server.getRootLogger()
     }
 
@@ -117,8 +126,13 @@ export class MiaoConsole extends interfaces.Plugin {
     addLog4jForward() {
         if (this.rootLogger) {
             let AbstractAppender = Java.type('org.apache.logging.log4j.core.appender.AbstractAppender')
+            let Level = Java.type('org.apache.logging.log4j.Level')
             let ProxyAppender = Java.extend(AbstractAppender, {
-                append: (logEvent) => global.eventCenter.emit('log', logEvent.getMessage().getFormattedMessage())
+                append: (logEvent) => {
+                    if (logEvent.level.intLevel() <= Level.INFO.intLevel()) {
+                        global.eventCenter.emit('log', logEvent.getMessage().getFormattedMessage())
+                    }
+                }
             })
             this.appender = new ProxyAppender("ProxyLogger", null, null)
             this.appender.start()
@@ -141,6 +155,8 @@ export class MiaoConsole extends interfaces.Plugin {
         }
     }
 
+    private LOGBACK_APPENDER_NAME = "NashornProxyAppender"
+
     @enable({ servers: [constants.ServerType.Spring] })
     addLogbackForward() {
         if (this.rootLogger) {
@@ -149,7 +165,8 @@ export class MiaoConsole extends interfaces.Plugin {
                 append: (logEvent) => global.eventCenter.emit('log', logEvent.getFormattedMessage())
             })
             this.appender = new ProxyAppender()
-            this.appender.setName("NashornProxyAppender")
+            this.appender.start()
+            this.appender.setName(this.LOGBACK_APPENDER_NAME)
             this.appender.setContext(this.rootLogger.getLoggerContext())
             this.rootLogger.addAppender(this.appender)
         }
@@ -187,7 +204,7 @@ export class MiaoConsole extends interfaces.Plugin {
     @disable({ servers: [constants.ServerType.Spring] })
     removeLogbackForward() {
         try {
-            this.rootLogger.detachAppender("NashornProxyAppender")
+            this.rootLogger.detachAppender(this.LOGBACK_APPENDER_NAME)
         } catch (error) {
             console.ex(error)
         }
@@ -211,72 +228,91 @@ export class MiaoConsole extends interfaces.Plugin {
                 client.disconnect(true)
                 return
             }
-            this.logger.console(`§6客户端 §b${client.id} §a请求连接 §4Token: §c********`)
             if (this.token != client.handshake.query.token) {
-                this.logger.console(`§6客户端 §b${client.id} §4无效请求 请提供正确Token后再次连接!`)
+                this.logger.console(`§6客户端 §b${client.id} §c无效请求 §4请提供正确Token后再次连接!`)
                 client.emit('unauthorized')
                 client.disconnect(true)
                 return
             }
+            this.initWebSocketClient(client)
+            this.logCache.forEach(msg => client.emit('log', msg))
             this.logger.console(`§6客户端 §b${client.id} §a新建连接 ${this.rootLogger ? '启动日志转发' : '§4转发日志启动失败'}...`)
-            client.on('type', (fn) => {
-                fn && fn(this.serverType)
-                client.emit('log', `Currect Server Version is ${this.server.getVersion()}`)
-            })
-            client.on('command', (cmd) => {
-                setTimeout(() => this.server.dispatchConsoleCommand(cmd), 0)
-                client.emit('log', `§6命令: §b${cmd} §a执行成功!`)
-            })
-            client.on('exec', (code) => {
-                try {
-                    client.emit('log', this.runCode(code, namespace, client))
-                } catch (ex) {
-                    client.emit('log', `§4代码执行异常 错误: ${ex}\n${console.stack(ex).join('\n')}`)
-                }
-            })
-            client.on('edit', (file: string, fn) => {
-                fn && fn(base.read(file), suffixMap[file.split('.', 2)[1]])
-            })
-            client.on('save', (name: string, content: string, fn) => {
-                this.logger.console(`§6客户端 §b${client.id} §6请求更新插件 §a${name} §6...`)
-                let file = fs.concat(root, this.pluginFolder, name + '.js')
-                if (!fs.exists(file)) { return fn('§6插件 §a' + name + ' §6尚未安装 §c请先创建空文件 或安装插件!') }
-                try {
-                    base.save(file, content)
-                    this.pluginManager.reload(name)
-                    fn('§6插件 §a' + name + ' §6更新成功!')
-                } catch (error) {
-                    this.logger.error(error)
-                    fn('§6插件 §a' + name + ' §4更新异常 错误: ' + error)
-                }
-            })
-            client.on('ls', (file: string, fn) => {
-                let dir = fs.file(file);
-                if (!dir.isDirectory()) {
-                    return fn(undefined, `${file} 不是一个目录!`)
-                }
-                fn(fs.list(dir))
-            })
-            client.on('error', (error) => {
-                this.logger.console(`§6客户端 §b${client.id} §c触发异常: ${error}`)
+        })
+    }
+
+    private initWebSocketClient(client: SocketIOSocket) {
+        client.on('type', (fn) => {
+            fn && fn(this.serverType)
+            client.emit('log', `Currect Server Version is ${this.server.getVersion()}`)
+        })
+        client.on('command', (cmd) => {
+            setTimeout(() => this.server.dispatchConsoleCommand(cmd), 0)
+            client.emit('log', `§6命令: §b${cmd} §a执行成功!`)
+        })
+        client.on('exec', (code) => {
+            try {
+                client.emit('log', this.runCode(code, client.nsp, client))
+            } catch (ex) {
+                client.emit('log', `§4代码执行异常 错误: ${ex}\n${console.stack(ex).join('\n')}`)
+            }
+        })
+        client.on('edit', (file: string, fn) => {
+            fn && fn(base.read(file), suffixMap[file.split('.', 2)[1]])
+        })
+        client.on('save', (name: string, content: string, fn) => {
+            this.logger.console(`§6客户端 §b${client.id} §6请求更新插件 §a${name} §6...`)
+            let file = fs.concat(root, this.pluginFolder, name + '.js')
+            if (!fs.exists(file)) { return fn('§6插件 §a' + name + ' §6尚未安装 §c请先创建空文件 或安装插件!') }
+            try {
+                base.save(file, content)
+                this.pluginManager.reload(name)
+                fn('§6插件 §a' + name + ' §6更新成功!')
+            } catch (error) {
                 this.logger.error(error)
-            })
-            client.on('disconnect', () => {
-                this.logger.console(`§6客户端 §b${client.id} §c断开连接...`)
-            })
+                fn('§6插件 §a' + name + ' §4更新异常 错误: ' + error)
+            }
+        })
+        client.on('ls', (file: string, fn) => {
+            let dir = fs.file(file);
+            if (!dir.isDirectory()) {
+                return fn(undefined, `${file} 不是一个目录!`)
+            }
+            fn(fs.list(dir))
+        })
+        client.on('error', (error) => {
+            this.logger.console(`§6客户端 §b${client.id} §c触发异常: ${error}`)
+            this.logger.error(error)
+        })
+        client.on('disconnect', () => {
+            this.logger.console(`§6客户端 §b${client.id} §c断开连接...`)
         })
     }
 
     private runCode(code: string, namespace: any, client: any) {
-        let tfunc = new Function('namespace', 'client', `
-        var reflect = require('@ccms/common/dist/reflect');
-        var tempconcent = '';
-        function print(text) {
-            tempconcent += text + "\\n"
-        }
-        var result = eval(${JSON.stringify(code)});
-        return tempconcent + '§a返回结果: §r'+ result
-        `)
-        return this.task.callSyncMethod(() => tfunc.apply(this, [namespace, client])) + ''
+        let paramNames = [
+            'namespace',
+            'client',
+            'reflect',
+            'container',
+            'pluginManager'
+        ]
+        let params = [
+            namespace,
+            client,
+            reflect,
+            this.container,
+            this.pluginManager
+        ]
+        let tfunc = new Function(
+            ...paramNames,
+            `var api = require('@ccms/api');
+if (this.serverType == "spring") {
+    var dbm = container.get(api.database.DataBaseManager)
+    var db = dbm.getMainDatabase()
+    var df = base.getInstance().getAutowireCapableBeanFactory()
+}
+return '§a返回结果: §r'+ eval(${JSON.stringify(code)});
+`)
+        return this.task.callSyncMethod(() => tfunc.apply(this, params)) + ''
     }
 }
