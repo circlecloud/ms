@@ -67,7 +67,7 @@ declare global {
     }
     interface Console {
         ex(err: Error): void;
-        stack(err: Error): string[];
+        stack(err: Error, color?: boolean): string[];
         sender(...args: any): void;
         console(...args: any): void;
         i18n(name: string, ...params: any[]): void;
