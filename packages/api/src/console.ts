@@ -128,19 +128,23 @@ export class MiaoScriptConsole implements Console {
             lineNumber
         }
     }
-    stack(ex: Error): string[] {
+    stack(ex: Error, color: boolean = true): string[] {
         let stack = ex.getStackTrace();
-        let cache = ['§c' + ex];
+        let cache = [(color ? '§c' : '') + ex];
         //@ts-ignore
         if (stack.class) {
             stack = Arrays.asList(stack)
         }
         stack.forEach(trace => {
-            if (!trace.fileName || trace.fileName.startsWith('jar:file:')) { return }
+            if (!trace.fileName || trace.fileName.startsWith('jar:file:') || trace.fileName.startsWith('file:')) { return }
             if (trace.className.startsWith('<')) {
                 let { fileName, lineNumber } = this.readSourceMap(trace.fileName, trace.lineNumber)
                 if (fileName.startsWith(root)) { fileName = fileName.split(root)[1] }
-                cache.push(`    §e->§c ${fileName}:${lineNumber} => §4${trace.methodName}`)
+                if (color) {
+                    cache.push(`    §e->§c ${fileName}:${lineNumber} => §4${trace.methodName}`)
+                } else {
+                    cache.push(`    -> ${fileName}:${lineNumber} => ${trace.methodName}`)
+                }
             } else {
                 let className = trace.className;
                 var fileName = trace.fileName as string;
@@ -155,7 +159,11 @@ export class MiaoScriptConsole implements Console {
                         }
                     }
                 }
-                cache.push(`    §e->§c ${className}.${trace.methodName}(§4${fileName}:${lineNumber}§c)`);
+                if (color) {
+                    cache.push(`    §e->§c ${className}.${trace.methodName}(§4${fileName}:${lineNumber}§c)`);
+                } else {
+                    cache.push(`    -> ${className}.${trace.methodName}(${fileName}:${lineNumber})`);
+                }
             }
         });
         return cache;

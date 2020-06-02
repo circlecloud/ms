@@ -32,8 +32,22 @@ function mcColor2ANSI(str: string) {
 }
 
 export class SpringConsole extends MiaoScriptConsole {
+    error(...args: any[]) {
+        this.logger.error(args.join(' '))
+    }
     sender(sender: any, ...args: any[]) {
-        this.console(args.join(' '))
+        sender = sender || {
+            sendMessage: (message: string) => console.console(message)
+        }
+        if (!sender.sendMessage) {
+            this.error('第一个参数未实现 sendMessage 无法发送消息!')
+            return
+        }
+        if (Object.prototype.toString.call(args[0]) === '[object Array]') {
+            args[0].forEach(line => sender.sendMessage(this.prefix + line))
+        } else {
+            sender.sendMessage(this.prefix + args.join(' '));
+        }
     }
     console(...args: string[]): void {
         this.logger.info(mcColor2ANSI(args.join(' ') + '§r'))
