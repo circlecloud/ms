@@ -3,21 +3,25 @@ import '@ccms/nashorn'
 import { command, plugin } from '@ccms/api'
 import { inject, provideSingleton, postConstruct } from '@ccms/container'
 
+import { CommandMap } from './internal/command'
+
 @provideSingleton(command.Command)
 export class SpringCommand extends command.Command {
     @inject(plugin.PluginInstance)
     private pluginInstance: any
+    @inject(CommandMap)
+    private commandMap: CommandMap = new CommandMap()
 
     protected create(plugin: any, command: string) {
-        console.console('§4Spring暂不支持create命令!')
+        return this.commandMap.register(plugin, command)
     }
     protected remove(plugin: any, command: string) {
-        console.console('§4Spring暂不支持remove命令!')
+        this.commandMap.unregister(plugin, command)
     }
     protected onCommand(plugin: any, command: any, executor: Function) {
-        console.console('§4Spring暂不支持onCommand!')
+        command.setExecutor(super.setExecutor(plugin, command, executor))
     }
     protected onTabComplete(plugin: any, command: any, tabCompleter: Function) {
-        console.console('§4Spring暂不支持onTabComplete!')
+        command.setTabCompleter(super.setExecutor(plugin, command, tabCompleter))
     }
 }

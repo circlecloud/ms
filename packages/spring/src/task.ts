@@ -34,7 +34,7 @@ export class SpringTaskManager implements task.TaskManager {
         return func()
     }
     disable() {
-        Object.values(tasks).forEach((task) => task.cancel())
+        Object.values(tasks).forEach((task) => task?.cancel())
         executor.shutdown();
     }
 }
@@ -43,7 +43,7 @@ export class SpringTask extends task.Task {
     public id = taskId++
     private running = new AtomicBoolean(true)
 
-    run() {
+    run(...args: any[]) {
         if (this.laterTime > 0) {
             try {
                 Thread.sleep(this.laterTime)
@@ -53,7 +53,7 @@ export class SpringTask extends task.Task {
         }
         while (this.running.get()) {
             try {
-                this.func()
+                this.func(...args)
             } catch (t) {
                 console.error("Task exec error:", t)
                 console.ex(t)
@@ -72,13 +72,13 @@ export class SpringTask extends task.Task {
     cancel(): any {
         var wasRunning = this.running.getAndSet(false)
         if (wasRunning) {
-            tasks[this.id] = undefined
+            delete tasks[this.id]
         }
     }
 
-    submit(): task.Cancelable {
+    submit(...args: any[]): task.Cancelable {
         tasks[this.id] = this
-        executor.execute(this.run.bind(this))
+        executor.execute(() => this.run(...args))
         return {
             cancel: () => {
                 return this.cancel()
