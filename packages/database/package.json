@@ -1,7 +1,7 @@
 {
-    "name": "@ccms/api",
-    "version": "0.7.0",
-    "description": "MiaoScript api package",
+    "name": "@ccms/database",
+    "version": "0.6.7",
+    "description": "MiaoScript database package",
     "keywords": [
         "miaoscript",
         "minecraft",
@@ -18,17 +18,13 @@
         "build": "yarn clean && tsc",
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
-    "dependencies": {
-        "@ccms/container": "^0.7.0",
-        "@ccms/ployfill": "^0.7.0",
-        "@ccms/common": "^0.7.0",
-        "base64-js": "^1.3.1",
-        "source-map-builder": "^0.0.7"
-    },
     "devDependencies": {
-        "@types/base64-js": "^1.2.5",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
         "typescript": "^3.9.2"
+    },
+    "dependencies": {
+        "@ccms/api": "^0.7.0",
+        "@ccms/container": "^0.7.0"
     }
 }
