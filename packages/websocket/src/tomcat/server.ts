@@ -28,7 +28,7 @@ class TomcatWebSocketServer extends EventEmitter {
         let NashornWebSocketServerProxy = Java.extend(WebSocketServerProxy, {
             onOpen: (session: TomcatWebSocketSession) => {
                 let tomcatClient = new TomcatClient(this, session)
-                this.allClients[tomcatClient.id] = tomcatClient
+                this.allClients[session.getId()] = tomcatClient
                 this.emit(ServerEvent.connect, tomcatClient)
             },
             onMessage: (session: TomcatWebSocketSession, message: string) => {

@@ -8,14 +8,12 @@ const TextSerializers = org.spongepowered.api.text.serializer.TextSerializers;
 const File = Java.type("java.io.File");
 
 @provideSingleton(server.Server)
-export class SpongeServer implements server.Server {
+export class SpongeServer extends server.ReflectServer {
     private pluginsFolder: string;
-    private pipeline: any;
-    private rootLogger: any;
 
     constructor() {
+        super();
         this.pluginsFolder = new File(base.getInstance().getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getCanonicalPath()
-        this.reflect()
     }
 
     getPlayer(name: string) {
@@ -37,16 +35,19 @@ export class SpongeServer implements server.Server {
         if (typeof sender === 'string') {
             sender = this.getPlayer(sender)
         }
-        return Sponge.getCommandManager().process(sender, command).getQueryResult()
+        return Sponge.getCommandManager().process(sender, command).getQueryResult().get()
     }
     dispatchConsoleCommand(command: string): boolean {
-        return Sponge.getCommandManager().process(Sponge.getServer().getConsole(), command).getQueryResult()
+        return Sponge.getCommandManager().process(Sponge.getServer().getConsole(), command).getQueryResult().get()
     }
     getPluginsFolder(): string {
         return this.pluginsFolder;
     }
     getNativePluginManager() {
         return Sponge.getPluginManager() as any;
+    }
+    getDedicatedServer() {
+        return reflect.on(Sponge.getServer()).get()
     }
     getNettyPipeline() {
         return this.pipeline;
@@ -59,38 +60,5 @@ export class SpongeServer implements server.Server {
             sender = this.getPlayer(sender)
         }
         sender.sendMessage(TextSerializers.JSON.deserialize(json))
-    }
-    private reflect() {
-        let consoleServer = reflect.on(Sponge.getServer()).get()
-        this.reflectPipeline(consoleServer)
-        this.reflectRootLogger(consoleServer)
-    }
-    private reflectPipeline(consoleServer: any) {
-        let connection: any;
-        let promise: any;
-        for (const method of constants.Reflect.Method.getServerConnection) {
-            try {
-                connection = reflect.on(consoleServer).call(method).get()
-                if (connection.class.name.indexOf('NetworkSystem') !== -1) { break; }
-                connection = undefined;
-            } catch (error) { }
-        }
-        if (!connection) { console.error("Can't found ServerConnection!"); return }
-        for (const field of constants.Reflect.Field.listeningChannels) {
-            try {
-                promise = reflect.on(connection).get(field).get().get(0);
-                if (promise.class.name.indexOf('Promise') !== -1) { break; }
-                promise = undefined;
-            } catch (error) { }
-        }
-        if (!promise) { console.error("Can't found listeningChannels!"); return }
-        this.pipeline = reflect.on(promise).get('channel').get().pipeline()
-    }
-    private reflectRootLogger(consoleServer: any) {
-        try {
-            this.rootLogger = reflect.on(consoleServer).get('LOGGER').get().parent
-        } catch (error) {
-            console.error("Can't found rootLogger!")
-        }
     }
 }
