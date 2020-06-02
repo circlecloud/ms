@@ -1,23 +1,23 @@
-import * as fs from "fs";
+import * as fs from "fs"
 
 function convertJson2TypeDefiend(infile: string, outDir: string) {
-    const file = infile.split(".json")[0];
-    const json = fs.readFileSync(`${inDir}/${file}.json`).toString();
-    const obj = JSON.parse(json);
-    const qnas: string[] = obj.qualifiedName.split(".");
-    let closeBuk = 0;
-    let temp = `declare namespace ${qnas[0]} {\n`;
-    closeBuk++;
-    const nms = qnas.slice(1, qnas.length - 1);
+    const file = infile.substr(0, infile.length - 5)
+    const json = fs.readFileSync(`${inDir}/${file}.json`).toString()
+    const obj = JSON.parse(json)
+    const qnas: string[] = obj.qualifiedName.split(".")
+    let closeBuk = 0
+    let temp = `declare namespace ${mappingNamespace(qnas[0])} {\n`
+    closeBuk++
+    const nms = qnas.slice(1, qnas.length - 1)
     for (const nm of nms) {
-        temp += `${'    '.repeat(closeBuk)}namespace ${nm.replace('function', 'function$')} {\n`;
-        closeBuk++;
+        temp += `${'    '.repeat(closeBuk)}namespace ${mappingNamespace(nm)} {\n`
+        closeBuk++
     }
     let classModifier = formatClassModifier(obj.modifiers)
     temp += `${'    '.repeat(closeBuk)}// @ts-ignore\n`
     temp += `${'    '.repeat(closeBuk)}${classModifier}${qnas[qnas.length - 1]}`
     let isInterface = classModifier.includes('interface')
-    let safeInterface = [];
+    let safeInterface = []
     for (const ifs of obj.interfaces) {
         // if (!ifs.qualifiedName.startsWith('java')) {
         safeInterface.push(ifs)
@@ -27,174 +27,171 @@ function convertJson2TypeDefiend(infile: string, outDir: string) {
         if (safeInterface.length > 0) {
             temp += ' extends '
             for (const ifs of safeInterface) {
-                temp += ifs.qualifiedName;
+                temp += ifs.qualifiedName
                 temp += ', '
             }
-            temp = temp.substr(0, temp.length - 2);
+            temp = temp.substr(0, temp.length - 2)
         }
     } else {
-        temp += `${(obj.superclass) ? (' extends ' + (obj.superclass.qualifiedName == "<any>" ? "object" : obj.superclass.qualifiedName)) : ''}`;
+        temp += `${(obj.superclass) ? (' extends ' + (obj.superclass.qualifiedName == "<any>" ? "object" : obj.superclass.qualifiedName)) : ''}`
         if (safeInterface.length > 0) {
             temp += ' implements '
             for (const ifs of safeInterface) {
-                temp += ifs.qualifiedName;
+                temp += ifs.qualifiedName
                 temp += ', '
             }
-            temp = temp.substr(0, temp.length - 2);
+            temp = temp.substr(0, temp.length - 2)
         }
     }
     temp += ' {\n'
-    closeBuk++;
+    closeBuk++
     for (const constructor of obj.constructors) {
-        temp += `${formatDoc(constructor.docString, closeBuk)}${'    '.repeat(closeBuk)}// @ts-ignore\n${'    '.repeat(closeBuk)}constructor(${formatParameters(constructor.parameters)})\n`;
+        temp += `${formatDoc(constructor.docString, closeBuk)}${'    '.repeat(closeBuk)}// @ts-ignore\n${'    '.repeat(closeBuk)}constructor(${formatParameters(constructor.parameters)})\n`
     }
 
-    let members = [];
+    let members = {}
 
-    let methods = '';
+    let methods = ''
     for (const method of obj.methods) {
         let methodModifier = isInterface ? '' : replaceModifiers(method.modifiers, classModifier.includes('abstract'))
-        if (!whiteKey.includes(method.name)) {
-            if (members[method.name] && methodModifier.includes('abstract')) {
-                continue;
-            }
-            members[method.name] = methodModifier;
+        if (members[method.name] && methodModifier.includes('abstract')) {
+            continue
         }
-        methods += `${formatDoc(method.docString, closeBuk)}${'    '.repeat(closeBuk)}// @ts-ignore\n${'    '.repeat(closeBuk)}${methodModifier} ${method.name}(${formatParameters(method.parameters)}): ${mappingType(method.returnType.type)};\n`;
+        members[method.name] = methodModifier
+        methods += `${formatDoc(method.docString, closeBuk)}${'    '.repeat(closeBuk)}// @ts-ignore\n${'    '.repeat(closeBuk)}${methodModifier ? (methodModifier + ' ') : ''}${method.name}(${formatParameters(method.parameters)}): ${mappingType(method.returnType, false)};\n`
     }
 
-    let fields = '';
+    let fields = ''
     for (const field of obj.fields) {
         if (members[field.name]) {
-            continue;
+            continue
         }
-        fields += `${'    '.repeat(closeBuk)}// @ts-ignore\n${'    '.repeat(closeBuk)}${isInterface ? '' : replaceModifiers(field.modifiers)} ${field.name}: ${mappingType(field.type ? field.type.type : "any")};\n`;
+        fields += `${'    '.repeat(closeBuk)}// @ts-ignore\n${'    '.repeat(closeBuk)}${isInterface ? '' : replaceModifiers(field.modifiers)} ${field.name}: ${mappingType(field.type)};\n`
     }
 
-    temp += fields + methods;
+    temp += fields + methods
 
     for (let index = 0; index < closeBuk; index++) {
-        temp += `${'    '.repeat(closeBuk - index - 1)}}\n`;
+        temp += `${'    '.repeat(closeBuk - index - 1)}}\n`
     }
 
-    fs.writeFileSync(`${outDir}/${file}.${suffix}`, temp);
-    return `${file}.${suffix}`;
+    fs.writeFileSync(`${outDir}/${file}.${suffix}`, temp)
+    return `${file}.${suffix}`
 }
 
 function formatClassModifier(modifiers: string) {
-    let tempm = modifiers.replace('public', '').replace('static', '').replace('final', '').trim();
-    if (!modifiers.includes('interface')) { tempm += ' class' }
-    return tempm.length > 0 ? (tempm + ' ') : '';
+    let tempm = modifiers.replace('public', '').replace('static', '').replace('final', '').trim()
+    if (!modifiers.includes('interface')) {
+        tempm += tempm.length == 0 ? 'class' : ' class'
+    }
+    return tempm.length > 0 ? (tempm + ' ') : ''
 }
 
 function formatDoc(doc: string, closeBuk: number) {
-    let middleDoc = '';
+    let middleDoc = ''
     for (const line of doc.split('\n')) {
         if (line.trim().length != 0) {
             middleDoc += `${'    '.repeat(closeBuk)} * ${line.trim()}\n`
         }
     }
-    return middleDoc.length > 0 ? `${'    '.repeat(closeBuk)}/**\n${middleDoc}${'    '.repeat(closeBuk)} */\n` : '';
+    return middleDoc.length > 0 ? `${'    '.repeat(closeBuk)}/**\n${middleDoc}${'    '.repeat(closeBuk)} */\n` : ''
 }
 
 function replaceModifiers(modifiers: string, absClass = false): string {
-    // modifiers = modifiers.replace(' final', ' readonly');
-    modifiers = modifiers.split(" final")[0];
-    modifiers = modifiers.split(" native")[0];
-    modifiers = modifiers.split(" volatile")[0];
-    modifiers = modifiers.split(" transient")[0];
-    modifiers = modifiers.split(" synchronized")[0];
+    // modifiers = modifiers.replace(' final', ' readonly')
+    modifiers = modifiers.split(" final")[0]
+    modifiers = modifiers.split(" native")[0]
+    modifiers = modifiers.split(" volatile")[0]
+    modifiers = modifiers.split(" transient")[0]
+    modifiers = modifiers.split(" synchronized")[0]
     if (!absClass) {
-        modifiers = modifiers.split(" abstract")[0];
+        modifiers = modifiers.split(" abstract")[0]
     }
-    return modifiers;
+    return modifiers
 }
 
 function formatParameters(params: any[]) {
-    let tempParam = '';
-    for (const p of params) {
-        tempParam += `${mappingName(p.name)}: ${mappingType(p.type ? p.type.qualifiedName : 'any')}, `
+    if (!params.length) return ''
+    let tempParam = ''
+    for (let i = 0; i < params.length - 1; i++) {
+        const p = params[i];
+        tempParam += `${mappingName(p.name)}: ${mappingType(p.type)}, `
     }
-    return tempParam.substr(0, tempParam.length - 2);
+    let lastParam = params[params.length - 1]
+    let lastMapType = mappingType(lastParam.type)
+    if (lastMapType.endsWith("[]")) {
+        tempParam += `...${mappingName(lastParam.name)}: ${lastMapType}`
+    } else {
+        tempParam += `${mappingName(lastParam.name)}: ${lastMapType}`
+    }
+    return tempParam
 }
 
-const nameMap = [];
+const nameMap = {}
 nameMap['function'] = 'func'
 nameMap['in'] = 'input'
 nameMap['var'] = 'variable'
+nameMap['enum'] = 'enumerate'
+nameMap['export'] = 'exporter'
+nameMap['is'] = 'jis'
+nameMap['with'] = 'jwith'
 
-function mappingName(name: string) {
-    if (whiteKey.includes(name)) { return name }
-    let outName = nameMap[name] || name || '';
-    return outName;
+function mappingNamespace(name: string) {
+    return typeof nameMap[name] == "string" ? name + '$' : name || ''
 }
 
-let whiteKey = ['shift', "map", 'filter', 'values', 'valueOf', 'toString', 'length', 'includes', 'entries', 'keys', 'join', 'fill']
+function mappingName(name: string) {
+    return typeof nameMap[name] == "string" ? nameMap[name] : name || ''
+}
 
-const typeMap = [];
-typeMap['int'] = 'number';
-typeMap['int[]'] = 'number[]';
-typeMap['int[][]'] = 'number[][]';
-typeMap['byte'] = 'number';
-typeMap['byte[]'] = 'number[]';
-typeMap['double'] = 'number';
-typeMap['double[]'] = 'number[]';
-typeMap['short'] = 'number';
-typeMap['short[]'] = 'number[]';
-typeMap['float'] = 'number';
-typeMap['float[]'] = 'number[]';
-typeMap['long'] = 'number';
-typeMap['long[]'] = 'number[]';
-typeMap['<any>'] = 'any';
-typeMap['char'] = 'string';
-typeMap['char[]'] = 'string[]';
-typeMap['java.lang.String'] = "string";
+const typeMap = []
+typeMap['int'] = 'number /*int*/'
+typeMap['java.lang.Integer'] = "number"
+typeMap['byte'] = 'number /*byte*/'
+typeMap['java.lang.Byte'] = "number"
+typeMap['double'] = 'number /*double*/'
+typeMap['java.lang.Double'] = "number"
+typeMap['short'] = 'number /*short*/'
+typeMap['java.lang.Short'] = "number"
+typeMap['float'] = 'number /*float*/'
+typeMap['java.lang.Float'] = "number"
+typeMap['long'] = 'number /*long*/'
+typeMap['java.lang.Long'] = "number"
+typeMap['<any>'] = 'any'
+typeMap['char'] = 'string'
+typeMap['java.lang.String'] = "string"
+typeMap['java.lang.Object'] = "any"
+typeMap['java.util.List'] = "Array"
+typeMap['java.util.Set'] = "Array"
+typeMap['java.util.Collection'] = "Array"
+typeMap['java.lang.Throwable'] = "Error"
 // typeMap['java.util.Date'] = 'any /*java.util.Date*/'
 // typeMap['java.util.List'] = 'any[] /*java.util.List*/'
 // typeMap['java.util.Set'] = 'any[] /*java.util.Set*/'
 // typeMap['java.util.Collection'] = 'any[] /*java.util.Collection*/'
 // typeMap['java.util.Map'] = 'Map<any, any> /*java.util.Map*/'
-// Sponge
-typeMap['Vectori'] = 'any /*Vector3i*/'
-typeMap['Vectord'] = 'any /*Vector3d*/'
-typeMap['Vectorf'] = 'any /*Vector3f*/'
-typeMap['Vector2i'] = 'any /*Vector2i*/'
-typeMap['Vector2d'] = 'any /*Vector2d*/'
-typeMap['Vector2f'] = 'any /*Vector2f*/'
-typeMap['Vector3i'] = 'any /*Vector3i*/'
-typeMap['Vector3d'] = 'any /*Vector3d*/'
-typeMap['Vector3f'] = 'any /*Vector3f*/'
-typeMap['Type'] = 'any /*Type*/'
-typeMap['Gson'] = 'any /*Gson*/'
-typeMap['Logger'] = 'any /*Logger*/'
-typeMap['MethodVisitor'] = 'any /*MethodVisitor*/'
-typeMap['ConfigurationNode'] = 'any /*ConfigurationNode*/'
-typeMap['TypeSerializerCollection'] = 'any /*TypeSerializerCollection*/'
-typeMap['Quaterniond'] = 'any /*Quaterniond*/'
-typeMap['Matrix2d'] = 'any /*Matrix2d*/'
-typeMap['Matrix3d'] = 'any /*Matrix3d*/'
-typeMap['Matrix4d'] = 'any /*Matrix4d*/'
 
-function mappingType(type: string): string {
-    let outType = typeMap[type] || type || 'any';
-    if (outType.indexOf('.') != -1) {
-        if (outType.startsWith('java.') || outType.startsWith('org.') || outType.startsWith('net.') || outType.startsWith('cn.')) {
+type JavaType = {
+    qualifiedName: string,
+    name: string,
+    type: string
+}
 
-        } else {
-            outType = `any /*${outType}*/`
-        }
-    }
-    return outType.replace('function', 'function$');
+function mappingType(type: JavaType, isParam: boolean = true): string {
+    if (!type || !type.type) { return 'any' }
+    let outType = typeMap[type.qualifiedName] || type.qualifiedName || 'any'
+    let tsType = type.type.replace(type.qualifiedName, outType).replace('function', 'function$')
+    return isParam && type.type !== tsType && type.type.includes('.') ? `${type.type} | ${tsType}` : tsType
 }
 
 var args = process.argv.splice(2)
 
 const suffix = 'd.ts'
 const inDir = `../docs/${args[0]}`
-const outDir = "./temp";
-const files = fs.readdirSync(inDir);
-let index = '';
+const outDir = "./temp"
+const files = fs.readdirSync(inDir)
+let index = ''
 for (const file of files) {
-    index += `/// <reference path="./${convertJson2TypeDefiend(file, outDir)}" />\n`;
+    index += `/// <reference path="./${convertJson2TypeDefiend(file, outDir)}" />\n`
 }
-fs.writeFileSync(`${outDir}/index.${suffix}`, index);
+fs.writeFileSync(`${outDir}/index.${suffix}`, index)
