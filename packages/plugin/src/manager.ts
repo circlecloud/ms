@@ -26,8 +26,8 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
     private initialized: boolean = false
     private pluginRequireMap: Map<string, any>
-    private pluginInstanceMap: Map<string, interfaces.Plugin>
-    private pluginMetadataMap: Map<string, interfaces.PluginMetadata>
+    private pluginInstanceMap: Map<string, plugin.Plugin>
+    private pluginMetadataMap: Map<string, plugin.PluginMetadata>
 
     initialize() {
         if (this.pluginInstance === undefined) { throw new Error("Can't found Plugin Instance!") }
@@ -52,23 +52,27 @@ export class PluginManagerImpl implements plugin.PluginManager {
         this.buildPlugins()
     }
 
-    private logStage(plugin: interfaces.Plugin, stage: string) {
+    private logStage(plugin: plugin.Plugin, stage: string) {
         console.i18n("ms.plugin.manager.stage", { stage, plugin: plugin.description.name, version: plugin.description.version, author: plugin.description.author })
     }
 
-    private runPluginStage(plugin: interfaces.Plugin, stage: string, ext: Function) {
-        this.logStage(plugin, i18n.translate(`ms.plugin.manager.stage.${stage}`))
-        ext()
-        this.runCatch(plugin, stage)
-        this.runCatch(plugin, `${this.serverType}${stage}`)
-        this.execPluginStage(plugin, stage)
+    private runPluginStage(plugin: plugin.Plugin, stage: string, ext: Function) {
+        try {
+            this.logStage(plugin, i18n.translate(`ms.plugin.manager.stage.${stage}`))
+            ext()
+            this.runCatch(plugin, stage)
+            this.runCatch(plugin, `${this.serverType}${stage}`)
+            this.execPluginStage(plugin, stage)
+        } catch (ex) {
+            console.i18n("ms.plugin.manager.stage.exec.error", { plugin: plugin.description.name, executor: stage, error: ex })
+        }
     }
 
     /**
      * 从文件加载插件
      * @param file java.io.File
      */
-    loadFromFile(file: string): interfaces.Plugin {
+    loadFromFile(file: string): plugin.Plugin {
         let metadata = this.loadPlugin(file)
         let plugin = this.buildPlugin(metadata && metadata.description ? metadata.description : this.pluginMetadataMap.get(file.toString()))
         this.load(plugin)
@@ -77,7 +81,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     load(...args: any[]): void {
-        this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
+        this.checkAndGet(args[0]).forEach((plugin: plugin.Plugin) => {
             this.runPluginStage(plugin, 'load', () => {
                 this.loadConfig(plugin)
             })
@@ -85,7 +89,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     enable(...args: any[]): void {
-        this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
+        this.checkAndGet(args[0]).forEach((plugin: plugin.Plugin) => {
             this.runPluginStage(plugin, 'enable', () => {
                 this.registryCommand(plugin)
                 this.registryListener(plugin)
@@ -94,7 +98,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     disable(...args: any[]): void {
-        this.checkAndGet(args[0]).forEach((plugin: interfaces.Plugin) => {
+        this.checkAndGet(args[0]).forEach((plugin: plugin.Plugin) => {
             this.runPluginStage(plugin, 'disable', () => {
                 this.saveConfig(plugin)
                 this.unregistryCommand(plugin)
@@ -104,10 +108,14 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     reload(...args: any[]): void {
-        this.checkAndGet(args[0]).forEach((pl: interfaces.Plugin) => {
+        this.checkAndGet(args[0]).forEach((pl: plugin.Plugin) => {
             this.disable(pl)
             this.loadFromFile(pl.description.source)
         })
+    }
+
+    getPlugin(name: string) {
+        return this.pluginInstanceMap.get(name)
     }
 
     getPlugins() {
@@ -123,11 +131,11 @@ export class PluginManagerImpl implements plugin.PluginManager {
         }
     }
 
-    private checkAndGet(name: string | interfaces.Plugin | undefined | any): Map<string, interfaces.Plugin> | interfaces.Plugin[] {
+    private checkAndGet(name: string | plugin.Plugin | undefined | any): Map<string, plugin.Plugin> | plugin.Plugin[] {
         if (name == this.pluginInstanceMap) { return this.pluginInstanceMap }
         if (typeof name == 'string' && this.pluginInstanceMap.has(name)) { return [this.pluginInstanceMap.get(name)] }
-        if (name instanceof interfaces.Plugin) { return [name as interfaces.Plugin] }
-        if (name.description || name.description.name) { return [name as interfaces.Plugin] }
+        if (name instanceof interfaces.Plugin) { return [name as plugin.Plugin] }
+        if (name.description || name.description.name) { return [name as plugin.Plugin] }
         throw new Error(`Plugin ${JSON.stringify(name)} not exist!`)
     }
 
@@ -214,12 +222,12 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     private buildPlugin(metadata: interfaces.PluginMetadata) {
-        let pluginInstance: interfaces.Plugin
+        let pluginInstance: plugin.Plugin
         switch (metadata.type) {
             case "ioc":
                 try {
                     this.bindPlugin(metadata)
-                    pluginInstance = this.container.getNamed<interfaces.Plugin>(plugin.Plugin, metadata.name)
+                    pluginInstance = this.container.getNamed<plugin.Plugin>(plugin.Plugin, metadata.name)
                     if (!(pluginInstance instanceof interfaces.Plugin)) {
                         console.i18n('ms.plugin.manager.build.not.extends', { source: metadata.source })
                         return
@@ -235,13 +243,13 @@ export class PluginManagerImpl implements plugin.PluginManager {
             default:
                 throw new Error('§4不支持的插件类型 请检查加载器是否正常启用!')
         }
-        this.pluginInstanceMap.set(metadata.name, pluginInstance)
+        pluginInstance && this.pluginInstanceMap.set(metadata.name, pluginInstance)
         return pluginInstance
     }
 
     private bindPlugin(metadata: interfaces.PluginMetadata) {
         try {
-            let pluginInstance = this.container.getNamed<interfaces.Plugin>(plugin.Plugin, metadata.name)
+            let pluginInstance = this.container.getNamed<plugin.Plugin>(plugin.Plugin, metadata.name)
             if (pluginInstance.description.source + '' !== metadata.source + '') {
                 console.i18n('ms.plugin.manager.build.duplicate', { exists: pluginInstance.description.source, source: metadata.source })
             }
@@ -251,7 +259,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
         }
     }
 
-    private loadConfig(plugin: interfaces.Plugin) {
+    private loadConfig(plugin: plugin.Plugin) {
         let configs = getPluginConfigMetadata(plugin)
         for (let [_, config] of configs) {
             try {
@@ -276,7 +284,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
         }
     }
 
-    private saveConfig(plugin: interfaces.Plugin) {
+    private saveConfig(plugin: plugin.Plugin) {
         let configs = getPluginConfigMetadata(plugin)
         for (let [_, config] of configs) {
             try {
@@ -290,7 +298,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
         }
     }
 
-    private registryCommand(pluginInstance: interfaces.Plugin) {
+    private registryCommand(pluginInstance: plugin.Plugin) {
         let cmds = getPluginCommandMetadata(pluginInstance)
         let tabs = getPluginTabCompleterMetadata(pluginInstance)
         for (const [_, cmd] of cmds) {
@@ -303,7 +311,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
         }
     }
 
-    private registryListener(pluginInstance: interfaces.Plugin) {
+    private registryListener(pluginInstance: plugin.Plugin) {
         let events = getPluginListenerMetadata(pluginInstance)
         for (const event of events) {
             // ignore space listener
@@ -313,18 +321,18 @@ export class PluginManagerImpl implements plugin.PluginManager {
         }
     }
 
-    private unregistryCommand(pluginInstance: interfaces.Plugin) {
+    private unregistryCommand(pluginInstance: plugin.Plugin) {
         let cmds = getPluginCommandMetadata(pluginInstance)
         cmds.forEach(cmd => {
             this.CommandManager.off(pluginInstance, cmd.name)
         })
     }
 
-    private unregistryListener(pluginInstance: interfaces.Plugin) {
+    private unregistryListener(pluginInstance: plugin.Plugin) {
         this.EventManager.disable(pluginInstance)
     }
 
-    private execPluginStage(pluginInstance: interfaces.Plugin, stageName: string) {
+    private execPluginStage(pluginInstance: plugin.Plugin, stageName: string) {
         let stages = getPluginStageMetadata(pluginInstance, stageName)
         for (const stage of stages) {
             if (!this.allowProcess(stage.servers)) { continue }

@@ -1,10 +1,10 @@
-import { server, MiaoScriptConsole, event } from "@ccms/api";
+import { server, MiaoScriptConsole, event, plugin } from "@ccms/api";
 import { injectable, inject, postConstruct } from "@ccms/container";
 import { getPluginMetadata } from "./utils";
 
 export namespace interfaces {
     @injectable()
-    export abstract class Plugin {
+    export abstract class Plugin implements plugin.Plugin {
         public description: PluginMetadata;
         public logger: Console;
         @inject(server.Console)
