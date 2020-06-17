@@ -1,3 +1,4 @@
+import { plugin as pluginApi } from "@ccms/api"
 import { injectable, decorate } from "@ccms/container"
 import { interfaces } from './interfaces'
 import { METADATA_KEY } from './constants'
@@ -7,16 +8,16 @@ import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata
  * MiaoScript plugin
  * @param metadata PluginMetadata
  */
-export function plugin(metadata: interfaces.PluginMetadata) {
+export function plugin(metadata: pluginApi.PluginMetadata) {
     return function (target: any) {
         metadata.target = target
         metadata.type = "ioc"
         decorate(injectable(), target)
         Reflect.defineMetadata(METADATA_KEY.plugin, metadata, target)
-        const previousMetadata: Map<string, interfaces.PluginMetadata> = getPluginMetadatas()
+        const previousMetadata: Map<string, pluginApi.PluginMetadata> = getPluginMetadatas()
         previousMetadata.set(metadata.name, metadata)
         Reflect.defineMetadata(METADATA_KEY.plugin, previousMetadata, Reflect)
-        const previousSources: Map<string, interfaces.PluginMetadata> = getPluginSources()
+        const previousSources: Map<string, pluginApi.PluginMetadata> = getPluginSources()
         previousSources.set(metadata.source.toString(), metadata)
         Reflect.defineMetadata(METADATA_KEY.souece, previousSources, Reflect)
     }

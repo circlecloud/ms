@@ -3,9 +3,9 @@ import { plugin, server, command, event } from '@ccms/api'
 import { inject, provideSingleton, Container, ContainerInstance } from '@ccms/container'
 import * as fs from '@ccms/common/dist/fs'
 
-import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPlugin, getPluginTabCompleterMetadata, getPluginConfigMetadata, getPluginStageMetadata, getPluginSources } from './utils'
 import { interfaces } from './interfaces'
 import { getConfigLoader } from './config'
+import { getPluginCommandMetadata, getPluginListenerMetadata, getPluginTabCompleterMetadata, getPluginConfigMetadata } from './utils'
 
 const Thread = Java.type('java.lang.Thread')
 
@@ -25,27 +25,53 @@ export class PluginManagerImpl implements plugin.PluginManager {
     private EventManager: event.Event
 
     private initialized: boolean = false
-    private pluginRequireMap: Map<string, any>
-    private pluginInstanceMap: Map<string, plugin.Plugin>
-    private pluginMetadataMap: Map<string, plugin.PluginMetadata>
+
+    private sacnnerMap: Map<string, plugin.PluginScanner>
+    private loaderMap: Map<string, plugin.PluginLoader>
+
+    private instanceMap: Map<string, plugin.Plugin>
+    private metadataMap: Map<string, plugin.PluginMetadata>
+
+    constructor() {
+        this.sacnnerMap = new Map()
+        this.loaderMap = new Map()
+
+        this.instanceMap = new Map()
+        this.metadataMap = new Map()
+    }
 
     initialize() {
         if (this.pluginInstance === undefined) { throw new Error("Can't found Plugin Instance!") }
         if (this.initialized !== true) {
             console.i18n('ms.plugin.initialize', { plugin: this.pluginInstance, loader: Thread.currentThread().contextClassLoader })
             console.i18n('ms.plugin.event.map', { count: this.EventManager.mapEventName().toFixed(0), type: this.serverType })
-            this.pluginRequireMap = new Map()
-            this.pluginInstanceMap = new Map()
-            this.pluginMetadataMap = getPluginSources()
+            let pluginScanner = this.container.getAll<plugin.PluginScanner>(plugin.PluginScanner)
+            pluginScanner.forEach((scanner) => {
+                console.debug(`loading plugin sacnner ${scanner.type}...`)
+                this.sacnnerMap.set(scanner.type, scanner)
+            })
+            let pluginLoaders = this.container.getAll<plugin.PluginLoader>(plugin.PluginLoader)
+            pluginLoaders.forEach((loader) => {
+                console.debug(`loading plugin loader ${loader.type}...`)
+                this.loaderMap.set(loader.type, loader)
+            })
             this.initialized = true
         }
     }
 
     scan(folder: string): void {
+        if (!folder) { throw new Error('plugin scan folder can\'t be empty!') }
         this.initialize()
-        var plugin = fs.file(root, folder)
-        var files = this.scanFolder(plugin)
-        this.loadPlugins(files)
+        for (const [, scanner] of this.sacnnerMap) {
+            try {
+                scanner.scan(folder).forEach(file => {
+                    this.loadPlugin(file, scanner)
+                })
+            } catch (error) {
+                console.error(`plugin scanner ${scanner.type} occurred error ${error}`)
+                console.ex(error)
+            }
+        }
     }
 
     build(): void {
@@ -57,24 +83,45 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     private runPluginStage(plugin: plugin.Plugin, stage: string, ext: Function) {
+        if (!plugin) { throw new Error(`can't run runPluginStage ${stage} because plugin is ${plugin}`) }
         try {
             this.logStage(plugin, i18n.translate(`ms.plugin.manager.stage.${stage}`))
             ext()
             this.runCatch(plugin, stage)
             this.runCatch(plugin, `${this.serverType}${stage}`)
-            this.execPluginStage(plugin, stage)
+            plugin.description.loader[stage](plugin)
         } catch (ex) {
             console.i18n("ms.plugin.manager.stage.exec.error", { plugin: plugin.description.name, executor: stage, error: ex })
         }
+    }
+
+    private loadPlugin(file: string, scanner: plugin.PluginScanner) {
+        try {
+            let requireInstance = scanner.load(file)
+            for (const [, loader] of this.loaderMap) {
+                let metadata = loader.require(file, requireInstance)
+                if (metadata && metadata.source && metadata.name) {
+                    metadata.loader = loader
+                    this.metadataMap.set(metadata.name, metadata)
+                    return metadata
+                }
+            }
+        } catch (error) {
+            console.i18n("ms.plugin.manager.initialize.error", { name: file, ex: error })
+            console.ex(error)
+        }
+        console.console(`§efile §b${file} §ccan't load metadata. §eskip load!`)
     }
 
     /**
      * 从文件加载插件
      * @param file java.io.File
      */
-    loadFromFile(file: string): plugin.Plugin {
-        let metadata = this.loadPlugin(file)
-        let plugin = this.buildPlugin(metadata && metadata.description ? metadata.description : this.pluginMetadataMap.get(file.toString()))
+    loadFromFile(file: string, scanner = this.sacnnerMap.get('file')): plugin.Plugin {
+        if (!file) { throw new Error('plugin file can\'t be null!') }
+        if (!scanner) { throw new Error('plugin scanner can\'t be null!') }
+        let metadata = this.loadPlugin(file, scanner)
+        let plugin = metadata.loader.build(metadata)
         this.load(plugin)
         this.enable(plugin)
         return plugin
@@ -110,16 +157,16 @@ export class PluginManagerImpl implements plugin.PluginManager {
     reload(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((pl: plugin.Plugin) => {
             this.disable(pl)
-            this.loadFromFile(pl.description.source)
+            this.loadFromFile(pl.description.source, pl.description.scanner)
         })
     }
 
     getPlugin(name: string) {
-        return this.pluginInstanceMap.get(name)
+        return this.instanceMap.get(name)
     }
 
     getPlugins() {
-        return this.pluginInstanceMap
+        return this.instanceMap
     }
 
     private runCatch(pl: any, func: string) {
@@ -132,62 +179,11 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     private checkAndGet(name: string | plugin.Plugin | undefined | any): Map<string, plugin.Plugin> | plugin.Plugin[] {
-        if (name == this.pluginInstanceMap) { return this.pluginInstanceMap }
-        if (typeof name == 'string' && this.pluginInstanceMap.has(name)) { return [this.pluginInstanceMap.get(name)] }
+        if (name == this.instanceMap) { return this.instanceMap }
+        if (typeof name == 'string' && this.instanceMap.has(name)) { return [this.instanceMap.get(name)] }
         if (name instanceof interfaces.Plugin) { return [name as plugin.Plugin] }
         if (name.description || name.description.name) { return [name as plugin.Plugin] }
         throw new Error(`Plugin ${JSON.stringify(name)} not exist!`)
-    }
-
-    private scanFolder(folder: any): string[] {
-        var files = []
-        console.i18n('ms.plugin.manager.scan', { folder })
-        this.checkUpdateFolder(folder)
-        // must check file is exist maybe is a illegal symbolic link file
-        fs.list(folder).forEach((file: any) => file.toFile().exists() ? files.push(file.toFile()) : void 0)
-        return files
-    }
-
-    /**
-     * 更新插件
-     * @param path
-     */
-    private checkUpdateFolder(path: any) {
-        var update = fs.file(path, "update")
-        if (!update.exists()) {
-            update.mkdirs()
-        }
-    }
-
-    private loadPlugins(files: any[]): void {
-        this.loadJsPlugins(files)
-    }
-
-    /**
-    * JS类型插件预加载
-    */
-    private loadJsPlugins(files: any[]) {
-        files.filter(file => file.name.endsWith(".js")).forEach(file => {
-            try {
-                this.loadPlugin(file)
-            } catch (ex) {
-                console.i18n("ms.plugin.manager.initialize.error", { name: file.name, ex })
-                console.ex(ex)
-            }
-        })
-    }
-
-    private loadPlugin(file: any) {
-        this.updatePlugin(file)
-        return this.createPlugin(file.toString())
-    }
-
-    private updatePlugin(file: any) {
-        var update = fs.file(fs.file(file.parentFile, 'update'), file.name)
-        if (update.exists()) {
-            console.i18n("ms.plugin.manager.build.update", { name: file.name })
-            fs.move(update, file, true)
-        }
     }
 
     private allowProcess(servers: string[]) {
@@ -203,59 +199,14 @@ export class PluginManagerImpl implements plugin.PluginManager {
         }
     }
 
-    private createPlugin(file: string) {
-        //@ts-ignore
-        let instance = require(file, { cache: false })
-        this.pluginRequireMap.set(file, instance)
-        return instance
-    }
-
     private buildPlugins() {
-        let metadatas = []
-        let pluginMetadatas = getPluginMetadatas()
-        for (const [_, metadata] of pluginMetadatas) { metadatas.push(metadata) }
-        for (const [_, instance] of this.pluginRequireMap) { if (instance.description) { this.buildPlugin(instance.description) } }
-        for (const metadata of metadatas) {
-            if (!this.allowProcess(metadata.servers)) { continue }
-            this.buildPlugin(metadata)
-        }
-    }
-
-    private buildPlugin(metadata: interfaces.PluginMetadata) {
-        let pluginInstance: plugin.Plugin
-        switch (metadata.type) {
-            case "ioc":
-                try {
-                    this.bindPlugin(metadata)
-                    pluginInstance = this.container.getNamed<plugin.Plugin>(plugin.Plugin, metadata.name)
-                    if (!(pluginInstance instanceof interfaces.Plugin)) {
-                        console.i18n('ms.plugin.manager.build.not.extends', { source: metadata.source })
-                        return
-                    }
-                } catch (ex) {
-                    console.i18n("ms.plugin.manager.initialize.error", { name: metadata.name, ex })
-                    console.ex(ex)
-                }
-                break
-            case "basic":
-                pluginInstance = this.pluginRequireMap.get(metadata.source.toString())
-                break
-            default:
-                throw new Error('§4不支持的插件类型 请检查加载器是否正常启用!')
-        }
-        pluginInstance && this.pluginInstanceMap.set(metadata.name, pluginInstance)
-        return pluginInstance
-    }
-
-    private bindPlugin(metadata: interfaces.PluginMetadata) {
-        try {
-            let pluginInstance = this.container.getNamed<plugin.Plugin>(plugin.Plugin, metadata.name)
-            if (pluginInstance.description.source + '' !== metadata.source + '') {
-                console.i18n('ms.plugin.manager.build.duplicate', { exists: pluginInstance.description.source, source: metadata.source })
+        for (const [, metadata] of this.metadataMap) {
+            let pluginInstance: plugin.Plugin
+            if (!this.loaderMap.has(metadata.type)) {
+                console.error(`§4无法加载插件 §c${metadata.name} §4请检查 §c${metadata.type} §4加载器是否正常启用!`)
+                continue
             }
-            this.container.rebind(plugin.Plugin).to(metadata.target).inSingletonScope().whenTargetNamed(metadata.name)
-        } catch{
-            this.container.bind(plugin.Plugin).to(metadata.target).inSingletonScope().whenTargetNamed(metadata.name)
+            (pluginInstance = this.loaderMap.get(metadata.type).build(metadata)) && this.instanceMap.set(metadata.name, pluginInstance)
         }
     }
 
@@ -330,19 +281,5 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
     private unregistryListener(pluginInstance: plugin.Plugin) {
         this.EventManager.disable(pluginInstance)
-    }
-
-    private execPluginStage(pluginInstance: plugin.Plugin, stageName: string) {
-        let stages = getPluginStageMetadata(pluginInstance, stageName)
-        for (const stage of stages) {
-            if (!this.allowProcess(stage.servers)) { continue }
-            console.i18n("ms.plugin.manager.stage.exec", { plugin: pluginInstance.description.name, name: stage.executor, stage: stageName, servers: stage.servers })
-            try {
-                pluginInstance[stage.executor].apply(pluginInstance)
-            } catch (error) {
-                console.i18n("ms.plugin.manager.stage.exec.error", { plugin: pluginInstance.description.name, executor: stage.executor, error })
-                console.ex(error)
-            }
-        }
     }
 }
