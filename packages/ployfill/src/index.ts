@@ -7,6 +7,8 @@ console.i18n("ms.ployfill.initialize")
 require('./es5-ext')
 require('./node-shim')
 require('core-js')
+//@ts-ignore
+process.on('exit', () => require.disable())
 global.setGlobal('Proxy', require('./proxy').Proxy)
 global.setGlobal('XMLHttpRequest', require('./xml-http-request').XMLHttpRequest)
 global.setGlobal('Blob', require('blob-polyfill').Blob)
