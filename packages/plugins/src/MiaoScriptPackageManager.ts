@@ -1,10 +1,11 @@
 import { plugin as pluginApi, task, server } from '@ccms/api'
 
 import { Translate } from '@ccms/i18n'
-import { inject } from '@ccms/container';
+import { inject, DefaultContainer as container } from '@ccms/container'
 import { interfaces, plugin, cmd, tab } from '@ccms/plugin'
 
 import * as fs from '@ccms/common/dist/fs'
+import * as reflect from '@ccms/common/dist/reflect'
 import http from '@ccms/common/dist/http'
 
 let help = [
@@ -19,7 +20,7 @@ let help = [
     '§6/mpm §arun §e<JS代码>        §6-  §3运行JS代码',
     '§6/mpm §adeploy §e<插件名称>   §6-  §3发布插件',
     '§6/mpm §crestart             §6-  §4重启MiaoScript脚本引擎'
-];
+]
 
 let langMap = {
     'main.command.not.exists': '§4未知的子命令: §c{command}',
@@ -53,20 +54,20 @@ let fallbackMap = langMap
 @plugin({ name: 'MiaoScriptPackageManager', prefix: 'PM', version: '1.0.1', author: 'MiaoWoo', source: __filename })
 export class MiaoScriptPackageManager extends interfaces.Plugin {
     @inject(pluginApi.PluginManager)
-    private pluginManager: pluginApi.PluginManager;
+    private pluginManager: pluginApi.PluginManager
     @inject(task.TaskManager)
-    private taskManager: task.TaskManager;
+    private taskManager: task.TaskManager
     @inject(server.ServerType)
-    private serverType: string;
+    private serverType: string
     @inject(server.Server)
     private server: server.Server
     @inject(pluginApi.PluginFolder)
-    private pluginFolder: string;
+    private pluginFolder: string
 
     private packageCache: any[] = [];
     private packageNameCache: string[] = [];
 
-    private translate: Translate;
+    private translate: Translate
 
     load() {
         this.translate = new Translate({
@@ -78,7 +79,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
 
     @cmd()
     mpm(sender: any, command: string, args: string[]) {
-        this.taskManager.create(() => this.main(sender, command, args)).async().submit();
+        this.taskManager.create(() => this.main(sender, command, args)).async().submit()
     }
 
     i18n(sender: any, name: string, params?: any) {
@@ -90,64 +91,64 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         if (!this[cmdKey]) {
             this.i18n(sender, 'main.command.not.exists', { command: args[0] })
             this.i18n(sender, 'main.command.help.tip', { command })
-            return;
+            return
         }
         args.shift()
-        this[cmdKey](sender, ...args);
+        this[cmdKey](sender, ...args)
     }
 
     cmdhelp(sender: any) {
-        this.logger.sender(sender, help);
+        this.logger.sender(sender, help)
     }
 
     cmdload(sender: any, name: string) {
-        let pluginFile = fs.concat(__dirname + '', name);
+        let pluginFile = fs.concat(__dirname + '', name)
         if (!fs.exists(pluginFile)) {
             this.i18n(sender, 'plugin.not.exists', { name: `${name}(${pluginFile})` })
-            return;
+            return
         }
-        this.pluginManager.loadFromFile(fs.file(pluginFile));
+        this.pluginManager.loadFromFile(fs.file(pluginFile))
     }
 
     cmdlist(sender: any, type: string = 'cloud') {
         if (type == "i" || type == "install") {
             this.i18n(sender, 'list.install.header')
             this.pluginManager.getPlugins().forEach((plugin) => {
-                this.i18n(sender, 'list.install.body', plugin.description);
+                this.i18n(sender, 'list.install.body', plugin.description)
             })
         } else {
             this.i18n(sender, 'list.header')
             for (var pkgName in this.packageCache) {
-                this.i18n(sender, 'list.body', this.packageCache[pkgName]);
+                this.i18n(sender, 'list.body', this.packageCache[pkgName])
             }
         }
     }
 
     cmdinstall(sender: any, name: string) {
         if (!name) { return this.i18n(sender, 'plugin.name.empty') }
-        this.download(sender, name);
+        this.download(sender, name)
     }
 
     cmdupdate(sender: any, name: string) {
         if (name) {
-            this.update(sender, name);
+            this.update(sender, name)
         } else {
             this.updateRepo(sender)
         }
     }
 
     cmdupgrade(sender: any, name: string) {
-        if (!name) { return this.i18n(sender, 'upgrade.confirm'); }
+        if (!name) { return this.i18n(sender, 'upgrade.confirm') }
         if (name == "comfirm") {
             let enginePath = fs.path(fs.file(fs.concat(root, 'node_modules', '@ccms')))
             if (enginePath.startsWith(root)) {
-                base.delete(enginePath);
-                this.cmdrestart(sender);
+                base.delete(enginePath)
+                this.cmdrestart(sender)
             }
         }
         if (this.checkPlugin(sender, name)) {
-            this.update(sender, name);
-            this.pluginManager.reload(name);
+            this.update(sender, name)
+            this.pluginManager.reload(name)
         }
     }
 
@@ -161,7 +162,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     cmdreload(sender: any, name: string) {
         name = name || this.description.name
         if (this.checkPlugin(sender, name)) {
-            this.pluginManager.reload(name);
+            this.pluginManager.reload(name)
             this.i18n(sender, 'plugin.reload.finish', { name })
         }
     }
@@ -184,33 +185,58 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
             return
         }
         try {
-            this.logger.sender(sender, '§6Reloading §3MiaoScript Engine...');
-            ScriptEngineContextHolder.disableEngine();
-            Packages.java.lang.System.gc();
-            ScriptEngineContextHolder.enableEngine();
-            this.logger.sender(sender, '§3MiaoScript Engine §6Reload §aSuccessful...');
+            this.logger.sender(sender, '§6Reloading §3MiaoScript Engine...')
+            ScriptEngineContextHolder.disableEngine()
+            Packages.java.lang.System.gc()
+            ScriptEngineContextHolder.enableEngine()
+            this.logger.sender(sender, '§3MiaoScript Engine §6Reload §aSuccessful...')
         } catch (ex) {
-            this.logger.sender(sender, "§3MiaoScript Engine §6Reload §cError! ERR: " + ex);
-            this.logger.sender(sender, this.logger.stack(ex));
+            this.logger.sender(sender, "§3MiaoScript Engine §6Reload §cError! ERR: " + ex)
+            this.logger.sender(sender, this.logger.stack(ex))
         }
     }
 
     cmdrun(sender: any, ...args: any[]) {
         try {
-            let script = args.join(' ');
+            let script = args.join(' ')
             this.i18n(sender, 'run.script', { script })
-            let result = eval(script);
+            let result = this.runCode(script, sender)
             this.i18n(sender, 'run.result', { result: result == undefined ? this.translate.translate('run.noresult') : result + '' })
         } catch (ex) {
-            this.logger.sender(sender, this.logger.stack(ex));
+            this.logger.sender(sender, this.logger.stack(ex))
         }
+    }
+
+    private runCode(code: string, sender: any) {
+        let paramNames = [
+            'sender',
+            'reflect',
+            'container',
+            'pluginManager'
+        ]
+        let params = [
+            sender,
+            reflect,
+            container,
+            this.pluginManager
+        ]
+        let tfunc = new Function(
+            ...paramNames,
+            `var api = require('@ccms/api');
+if (this.serverType == "spring") {
+    var dbm = container.get(api.database.DataBaseManager)
+    var db = dbm.getMainDatabase()
+    var df = base.getInstance().getAutowireCapableBeanFactory()
+}
+return '§a返回结果: §r'+ eval(${JSON.stringify(code)});`)
+        return tfunc.apply(this, params) + ''
     }
 
     cmddeploy(sender: any, name: any) {
         if (!process.env.AccessToken) { return this.i18n(sender, 'deploy.token.not.exists') }
         this.taskManager.create(() => {
             if (this.checkPlugin(sender, name)) {
-                let plugin: pluginApi.Plugin = this.pluginManager.getPlugins().get(name);
+                let plugin: pluginApi.Plugin = this.pluginManager.getPlugins().get(name)
                 let result = http.post("http://ms.yumc.pw/api/plugin/deploy?access_token=" + process.env.AccessToken, {
                     name,
                     author: plugin.description.author,
@@ -224,7 +250,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
 
     update(sender: any, name: string) {
         if (this.checkCloudPlugin(sender, name)) {
-            this.download(sender, name, true);
+            this.download(sender, name, true)
         }
     }
 
@@ -236,25 +262,25 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
                 case "list":
                     return ["install", "cloud"]
                 case "install":
-                    return this.packageNameCache;
+                    return this.packageNameCache
                 case "update":
                 case "upgrade":
                 case "load":
                 case "unload":
                 case "reload":
                 case "deploy":
-                    return [...this.pluginManager.getPlugins().keys()];
+                    return [...this.pluginManager.getPlugins().keys()]
             }
         }
     }
 
     updateRepo(sender: any) {
         this.taskManager.create(() => {
-            let result = http.get('http://ms.yumc.pw/api/plugin/list');
-            for (const pl of result.data) { this.packageCache[pl.name] = pl; }
-            this.packageNameCache = Object.keys(this.packageCache);
+            let result = http.get('http://ms.yumc.pw/api/plugin/list')
+            for (const pl of result.data) { this.packageCache[pl.name] = pl }
+            this.packageNameCache = Object.keys(this.packageCache)
             this.i18n(sender, 'cloud.update.finish', { length: this.packageNameCache.length })
-        }).async().submit();
+        }).async().submit()
     }
 
     download(sender: any, name: string, update: boolean = false) {

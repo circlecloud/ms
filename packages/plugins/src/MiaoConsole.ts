@@ -1,3 +1,4 @@
+/// <reference types="@ccms/nashorn" />
 /// <reference types="@ccms/types/dist/typings/bukkit" />
 /// <reference types="@ccms/types/dist/typings/sponge" />
 /// <reference types="@ccms/types/dist/typings/bungee" />
@@ -56,7 +57,7 @@ export class MiaoConsole extends interfaces.Plugin {
             this.token = Java.type('java.util.UUID').randomUUID().toString()
             this.logger.console(`§6已生成随机Token: §3${this.token} §c重启后或重新生成后失效!`)
         }
-        global.eventCenter.on('log', (msg) => {
+        process.on('message', (msg) => {
             this.logCache.push(msg)
             if (this.logCache.length > 30) {
                 this.logCache = this.logCache.slice(this.logCache.length - 30, this.logCache.length)
@@ -130,7 +131,7 @@ export class MiaoConsole extends interfaces.Plugin {
             let ProxyAppender = Java.extend(AbstractAppender, {
                 append: (logEvent) => {
                     if (logEvent.level.intLevel() <= Level.INFO.intLevel()) {
-                        global.eventCenter.emit('log', logEvent.getMessage().getFormattedMessage())
+                        process.emit('message', logEvent.getMessage().getFormattedMessage())
                     }
                 }
             })
@@ -146,7 +147,7 @@ export class MiaoConsole extends interfaces.Plugin {
         if (this.rootLogger) {
             let AbstractHandler = Java.type('java.util.logging.Handler')
             let ProxyHandler = Java.extend(AbstractHandler, {
-                publish: (record) => global.eventCenter.emit('log', record.getMessage()),
+                publish: (record) => process.emit('message', record.getMessage()),
                 flush: () => { },
                 close: () => { }
             })
@@ -162,7 +163,7 @@ export class MiaoConsole extends interfaces.Plugin {
         if (this.rootLogger) {
             let AppenderBase = Java.type('ch.qos.logback.core.AppenderBase')
             let ProxyAppender = Java.extend(AppenderBase, {
-                append: (logEvent) => global.eventCenter.emit('log', logEvent.getFormattedMessage())
+                append: (logEvent) => process.emit('message', logEvent.getFormattedMessage())
             })
             this.appender = new ProxyAppender()
             this.appender.start()
@@ -175,7 +176,7 @@ export class MiaoConsole extends interfaces.Plugin {
     disable() {
         if (this.socketIOServer) {
             this.socketIOServer.close()
-            global.eventCenter.removeAllListeners('log')
+            process.removeAllListeners('message')
         }
         if (this.container.isBound(io.Instance)) {
             this.container.unbind(io.Instance)
@@ -220,7 +221,7 @@ export class MiaoConsole extends interfaces.Plugin {
 
     startSocketIOServer() {
         let namespace = this.socketIOServer.of('/MiaoConsole')
-        global.eventCenter.on('log', (msg) => namespace.emit('log', msg))
+        process.on('message', (msg) => namespace.emit('log', msg))
         namespace.on('connect', (client: SocketIOSocket) => {
             if (!this.token) {
                 this.logger.console(`§6客户端 §b${client.id} §a请求连接 §4服务器尚未设置 Token 无法连接!`)
@@ -249,6 +250,9 @@ export class MiaoConsole extends interfaces.Plugin {
             setTimeout(() => this.server.dispatchConsoleCommand(cmd), 0)
             client.emit('log', `§6命令: §b${cmd} §a执行成功!`)
         })
+        client.on('tabComplate', (input, index, callback) => {
+            callback && callback(this.server.tabComplete(this.server.getConsoleSender(), input, index))
+        })
         client.on('exec', (code) => {
             try {
                 client.emit('log', this.runCode(code, client.nsp, client))
@@ -273,7 +277,7 @@ export class MiaoConsole extends interfaces.Plugin {
             }
         })
         client.on('ls', (file: string, fn) => {
-            let dir = fs.file(file);
+            let dir = fs.file(file)
             if (!dir.isDirectory()) {
                 return fn(undefined, `${file} 不是一个目录!`)
             }
@@ -309,10 +313,9 @@ export class MiaoConsole extends interfaces.Plugin {
 if (this.serverType == "spring") {
     var dbm = container.get(api.database.DataBaseManager)
     var db = dbm.getMainDatabase()
-    var df = base.getInstance().getAutowireCapableBeanFactory()
+    var bf = base.getInstance().getAutowireCapableBeanFactory()
 }
-return '§a返回结果: §r'+ eval(${JSON.stringify(code)});
-`)
+return '§a返回结果: §r'+ eval(${JSON.stringify(code)});`)
         return this.task.callSyncMethod(() => tfunc.apply(this, params)) + ''
     }
 }
