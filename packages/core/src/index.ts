@@ -26,17 +26,16 @@ class MiaoScriptCore {
     }
 
     loadServerConsole() {
-        global.setGlobal('eventCenter', new EventEmitter(), { writable: false, configurable: false });
         //@ts-ignore
         global.setGlobal('console', new this.Console(), { writable: false, configurable: false })
     }
 
     loadTaskFunction() {
         global.setGlobal('setTimeout', (func: Function, tick: number, ...args: any[]) => {
-            this.taskManager.create(func).later(tick).submit(...args)
+            return this.taskManager.create(func).later(tick).submit(...args)
         }, { writable: false, configurable: false })
         global.setGlobal('setInterval', (func: Function, tick: number, ...args: any[]) => {
-            this.taskManager.create(func).timer(tick).submit(...args)
+            return this.taskManager.create(func).timer(tick).submit(...args)
         }, { writable: false, configurable: false })
     }
 
@@ -54,9 +53,8 @@ class MiaoScriptCore {
         console.i18n("ms.core.engine.disable")
         this.pluginManager.disable(this.pluginManager.getPlugins())
         this.taskManager.disable()
+        process.emit('exit', 0)
         process.exit(0)
-        //@ts-ignore
-        require.disable()
     }
 }
 

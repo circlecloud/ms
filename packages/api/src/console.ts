@@ -2,10 +2,10 @@ import i18m from '@ccms/i18n'
 import { SourceMapBuilder } from 'source-map-builder'
 import * as base64 from 'base64-js'
 
-const Arrays = Java.type('java.util.Arrays');
-const Level = Java.type('java.util.logging.Level');
-const Paths = Java.type('java.nio.file.Paths');
-const ignoreLogPrefix = ['java.', 'net.minecraft.', 'org.bukkit.', 'jdk.nashorn.', 'io.netty.', 'org.spongepowered.'];
+const Arrays = Java.type('java.util.Arrays')
+const Level = Java.type('java.util.logging.Level')
+const Paths = Java.type('java.nio.file.Paths')
+const ignoreLogPrefix = ['java.', 'javax.', 'sun.', 'net.minecraft.', 'org.bukkit.', 'jdk.nashorn.', 'io.netty.', 'org.spongepowered.', 'org.apache', 'org.springframework']
 
 enum LogLevel {
     ALL,
@@ -19,19 +19,19 @@ enum LogLevel {
 }
 
 export class MiaoScriptConsole implements Console {
-    Console: NodeJS.ConsoleConstructor;
+    Console: NodeJS.ConsoleConstructor
 
-    private static sourceMaps: { [key: string]: SourceMapBuilder } = {};
-    private static sourceFileMaps: { [key: string]: string } = {};
-    private _name: string = '';
-    private _level: LogLevel = LogLevel.INFO;
+    private static sourceMaps: { [key: string]: SourceMapBuilder } = {}
+    private static sourceFileMaps: { [key: string]: string } = {}
+    private _name: string = ''
+    private _level: LogLevel = LogLevel.INFO
 
-    protected logger: any;
-    protected prefix: string = '§6[§bMiaoScript§6]§r ';
+    protected logger: any
+    protected prefix: string = '§6[§bMiaoScript§6]§r '
 
     constructor(name?: string) {
-        this.name = name;
-        this.logger = global.logger;
+        this.name = name
+        this.logger = global.logger
         if (global.debug) {
             this._level = LogLevel.DEBUG
         }
@@ -41,36 +41,36 @@ export class MiaoScriptConsole implements Console {
     }
 
     get name() {
-        return this._name;
+        return this._name
     }
 
     set name(name: string) {
         if (name) {
-            this._name = `[${name}] `;
+            this._name = `[${name}] `
             // noinspection JSUnusedGlobalSymbols
-            this.prefix = `§6[§cMS§6][§b${name}§6]§r `;
+            this.prefix = `§6[§cMS§6][§b${name}§6]§r `
         }
     }
     log(...args: any[]): void {
-        this.logger.info(this.name + args.join(' '));
+        this.logger.info(this.name + args.join(' '))
     }
     info(...args: any[]) {
-        this.logger.info(this.name + args.join(' '));
+        this.logger.info(this.name + args.join(' '))
     }
     warn(...args: any[]) {
-        this.logger.warning(this.name + args.join(' '));
+        this.logger.warning(this.name + args.join(' '))
     }
     error(...args: any[]) {
-        this.logger.log(Level.SEVERE, this.name + args.join(' '));
+        this.logger.log(Level.SEVERE, this.name + args.join(' '))
     }
     debug(...args: any[]) {
         if (global.debug) {
-            this.logger.info(this.name + '[DEBUG] ' + args.join(' '));
+            this.logger.info(this.name + '[DEBUG] ' + args.join(' '))
         }
     }
     trace(...args: any[]): void {
         if (this._level <= LogLevel.TRACE) {
-            this.logger.info(this.name + '[TRACE] ' + args.join(' '));
+            this.logger.info(this.name + '[TRACE] ' + args.join(' '))
         }
     }
     sender(...args) {
@@ -95,29 +95,29 @@ export class MiaoScriptConsole implements Console {
             if (fileName.endsWith('js')) {
                 if (MiaoScriptConsole.sourceMaps[fileName] === undefined) {
                     MiaoScriptConsole.sourceMaps[fileName] = null
-                    let sourceLine = base.read(fileName).split('\n');
+                    let sourceLine = base.read(fileName).split('\n')
                     let lastLine = sourceLine[sourceLine.length - 1]
                     if (lastLine.startsWith('//# sourceMappingURL=')) {
-                        let sourceContent = null;
-                        let sourceMappingURL = lastLine.split('sourceMappingURL=', 2)[1];
-                        if (sourceMappingURL.startsWith('data:application/json;base64,')) {
+                        let sourceContent = null
+                        let sourceMappingURL = lastLine.split('sourceMappingURL=', 2)[1]
+                        if (sourceMappingURL.startsWith('data:application/jsonbase64,')) {
                             sourceContent = String.fromCharCode(...Array.from(base64.toByteArray(sourceMappingURL.split(',', 2)[1])))
                         } else if (sourceMappingURL.startsWith('http')) {
                             // TODO
                         } else {
-                            let file = Paths.get(Paths.get(fileName, '..', sourceMappingURL).toFile().getCanonicalPath()).toFile();
+                            let file = Paths.get(Paths.get(fileName, '..', sourceMappingURL).toFile().getCanonicalPath()).toFile()
                             if (file.exists()) { sourceContent = base.read(file) }
                         }
                         if (sourceContent) {
                             MiaoScriptConsole.sourceMaps[fileName] = new SourceMapBuilder(JSON.parse(sourceContent))
-                            MiaoScriptConsole.sourceFileMaps[fileName] = Paths.get(fileName, '..', MiaoScriptConsole.sourceMaps[fileName].sources[0]).toFile().getCanonicalPath();
+                            MiaoScriptConsole.sourceFileMaps[fileName] = Paths.get(fileName, '..', MiaoScriptConsole.sourceMaps[fileName].sources[0]).toFile().getCanonicalPath()
                         }
                     }
                 }
                 if (MiaoScriptConsole.sourceMaps[fileName]) {
-                    let sourceMapping = MiaoScriptConsole.sourceMaps[fileName].getSource(lineNumber, 25, true, true);
+                    let sourceMapping = MiaoScriptConsole.sourceMaps[fileName].getSource(lineNumber, 25, true, true)
                     fileName = MiaoScriptConsole.sourceFileMaps[fileName]
-                    if (sourceMapping && lineNumber != sourceMapping.mapping.sourceLine) { lineNumber = sourceMapping.mapping.sourceLine; }
+                    if (sourceMapping && lineNumber != sourceMapping.mapping.sourceLine) { lineNumber = sourceMapping.mapping.sourceLine }
                 }
             }
         } catch (error) {
@@ -129,8 +129,8 @@ export class MiaoScriptConsole implements Console {
         }
     }
     stack(ex: Error, color: boolean = true): string[] {
-        let stack = ex.getStackTrace();
-        let cache = [(color ? '§c' : '') + ex];
+        let stack = ex.getStackTrace()
+        let cache = [(color ? '§c' : '') + ex]
         //@ts-ignore
         if (stack.class) {
             stack = Arrays.asList(stack)
@@ -146,8 +146,8 @@ export class MiaoScriptConsole implements Console {
                     cache.push(`    -> ${fileName}:${lineNumber} => ${trace.methodName}`)
                 }
             } else {
-                let className = trace.className;
-                var fileName = trace.fileName as string;
+                let className = trace.className
+                var fileName = trace.fileName as string
                 if (className.startsWith('jdk.nashorn.internal.scripts')) {
                     className = className.substr(className.lastIndexOf('$') + 1)
                     var { fileName, lineNumber } = this.readSourceMap(trace.fileName, trace.lineNumber)
@@ -155,74 +155,74 @@ export class MiaoScriptConsole implements Console {
                 } else {
                     for (let prefix in ignoreLogPrefix) {
                         if (className.startsWith(ignoreLogPrefix[prefix])) {
-                            return;
+                            return
                         }
                     }
                 }
                 if (color) {
-                    cache.push(`    §e->§c ${className}.${trace.methodName}(§4${fileName}:${lineNumber}§c)`);
+                    cache.push(`    §e->§c ${className}.${trace.methodName}(§4${fileName}:${lineNumber}§c)`)
                 } else {
-                    cache.push(`    -> ${className}.${trace.methodName}(${fileName}:${lineNumber})`);
+                    cache.push(`    -> ${className}.${trace.methodName}(${fileName}:${lineNumber})`)
                 }
             }
-        });
-        return cache;
+        })
+        return cache
     }
     assert(value: any, message?: string, ...optionalParams: any[]): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     clear(): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     count(label?: string): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     countReset(label?: string): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     dir(obj: any, options?: NodeJS.InspectOptions): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     dirxml(...data: any[]): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     group(...label: any[]): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     groupCollapsed(...label: any[]): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     groupEnd(): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     table(tabularData: any, properties?: string[]): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     time(label?: string): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     timeEnd(label?: string): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     timeLog(label?: string, ...data: any[]): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     markTimeline(label?: string): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     profile(label?: string): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     profileEnd(label?: string): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     timeStamp(label?: string): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     timeline(label?: string): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     timelineEnd(label?: string): void {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
 }
