@@ -1,29 +1,30 @@
 import { task, plugin } from '@ccms/api'
 import { inject, provideSingleton } from '@ccms/container'
+import thread_pool from '@ccms/common/dist/thread-pool'
 
+const AtomicInteger = Java.type("java.util.concurrent.atomic.AtomicInteger")
 const AtomicBoolean = Java.type("java.util.concurrent.atomic.AtomicBoolean")
 const Thread = Java.type('java.lang.Thread')
-const ThreadPoolExecutor = Java.type('java.util.concurrent.ThreadPoolExecutor')
-const ThreadPoolTaskExecutor = Java.type('org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor')
 
-let executor: any
-let tasks: { [key: number]: task.Cancelable } = {}
-let taskId = 0
+const taskId = new AtomicInteger(0)
+const tasks: { [key: number]: task.Cancelable } = {}
+const executor = thread_pool.create({
+    groupName: '@ccms/spring'
+})
 
 @provideSingleton(task.TaskManager)
 export class SpringTaskManager implements task.TaskManager {
     @inject(plugin.PluginInstance)
     private pluginInstance: any
 
+    private innerTaskId: any
+    private innerTasks: { [s: string]: task.Cancelable }
+    private innerExecutor: java.util.concurrent.ThreadPoolExecutor
+
     constructor() {
-        executor = new ThreadPoolTaskExecutor()
-        executor.setCorePoolSize(10)
-        executor.setMaxPoolSize(100)
-        executor.setQueueCapacity(500)
-        executor.setKeepAliveSeconds(60)
-        executor.setThreadNamePrefix("@ccms/spring-")
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy())
-        executor.initialize()
+        this.innerTaskId = taskId
+        this.innerTasks = tasks
+        this.innerExecutor = executor
     }
 
     create(func: Function): task.Task {
@@ -34,13 +35,13 @@ export class SpringTaskManager implements task.TaskManager {
         return func()
     }
     disable() {
-        Object.values(tasks).forEach((task) => task?.cancel())
-        executor.shutdown();
+        Object.values(this.innerTasks).forEach((task) => task?.cancel())
+        this.innerExecutor.shutdown()
     }
 }
 
 export class SpringTask extends task.Task {
-    public id = taskId++
+    public id = taskId.incrementAndGet()
     private running = new AtomicBoolean(true)
 
     run(...args: any[]) {
@@ -78,7 +79,7 @@ export class SpringTask extends task.Task {
 
     submit(...args: any[]): task.Cancelable {
         tasks[this.id] = this
-        executor.execute(() => this.run(...args))
+        executor.execute((() => this.run(...args)) as any)
         return {
             cancel: () => {
                 return this.cancel()

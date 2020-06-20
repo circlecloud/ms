@@ -156,9 +156,10 @@ export class Server {
         }
         console.debug(`
 ===================== MiaoSpring =====================
-Request    URL   : ${ctx.url}
-Response   Body  : ${JSON.stringify(Java.asJSONCompatible(ctx.result))}
-Handle     Time  : ${Date.now() - startTime}ms
+Request  Method : ${ctx.request.getMethod()}
+Request  URL    : ${ctx.url}
+Response Body   : ${JSON.stringify(Java.asJSONCompatible(ctx.result))}
+Handle   Time   : ${Date.now() - startTime}ms
 ======================================================`)
         return ctx.result
     }

@@ -3,17 +3,17 @@ export const Controller = () => {
         return
     }
 }
-export const Header = () => {
-    return <T>(target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>): MethodDecorator => {
-        return
-    }
-}
 export const Post = () => {
     return <T>(target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>): MethodDecorator => {
         return
     }
 }
 export const Get = () => {
+    return <T>(target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>): MethodDecorator => {
+        return
+    }
+}
+export const Header = () => {
     return <T>(target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>): MethodDecorator => {
         return
     }

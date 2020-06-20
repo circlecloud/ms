@@ -21,6 +21,7 @@ export class SpringServer implements server.Server {
     }
     getConsoleSender() {
         return {
+            name: 'CONSOLE',
             sendMessage: (message: string) => console.console(message)
         }
     }
@@ -50,6 +51,6 @@ export class SpringServer implements server.Server {
         throw new Error("Method not implemented.")
     }
     tabComplete(sender: any, input: string, index?: number) {
-        throw new Error("Method not implemented.")
+        return this.commandMap.tabComplate(sender, input, index)
     }
 }

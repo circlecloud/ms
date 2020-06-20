@@ -28,12 +28,15 @@ function mcColor2ANSI(str: string) {
     for (const regex in regexMap) {
         str = str.replace(regexMap[regex], `\u001b[${regex}m`)
     }
-    return str;
+    return str
 }
 
 export class SpringConsole extends MiaoScriptConsole {
     error(...args: any[]) {
         this.logger.error(args.join(' '))
+    }
+    warn(...args: any[]) {
+        this.logger.warn(args.join(' '))
     }
     sender(sender: any, ...args: any[]) {
         sender = sender || {
@@ -46,7 +49,7 @@ export class SpringConsole extends MiaoScriptConsole {
         if (Object.prototype.toString.call(args[0]) === '[object Array]') {
             args[0].forEach(line => sender.sendMessage(this.prefix + line))
         } else {
-            sender.sendMessage(this.prefix + args.join(' '));
+            sender.sendMessage(this.prefix + args.join(' '))
         }
     }
     console(...args: string[]): void {

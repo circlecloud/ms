@@ -26,6 +26,7 @@
     "dependencies": {
         "@ccms/api": "^0.7.0",
         "@ccms/common": "^0.7.0",
-        "@ccms/container": "^0.7.0"
+        "@ccms/container": "^0.7.0",
+        "@ccms/database": "^0.7.0"
     }
 }
