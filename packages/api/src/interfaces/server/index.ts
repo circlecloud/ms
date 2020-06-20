@@ -38,7 +38,7 @@ export namespace server {
         getNettyPipeline(): any
         getRootLogger(): any
         sendJson(sender: string | any, json: object | string): void
-        tabComplete?(sender: string | any, input: string, index?: number)
+        tabComplete?(sender: string | any, input: string, index?: number): string[]
     }
     @injectable()
     export abstract class ReflectServer implements server.Server {
@@ -88,7 +88,7 @@ export namespace server {
         sendJson(sender: any, json: string | object): void {
             throw new Error("Method not implemented.")
         }
-        tabComplete?(sender: any, input: string, index?: number) {
+        tabComplete?(sender: any, input: string, index?: number): string[] {
             throw new Error("Method not implemented.")
         }
         protected reflect() {
