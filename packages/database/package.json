@@ -1,6 +1,6 @@
 {
     "name": "@ccms/database",
-    "version": "0.6.7",
+    "version": "0.7.0",
     "description": "MiaoScript database package",
     "keywords": [
         "miaoscript",

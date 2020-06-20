@@ -34,11 +34,31 @@ export class CommandMap {
         }
         let exists = this.commands[command]
         if (exists) {
-            return exists.executor(sender, '', command, Java.to(args))
+            try {
+                return exists.executor(sender, '', command, Java.to(args))
+            } catch (error) {
+                console.ex(error)
+            }
+            return true
         } else {
             sender.sendMessage && sender.sendMessage(`Unknown command. Type "/help" for help.`)
             return false
         }
+    }
+
+    tabComplate(sender: any, input: string, index?: number): string[] {
+        if (index == 0) { return Object.keys(this.commands) }
+        let [command, ...args] = input.split(' ')
+        let exists = this.commands[command]
+        if (exists && exists.tabCompleter) {
+            try {
+                if (args.length !== index) { args.push('') }
+                return exists.tabCompleter(sender, '', command, Java.to(args))
+            } catch (error) {
+                console.ex(error)
+            }
+        }
+        return []
     }
 }
 
