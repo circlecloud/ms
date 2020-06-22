@@ -1,6 +1,3 @@
-/// <reference types="@ccms/types/dist/typings/rabbitmq" />
-/// <reference types="@ccms/types/dist/typings/spring/amqp" />
-
 import { constants, plugin as pluginApi, amqp, server, web } from '@ccms/api'
 import { plugin, interfaces, cmd } from '@ccms/plugin'
 import { AmqpAdmin, ConnectionFactoryAdapter, AmqpManager } from '@ccms/amqp'

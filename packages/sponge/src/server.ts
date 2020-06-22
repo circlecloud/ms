@@ -1,18 +1,18 @@
 import { server, constants } from '@ccms/api'
-import { provideSingleton } from '@ccms/container';
+import { provideSingleton } from '@ccms/container'
 
 import * as reflect from '@ccms/common/dist/reflect'
 
-const Sponge = org.spongepowered.api.Sponge;
-const TextSerializers = org.spongepowered.api.text.serializer.TextSerializers;
-const File = Java.type("java.io.File");
+const Sponge = org.spongepowered.api.Sponge
+const TextSerializers = org.spongepowered.api.text.serializer.TextSerializers
+const File = Java.type("java.io.File")
 
 @provideSingleton(server.Server)
 export class SpongeServer extends server.ReflectServer {
-    private pluginsFolder: string;
+    private pluginsFolder: string
 
     constructor() {
-        super();
+        super()
         this.pluginsFolder = new File(base.getInstance().getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getCanonicalPath()
     }
 
@@ -35,25 +35,25 @@ export class SpongeServer extends server.ReflectServer {
         if (typeof sender === 'string') {
             sender = this.getPlayer(sender)
         }
-        return Sponge.getCommandManager().process(sender, command).getQueryResult().get()
+        return Sponge.getCommandManager().process(sender, command).getQueryResult().get() != 0
     }
     dispatchConsoleCommand(command: string): boolean {
-        return Sponge.getCommandManager().process(Sponge.getServer().getConsole(), command).getQueryResult().get()
+        return Sponge.getCommandManager().process(Sponge.getServer().getConsole(), command).getQueryResult().get() != 0
     }
     getPluginsFolder(): string {
-        return this.pluginsFolder;
+        return this.pluginsFolder
     }
     getNativePluginManager() {
-        return Sponge.getPluginManager() as any;
+        return Sponge.getPluginManager() as any
     }
     getDedicatedServer() {
         return reflect.on(Sponge.getServer()).get()
     }
     getNettyPipeline() {
-        return this.pipeline;
+        return this.pipeline
     }
     getRootLogger() {
-        return this.rootLogger;
+        return this.rootLogger
     }
     sendJson(sender: string | any, json: string): void {
         if (typeof sender === "string") {

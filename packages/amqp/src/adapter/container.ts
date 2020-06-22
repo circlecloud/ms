@@ -2,7 +2,7 @@ import { ConnectionFactoryAdapter, ConnectionFactory } from "./connection"
 import { ChannelAwareMessageListenerAdapter, ChannelAwareMessageListener } from "./listener"
 
 export const SimpleMessageListenerContainer = org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
-export const AcknowledgeMode = org.springframework.amqp.core.AcknowledgeMode
+export const AcknowledgeMode: org.springframework.amqp.core.AcknowledgeMode = Java.type('org.springframework.amqp.core.AcknowledgeMode')
 interface ContainerConfig {
     connectionFactory: ConnectionFactoryAdapter | typeof ConnectionFactory
     queueNames: string[]

@@ -1,5 +1,6 @@
 /// <reference types="@ccms/nashorn" />
-/// <reference types="@ccms/types/dist/typings/jdk/index" />
+/// <reference types="@javatypes/jdk" />
+/// <reference types="@javatypes/spring-jdbc" />
 
 export * from './database'
 export * from './manager'

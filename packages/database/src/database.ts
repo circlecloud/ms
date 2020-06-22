@@ -1,5 +1,3 @@
-/// <reference types="@ccms/types/dist/typings/spring" />
-
 import { Model } from './model'
 
 const HikariDataSource = Java.type('com.zaxxer.hikari.HikariDataSource')
@@ -69,7 +67,7 @@ export class DataBase {
      */
     query<T>(sql: string, ...args: any[]): Array<T> {
         let startTime = Date.now()
-        let result = Java.from(this.jdbcTemplate.queryForList(sql, args))
+        let result = Java.from<any>(this.jdbcTemplate.queryForList(sql, args))
         console.debug(java.lang.String.format(`\n[DB] query \nSQL  : ${sql.replace(/\?/ig, '%s')} \nCOST : ${Date.now() - startTime}ms`, args))
         return result
     }

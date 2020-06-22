@@ -1,8 +1,6 @@
 import { JSClass } from "@ccms/container"
 import { RabbitAdminAdapter, MessageListenerContainerAdapter, AcknowledgeMode, MessageHandler, ChannelAwareMessageListenerAdapter } from "./adapter"
 
-const RabbitAdmin = Java.type('org.springframework.amqp.rabbit.core.RabbitAdmin')
-
 export class AmqpAdmin {
     @JSClass('org.springframework.amqp.core.TopicExchange')
     private TopicExchange: typeof org.springframework.amqp.core.TopicExchange
@@ -10,14 +8,15 @@ export class AmqpAdmin {
     private Queue: typeof org.springframework.amqp.core.Queue
     @JSClass('org.springframework.amqp.core.Binding')
     private Binding: typeof org.springframework.amqp.core.Binding
-
+    @JSClass('org.springframework.amqp.rabbit.core.RabbitAdmin')
+    private RabbitAdmin: typeof org.springframework.amqp.rabbit.core.RabbitAdmin
     @JSClass('org.springframework.amqp.core.Binding.DestinationType')
-    private DestinationType: typeof org.springframework.amqp.core.Binding.DestinationType
+    private DestinationType: org.springframework.amqp.core.Binding.DestinationType
 
     private amqpAdmin: org.springframework.amqp.rabbit.core.RabbitAdmin
 
     constructor(amqpAdmin: org.springframework.amqp.rabbit.core.RabbitAdmin | any) {
-        if (amqpAdmin instanceof RabbitAdmin) {
+        if (amqpAdmin instanceof this.RabbitAdmin) {
             this.amqpAdmin = amqpAdmin
         } else if (amqpAdmin instanceof RabbitAdminAdapter) {
             this.amqpAdmin = amqpAdmin.getHandler()

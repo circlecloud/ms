@@ -1,4 +1,4 @@
-/// <reference types="@ccms/types/dist/typings/jdk" />
+/// <reference types="@javatypes/jdk" />
 
 /**
  * 反射工具类
@@ -11,7 +11,7 @@ const methodCache = []
 
 class Reflect {
     private obj: java.lang.Object
-    private class: java.lang.Class
+    private class: java.lang.Class<any>
 
     constructor(obj: any) {
         // if (obj === undefined || obj === null) { throw Error(`reflect object can't be ${obj}!`) }
@@ -26,8 +26,8 @@ class Reflect {
         }
     }
 
-    method(name: string, ...args: any[]) {
-        return declaredMethod(this.class, name, args)
+    method(name: string, ...args: java.lang.Class<any>[]) {
+        return declaredMethod(this.class, name, ...args)
     }
 
     methods() {
@@ -90,7 +90,7 @@ function types(values: any[], def?: any) {
     if (values === null) {
         return []
     }
-    let result: java.lang.Class[] = []
+    let result: java.lang.Class<any>[] = []
     values.forEach(t => result.push((t || def) ? JavaObject.class : t instanceof JavaClass ? t : t.class))
     return result
 }
@@ -119,7 +119,7 @@ function declaredConstructor(clazz, param) {
     return accessible(constructor)
 }
 
-function declaredField(clazz: java.lang.Class, name: string | java.lang.String) {
+function declaredField(clazz: java.lang.Class<any>, name: string | java.lang.String) {
     if (!clazz) { throw Error(`target class can't be ${clazz}!`) }
     let target = clazz
     let field = null
@@ -139,17 +139,17 @@ function declaredField(clazz: java.lang.Class, name: string | java.lang.String) 
     return field
 }
 
-function declaredMethod(clazz: java.lang.Class, name: string, ...clazzs: any[]): java.lang.reflect.Method {
+function declaredMethod(clazz: java.lang.Class<any>, name: string, ...clazzs: java.lang.Class<any>[]): java.lang.reflect.Method {
     let key = clazz.getName() + '.' + name + ':' + (clazzs || []).join(':')
     if (!methodCache[key]) {
         try {
-            methodCache[key] = clazz.getMethod(name, clazzs as any)
+            methodCache[key] = clazz.getMethod(name, ...clazzs)
         } catch (ex) {
             try {
                 methodCache[key] = clazz.getDeclaredMethod(name, clazzs as any)
             } catch (ex) {
                 for (const m of Java.from(declaredMethods(clazz))) {
-                    if (m.name == name) {
+                    if (m.getName() == name) {
                         methodCache[key] = m
                         break
                     }
@@ -160,8 +160,8 @@ function declaredMethod(clazz: java.lang.Class, name: string, ...clazzs: any[]):
     return methodCache[key]
 }
 
-function declaredMethods(clazz) {
-    return clazz.declaredMethods
+function declaredMethods(clazz: java.lang.Class<any>) {
+    return clazz.getDeclaredMethods()
 }
 
 let classMethodsCache: any[] = []

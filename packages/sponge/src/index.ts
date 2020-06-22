@@ -1,4 +1,4 @@
-/// <reference types="@ccms/types/dist/typings/sponge" />
+/// <reference types="@javatypes/sponge-api" />
 
 import { server } from '@ccms/api'
 import { Container } from '@ccms/container'

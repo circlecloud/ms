@@ -1,9 +1,8 @@
-/// <reference types="@ccms/types" />
-/// <reference types="@ccms/types/dist/typings/tomcat/index" />
-/// <reference types="@ccms/types/dist/typings/spring/index" />
+/// <reference types="@javatypes/tomcat" />
+/// <reference types="@javatypes/spring-web" />
 
 import { constants, database, plugin, web } from "@ccms/api"
-import { inject, ContainerInstance, Container } from "@ccms/container"
+import { inject, ContainerInstance, Container, JSClass } from "@ccms/container"
 import { JSPlugin, interfaces, cmd } from "@ccms/plugin"
 import { DataBase, DataBaseManager } from '@ccms/database'
 import { Server, Context, RequestHandler } from '@ccms/web'
@@ -21,6 +20,9 @@ export class MiaoSpring extends interfaces.Plugin {
     private databaseManager: DataBaseManager
     @inject(web.Server)
     private webServer: Server
+
+    @JSClass('org.springframework.http.HttpStatus')
+    private HttpStatus: org.springframework.http.HttpStatus
 
     private ResponseEntity = org.springframework.http.ResponseEntity
 
@@ -56,7 +58,7 @@ export class MiaoSpring extends interfaces.Plugin {
             preHandle: (ctx: Context) => {
                 const index = foundMap.indexOf(ctx.request.getRequestURI())
                 if (index != -1) {
-                    return this.ResponseEntity.status(org.springframework.http.HttpStatus.FOUND).header('Location', foundMap[index + 1]).build()
+                    return this.ResponseEntity.status(this.HttpStatus.FOUND).header('Location', foundMap[index + 1]).build()
                 }
             }
         })
