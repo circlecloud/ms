@@ -1,6 +1,6 @@
 {
     "name": "@ccms/common",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "description": "MiaoScript api package",
     "keywords": [
         "miaoscript",
@@ -24,7 +24,7 @@
         "typescript": "^3.9.2"
     },
     "dependencies": {
-        "@ccms/nashorn": "^0.7.0",
+        "@ccms/nashorn": "^0.8.0",
         "@javatypes/jdk": "^1.14.0"
     },
     "gitHead": "562e2d00175c9d3a99c8b672aa07e6d92706a027"

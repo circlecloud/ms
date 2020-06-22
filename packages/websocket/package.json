@@ -1,6 +1,6 @@
 {
     "name": "@ccms/websocket",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "description": "MiaoScript websocket package",
     "keywords": [
         "miaoscript",
@@ -24,6 +24,6 @@
         "typescript": "^3.9.2"
     },
     "dependencies": {
-        "@ccms/nashorn": "^0.7.0"
+        "@ccms/nashorn": "^0.8.0"
     }
 }
