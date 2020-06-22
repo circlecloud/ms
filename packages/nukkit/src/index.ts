@@ -1,4 +1,4 @@
-/// <reference types="@ccms/types/dist/typings/nukkit" />
+/// <reference types="@javatypes/nukkit-api" />
 
 import { server } from '@ccms/api'
 import { Container } from '@ccms/container'

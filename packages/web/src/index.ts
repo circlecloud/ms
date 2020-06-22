@@ -1,7 +1,9 @@
-/// <reference types="@ccms/types/dist/typings/jdk/index" />
-/// <reference types="@ccms/types/dist/typings/tomcat/index" />
-/// <reference types="@ccms/types/dist/typings/spring/index" />
-/// <reference types="@ccms/types/dist/typings/spring/beans/index" />
+/// <reference types="@ccms/nashorn" />
+/// <reference types="@javatypes/jdk" />
+/// <reference types="@javatypes/tomcat" />
+/// <reference types="@javatypes/spring-web" />
+/// <reference types="@javatypes/spring-core" />
+/// <reference types="@javatypes/spring-beans" />
 
 export * from './server'
 export * from './decorators'

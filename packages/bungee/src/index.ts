@@ -1,4 +1,4 @@
-/// <reference types="@ccms/types/dist/typings/bungee" />
+/// <reference types="@javatypes/bungee-api" />
 
 import { server } from '@ccms/api'
 import { Container } from '@ccms/container'

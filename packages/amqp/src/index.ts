@@ -1,8 +1,8 @@
 /// <reference types="@ccms/nashorn" />
-/// <reference types="@ccms/types/dist/typings/jdk" />
-/// <reference types="@ccms/types/dist/typings/spring" />
-/// <reference types="@ccms/types/dist/typings/spring/amqp" />
-/// <reference types="@ccms/types/dist/typings/rabbitmq" />
+/// <reference types="@javatypes/jdk" />
+/// <reference types="@javatypes/spring-amqp" />
+/// <reference types="@javatypes/spring-rabbit" />
+/// <reference types="@javatypes/amqp-client" />
 
 import { amqp } from '@ccms/api'
 import { getContainer, reduceMetadata } from '@ccms/container'

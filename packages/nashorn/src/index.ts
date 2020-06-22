@@ -13,8 +13,8 @@ declare global {
 
     namespace Java {
         function type<T = any>(clazz: string): T
-        function from<T>(javaObj: T[]): T[]
-        function to<T>(array: T[], type?: T): T[]
+        function from<T = any>(javaObj: T[]): T[]
+        function to<T = any>(array: T[], type?: T): T[]
         function extend(...parentTypes: any[]): any
         function synchronized(func: () => void, lock: any): Function
         function asJSONCompatible<T = any>(obj: T): T

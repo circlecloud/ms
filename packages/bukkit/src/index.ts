@@ -1,4 +1,4 @@
-/// <reference types="@ccms/types/dist/typings/bukkit" />
+/// <reference types="@javatypes/spigot-api" />
 
 import { server } from '@ccms/api'
 import { Container } from '@ccms/container'
