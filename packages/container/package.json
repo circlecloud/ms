@@ -1,6 +1,6 @@
 {
     "name": "@ccms/container",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "description": "MiaoScript container package",
     "keywords": [
         "miaoscript",
@@ -24,8 +24,8 @@
         "typescript": "^3.9.2"
     },
     "dependencies": {
+        "@ccms/nashorn": "^0.8.0",
         "inversify": "^5.0.1",
-        "inversify-binding-decorators": "^4.0.0",
-        "@ccms/nashorn": "^0.7.0"
+        "inversify-binding-decorators": "^4.0.0"
     }
 }
