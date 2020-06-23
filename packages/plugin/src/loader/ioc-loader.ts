@@ -18,8 +18,13 @@ export class IocLoader implements plugin.PluginLoader {
         this.pluginMetadataMap = getPluginSources()
     }
 
-    require(target: any, result: any) {
-        return this.pluginMetadataMap.get(target.toString())
+    require(loadMetadata: plugin.PluginLoadMetadata) {
+        let metadata = this.pluginMetadataMap.get(loadMetadata.file.toString())
+        if (metadata && metadata.type == this.type) {
+            loadMetadata.metadata = metadata
+            loadMetadata.loaded = true
+        }
+        return loadMetadata
     }
 
     build(metadata: plugin.PluginMetadata) {

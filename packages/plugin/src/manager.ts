@@ -64,8 +64,13 @@ export class PluginManagerImpl implements plugin.PluginManager {
         this.initialize()
         for (const [, scanner] of this.sacnnerMap) {
             try {
-                scanner.scan(folder).forEach(file => {
-                    this.loadPlugin(file, scanner)
+                scanner.scan(folder).forEach(loadMetadata => {
+                    try {
+                        this.loadPlugin(scanner.load(loadMetadata))
+                    } catch (error) {
+                        console.error(`plugin scanner ${scanner.type} load ${loadMetadata.name} occurred error ${error}`)
+                        console.ex(error)
+                    }
                 })
             } catch (error) {
                 console.error(`plugin scanner ${scanner.type} occurred error ${error}`)
@@ -89,28 +94,28 @@ export class PluginManagerImpl implements plugin.PluginManager {
             ext()
             this.runCatch(plugin, stage)
             this.runCatch(plugin, `${this.serverType}${stage}`)
-            plugin.description.loader[stage](plugin)
+            plugin.description.loadMetadata.loader[stage](plugin)
         } catch (ex) {
             console.i18n("ms.plugin.manager.stage.exec.error", { plugin: plugin.description.name, executor: stage, error: ex })
         }
     }
 
-    private loadPlugin(file: string, scanner: plugin.PluginScanner) {
+    private loadPlugin(loadMetadata: plugin.PluginLoadMetadata) {
         try {
-            let requireInstance = scanner.load(file)
             for (const [, loader] of this.loaderMap) {
-                let metadata = loader.require(file, requireInstance)
-                if (metadata && metadata.source && metadata.name) {
-                    metadata.loader = loader
+                if (loader.require(loadMetadata).loaded) {
+                    loadMetadata.loader = loader
+                    let metadata = loadMetadata.metadata
                     this.metadataMap.set(metadata.name, metadata)
+                    metadata.loadMetadata = loadMetadata
                     return metadata
                 }
             }
         } catch (error) {
-            console.i18n("ms.plugin.manager.initialize.error", { name: file, ex: error })
+            console.i18n("ms.plugin.manager.initialize.error", { name: loadMetadata.file, ex: error })
             console.ex(error)
         }
-        console.console(`§efile §b${file} §ccan't load metadata. §eskip load!`)
+        console.console(`§6scanner: §b${loadMetadata.scanner.type} §ccan\'t load §6file §b${loadMetadata.file}. §eskip!`)
     }
 
     /**
@@ -120,8 +125,8 @@ export class PluginManagerImpl implements plugin.PluginManager {
     loadFromFile(file: string, scanner = this.sacnnerMap.get('file')): plugin.Plugin {
         if (!file) { throw new Error('plugin file can\'t be null!') }
         if (!scanner) { throw new Error('plugin scanner can\'t be null!') }
-        let metadata = this.loadPlugin(file, scanner)
-        let plugin = metadata.loader.build(metadata)
+        let metadata = this.loadPlugin(scanner.read(file))
+        let plugin = metadata.loadMetadata.loader.build(metadata)
         this.load(plugin)
         this.enable(plugin)
         return plugin
@@ -157,7 +162,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     reload(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((pl: plugin.Plugin) => {
             this.disable(pl)
-            this.loadFromFile(pl.description.source, pl.description.scanner)
+            this.loadFromFile(pl.description.source, pl.description.loadMetadata.scanner)
         })
     }
 
@@ -206,7 +211,9 @@ export class PluginManagerImpl implements plugin.PluginManager {
                 console.error(`§4无法加载插件 §c${metadata.name} §4请检查 §c${metadata.type} §4加载器是否正常启用!`)
                 continue
             }
-            (pluginInstance = this.loaderMap.get(metadata.type).build(metadata)) && this.instanceMap.set(metadata.name, pluginInstance)
+            pluginInstance = this.loaderMap.get(metadata.type).build(metadata)
+            if (!pluginInstance) { console.error(`§4加载器 §c${metadata.type} §4加载插件 §c${metadata.name} §4失败!`); continue }
+            this.instanceMap.set(metadata.name, pluginInstance)
         }
     }
 
