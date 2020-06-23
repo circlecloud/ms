@@ -12,9 +12,9 @@
         "build": "lerna run build --scope=\"@ccms/!(plugins)\"",
         "build:plugins": "lerna run build --scope=\"@ccms/plugins\"",
         "ug": "yarn upgrade-interactive --latest",
-        "np": "lerna exec \"npm publish --registry https://registry.npmjs.org\" --scope=\"@ccms/!(client|plugins)\"",
+        "np": "lerna exec \"npm publish --access=public --registry https://registry.npmjs.org\" --scope=\"@ccms/!(client|plugins)\"",
         "lsp": "npm login --registry=https://registry.npmjs.org --scope=@ccms",
-        "lp": "lerna publish"
+        "lp": "lerna publish --access=public --registry https://registry.npmjs.org"
     },
     "workspaces": [
         "packages/*"
