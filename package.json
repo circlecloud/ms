@@ -14,7 +14,7 @@
         "ug": "yarn upgrade-interactive --latest",
         "np": "lerna exec \"npm publish --access=public --registry https://registry.npmjs.org\" --scope=\"@ccms/!(client|plugins)\"",
         "lsp": "npm login --registry=https://registry.npmjs.org --scope=@ccms",
-        "lp": "lerna publish --access=public --registry https://registry.npmjs.org"
+        "lp": "lerna publish --registry https://registry.npmjs.org"
     },
     "workspaces": [
         "packages/*"
