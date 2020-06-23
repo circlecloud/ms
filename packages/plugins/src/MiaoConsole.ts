@@ -1,7 +1,4 @@
 /// <reference types="@ccms/nashorn" />
-/// <reference types="@ccms/types/dist/typings/bukkit" />
-/// <reference types="@ccms/types/dist/typings/sponge" />
-/// <reference types="@ccms/types/dist/typings/bungee" />
 
 import { plugin as pluginApi, server, task, constants } from '@ccms/api'
 import { plugin, interfaces, cmd, tab, enable, config, disable } from '@ccms/plugin'

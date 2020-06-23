@@ -1,6 +1,6 @@
-/// <reference types="@ccms/types/dist/typings/bukkit" />
-/// <reference types="@ccms/types/dist/typings/sponge" />
-/// <reference types="@ccms/types/dist/typings/bungee" />
+/// <reference types="@javatypes/bungee-api" />
+/// <reference types="@javatypes/spigot-api" />
+/// <reference types="@javatypes/sponge-api" />
 
 import { server, plugin as pluginApi, channel, constants } from '@ccms/api'
 import { inject, optional } from '@ccms/container';

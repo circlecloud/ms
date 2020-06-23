@@ -10,9 +10,14 @@ export class BasicLoader implements plugin.PluginLoader {
     constructor() {
         this.pluginRequireMap = new Map()
     }
-    require(target: any, result: any) {
-        this.pluginRequireMap.set(target.toString(), result)
-        return result
+    require(loadMetadata: plugin.PluginLoadMetadata) {
+        let metadata = loadMetadata.instance.description
+        if (metadata && metadata.type == this.type) {
+            loadMetadata.metadata = metadata
+            loadMetadata.loaded = true
+            this.pluginRequireMap.set(metadata.source.toString(), loadMetadata.instance)
+        }
+        return loadMetadata
     }
     build(metadata: plugin.PluginMetadata) {
         return this.pluginRequireMap.get(metadata.source.toString())

@@ -1,7 +1,6 @@
-/// <reference types="@ccms/types/dist/typings/bukkit" />
-/// <reference types="@ccms/types/dist/typings/sponge" />
-/// <reference types="@ccms/types/dist/typings/bungee" />
-/// <reference types="@ccms/types/dist/typings/nukkit" />
+/// <reference types="@javatypes/bungee-api" />
+/// <reference types="@javatypes/spigot-api" />
+/// <reference types="@javatypes/sponge-api" />
 
 import { server } from '@ccms/api';
 import { inject } from '@ccms/container';

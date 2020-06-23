@@ -31,6 +31,44 @@ export namespace plugin {
     }
     export const PluginScanner = Symbol("PluginScanner")
     /**
+     * 插件加载元信息
+     */
+    export interface PluginLoadMetadata {
+        /**
+         * 插件加载类型
+         */
+        type: string
+        /**
+         * 插件名称
+         */
+        name?: string
+        /**
+         * 插件文件
+         */
+        file?: string
+        /**
+         * 插件实例
+         */
+        instance?: any
+        /**
+         * 插件元信息
+         */
+        metadata?: PluginMetadata
+        /**
+         * 插件扫描器
+         */
+        scanner: PluginScanner
+        /**
+         * 插件加载器
+         */
+        loader?: PluginLoader
+        /**
+         * 是否已加载
+         */
+        loaded?: boolean
+        [key: string]: any
+    }
+    /**
      * 插件扫描器
      */
     export interface PluginScanner {
@@ -39,15 +77,20 @@ export namespace plugin {
          */
         type: string
         /**
-         * 扫描插件 返回插件加载列表
+         * 扫描插件目录 返回插件加载元信息列表
          * @param target 扫描目标
          */
-        scan(target: any): string[]
+        scan(target: any): PluginLoadMetadata[]
+        /**
+         * 读取插件 返回插件加载元信息
+         * @param target 
+         */
+        read(target: any): PluginLoadMetadata
         /**
          * 加载扫描到的目标
          * @param target 加载目标
          */
-        load(target: any): any
+        load(target: PluginLoadMetadata): PluginLoadMetadata
     }
     export const PluginLoader = Symbol("PluginLoader")
     /**
@@ -63,12 +106,12 @@ export namespace plugin {
          * @param target 加载目标
          * @param result 扫描器加载的结果
          */
-        require(target: any, result: any): PluginMetadata
+        require(loadMetadata: PluginLoadMetadata): PluginLoadMetadata
         /**
          * 构建插件
          * @param metadata 插件元信息
          */
-        build(metadata: any): Plugin
+        build(metadata: PluginMetadata): Plugin
         /**
          * Load 阶段
          * @param plugin 插件
@@ -133,13 +176,9 @@ export namespace plugin {
          */
         type?: string
         /**
-         * 插件扫描器
+         * 插件加载信息
          */
-        scanner?: PluginScanner
-        /**
-         * 插件加载器
-         */
-        loader?: PluginLoader
+        loadMetadata?: PluginLoadMetadata
         /**
          * 插件本体
          */

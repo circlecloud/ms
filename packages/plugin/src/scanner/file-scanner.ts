@@ -6,15 +6,20 @@ import { provideSingletonNamed } from "@ccms/container"
 export class JSFileScanner implements plugin.PluginScanner {
     type: string = 'file'
 
-    scan(target: any): string[] {
-        return this.scanFolder(fs.concat(root, target))
+    scan(target: any): plugin.PluginLoadMetadata[] {
+        return this.scanFolder(fs.concat(root, target)).map((file) => this.read(file))
     }
 
-    load(file: string) {
-        if (typeof file === "string") { return }
-        this.updatePlugin(file)
+    read(file: any): plugin.PluginLoadMetadata {
+        return { file, type: this.type, scanner: this, loaded: false }
+    }
+
+    load(metadata: plugin.PluginLoadMetadata): plugin.PluginLoadMetadata {
+        if (metadata.type !== this.type) { return }
+        this.updatePlugin(metadata.file)
         //@ts-ignore
-        return require(file.toString(), { cache: false })
+        metadata.instance = require(metadata.file.toString(), { cache: false })
+        return metadata
     }
 
     private scanFolder(folder: any): string[] {

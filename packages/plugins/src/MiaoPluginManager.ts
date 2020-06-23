@@ -1,4 +1,4 @@
-/// <reference types="@ccms/types" />
+/// <reference types="@javatypes/jdk" />
 
 import { task, server } from "@ccms/api";
 import { inject } from "@ccms/container";

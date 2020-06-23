@@ -1,5 +1,5 @@
 /// <reference types="@ccms/nashorn" />
-
+import '@ccms/nodejs'
 import i18n from '@ccms/i18n'
 let ployfillStartTime = new Date().getTime()
 i18n.initialize()

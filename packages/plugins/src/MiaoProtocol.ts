@@ -1,5 +1,3 @@
-/// <reference types="@ccms/types" />
-
 import { task, server, constants } from "@ccms/api";
 import { inject } from "@ccms/container";
 import { plugin, interfaces, cmd } from "@ccms/plugin";
