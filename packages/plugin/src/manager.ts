@@ -56,6 +56,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
                 this.loaderMap.set(loader.type, loader)
             })
             this.initialized = true
+            process.emit('plugin.initialize')
         }
     }
 
@@ -77,10 +78,12 @@ export class PluginManagerImpl implements plugin.PluginManager {
                 console.ex(error)
             }
         }
+        process.emit('plugin.scan', folder)
     }
 
     build(): void {
         this.buildPlugins()
+        process.emit('plugin.build')
     }
 
     private logStage(plugin: plugin.Plugin, stage: string) {
@@ -101,14 +104,25 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     private loadPlugin(loadMetadata: plugin.PluginLoadMetadata) {
+        if (!loadMetadata) { throw new Error('loadMetadata can\'t be undefiend when loadPlugin!') }
+        if (loadMetadata.loaded) { throw new Error(`Plugin ${loadMetadata.name} is already loaded by ${loadMetadata.loader?.type}!`) }
         try {
             for (const [, loader] of this.loaderMap) {
-                if (loader.require(loadMetadata).loaded) {
-                    loadMetadata.loader = loader
-                    let metadata = loadMetadata.metadata
-                    this.metadataMap.set(metadata.name, metadata)
-                    metadata.loadMetadata = loadMetadata
-                    return metadata
+                try {
+                    if (loader.require(loadMetadata).loaded) {
+                        loadMetadata.loader = loader
+                        let metadata = loadMetadata.metadata
+                        this.metadataMap.set(metadata.name, metadata)
+                        metadata.loadMetadata = loadMetadata
+                        return metadata
+                    }
+                } catch (error) {
+                    if (global.debug) {
+                        console.console(`§6Loader §b${loader.type} §6load §a${loadMetadata.file} §cerror. §4Err: §c${error}`)
+                        console.ex(error)
+                    } else {
+                        console.warn(`Loader ${loader.type} load ${loadMetadata.file} error. Err: ${error}`)
+                    }
                 }
             }
         } catch (error) {
@@ -123,8 +137,8 @@ export class PluginManagerImpl implements plugin.PluginManager {
      * @param file java.io.File
      */
     loadFromFile(file: string, scanner = this.sacnnerMap.get('file')): plugin.Plugin {
-        if (!file) { throw new Error('plugin file can\'t be null!') }
-        if (!scanner) { throw new Error('plugin scanner can\'t be null!') }
+        if (!file) { throw new Error('plugin file can\'t be undefiend!') }
+        if (!scanner) { throw new Error('plugin scanner can\'t be undefiend!') }
         let metadata = this.loadPlugin(scanner.read(file))
         let plugin = metadata.loadMetadata.loader.build(metadata)
         this.load(plugin)
@@ -162,7 +176,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     reload(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((pl: plugin.Plugin) => {
             this.disable(pl)
-            this.loadFromFile(pl.description.source, pl.description.loadMetadata.scanner)
+            this.loadFromFile(pl.description.source.toString(), pl.description.loadMetadata.scanner)
         })
     }
 
@@ -184,10 +198,11 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     private checkAndGet(name: string | plugin.Plugin | undefined | any): Map<string, plugin.Plugin> | plugin.Plugin[] {
+        if (name === undefined) throw new Error(`checkAndGet Plugin can't be undefiend!`)
         if (name == this.instanceMap) { return this.instanceMap }
         if (typeof name == 'string' && this.instanceMap.has(name)) { return [this.instanceMap.get(name)] }
         if (name instanceof interfaces.Plugin) { return [name as plugin.Plugin] }
-        if (name.description || name.description.name) { return [name as plugin.Plugin] }
+        if (name.description?.name) { return [name as plugin.Plugin] }
         throw new Error(`Plugin ${JSON.stringify(name)} not exist!`)
     }
 

@@ -14,6 +14,7 @@ export class MySQLScanner implements plugin.PluginScanner {
     type: string = "mysql"
 
     private cacheDir = 'mysql-plugin-cache'
+    private cacheFileMap: Map<string, MySQLPlugin> = new Map()
     private target: string
 
     @inject(database.DataBaseManager)
@@ -25,7 +26,14 @@ export class MySQLScanner implements plugin.PluginScanner {
         return plugins.map(p => this.read(p))
     }
     read(mysqlPlugin: MySQLPlugin): plugin.PluginLoadMetadata {
-        return { name: mysqlPlugin.name, file: fs.concat(root, this.cacheDir, `${mysqlPlugin.name}.js`), type: this.type, mysqlPlugin, scanner: this }
+        // if invoke this function from loadFromFile mysqlPlugin is a string need read from cache
+        if (typeof mysqlPlugin == "string") {
+            if (!this.cacheFileMap.has(mysqlPlugin)) { throw new Error(`this file ${mysqlPlugin} is not read from mysql-scanner. can't reload from this scanner!`) }
+            mysqlPlugin = this.cacheFileMap.get(mysqlPlugin)
+        }
+        let cacheFile = fs.concat(root, this.cacheDir, `${mysqlPlugin.name}.js`)
+        this.cacheFileMap.set(cacheFile, mysqlPlugin)
+        return { name: mysqlPlugin.name, file: cacheFile, type: this.type, mysqlPlugin, scanner: this }
     }
     load(metadata: plugin.PluginLoadMetadata) {
         if (metadata.type !== this.type) { return }

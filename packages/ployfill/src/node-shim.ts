@@ -28,8 +28,9 @@ class Process extends EventEmitter {
     queueMicrotask(func: Function) {
         microTaskPool.execute(func)
     }
-    exit() {
-        microTaskPool.shutdown();
+    exit(code: number) {
+        process.emit('exit', code)
+        microTaskPool.shutdown()
     }
 }
 global.setGlobal('process', new Process(), {})
