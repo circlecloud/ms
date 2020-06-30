@@ -79,23 +79,16 @@ export function config(metadata: interfaces.ConfigMetadata = {}) {
     }
 }
 
-function stage(metadata: interfaces.ExecMetadata = {}, stage: string) {
-    return function (target: any, key: string, value: any) {
-        metadata.name = metadata.name || key
-        metadata.executor = key
-        const previousMetadata: interfaces.ExecMetadata[] = getPluginStageMetadata(target, stage)
-        Reflect.defineMetadata(METADATA_KEY.stage[stage], [metadata, ...previousMetadata], target.constructor)
+function stage(stage: string) {
+    return (metadata: interfaces.ExecMetadata = {}) => {
+        return function (target: any, key: string, value: any) {
+            metadata.name = metadata.name || key
+            metadata.executor = key
+            const previousMetadata: interfaces.ExecMetadata[] = getPluginStageMetadata(target, stage)
+            Reflect.defineMetadata(METADATA_KEY.stage[stage], [metadata, ...previousMetadata], target.constructor)
+        }
     }
 }
-
-export function load(metadata: interfaces.ExecMetadata = {}) {
-    return stage(metadata, 'load')
-}
-
-export function enable(metadata: interfaces.ExecMetadata = {}) {
-    return stage(metadata, 'enable')
-}
-
-export function disable(metadata: interfaces.ExecMetadata = {}) {
-    return stage(metadata, 'disable')
-}
+export const load = stage('load')
+export const enable = stage('enable')
+export const disable = stage('disable')

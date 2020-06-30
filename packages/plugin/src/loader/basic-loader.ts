@@ -11,8 +11,8 @@ export class BasicLoader implements plugin.PluginLoader {
         this.pluginRequireMap = new Map()
     }
     require(loadMetadata: plugin.PluginLoadMetadata) {
-        let metadata = loadMetadata.instance.description
-        if (metadata && metadata.type == this.type) {
+        let metadata = loadMetadata.instance?.description
+        if (metadata?.type == this.type) {
             loadMetadata.metadata = metadata
             loadMetadata.loaded = true
             this.pluginRequireMap.set(metadata.source.toString(), loadMetadata.instance)
