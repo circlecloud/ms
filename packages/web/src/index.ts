@@ -6,5 +6,6 @@
 /// <reference types="@javatypes/spring-beans" />
 
 export * from './server'
+export * from './constants'
 export * from './decorators'
 export * from './interfaces'
