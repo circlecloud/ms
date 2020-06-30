@@ -1,10 +1,16 @@
 import * as querystring from 'querystring'
 
 import { web } from '@ccms/api'
-import { provideSingleton, JSClass, postConstruct } from '@ccms/container'
+import { provideSingleton, JSClass, postConstruct, Container, ContainerInstance, inject } from '@ccms/container'
 
-import { WebProxyBeanName, FilterProxyBeanName } from './constants'
-import { Context, InterceptorAdapter, RequestHandler } from './interfaces'
+import { WebProxyBeanName, FilterProxyBeanName, METADATA_KEY, PARAM_TYPE } from './constants'
+import { Context, InterceptorAdapter, RequestHandler, interfaces } from './interfaces'
+import { getControllerActions, getActionMetadata, getControllerMetadata, getActionParams } from './decorators'
+
+const HttpServletRequestWrapper = Java.type('javax.servlet.http.HttpServletRequestWrapper')
+const HttpServletResponseWrapper = Java.type('javax.servlet.http.HttpServletResponseWrapper')
+const ServletInputStream = Java.type('javax.servlet.ServletInputStream')
+const ServletOutputStream = Java.type('javax.servlet.ServletOutputStream')
 
 @provideSingleton(web.Server)
 export class Server {
@@ -13,11 +19,14 @@ export class Server {
     @JSClass('pw.yumc.MiaoScript.web.WebFilterProxy')
     private WebFilterProxy: any
 
+    @inject(ContainerInstance)
+    private container: Container
+
     private StreamUtils = org.springframework.util.StreamUtils
     private ResponseEntity = org.springframework.http.ResponseEntity
 
     private interceptors: Map<string, InterceptorAdapter>
-    private handlerMapping: Map<string, RequestHandler>
+    private methodMappings: Map<string, Map<string, RequestHandler>>
 
     private beanFactory: org.springframework.beans.factory.support.DefaultListableBeanFactory
 
@@ -25,7 +34,7 @@ export class Server {
     initialization() {
         this.beanFactory = base.getInstance().getAutowireCapableBeanFactory()
         this.interceptors = new Map()
-        this.handlerMapping = new Map()
+        this.methodMappings = new Map()
         this.start()
     }
 
@@ -43,13 +52,77 @@ export class Server {
         }
     }
 
+    registryController(target: any) {
+        if (!target) { throw new Error('Controller can\'t be undefiend!') }
+        let controllerMetadata = getControllerMetadata(target)
+        if (!controllerMetadata) { throw new Error(`Controller ${target.name} must have @Controller decorator!`) }
+        try {
+            this.container.rebind(METADATA_KEY.Controller).to(target).inSingletonScope().whenTargetNamed(target.name)
+        } catch{
+            this.container.bind(METADATA_KEY.Controller).to(target).inSingletonScope().whenTargetNamed(target.name)
+        }
+        target = this.container.getNamed(METADATA_KEY.Controller, target.name)
+        let actions = getControllerActions(target)
+        for (const action of actions) {
+            let actionMetadata = getActionMetadata(target, action)
+            let path = `${controllerMetadata.path || ''}${actionMetadata.path || ''}`
+            if (!path) throw new Error(`Controller ${controllerMetadata.name} Action ${actionMetadata.name} path is empty!`)
+            if (!this.methodMappings.has(path)) { this.methodMappings.set(path, new Map()) }
+            console.debug(`Controller ${controllerMetadata.name} Registry ${path} to ${actionMetadata.executor || '<anonymous>'} Action function.`)
+            this.methodMappings.get(path).set(actionMetadata.method || 'ALL', (ctx: Context) => {
+                let args = []
+                let params = getActionParams(target, action)
+                for (const index in params) {
+                    let param = params[index]
+                    let paramValue = undefined
+                    switch (param.type) {
+                        case PARAM_TYPE.REQUEST: paramValue = ctx.request; break
+                        case PARAM_TYPE.RESPONSE: paramValue = ctx.response; break
+                        case PARAM_TYPE.QUERY: paramValue = ctx.params[param.name]; break
+                        case PARAM_TYPE.HEADER: paramValue = ctx.headers[param.name]; break
+                        case PARAM_TYPE.BODY: paramValue = ctx.body; break
+                        case PARAM_TYPE.COOKIE: paramValue = ctx.cookies[param.name]; break
+                    }
+                    if (param.require && !paramValue) {
+                        return {
+                            status: 400,
+                            msg: param.message ?? `Param Type ${param.type} require not empty!`,
+                            data: param
+                        }
+                    }
+                    args[param.index] = paramValue ?? param.default
+                }
+                return target[actionMetadata.executor].apply(target, args)
+            })
+        }
+    }
+
+    unregistryController(target: any) {
+        if (!target) { throw new Error('Controller can\'t be undefiend!') }
+        let controllerMetadata = getControllerMetadata(target)
+        if (!controllerMetadata) { throw new Error(`Controller ${target.name} must have @Controller decorator!`) }
+        try {
+            target = this.container.getNamed(METADATA_KEY.Controller, target.name)
+        } catch (error) {
+            throw new Error(`Controller ${target.name} not registry! err: ${error}`)
+        }
+        let actions = getControllerActions(target)
+        for (const action of actions) {
+            let actionMetadata = getActionMetadata(target, action)
+            let path = `${controllerMetadata.path || ''}${actionMetadata.path || ''}`
+            if (!this.methodMappings.has(path)) { continue }
+            this.methodMappings.get(path).delete(actionMetadata.method)
+        }
+    }
+
     registryMapping(path: string, handler: RequestHandler) {
         console.debug(`Registry Mapping ${path} to handle ${handler.name || '<anonymous>'} function.`)
-        this.handlerMapping.set(path, handler)
+        if (!this.methodMappings.has(path)) { this.methodMappings.set(path, new Map()) }
+        this.methodMappings.get(path).set("ALL", handler)
     }
 
     unregistryMapping(path: string) {
-        this.handlerMapping.delete(path)
+        if (this.methodMappings.has(path)) { this.methodMappings.get(path).delete("ALL") }
     }
 
     registryInterceptor(interceptor: InterceptorAdapter) {
@@ -65,28 +138,72 @@ export class Server {
         try { this.beanFactory.destroySingleton(FilterProxyBeanName) } catch (ex) { }
         var WebFilterProxyNashorn = Java.extend(this.WebFilterProxy, {
             doFilter: (servletRequest: javax.servlet.http.HttpServletRequest, servletResponse: javax.servlet.http.HttpServletResponse, filterChain: javax.servlet.FilterChain) => {
-                console.log('WebFilterProxyNashorn', 'doFilter', servletRequest, servletResponse)
                 filterChain.doFilter(servletRequest, servletResponse)
             }
         })
         this.beanFactory.registerSingleton(FilterProxyBeanName, new WebFilterProxyNashorn())
     }
 
+    // private getRequestWrapper(servletRequest: javax.servlet.http.HttpServletRequest) {
+    //     var body = org.springframework.util.StreamUtils.copyToByteArray(servletRequest.getInputStream())
+    //     var HttpServletRequestWrapperAdapter = Java.extend(HttpServletRequestWrapper, {
+    //         getInputStream: () => {
+    //             var bais = new java.io.ByteArrayInputStream(body)
+    //             return new ServletInputStream({
+    //                 read: () => bais.read(),
+    //                 isFinished: () => bais.available() == 0
+    //             })
+    //         }
+    //     })
+    //     var wrapper = new HttpServletRequestWrapperAdapter(servletRequest)
+    //     return wrapper
+    // }
+
+    // private getResponseWrapper(servletResponse: javax.servlet.http.HttpServletResponse) {
+    //     var HttpServletRequestWrapperAdapter = Java.extend(HttpServletRequestWrapper, {
+    //         getOutputStream: () => {
+    //             return new ServletOutputStream({
+    //             })
+    //         }
+    //     })
+    //     var wrapper = new HttpServletRequestWrapperAdapter(servletResponse)
+    //     return wrapper
+    // }
+
+    private notFound(method: string, path: string) {
+        return {
+            status: 404,
+            msg: "handlerMapping Not Found!",
+            method,
+            path,
+            timestamp: Date.now()
+        }
+    }
+
     private registryWebProxy() {
         try { this.beanFactory.destroySingleton(WebProxyBeanName) } catch (ex) { }
         var WebServerProxyNashorn = Java.extend(this.WebServerProxy, {
             process: (req: javax.servlet.http.HttpServletRequest, resp: javax.servlet.http.HttpServletResponse) => {
-                let ctx: Context = { request: req, response: resp }
+                let path = req.getRequestURI()
+                if (!this.methodMappings.has(path)) return this.notFound(req.getMethod(), path)
+                let mappings = this.methodMappings.get(req.getRequestURI())
+                let handler = mappings.get(req.getMethod()) || mappings.get("ALL")
+                if (!handler) return this.notFound(req.getMethod(), path)
+                let ctx: Context = { request: req, response: resp, params: {}, body: {}, handler }
                 ctx.url = req.getRequestURI()
                 // @ts-ignore
-                ctx.header = { __noSuchProperty__: (name: string) => req.getHeader(name) + '' }
+                ctx.headers = { __noSuchProperty__: (name: string) => req.getHeader(name) }
+                ctx.cookies = {}
+                for (const cookie of (req.getCookies() || [])) {
+                    ctx.cookies[cookie.getName()] = cookie.getValue()
+                }
                 if (req.getQueryString()) {
                     ctx.url += `?${req.getQueryString()}`
                     ctx.params = querystring.parse(req.getQueryString())
                 }
                 if (req.getMethod() == "POST") {
                     ctx.body = this.StreamUtils.copyToString(req.getInputStream(), java.nio.charset.StandardCharsets.UTF_8)
-                    if ((ctx.header['Content-Type'] || '').includes('application/json')) {
+                    if ((ctx.headers['Content-Type'] || '').includes('application/json')) {
                         try {
                             ctx.body = JSON.parse(ctx.body)
                         } catch (error) {
@@ -158,6 +275,7 @@ export class Server {
 ===================== MiaoSpring =====================
 Request  Method : ${ctx.request.getMethod()}
 Request  URL    : ${ctx.url}
+Request  Body   : ${JSON.stringify(ctx.body)}
 Response Body   : ${JSON.stringify(Java.asJSONCompatible(ctx.result))}
 Handle   Time   : ${Date.now() - startTime}ms
 ======================================================`)
@@ -165,16 +283,8 @@ Handle   Time   : ${Date.now() - startTime}ms
     }
 
     private execRequestHandle(ctx: Context) {
-        if (!this.handlerMapping.has(ctx.request.getRequestURI())) {
-            return {
-                status: 404,
-                msg: "handlerMapping Not Found!",
-                path: ctx.url,
-                timestamp: Date.now()
-            }
-        }
         try {
-            return this.handlerMapping.get(ctx.request.getRequestURI())(ctx)
+            return ctx.handler(ctx)
         } catch (error) {
             return {
                 status: 500,

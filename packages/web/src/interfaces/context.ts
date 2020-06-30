@@ -5,14 +5,20 @@ export interface InterceptorAdapter {
     postHandle?(ctx: Context): void
 }
 
-export type RequestHeader = { [key: string]: string | string[] }
-export type RequestParams = { [key: string]: string | string[] }
+type StringKeyAndStringValue = { [key: string]: string }
+type StringKeyAndStringOrArrayValue = { [key: string]: string | string[] }
+
+export type RequestHeaders = StringKeyAndStringOrArrayValue
+export type RequestParams = StringKeyAndStringOrArrayValue
+export type RequestCookies = StringKeyAndStringValue
 
 export interface Context {
     request?: javax.servlet.http.HttpServletRequest
     response?: javax.servlet.http.HttpServletResponse
-    header?: RequestHeader
+    handler?: RequestHandler
     url?: string
+    headers?: RequestHeaders
+    cookies?: RequestCookies
     params?: RequestParams
     body?: any
     result?: any
