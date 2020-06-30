@@ -2,10 +2,10 @@
 /// <reference types="@javatypes/spring-web" />
 
 import { constants, database, plugin, web } from "@ccms/api"
-import { inject, ContainerInstance, Container, JSClass } from "@ccms/container"
+import { inject, ContainerInstance, Container, JSClass, postConstruct } from "@ccms/container"
 import { JSPlugin, interfaces, cmd } from "@ccms/plugin"
 import { DataBase, DataBaseManager } from '@ccms/database'
-import { Server, Context, RequestHandler } from '@ccms/web'
+import { Server, Context, RequestHandler, Controller, Get, Post, Param, Body } from '@ccms/web'
 
 import * as fs from '@ccms/common/dist/fs'
 import * as reflect from '@ccms/common/dist/reflect'
@@ -65,7 +65,7 @@ export class MiaoSpring extends interfaces.Plugin {
         this.webServer.registryInterceptor({
             name: 'StaticHandle',
             preHandle: (ctx: Context) => {
-                let type = ctx.header['Accept'] || ''
+                let type = ctx.headers['Accept'] || ''
                 if (type == '*/*' || type.includes('text/css') || type.includes('text/html')) {
                     let filePath = fs.concat(root, 'wwwroot', (ctx.request.getRequestURI() == '/' ? 'index.html' : ctx.request.getRequestURI()))
                     let fileType = 'text/html;charset=utf-8'
@@ -73,33 +73,25 @@ export class MiaoSpring extends interfaces.Plugin {
                     if (fs.exists(filePath)) {
                         if (filePath.endsWith('.js')) { fileType = 'application/javascript' }
                         if (filePath.endsWith('.css')) { fileType = 'text/css' }
-                        // @ts-ignore
                         return this.ResponseEntity.ok().header('Content-Type', fileType).body(base.read(filePath))
                     }
                 }
             }
         })
-        this.webServer.registryMapping('/api/eval', (ctx: Context) => {
+        this.registryMapping('/api/eval', (ctx: Context) => {
             try {
                 return { status: 200, data: this.runCode(ctx.body + ''), msg: '代码执行成功!' }
             } catch (error) {
                 return { status: 500, data: console.stack(error, false), msg: '代码执行异常!' }
             }
         })
-        this.webServer.registryMapping('/api/plugin/list', () => {
-            return { status: 200, data: [...this.pluginManager.getPlugins().values()].map((plugin) => plugin.description), msg: '插件列表获取成功!' }
-        })
-        this.webServer.registryMapping('/api/plugin/update', (ctx: Context) => {
-            if (!ctx.params.name) { return { status: 400, msg: '插件名称不得为空!' } }
-
-        })
     }
 
     private registryPages() {
-        this.webServer.registryMapping('/api/page/list', () => {
+        this.registryMapping('/api/page/list', () => {
             return { status: 0, data: { rows: this.mainDatabase.query('SELECT `id`, `type`, `name`, `content` FROM `pages` WHERE `deleted` = 0') } }
         })
-        this.webServer.registryMapping('/api/page/get', (ctx: Context) => {
+        this.registryMapping('/api/page/get', (ctx: Context) => {
             let name = decodeURIComponent(`${ctx.params.name}`)
             let varable = undefined
             if (!name) { return { status: 400, msg: '名称不能为空!' } }
@@ -119,20 +111,20 @@ export class MiaoSpring extends interfaces.Plugin {
             }
             return { status: 0, data: JSON.parse(content) }
         })
-        this.webServer.registryMapping('/api/page/add', (ctx: Context) => {
+        this.registryMapping('/api/page/add', (ctx: Context) => {
             let body = ctx.body
             if (typeof body.content !== "string") { body.content = JSON.stringify(body.content) }
             this.mainDatabase.update("INSERT INTO `pages`(`type`, `name`, `content`) VALUES (?, ?, ?)", body.type || 1, body.name, body.content)
             return { status: 0, msg: `${body.name} 新增成功!` }
         })
-        this.webServer.registryMapping('/api/page/update', (ctx: Context) => {
+        this.registryMapping('/api/page/update', (ctx: Context) => {
             if (!ctx.params.id) { return { status: 400, msg: 'ID 不能为空!' } }
             const body = ctx.body
             if (typeof body.content !== "string") { body.content = JSON.stringify(body.content) }
             this.mainDatabase.update("UPDATE `pages` SET `name` = ?, `content` = ? WHERE id = ?", body.name, body.content, ctx.params.id)
             return { status: 0, msg: `${body.name} 更新成功!` }
         })
-        this.webServer.registryMapping('/api/page/delete', (ctx: Context) => {
+        this.registryMapping('/api/page/delete', (ctx: Context) => {
             if (!ctx.params.name) { return { status: 400, msg: '页面 名称 不能为空!' } }
             this.mainDatabase.update("UPDATE `pages` SET `name` = CONCAT(name, '_deleted'), deleted = 1 WHERE name = ?", ctx.params.name)
             return { status: 0, msg: `${ctx.params.name} 删除成功!` }
@@ -142,17 +134,17 @@ export class MiaoSpring extends interfaces.Plugin {
     private configTable = "config"
 
     private registryDatabase() {
-        this.webServer.registryMapping('/api/config/list', (ctx: Context) => {
+        this.registryMapping('/api/config/list', (ctx: Context) => {
             return { status: 0, data: this.mainDatabase.query('SELECT id, name, label, url, driver, username, password FROM `' + this.configTable + '` WHERE deleted = 0 AND type = ?', ctx.params.type || 0) }
         })
-        this.webServer.registryMapping('/api/config/get', (ctx: Context) => {
+        this.registryMapping('/api/config/get', (ctx: Context) => {
             let name = ctx.params.name
             if (!name) { return { status: 400, msg: '名称不能为空!' } }
             let result = this.mainDatabase.query('SELECT id, name, label, url, driver, username, password FROM `' + this.configTable + '` WHERE `name` = ?', name)
             if (!result.length) { return { status: 404, msg: `配置 ${name} 不存在!` } }
             return { status: 0, data: result[0] }
         })
-        this.webServer.registryMapping('/api/config/add', (ctx: Context) => {
+        this.registryMapping('/api/config/add', (ctx: Context) => {
             let body = ctx.body
             if (!body.name) { return { status: 400, msg: '名称不能为空!' } }
             this.mainDatabase.update(
@@ -161,7 +153,7 @@ export class MiaoSpring extends interfaces.Plugin {
             )
             return { status: 0, msg: `配置 ${body.name} 新增成功!` }
         })
-        this.webServer.registryMapping('/api/config/update', (ctx: Context) => {
+        this.registryMapping('/api/config/update', (ctx: Context) => {
             if (!ctx.params.id) { return { status: 400, msg: 'ID 不能为空!' } }
             let body = ctx.body
             this.mainDatabase.update(
@@ -195,5 +187,46 @@ return eval(${JSON.stringify(code)});`)
 
     disable() {
         Object.keys(this.mappings).forEach((r) => this.webServer.unregistryMapping(r))
+    }
+}
+
+class Plugin {
+    id: number
+    name: string
+    source: string
+}
+
+@Controller()
+class PluginController {
+    @inject(plugin.PluginManager)
+    private pluginManager: plugin.PluginManager
+    @inject(database.DataBaseManager)
+    private databaseManager: DataBaseManager
+
+    private mainDB: DataBase
+
+    @postConstruct()
+    initialize() {
+        this.mainDB = this.databaseManager.getMainDatabase()
+    }
+
+    @Get()
+    list(@Param('install') install: boolean) {
+        if (install) {
+            return { status: 200, data: [...this.pluginManager.getPlugins().values()].map((plugin) => plugin.description), msg: '插件列表获取成功!' }
+        } else {
+            return { status: 200, data: this.mainDB.query<Plugin>("SELECT name FROM plugins WHERE deleted = 0") }
+        }
+    }
+    @Post()
+    deploy(@Body() info: Plugin) {
+        let plugin = this.mainDB.query<Plugin>("SELECT name FROM plugins WHERE name = ?", info.name)
+        if (plugin.length == 0) {
+            this.mainDB.update("INSERT INTO `plugins`(`name`, `source`) VALUES (?, ?)", info.name, info.source)
+            return { status: 200, msg: `插件 ${info.name} 新增成功!` }
+        } else {
+            this.mainDB.update("UPDATE `plugins` SET `source` = ? WHERE id = ?", info.source, plugin[0].id)
+            return { status: 200, msg: `插件 ${info.name} 更新成功!` }
+        }
     }
 }
