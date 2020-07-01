@@ -20,6 +20,6 @@
         "packages/*"
     ],
     "devDependencies": {
-        "lerna": "^3.21.0"
+        "lerna": "^3.22.1"
     }
 }

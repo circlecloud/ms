@@ -10,9 +10,7 @@ const WebSocketServerProxy = Java.type("pw.yumc.MiaoScript.websocket.WebSocketPr
 const ThreadPoolExecutor = Java.type('java.util.concurrent.ThreadPoolExecutor')
 const ThreadPoolTaskExecutor = Java.type('org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor')
 
-interface TomcatWebSocketSession {
-    getId: () => number
-}
+type TomcatWebSocketSession = javax.websocket.Session
 
 class TomcatWebSocketServer extends EventEmitter {
     private beanFactory: any

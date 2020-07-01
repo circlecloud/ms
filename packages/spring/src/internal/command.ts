@@ -47,7 +47,7 @@ export class CommandMap {
     }
 
     tabComplate(sender: any, input: string, index?: number): string[] {
-        if (index == 0) { return Object.keys(this.commands) }
+        if (index == 0) { return Object.keys(this.commands).concat('help') }
         let [command, ...args] = input.split(' ')
         let exists = this.commands[command]
         if (exists && exists.tabCompleter) {
