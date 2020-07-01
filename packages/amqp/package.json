@@ -21,12 +21,15 @@
     "dependencies": {
         "@ccms/api": "^0.8.1",
         "@ccms/common": "^0.8.0",
-        "@ccms/container": "^0.8.0",
-        "@ccms/nashorn": "^0.8.0"
+        "@ccms/container": "^0.8.0"
     },
     "devDependencies": {
+        "@ccms/nashorn": "^0.8.0",
+        "@javatypes/amqp-client": "^0.0.2",
+        "@javatypes/spring-amqp": "^0.0.2",
+        "@javatypes/spring-rabbit": "^0.0.2",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
-        "typescript": "^3.9.2"
+        "typescript": "^3.9.5"
     }
 }

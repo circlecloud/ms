@@ -19,9 +19,10 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "devDependencies": {
+        "@javatypes/spring-jdbc": "^0.0.2",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
-        "typescript": "^3.9.2"
+        "typescript": "^3.9.5"
     },
     "dependencies": {
         "@ccms/api": "^0.8.1",

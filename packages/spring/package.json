@@ -21,7 +21,7 @@
     "devDependencies": {
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
-        "typescript": "^3.9.2"
+        "typescript": "^3.9.5"
     },
     "dependencies": {
         "@ccms/api": "^0.8.1",
