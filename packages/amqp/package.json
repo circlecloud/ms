@@ -1,6 +1,6 @@
 {
     "name": "@ccms/amqp",
-    "version": "0.8.2",
+    "version": "0.8.3",
     "description": "MiaoScript amqp package",
     "keywords": [
         "miaoscript",
@@ -19,12 +19,12 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
-        "@ccms/api": "^0.8.2",
-        "@ccms/common": "^0.8.2",
-        "@ccms/container": "^0.8.2"
+        "@ccms/api": "^0.8.3",
+        "@ccms/common": "^0.8.3",
+        "@ccms/container": "^0.8.3"
     },
     "devDependencies": {
-        "@ccms/nashorn": "^0.8.2",
+        "@ccms/nashorn": "^0.8.3",
         "@javatypes/amqp-client": "^0.0.2",
         "@javatypes/spring-amqp": "^0.0.2",
         "@javatypes/spring-rabbit": "^0.0.2",
