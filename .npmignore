@@ -21,3 +21,4 @@ wallaby.js
 .theia
 type_definitions
 tsconfig.tsbuildinfo
+*.tsbuildinfo
