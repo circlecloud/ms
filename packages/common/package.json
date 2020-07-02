@@ -1,6 +1,6 @@
 {
     "name": "@ccms/common",
-    "version": "0.8.2",
+    "version": "0.8.3",
     "description": "MiaoScript api package",
     "keywords": [
         "miaoscript",
@@ -19,7 +19,7 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "devDependencies": {
-        "@ccms/nashorn": "^0.8.2",
+        "@ccms/nashorn": "^0.8.3",
         "@javatypes/jdk": "^0.0.2",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",

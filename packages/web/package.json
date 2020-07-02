@@ -1,6 +1,6 @@
 {
     "name": "@ccms/web",
-    "version": "0.8.2",
+    "version": "0.8.3",
     "description": "MiaoScript web package",
     "keywords": [
         "miaoscript",
@@ -29,7 +29,7 @@
         "typescript": "^3.9.6"
     },
     "dependencies": {
-        "@ccms/api": "^0.8.2",
-        "@ccms/container": "^0.8.2"
+        "@ccms/api": "^0.8.3",
+        "@ccms/container": "^0.8.3"
     }
 }

@@ -1,6 +1,6 @@
 {
     "name": "@ccms/database",
-    "version": "0.8.2",
+    "version": "0.8.3",
     "description": "MiaoScript database package",
     "keywords": [
         "miaoscript",
@@ -25,7 +25,7 @@
         "typescript": "^3.9.6"
     },
     "dependencies": {
-        "@ccms/api": "^0.8.2",
-        "@ccms/container": "^0.8.2"
+        "@ccms/api": "^0.8.3",
+        "@ccms/container": "^0.8.3"
     }
 }
