@@ -5,7 +5,9 @@
         "outDir": "dist",
         "skipLibCheck": true,
         "sourceMap": false,
-        "inlineSourceMap": true
+        "inlineSourceMap": true,
+        "declaration": false,
+        "declarationMap": false
     },
     "exclude": [
         "dist",

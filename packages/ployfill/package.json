@@ -22,6 +22,6 @@
         "@ccms/nashorn": "^0.8.2",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
-        "typescript": "^3.9.5"
+        "typescript": "^3.9.6"
     }
 }
