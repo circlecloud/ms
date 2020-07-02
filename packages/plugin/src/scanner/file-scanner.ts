@@ -44,7 +44,7 @@ export class JSFileScanner implements plugin.PluginScanner {
     }
 
     private updatePlugin(file: any) {
-        var update = fs.file(fs.file(file.parentFile, 'update'), file.name)
+        var update = fs.file(fs.file(fs.file(file).parentFile, 'update'), file.name)
         if (update.exists()) {
             console.i18n("ms.plugin.manager.build.update", { name: file.name })
             fs.move(update, file, true)

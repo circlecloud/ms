@@ -139,7 +139,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     loadFromFile(file: string, scanner = this.sacnnerMap.get('file')): plugin.Plugin {
         if (!file) { throw new Error('plugin file can\'t be undefiend!') }
         if (!scanner) { throw new Error('plugin scanner can\'t be undefiend!') }
-        let metadata = this.loadPlugin(scanner.read(file))
+        let metadata = this.loadPlugin(scanner.load(scanner.read(file)))
         let plugin = metadata.loadMetadata.loader.build(metadata)
         this.load(plugin)
         this.enable(plugin)
