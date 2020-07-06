@@ -1,11 +1,11 @@
 import * as querystring from 'querystring'
 
-import { web } from '@ccms/api'
+import { web, plugin } from '@ccms/api'
 import { provideSingleton, JSClass, postConstruct, Container, ContainerInstance, inject } from '@ccms/container'
 
 import { WebProxyBeanName, FilterProxyBeanName, METADATA_KEY, PARAM_TYPE } from './constants'
 import { Context, InterceptorAdapter, RequestHandler, interfaces } from './interfaces'
-import { getControllerActions, getActionMetadata, getControllerMetadata, getActionParams } from './decorators'
+import { getControllerActions, getActionMetadata, getControllerMetadata, getActionParams, getControllerMetadatas } from './decorators'
 
 const HttpServletRequestWrapper = Java.type('javax.servlet.http.HttpServletRequestWrapper')
 const HttpServletResponseWrapper = Java.type('javax.servlet.http.HttpServletResponseWrapper')
@@ -25,6 +25,7 @@ export class Server {
     private StreamUtils = org.springframework.util.StreamUtils
     private ResponseEntity = org.springframework.http.ResponseEntity
 
+    private pluginControllers: Map<string, any>
     private interceptors: Map<string, InterceptorAdapter>
     private methodMappings: Map<string, Map<string, RequestHandler>>
 
@@ -36,6 +37,8 @@ export class Server {
         this.interceptors = new Map()
         this.methodMappings = new Map()
         this.start()
+        process.on('plugin.after.enable', (plugin: plugin.Plugin) => this.registryPlugin(plugin))
+        process.on('plugin.after.disable', (plugin: plugin.Plugin) => this.unregistryPlugin(plugin))
     }
 
     start() {
@@ -52,23 +55,34 @@ export class Server {
         }
     }
 
+    registryPlugin(plugin: plugin.Plugin) {
+        let controllers = getControllerMetadatas(plugin).values()
+        for (const controller of controllers) {
+            console.debug(`Plugin ${plugin.description.name} Registry Controller ${controller.name}.`)
+            this.registryController(controller.target)
+        }
+    }
+
+    unregistryPlugin(plugin: plugin.Plugin) {
+        let controllers = getControllerMetadatas(plugin).values()
+        for (const controller of controllers) {
+            console.debug(`Plugin ${plugin.description.name} Unregistry Controller ${controller.name}.`)
+            this.unregistryController(controller.target)
+        }
+    }
+
     registryController(target: any) {
         if (!target) { throw new Error('Controller can\'t be undefiend!') }
         let controllerMetadata = getControllerMetadata(target)
         if (!controllerMetadata) { throw new Error(`Controller ${target.name} must have @Controller decorator!`) }
-        try {
-            this.container.rebind(METADATA_KEY.Controller).to(target).inSingletonScope().whenTargetNamed(target.name)
-        } catch{
-            this.container.bind(METADATA_KEY.Controller).to(target).inSingletonScope().whenTargetNamed(target.name)
-        }
-        target = this.container.getNamed(METADATA_KEY.Controller, target.name)
+        target = this.bindController(target)
         let actions = getControllerActions(target)
         for (const action of actions) {
             let actionMetadata = getActionMetadata(target, action)
             let path = `${controllerMetadata.path || ''}${actionMetadata.path || ''}`
             if (!path) throw new Error(`Controller ${controllerMetadata.name} Action ${actionMetadata.name} path is empty!`)
             if (!this.methodMappings.has(path)) { this.methodMappings.set(path, new Map()) }
-            console.debug(`Controller ${controllerMetadata.name} Registry ${path} to ${actionMetadata.executor || '<anonymous>'} Action function.`)
+            console.debug(`Controller ${controllerMetadata.name} Registry ${path} Action to ${actionMetadata.executor || '<anonymous>'} function.`)
             this.methodMappings.get(path).set(actionMetadata.method || 'ALL', (ctx: Context) => {
                 let args = []
                 let params = getActionParams(target, action)
@@ -97,6 +111,15 @@ export class Server {
         }
     }
 
+    private bindController(target: any) {
+        try {
+            this.container.rebind(METADATA_KEY.Controller).to(target).inSingletonScope().whenTargetNamed(target.name)
+        } catch{
+            this.container.bind(METADATA_KEY.Controller).to(target).inSingletonScope().whenTargetNamed(target.name)
+        }
+        return this.container.getNamed(METADATA_KEY.Controller, target.name)
+    }
+
     unregistryController(target: any) {
         if (!target) { throw new Error('Controller can\'t be undefiend!') }
         let controllerMetadata = getControllerMetadata(target)
@@ -112,6 +135,7 @@ export class Server {
             let path = `${controllerMetadata.path || ''}${actionMetadata.path || ''}`
             if (!this.methodMappings.has(path)) { continue }
             this.methodMappings.get(path).delete(actionMetadata.method)
+            console.debug(`Controller ${controllerMetadata.name} Unregistry ${path} Action.`)
         }
     }
 
@@ -130,7 +154,9 @@ export class Server {
         this.interceptors.set(interceptor.name, interceptor)
     }
 
-    unregistryInterceptor(interceptor: InterceptorAdapter) {
+    unregistryInterceptor(interceptor: string | InterceptorAdapter) {
+        if (typeof interceptor === "string") { interceptor = { name: interceptor } }
+        console.debug(`Unregistry ${interceptor.name} Interceptor.`)
         this.interceptors.delete(interceptor.name)
     }
 
@@ -170,12 +196,12 @@ export class Server {
     //     return wrapper
     // }
 
-    private notFound(method: string, path: string) {
+    private notFound(ctx: Context) {
         return {
             status: 404,
             msg: "handlerMapping Not Found!",
-            method,
-            path,
+            method: ctx.request.getMethod(),
+            path: ctx.request.getRequestURI(),
             timestamp: Date.now()
         }
     }
@@ -184,12 +210,7 @@ export class Server {
         try { this.beanFactory.destroySingleton(WebProxyBeanName) } catch (ex) { }
         var WebServerProxyNashorn = Java.extend(this.WebServerProxy, {
             process: (req: javax.servlet.http.HttpServletRequest, resp: javax.servlet.http.HttpServletResponse) => {
-                let path = req.getRequestURI()
-                if (!this.methodMappings.has(path)) return this.notFound(req.getMethod(), path)
-                let mappings = this.methodMappings.get(req.getRequestURI())
-                let handler = mappings.get(req.getMethod()) || mappings.get("ALL")
-                if (!handler) return this.notFound(req.getMethod(), path)
-                let ctx: Context = { request: req, response: resp, params: {}, body: {}, handler }
+                let ctx: Context = { request: req, response: resp, params: {}, body: {} }
                 ctx.url = req.getRequestURI()
                 // @ts-ignore
                 ctx.headers = { __noSuchProperty__: (name: string) => req.getHeader(name) }
@@ -250,6 +271,10 @@ export class Server {
                 }
             }
         }
+        let path = ctx.request.getRequestURI()
+        if (!this.methodMappings.has(path)) return this.notFound(ctx)
+        let mappings = this.methodMappings.get(ctx.request.getRequestURI())
+        ctx.handler = mappings.get(ctx.request.getMethod()) || mappings.get("ALL")
         ctx.result = this.execRequestHandle(ctx)
         for (const [_, interceptor] of this.interceptors) {
             if (interceptor.postHandle) {
@@ -283,6 +308,7 @@ Handle   Time   : ${Date.now() - startTime}ms
     }
 
     private execRequestHandle(ctx: Context) {
+        if (!ctx.handler) return this.notFound(ctx)
         try {
             return ctx.handler(ctx)
         } catch (error) {
