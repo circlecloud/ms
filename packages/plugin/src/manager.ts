@@ -1,11 +1,11 @@
 import i18n from '@ccms/i18n'
-import { plugin, server, command, event } from '@ccms/api'
+import { plugin, server, event } from '@ccms/api'
 import { inject, provideSingleton, Container, ContainerInstance } from '@ccms/container'
-import * as fs from '@ccms/common/dist/fs'
 
+import './config'
 import { interfaces } from './interfaces'
-import { getConfigLoader } from './config'
-import { getPluginCommandMetadata, getPluginListenerMetadata, getPluginTabCompleterMetadata, getPluginConfigMetadata } from './utils'
+import { PluginCommandManager } from './command'
+import { PluginEventManager } from './event'
 
 const Thread = Java.type('java.lang.Thread')
 
@@ -15,14 +15,15 @@ export class PluginManagerImpl implements plugin.PluginManager {
     private container: Container
     @inject(plugin.PluginInstance)
     private pluginInstance: any
-    @inject(plugin.PluginFolder)
-    private pluginFolder: string
     @inject(server.ServerType)
     private serverType: string
-    @inject(command.Command)
-    private CommandManager: command.Command
     @inject(event.Event)
     private EventManager: event.Event
+
+    @inject(PluginCommandManager)
+    private commandManager: PluginCommandManager
+    @inject(PluginEventManager)
+    private eventManager: PluginEventManager
 
     private initialized: boolean = false
 
@@ -38,6 +39,10 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
         this.instanceMap = new Map()
         this.metadataMap = new Map()
+
+        // ignore unused
+        this.commandManager
+        this.eventManager
     }
 
     initialize() {
@@ -90,14 +95,15 @@ export class PluginManagerImpl implements plugin.PluginManager {
         console.i18n("ms.plugin.manager.stage", { stage, plugin: plugin.description.name, version: plugin.description.version, author: plugin.description.author })
     }
 
-    private runPluginStage(plugin: plugin.Plugin, stage: string, ext: Function) {
+    private runPluginStage(plugin: plugin.Plugin, stage: string) {
         if (!plugin) { throw new Error(`can't run runPluginStage ${stage} because plugin is ${plugin}`) }
         try {
             this.logStage(plugin, i18n.translate(`ms.plugin.manager.stage.${stage}`))
-            ext()
+            process.emit(`plugin.before.${stage}`, plugin)
             this.runCatch(plugin, stage)
             this.runCatch(plugin, `${this.serverType}${stage}`)
             plugin.description.loadMetadata.loader[stage](plugin)
+            process.emit(`plugin.after.${stage}`, plugin)
         } catch (ex) {
             console.i18n("ms.plugin.manager.stage.exec.error", { plugin: plugin.description.name, executor: stage, error: ex })
         }
@@ -108,28 +114,32 @@ export class PluginManagerImpl implements plugin.PluginManager {
         if (loadMetadata.loaded) { throw new Error(`Plugin ${loadMetadata.name} is already loaded by ${loadMetadata.loader?.type}!`) }
         try {
             for (const [, loader] of this.loaderMap) {
-                try {
-                    if (loader.require(loadMetadata).loaded) {
-                        loadMetadata.loader = loader
-                        let metadata = loadMetadata.metadata
-                        this.metadataMap.set(metadata.name, metadata)
-                        metadata.loadMetadata = loadMetadata
-                        return metadata
-                    }
-                } catch (error) {
-                    if (global.debug) {
-                        console.console(`§6Loader §b${loader.type} §6load §a${loadMetadata.file} §cerror. §4Err: §c${error}`)
-                        console.ex(error)
-                    } else {
-                        console.warn(`Loader ${loader.type} load ${loadMetadata.file} error. Err: ${error}`)
-                    }
-                }
+                if (this.loaderRequirePlugin(loadMetadata, loader)?.loaded) return loadMetadata.metadata
             }
         } catch (error) {
             console.i18n("ms.plugin.manager.initialize.error", { name: loadMetadata.file, ex: error })
             console.ex(error)
         }
         console.console(`§6scanner: §b${loadMetadata.scanner.type} §ccan\'t load §6file §b${loadMetadata.file}. §eskip!`)
+    }
+
+    private loaderRequirePlugin(loadMetadata: plugin.PluginLoadMetadata, loader: plugin.PluginLoader) {
+        try {
+            if (loader.require(loadMetadata).loaded) {
+                loadMetadata.loader = loader
+                let metadata = loadMetadata.metadata
+                this.metadataMap.set(metadata.name, metadata)
+                metadata.loadMetadata = loadMetadata
+            }
+            return loadMetadata
+        } catch (error) {
+            if (global.debug) {
+                console.console(`§6Loader §b${loader.type} §6load §a${loadMetadata.file} §cerror. §4Err: §c${error}`)
+                console.ex(error)
+            } else {
+                console.warn(`Loader ${loader.type} load ${loadMetadata.file} error. Err: ${error}`)
+            }
+        }
     }
 
     /**
@@ -147,36 +157,21 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     load(...args: any[]): void {
-        this.checkAndGet(args[0]).forEach((plugin: plugin.Plugin) => {
-            this.runPluginStage(plugin, 'load', () => {
-                this.loadConfig(plugin)
-            })
-        })
+        this.checkAndGet(args[0]).forEach((plugin: plugin.Plugin) => this.runPluginStage(plugin, 'load'))
     }
 
     enable(...args: any[]): void {
-        this.checkAndGet(args[0]).forEach((plugin: plugin.Plugin) => {
-            this.runPluginStage(plugin, 'enable', () => {
-                this.registryCommand(plugin)
-                this.registryListener(plugin)
-            })
-        })
+        this.checkAndGet(args[0]).forEach((plugin: plugin.Plugin) => this.runPluginStage(plugin, 'enable'))
     }
 
     disable(...args: any[]): void {
-        this.checkAndGet(args[0]).forEach((plugin: plugin.Plugin) => {
-            this.runPluginStage(plugin, 'disable', () => {
-                this.saveConfig(plugin)
-                this.unregistryCommand(plugin)
-                this.unregistryListener(plugin)
-            })
-        })
+        this.checkAndGet(args[0]).forEach((plugin: plugin.Plugin) => this.runPluginStage(plugin, 'disable'))
     }
 
     reload(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((pl: plugin.Plugin) => {
             this.disable(pl)
-            this.loadFromFile(pl.description.source.toString(), pl.description.loadMetadata.scanner)
+            this.loadFromFile(pl.description.loadMetadata.file, pl.description.loadMetadata.scanner)
         })
     }
 
@@ -206,19 +201,6 @@ export class PluginManagerImpl implements plugin.PluginManager {
         throw new Error(`Plugin ${JSON.stringify(name)} not exist!`)
     }
 
-    private allowProcess(servers: string[]) {
-        // Not set servers -> allow
-        if (!servers || !servers.length) return true
-        // include !type -> deny
-        let denyServers = servers.filter(svr => svr.startsWith("!"))
-        if (denyServers.length !== 0) {
-            return !denyServers.includes(`!${this.serverType}`)
-        } else {
-            // only include -> allow
-            return servers.includes(this.serverType)
-        }
-    }
-
     private buildPlugins() {
         for (const [, metadata] of this.metadataMap) {
             let pluginInstance: plugin.Plugin
@@ -230,78 +212,5 @@ export class PluginManagerImpl implements plugin.PluginManager {
             if (!pluginInstance) { console.error(`§4加载器 §c${metadata.type} §4加载插件 §c${metadata.name} §4失败!`); continue }
             this.instanceMap.set(metadata.name, pluginInstance)
         }
-    }
-
-    private loadConfig(plugin: plugin.Plugin) {
-        let configs = getPluginConfigMetadata(plugin)
-        for (let [_, config] of configs) {
-            try {
-                let configFile = fs.concat(root, this.pluginFolder, plugin.description.name, config.name + '.' + config.format)
-                let configFactory = getConfigLoader(config.format)
-                if (!fs.exists(configFile)) {
-                    base.save(configFile, configFactory.dump(plugin[config.variable]))
-                    console.i18n("ms.plugin.manager.config.save.default", { plugin: plugin.description.name, name: config.name, format: config.format })
-                } else {
-                    plugin[config.variable] = configFactory.load(base.read(configFile))
-                    plugin[config.variable].save = () => {
-                        let result = configFactory.dump(plugin[config.variable])
-                        base.save(configFile, result)
-                        console.debug(`[${plugin.description.name}] Save Config ${config.variable} to file ${configFile} result ${result}`)
-                    }
-                    console.debug(`[${plugin.description.name}] Load Config ${config.variable} from file ${configFile} result ${JSON.stringify(plugin[config.variable])}`)
-                }
-            } catch (error) {
-                console.i18n("ms.plugin.manager.config.load.error", { plugin: plugin.description.name, name: config.name, format: config.format, error })
-                console.ex(error)
-            }
-        }
-    }
-
-    private saveConfig(plugin: plugin.Plugin) {
-        let configs = getPluginConfigMetadata(plugin)
-        for (let [_, config] of configs) {
-            try {
-                let configFile = fs.concat(root, this.pluginFolder, plugin.description.name, config.name + '.' + config.format)
-                let configFactory = getConfigLoader(config.format)
-                if (!config.readonly) { base.save(configFile, configFactory.dump(plugin[config.variable])) }
-            } catch (error) {
-                console.i18n("ms.plugin.manager.config.save.error", { plugin: plugin.description.name, name: config.name, format: config.format, error })
-                console.ex(error)
-            }
-        }
-    }
-
-    private registryCommand(pluginInstance: plugin.Plugin) {
-        let cmds = getPluginCommandMetadata(pluginInstance)
-        let tabs = getPluginTabCompleterMetadata(pluginInstance)
-        for (const [_, cmd] of cmds) {
-            let tab = tabs.get(cmd.name)
-            if (!this.allowProcess(cmd.servers)) { continue }
-            this.CommandManager.on(pluginInstance, cmd.name, {
-                cmd: pluginInstance[cmd.executor].bind(pluginInstance),
-                tab: tab ? pluginInstance[tab.executor].bind(pluginInstance) : undefined
-            })
-        }
-    }
-
-    private registryListener(pluginInstance: plugin.Plugin) {
-        let events = getPluginListenerMetadata(pluginInstance)
-        for (const event of events) {
-            // ignore space listener
-            if (!this.allowProcess(event.servers)) { continue }
-            // here must bind this to pluginInstance
-            this.EventManager.listen(pluginInstance, event.name, pluginInstance[event.executor].bind(pluginInstance))
-        }
-    }
-
-    private unregistryCommand(pluginInstance: plugin.Plugin) {
-        let cmds = getPluginCommandMetadata(pluginInstance)
-        cmds.forEach(cmd => {
-            this.CommandManager.off(pluginInstance, cmd.name)
-        })
-    }
-
-    private unregistryListener(pluginInstance: plugin.Plugin) {
-        this.EventManager.disable(pluginInstance)
     }
 }
