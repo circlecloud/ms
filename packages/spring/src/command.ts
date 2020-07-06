@@ -7,10 +7,8 @@ import { CommandMap } from './internal/command'
 
 @provideSingleton(command.Command)
 export class SpringCommand extends command.Command {
-    @inject(plugin.PluginInstance)
-    private pluginInstance: any
     @inject(CommandMap)
-    private commandMap: CommandMap = new CommandMap()
+    private commandMap: CommandMap
 
     protected create(plugin: any, command: string) {
         return this.commandMap.register(plugin, command)
@@ -22,6 +20,6 @@ export class SpringCommand extends command.Command {
         command.setExecutor(super.setExecutor(plugin, command, executor))
     }
     protected onTabComplete(plugin: any, command: any, tabCompleter: Function) {
-        command.setTabCompleter(super.setExecutor(plugin, command, tabCompleter))
+        command.setTabCompleter(super.setTabCompleter(plugin, command, tabCompleter))
     }
 }
