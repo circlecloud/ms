@@ -5,12 +5,47 @@ import { constants, database, plugin, web } from "@ccms/api"
 import { inject, ContainerInstance, Container, JSClass, postConstruct } from "@ccms/container"
 import { JSPlugin, interfaces, cmd } from "@ccms/plugin"
 import { DataBase, DataBaseManager } from '@ccms/database'
-import { Server, Context, RequestHandler, Controller, Get, Post, Param, Body } from '@ccms/web'
+import { Server, Context, RequestHandler, Controllers, Controller, Get, Post, Param, Body } from '@ccms/web'
 
 import * as fs from '@ccms/common/dist/fs'
 import * as reflect from '@ccms/common/dist/reflect'
 
-@JSPlugin({ name: 'MiaoSpring', prefix: 'MSpring', version: '1.0.1', author: 'MiaoWoo', servers: [constants.ServerType.Spring], source: __filename })
+@Controller()
+class PluginController {
+    @inject(plugin.PluginManager)
+    private pluginManager: plugin.PluginManager
+    @inject(database.DataBaseManager)
+    private databaseManager: DataBaseManager
+
+    private mainDB: DataBase
+
+    @postConstruct()
+    initialize() {
+        this.mainDB = this.databaseManager.getMainDatabase()
+    }
+
+    @Get()
+    list(@Param('install') install: boolean) {
+        if (install) {
+            return { status: 200, data: [...this.pluginManager.getPlugins().values()].map((plugin) => plugin.description), msg: '插件列表获取成功!' }
+        } else {
+            return { status: 200, data: this.mainDB.query<Plugin>("SELECT name FROM plugins WHERE deleted = 0") }
+        }
+    }
+    @Post()
+    deploy(@Body() info: Plugin) {
+        let plugin = this.mainDB.query<Plugin>("SELECT name FROM plugins WHERE name = ?", info.name)
+        if (plugin.length == 0) {
+            this.mainDB.update("INSERT INTO `plugins`(`name`, `source`) VALUES (?, ?)", info.name, info.source)
+            return { status: 200, msg: `插件 ${info.name} 新增成功!` }
+        } else {
+            this.mainDB.update("UPDATE `plugins` SET `source` = ? WHERE id = ?", info.source, plugin[0].id)
+            return { status: 200, msg: `插件 ${info.name} 更新成功!` }
+        }
+    }
+}
+
+@JSPlugin({ author: 'MiaoWoo', servers: [constants.ServerType.Spring], source: __filename })
 export class MiaoSpring extends interfaces.Plugin {
     @inject(ContainerInstance)
     private container: Container
@@ -40,6 +75,7 @@ export class MiaoSpring extends interfaces.Plugin {
         this.mappings = new Set()
     }
 
+    @Controllers(PluginController)
     enable() {
         this.registryDefault()
         this.registryPages()
@@ -173,6 +209,7 @@ export class MiaoSpring extends interfaces.Plugin {
             'pluginManager'
         ]
         let params = [
+            base.getInstance().getAutowireCapableBeanFactory(),
             this.mainDatabase,
             reflect,
             this.container,
@@ -187,6 +224,8 @@ return eval(${JSON.stringify(code)});`)
 
     disable() {
         Object.keys(this.mappings).forEach((r) => this.webServer.unregistryMapping(r))
+        this.webServer.unregistryInterceptor({ name: 'RedirectHandle' })
+        this.webServer.unregistryInterceptor({ name: 'StaticHandle' })
     }
 }
 
@@ -194,39 +233,4 @@ class Plugin {
     id: number
     name: string
     source: string
-}
-
-@Controller()
-class PluginController {
-    @inject(plugin.PluginManager)
-    private pluginManager: plugin.PluginManager
-    @inject(database.DataBaseManager)
-    private databaseManager: DataBaseManager
-
-    private mainDB: DataBase
-
-    @postConstruct()
-    initialize() {
-        this.mainDB = this.databaseManager.getMainDatabase()
-    }
-
-    @Get()
-    list(@Param('install') install: boolean) {
-        if (install) {
-            return { status: 200, data: [...this.pluginManager.getPlugins().values()].map((plugin) => plugin.description), msg: '插件列表获取成功!' }
-        } else {
-            return { status: 200, data: this.mainDB.query<Plugin>("SELECT name FROM plugins WHERE deleted = 0") }
-        }
-    }
-    @Post()
-    deploy(@Body() info: Plugin) {
-        let plugin = this.mainDB.query<Plugin>("SELECT name FROM plugins WHERE name = ?", info.name)
-        if (plugin.length == 0) {
-            this.mainDB.update("INSERT INTO `plugins`(`name`, `source`) VALUES (?, ?)", info.name, info.source)
-            return { status: 200, msg: `插件 ${info.name} 新增成功!` }
-        } else {
-            this.mainDB.update("UPDATE `plugins` SET `source` = ? WHERE id = ?", info.source, plugin[0].id)
-            return { status: 200, msg: `插件 ${info.name} 更新成功!` }
-        }
-    }
 }

@@ -1,21 +1,6 @@
-import { constants, web } from "@ccms/api"
-import { inject } from "@ccms/container"
+import { constants } from "@ccms/api"
 import { plugin, interfaces } from "@ccms/plugin"
-import { Controller, Get, Server, Body, Post, Cookie, Header, Param } from "@ccms/web"
-
-@plugin({ name: 'MiaoWeb', version: '1.0.0', author: 'MiaoWoo', servers: [constants.ServerType.Spring], source: __filename })
-export class MiaoWeb extends interfaces.Plugin {
-    @inject(web.Server)
-    private webServer: Server
-
-    enable() {
-        this.webServer.registryController(TestController)
-    }
-
-    disable() {
-        this.webServer.unregistryController(TestController)
-    }
-}
+import { Controllers, Controller, Get, Body, Post, Cookie, Header, Param } from "@ccms/web"
 
 @Controller()
 export class TestController {
@@ -36,4 +21,11 @@ export class TestController {
         }
     }
 }
- 
+
+@plugin({ author: 'MiaoWoo', servers: [constants.ServerType.Spring], source: __filename })
+export class MiaoWeb extends interfaces.Plugin {
+    @Controllers(TestController)
+    enable() {
+
+    }
+}

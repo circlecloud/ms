@@ -137,14 +137,15 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         }
     }
 
-    cmdupgrade(sender: any, name: string) {
-        if (!name) { return this.i18n(sender, 'upgrade.confirm') }
-        if (name == "comfirm") {
-            let enginePath = fs.path(fs.file(fs.concat(root, 'node_modules', '@ccms')))
+    cmdupgrade(sender: any, name: string, confirm: boolean) {
+        if (name == "system") {
+            if (!confirm) { return this.i18n(sender, 'upgrade.confirm') }
+            let enginePath = fs.path(fs.file(root, 'node_modules'))
             if (enginePath.startsWith(root)) {
                 base.delete(enginePath)
                 this.cmdrestart(sender)
             }
+            return
         }
         if (this.checkPlugin(sender, name)) {
             this.update(sender, name)
@@ -241,7 +242,7 @@ return '§a返回结果: §r'+ eval(${JSON.stringify(code)});`)
                     name,
                     author: plugin.description.author,
                     version: plugin.description.version,
-                    source: base.read(plugin.description.source.toString())
+                    source: base.read((plugin.description.source || plugin.description.loadMetadata.file).toString())
                 })
                 this.i18n(sender, result.code == 200 ? 'deploy.success' : 'deploy.fail', { name, msg: result.msg })
             }
@@ -263,8 +264,11 @@ return '§a返回结果: §r'+ eval(${JSON.stringify(code)});`)
                     return ["install", "cloud"]
                 case "install":
                     return this.packageNameCache
-                case "update":
                 case "upgrade":
+                    if (args.length == 2) return ["system", ...this.pluginManager.getPlugins().keys()]
+                    if (args.length == 3 && args[1] == "system") return ["confirm"]
+                    return []
+                case "update":
                 case "load":
                 case "unload":
                 case "reload":
