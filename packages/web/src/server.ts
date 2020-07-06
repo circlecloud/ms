@@ -25,7 +25,7 @@ export class Server {
     private StreamUtils = org.springframework.util.StreamUtils
     private ResponseEntity = org.springframework.http.ResponseEntity
 
-    private pluginControllers: Map<string, any>
+    private controllerActions: Map<string, interfaces.ActionMetadata[]>
     private interceptors: Map<string, InterceptorAdapter>
     private methodMappings: Map<string, Map<string, RequestHandler>>
 
@@ -34,6 +34,7 @@ export class Server {
     @postConstruct()
     initialization() {
         this.beanFactory = base.getInstance().getAutowireCapableBeanFactory()
+        this.controllerActions = new Map()
         this.interceptors = new Map()
         this.methodMappings = new Map()
         this.start()
@@ -77,8 +78,10 @@ export class Server {
         if (!controllerMetadata) { throw new Error(`Controller ${target.name} must have @Controller decorator!`) }
         target = this.bindController(target)
         let actions = getControllerActions(target)
+        this.controllerActions.set(controllerMetadata.name, [])
         for (const action of actions) {
             let actionMetadata = getActionMetadata(target, action)
+            this.controllerActions.get(controllerMetadata.name).push(actionMetadata)
             let path = `${controllerMetadata.path || ''}${actionMetadata.path || ''}`
             if (!path) throw new Error(`Controller ${controllerMetadata.name} Action ${actionMetadata.name} path is empty!`)
             if (!this.methodMappings.has(path)) { this.methodMappings.set(path, new Map()) }
@@ -124,19 +127,15 @@ export class Server {
         if (!target) { throw new Error('Controller can\'t be undefiend!') }
         let controllerMetadata = getControllerMetadata(target)
         if (!controllerMetadata) { throw new Error(`Controller ${target.name} must have @Controller decorator!`) }
-        try {
-            target = this.container.getNamed(METADATA_KEY.Controller, target.name)
-        } catch (error) {
-            throw new Error(`Controller ${target.name} not registry! err: ${error}`)
-        }
-        let actions = getControllerActions(target)
-        for (const action of actions) {
-            let actionMetadata = getActionMetadata(target, action)
+        if (!this.controllerActions.has(controllerMetadata.name)) { return console.warn(`Controller ${controllerMetadata.name} not registry!`) }
+        let actions = this.controllerActions.get(controllerMetadata.name)
+        for (const actionMetadata of actions) {
             let path = `${controllerMetadata.path || ''}${actionMetadata.path || ''}`
             if (!this.methodMappings.has(path)) { continue }
             this.methodMappings.get(path).delete(actionMetadata.method)
             console.debug(`Controller ${controllerMetadata.name} Unregistry ${path} Action.`)
         }
+        this.controllerActions.delete(controllerMetadata.name)
     }
 
     registryMapping(path: string, handler: RequestHandler) {
