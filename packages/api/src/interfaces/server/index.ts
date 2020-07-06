@@ -1,5 +1,5 @@
 import * as reflect from '@ccms/common/dist/reflect'
-import { injectable } from '@ccms/container'
+import { injectable, inject } from '@ccms/container'
 
 import { NativePluginManager } from './native_plugin'
 import { constants } from '../../constants'
@@ -39,6 +39,23 @@ export namespace server {
         getRootLogger(): any
         sendJson(sender: string | any, json: object | string): void
         tabComplete?(sender: string | any, input: string, index?: number): string[]
+    }
+    @injectable()
+    export class ServerChecker {
+        @inject(ServerType)
+        private serverType: string
+        check(servers: string[]) {
+            // Not set servers -> allow
+            if (!servers || !servers.length) return true
+            // include !type -> deny
+            let denyServers = servers.filter(svr => svr.startsWith("!"))
+            if (denyServers.length !== 0) {
+                return !denyServers.includes(`!${this.serverType}`)
+            } else {
+                // only include -> allow
+                return servers.includes(this.serverType)
+            }
+        }
     }
     @injectable()
     export abstract class ReflectServer implements server.Server {
