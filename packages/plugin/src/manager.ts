@@ -106,6 +106,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
             process.emit(`plugin.after.${stage}`, plugin)
         } catch (ex) {
             console.i18n("ms.plugin.manager.stage.exec.error", { plugin: plugin.description.name, executor: stage, error: ex })
+            if (global.debug) { console.ex(ex) }
         }
     }
 
