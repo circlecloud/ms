@@ -97,6 +97,7 @@ function initialize() {
         let type = detectServer()
         console.i18n("ms.core.initialize.detect", { scope: global.scope, type })
         container.bind(server.ServerType).toConstantValue(type)
+        container.bind(server.ServerChecker).toSelf().inSingletonScope()
         console.i18n("ms.core.package.initialize", { scope: global.scope, type })
         require(`${global.scope}/${type}`).default(container)
         require(`${global.scope}/plugin`)
