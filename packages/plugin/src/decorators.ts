@@ -8,10 +8,10 @@ import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata
  * MiaoScript plugin
  * @param metadata PluginMetadata
  */
-export function plugin(metadata: pluginApi.PluginMetadata) {
+export function plugin(metadata: pluginApi.PluginMetadata | any) {
     return function (target: any) {
-        metadata.target = target
-        metadata.type = "ioc"
+        if (!metadata.source) metadata = { souece: metadata }
+        metadata = { name: target.name, version: '1.0.0', author: 'Unknow', target, type: 'ioc', ...metadata }
         decorate(injectable(), target)
         Reflect.defineMetadata(METADATA_KEY.plugin, metadata, target)
         const previousMetadata: Map<string, pluginApi.PluginMetadata> = getPluginMetadatas()

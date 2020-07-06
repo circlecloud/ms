@@ -152,21 +152,21 @@ export namespace plugin {
     }
     export interface PluginMetadata extends BaseMetadata {
         /**
-         * 插件名称
+         * 插件名称 不填默认为类名
          */
-        name: string
+        name?: string
         /**
          * 前缀
          */
         prefix?: string
         /**
-         * 插件版本
+         * 插件版本 不填默认为 1.0.0
          */
-        version: string
+        version?: string
         /**
-         * 插件版本
+         * 插件作者 不填默认为 Unknow
          */
-        author: string | string[]
+        author?: string | string[]
         /**
          * 插件源文件 必须指定为 __filename
          */
