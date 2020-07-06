@@ -19,7 +19,7 @@ export namespace interfaces {
         /**
          * 对象
          */
-        target?: string
+        target?: any
     }
     export interface ControllerMetadata extends WebMetadata {
 

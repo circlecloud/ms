@@ -1,11 +1,13 @@
 import { interfaces } from '../interfaces'
 import { METADATA_KEY } from '../constants'
 
-export function getControllerMetadatas(): interfaces.ControllerMetadata[] {
-    return Reflect.getMetadata(METADATA_KEY.Controller, Reflect) || []
+export function getControllerMetadatas(target: any = Reflect): Map<string, interfaces.ControllerMetadata> {
+    return Reflect.getMetadata(METADATA_KEY.Controller, target) || new Map<string, interfaces.ControllerMetadata>()
 }
-export function addControllerMetadata(metadata: interfaces.ControllerMetadata) {
-    Reflect.defineMetadata(METADATA_KEY.Controller, [metadata, ...getControllerMetadatas()], Reflect)
+export function addControllerMetadata(metadata: interfaces.ControllerMetadata, target: any = Reflect) {
+    let metadatas = getControllerMetadatas(target)
+    metadatas.set(metadata.name, metadata)
+    Reflect.defineMetadata(METADATA_KEY.Controller, metadatas, target)
 }
 export function getControllerActions(target: any): string[] {
     return Reflect.getMetadata(METADATA_KEY.Action, target.constructor) || []

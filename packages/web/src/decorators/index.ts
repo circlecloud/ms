@@ -1,20 +1,29 @@
-import { decorate, injectable } from "@ccms/container"
+import { plugin } from '@ccms/api'
+import { decorate, injectable, getContainer } from "@ccms/container"
 
 import { METADATA_KEY, PARAM_TYPE } from '../constants'
 import { interfaces } from "../interfaces"
-import { addControllerMetadata, addControllerAction, addActionParam } from "./utils"
+import { addControllerMetadata, addControllerAction, addActionParam, getControllerMetadata } from "./utils"
+
+export const Controllers = (...controllers: any[]) => {
+    return (target: any, propertyKey: string) => {
+        for (const controller of controllers) {
+            addControllerMetadata(getControllerMetadata(controller), target)
+        }
+    }
+}
 
 export const Controller = (metadata?: string | interfaces.ControllerMetadata) => {
     return (target: any) => {
         if (!metadata) { metadata = target.name.toLowerCase().replace('controller', '') }
         if (typeof metadata === "string") { metadata = { path: metadata } }
+        metadata.target = target
         metadata.name = metadata.name || target.name
         metadata.path = metadata.path ?? `/${metadata}`
         metadata.path = metadata.path.startsWith('/') ? metadata.path : `/${metadata.path}`
         decorate(injectable(), target)
         Reflect.defineMetadata(METADATA_KEY.Controller, metadata, target)
         addControllerMetadata(metadata)
-        return
     }
 }
 
@@ -29,7 +38,6 @@ function action(method: interfaces.Method) {
             metadata.executor = propertyKey
             Reflect.defineMetadata(METADATA_KEY.Action, metadata, target[propertyKey])
             addControllerAction(target, propertyKey)
-            return
         }
     }
 }
@@ -50,7 +58,6 @@ function param(type: PARAM_TYPE) {
             metadata.index = index
             metadata.paramtype = Reflect.getMetadata("design:paramtypes", target, propertyKey)[index]
             addActionParam(target, propertyKey, metadata)
-            return
         }
     }
 }
@@ -72,7 +79,6 @@ function Middleware() {
             metadata.executor = propertyKey
             Reflect.defineMetadata(METADATA_KEY.Action, metadata, target[propertyKey])
             addControllerAction(target, propertyKey)
-            return
         }
     }
 }
