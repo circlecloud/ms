@@ -96,10 +96,7 @@ function types(values: any[], def?: any) {
 }
 
 function accessible<T extends java.lang.reflect.AccessibleObject>(accessible: T): T {
-    if (accessible === null) {
-        return null
-    }
-    if (!accessible.isAccessible()) {
+    if (!accessible?.isAccessible()) {
         accessible.setAccessible(true)
     }
     return accessible
@@ -143,7 +140,8 @@ function declaredMethod(clazz: java.lang.Class<any>, name: string, ...clazzs: ja
     let key = clazz.getName() + '.' + name + ':' + (clazzs || []).join(':')
     if (!methodCache[key]) {
         try {
-            methodCache[key] = clazz.getMethod(name, ...clazzs)
+            // @ts-ignore
+            methodCache[key] = clazz.getMethod(name, clazzs)
         } catch (ex) {
             try {
                 methodCache[key] = clazz.getDeclaredMethod(name, clazzs as any)
