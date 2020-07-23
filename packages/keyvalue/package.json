@@ -1,7 +1,7 @@
 {
-    "name": "@ccms/sponge",
+    "name": "@ccms/keyvalue",
     "version": "0.8.4",
-    "description": "MiaoScript api package",
+    "description": "MiaoScript keyvalue package",
     "keywords": [
         "miaoscript",
         "minecraft",
@@ -18,15 +18,18 @@
         "build": "yarn clean && tsc",
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
-    "devDependencies": {
-        "@javatypes/sponge-api": "^0.0.2",
-        "reflect-metadata": "^0.1.13",
-        "rimraf": "^3.0.2",
-        "typescript": "^3.9.6"
-    },
     "dependencies": {
         "@ccms/api": "^0.8.4",
         "@ccms/common": "^0.8.4",
         "@ccms/container": "^0.8.4"
+    },
+    "devDependencies": {
+        "@ccms/nashorn": "^0.8.4",
+        "@javatypes/amqp-client": "^0.0.2",
+        "@javatypes/spring-amqp": "^0.0.2",
+        "@javatypes/spring-rabbit": "^0.0.2",
+        "reflect-metadata": "^0.1.13",
+        "rimraf": "^3.0.2",
+        "typescript": "^3.9.6"
     }
 }
