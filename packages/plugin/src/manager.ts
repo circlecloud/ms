@@ -129,6 +129,10 @@ export class PluginManagerImpl implements plugin.PluginManager {
             if (loader.require(loadMetadata).loaded) {
                 loadMetadata.loader = loader
                 let metadata = loadMetadata.metadata
+                if (this.metadataMap.has(metadata.name)) {
+                    let oldMetadata = this.metadataMap.get(metadata.name)
+                    throw new Error(`Plugin ${oldMetadata.name} is already load from ${oldMetadata.source}...`)
+                }
                 this.metadataMap.set(metadata.name, metadata)
                 metadata.loadMetadata = loadMetadata
             }
@@ -151,7 +155,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
         if (!file) { throw new Error('plugin file can\'t be undefiend!') }
         if (!scanner) { throw new Error('plugin scanner can\'t be undefiend!') }
         let metadata = this.loadPlugin(scanner.load(scanner.read(file)))
-        let plugin = metadata.loadMetadata.loader.build(metadata)
+        let plugin = this.buildPlugin(metadata)
         this.load(plugin)
         this.enable(plugin)
         return plugin
@@ -166,7 +170,11 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     disable(...args: any[]): void {
-        this.checkAndGet(args[0]).forEach((plugin: plugin.Plugin) => this.runPluginStage(plugin, 'disable'))
+        this.checkAndGet(args[0]).forEach((plugin: plugin.Plugin) => {
+            this.runPluginStage(plugin, 'disable')
+            this.metadataMap.delete(plugin.description.name)
+            this.instanceMap.delete(plugin.description.name)
+        })
     }
 
     reload(...args: any[]): void {
@@ -203,15 +211,21 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     private buildPlugins() {
-        for (const [, metadata] of this.metadataMap) {
-            let pluginInstance: plugin.Plugin
-            if (!this.loaderMap.has(metadata.type)) {
-                console.error(`§4无法加载插件 §c${metadata.name} §4请检查 §c${metadata.type} §4加载器是否正常启用!`)
-                continue
+        this.metadataMap.forEach((metadata) => {
+            try {
+                this.buildPlugin(metadata)
+            } catch (error) {
+                console.error(error)
             }
-            pluginInstance = this.loaderMap.get(metadata.type).build(metadata)
-            if (!pluginInstance) { console.error(`§4加载器 §c${metadata.type} §4加载插件 §c${metadata.name} §4失败!`); continue }
-            this.instanceMap.set(metadata.name, pluginInstance)
-        }
+        })
+    }
+
+    private buildPlugin(metadata: plugin.PluginMetadata) {
+        if (!this.loaderMap.has(metadata.type)) { throw new Error(`§4无法加载插件 §c${metadata.name} §4请检查 §c${metadata.type} §4加载器是否正常启用!`) }
+        let pluginInstance = this.loaderMap.get(metadata.type).build(metadata)
+        if (!pluginInstance) { throw new Error(`§4加载器 §c${metadata.type} §4加载插件 §c${metadata.name} §4失败!`) }
+        if (this.instanceMap.has(metadata.name)) { throw new Error(`Plugin ${metadata.name} is already load from ${metadata.source}...`) }
+        this.instanceMap.set(metadata.name, pluginInstance)
+        return pluginInstance
     }
 }
