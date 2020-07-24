@@ -31,5 +31,6 @@
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
         "typescript": "^3.9.6"
-    }
+    },
+    "gitHead": "2589633069d24f646ac09261b1b2304c21d4ea75"
 }
