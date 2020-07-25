@@ -26,7 +26,7 @@ let langMap = {
     'main.command.not.exists': '§4未知的子命令: §c{command}',
     'main.command.help.tip': '§6请执行 §b/{command} §ahelp §6查看帮助!',
     'list.install.header': '§6当前 §bMiaoScript §6已安装下列插件:',
-    'list.install.body': '§6插件名称: §b{name} §6版本: §a{version} §6作者: §3{author}',
+    'list.install.body': '§6插件名称: §b{name} §6版本: §a{version} §6作者: §3{author} §6来源: §c{from}',
     'list.header': '§6当前 §bMiaoScriptPackageCenter §6中存在下列插件:',
     'list.body': '§6插件名称: §b{name} §6版本: §a{version} §6作者: §3{author} §6更新时间: §9{updated_at}',
     'plugin.not.exists': '§6插件 §b{name} §c不存在!',
@@ -51,7 +51,7 @@ let langMap = {
 
 let fallbackMap = langMap
 
-@plugin({ name: 'MiaoScriptPackageManager', prefix: 'PM', version: '1.0.1', author: 'MiaoWoo', source: __filename })
+@plugin({ name: 'MiaoScriptPackageManager', prefix: 'PM', version: '1.0.2', author: 'MiaoWoo', source: __filename })
 export class MiaoScriptPackageManager extends interfaces.Plugin {
     @inject(pluginApi.PluginManager)
     private pluginManager: pluginApi.PluginManager
@@ -114,7 +114,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         if (type == "i" || type == "install") {
             this.i18n(sender, 'list.install.header')
             this.pluginManager.getPlugins().forEach((plugin) => {
-                this.i18n(sender, 'list.install.body', plugin.description)
+                this.i18n(sender, 'list.install.body', { ...plugin.description, from: plugin.description.loadMetadata.type })
             })
         } else {
             this.i18n(sender, 'list.header')
@@ -295,7 +295,7 @@ return '§a返回结果: §r'+ eval(${JSON.stringify(code)});`)
             http.download(this.packageCache[name].url, pluginFile)
             this.i18n(sender, 'download.finish', { name })
             if (!update) {
-                this.pluginManager.loadFromFile(fs.file(pluginFile))
+                this.pluginManager.loadFromFile(fs.concat(root, this.pluginFolder, name + '.js'))
                 this.i18n(sender, 'install.finish', { name })
             } else {
                 this.i18n(sender, 'update.finish', { name })

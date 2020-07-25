@@ -179,6 +179,7 @@ class SearchRankingController {
                     sortType: 'va_rmdarkgmv30rt',
                     button_click: 'top'
                 } : {},
+                pageTotal: 3,
                 cacheKey: this.getResultCacheKey(keywords, type, dateCache)
             },
             resRouteSuffix: ROUTER_KEY,
