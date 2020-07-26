@@ -97,10 +97,11 @@ export class MiaoScriptConsole implements Console {
                     MiaoScriptConsole.sourceMaps[fileName] = null
                     let sourceLine = base.read(fileName).split('\n')
                     let lastLine = sourceLine[sourceLine.length - 1]
+                    // lastLine is similar //# sourceMappingURL=data:application/json;base64,
                     if (lastLine.startsWith('//# sourceMappingURL=')) {
                         let sourceContent = null
                         let sourceMappingURL = lastLine.split('sourceMappingURL=', 2)[1]
-                        if (sourceMappingURL.startsWith('data:application/jsonbase64,')) {
+                        if (sourceMappingURL.startsWith('data:application/json;base64,')) {
                             sourceContent = String.fromCharCode(...Array.from(base64.toByteArray(sourceMappingURL.split(',', 2)[1])))
                         } else if (sourceMappingURL.startsWith('http')) {
                             // TODO
@@ -122,6 +123,9 @@ export class MiaoScriptConsole implements Console {
             }
         } catch (error) {
             console.debug('search source map', fileName, 'line', lineNumber, 'error:', error)
+            if (global.debug) {
+                console.ex(error)
+            }
         }
         return {
             fileName,
