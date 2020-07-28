@@ -4,7 +4,7 @@
 import i18n from '@ccms/i18n'
 import { injectable, unmanaged } from '@ccms/container'
 
-const Thread = Java.type('java.lang.Thread');
+const Thread = Java.type('java.lang.Thread')
 
 export namespace event {
     /**
@@ -30,7 +30,7 @@ export namespace event {
         protected baseEventDir = '';
 
         constructor(@unmanaged() baseEventDir: string) {
-            this.baseEventDir = baseEventDir;
+            this.baseEventDir = baseEventDir
         }
 
         /**
@@ -39,74 +39,74 @@ export namespace event {
          *     org.spongepowered.api.event.game.GameRegistryEvent.Register => gameregistryevent$register
          */
         mapEventName() {
-            if (this.baseEventDir === "") { throw new Error(i18n.translate('ms.api.event.empty.event.dir')); }
-            let count = 0;
-            let jar = this.getJarFile(this.baseEventDir);
-            let entries = jar.entries();
+            if (this.baseEventDir === "") { throw new Error(i18n.translate('ms.api.event.empty.event.dir')) }
+            let count = 0
+            let jar = this.getJarFile(this.baseEventDir)
+            let entries = jar.entries()
             while (entries.hasMoreElements()) {
-                let entry = entries.nextElement();
-                let name = entry.name;
+                let entry = entries.nextElement()
+                let name = entry.name
                 if (name.startsWith(this.baseEventDir) && name.endsWith(".class")) {
                     // replace name to qualifiedName
-                    let qualifiedName = name.replaceAll('/', '.');
+                    let qualifiedName = name.replaceAll('/', '.')
                     try {
-                        let clazz = base.getClass(qualifiedName.substring(0, qualifiedName.length - 6));
+                        let clazz = base.getClass(qualifiedName.substring(0, qualifiedName.length - 6))
                         if (this.isValidEvent(clazz)) {
-                            let simpleName = this.class2Name(clazz).toLowerCase();
-                            console.trace(i18n.translate("ms.api.event.mapping", { canonicalName: clazz.canonicalName, simpleName }));
-                            this.mapEvent[simpleName] = clazz;
-                            count++;
+                            let simpleName = this.class2Name(clazz).toLowerCase()
+                            console.trace(i18n.translate("ms.api.event.mapping", { canonicalName: clazz.canonicalName, simpleName }))
+                            this.mapEvent[simpleName] = clazz
+                            count++
                         }
                     } catch (ex) {
                         //ignore already loaded class
                     }
                 }
             }
-            return count;
+            return count
         }
 
         getJarFile(resource: string, loader?: any) {
-            let dirs = (loader || Thread.currentThread().getContextClassLoader()).getResources(resource);
+            let dirs = (loader || Thread.currentThread().getContextClassLoader()).getResources(resource)
             if (dirs.hasMoreElements()) {
-                let url = dirs.nextElement();
-                if (url.protocol === "jar") { return url.openConnection().jarFile; }
+                let url = dirs.nextElement()
+                if (url.protocol === "jar") { return url.openConnection().jarFile }
             }
             throw new Error(i18n.translate("ms.api.event.resource.not.found", { resource }))
         }
 
         class2Name(clazz: any) {
-            return clazz.simpleName;
+            return clazz.simpleName
         }
 
         name2Class(name: any, event: string) {
-            let eventCls = this.mapEvent[event.toLowerCase()] || this.mapEvent[event.toLowerCase() + 'event'];
+            let eventCls = this.mapEvent[event.toLowerCase()] || this.mapEvent[event.toLowerCase() + 'event']
             if (!eventCls) {
                 try {
-                    eventCls = base.getClass(eventCls);
-                    this.mapEvent[event] = eventCls;
+                    eventCls = base.getClass(eventCls)
+                    this.mapEvent[event] = eventCls
                 } catch (ex) {
                     console.i18n("ms.api.event.not.found", { name, event })
-                    return;
+                    return
                 }
             }
-            return eventCls;
+            return eventCls
         }
 
         execute(name, exec, eventCls) {
             return (...args: any[]) => {
                 try {
-                    let event = args[args.length - 1];
+                    let event = args[args.length - 1]
                     if (eventCls.isAssignableFrom(event.getClass())) {
                         let time = Date.now()
-                        exec(event);
-                        let cost = Date.now() - time;
+                        exec(event)
+                        let cost = Date.now() - time
                         if (cost > 20) {
                             console.i18n("ms.api.event.execute.slow", { name, event: this.class2Name(eventCls), cost })
                         }
                     }
                 } catch (ex) {
                     console.i18n("ms.api.event.execute.error", { name, event: this.class2Name(eventCls), ex })
-                    console.ex(ex);
+                    console.ex(ex)
                 }
             }
         }
@@ -120,34 +120,34 @@ export namespace event {
         * @param ignoreCancel
         */
         listen(plugin: any, event: string, exec: (event: any) => void, priority: EventPriority = EventPriority.NORMAL, ignoreCancel = false) {
-            if (!plugin || !plugin.description || !plugin.description.name) throw new TypeError(i18n.translate("ms.api.event.listen.plugin.name.empty"));
-            var name = plugin.description.name;
-            var eventCls = this.name2Class(name, event);
-            if (!eventCls) { return; }
+            if (!plugin || !plugin.description || !plugin.description.name) throw new TypeError(i18n.translate("ms.api.event.listen.plugin.name.empty"))
+            var name = plugin.description.name
+            var eventCls = this.name2Class(name, event)
+            if (!eventCls) { return }
             if (typeof priority === 'boolean') {
-                ignoreCancel = priority;
-                priority = EventPriority.NORMAL;
+                ignoreCancel = priority
+                priority = EventPriority.NORMAL
             }
-            priority = priority || EventPriority.NORMAL;
-            ignoreCancel = ignoreCancel || false;
+            priority = priority || EventPriority.NORMAL
+            ignoreCancel = ignoreCancel || false
             // noinspection JSUnusedGlobalSymbols
-            var listener = this.register(eventCls, this.execute(name, exec, eventCls), priority, ignoreCancel);
-            var listenerMap = this.listenerMap;
+            var listener = this.register(eventCls, this.execute(name, exec, eventCls), priority, ignoreCancel)
+            var listenerMap = this.listenerMap
             // add to cache Be used for close plugin to close event
-            if (!listenerMap[name]) listenerMap[name] = [];
+            if (!listenerMap[name]) listenerMap[name] = []
             var offExec = () => {
-                this.unregister(eventCls, listener);
-                console.debug(i18n.translate("ms.api.event.unregister", { name, event: this.class2Name(eventCls) }));
-            };
+                this.unregister(eventCls, listener)
+                console.debug(i18n.translate("ms.api.event.unregister", { name, event: this.class2Name(eventCls), exec: exec.name || '[anonymous]' }))
+            }
             var off = {
                 event: eventCls,
                 listener: listener,
                 off: offExec
-            };
-            listenerMap[name].push(off);
+            }
+            listenerMap[name].push(off)
             // noinspection JSUnresolvedVariable
-            console.debug(i18n.translate("ms.api.event.register", { name, event: this.class2Name(eventCls) }));
-            return off;
+            console.debug(i18n.translate("ms.api.event.register", { name, event: this.class2Name(eventCls), exec: exec.name || '[anonymous]' }))
+            return off
         }
 
         /**
@@ -155,10 +155,10 @@ export namespace event {
          * @param plugin 插件
          */
         disable(plugin: any) {
-            var eventCache = this.listenerMap[plugin.description.name];
+            var eventCache = this.listenerMap[plugin.description.name]
             if (eventCache) {
-                eventCache.forEach(t => t.off());
-                delete this.listenerMap[plugin.description.name];
+                eventCache.forEach(t => t.off())
+                delete this.listenerMap[plugin.description.name]
             }
         }
 
@@ -166,7 +166,7 @@ export namespace event {
          * 判断
          * @param clazz 事件类
          */
-        abstract isValidEvent(clazz: any): boolean;
+        abstract isValidEvent(clazz: any): boolean
         /**
          * 注册事件
          * @param eventCls 事件类
@@ -174,12 +174,12 @@ export namespace event {
          * @param priority 优先级
          * @param ignoreCancel 是否忽略已取消的事件
          */
-        abstract register(eventCls: any, exec: Function, priority: any, ignoreCancel: boolean): any;
+        abstract register(eventCls: any, exec: Function, priority: any, ignoreCancel: boolean): any
         /**
          * 取消监听事件
          * @param event 事件
          * @param listener 监听器
          */
-        abstract unregister(event: any, listener: any): void;
+        abstract unregister(event: any, listener: any): void
     }
 }

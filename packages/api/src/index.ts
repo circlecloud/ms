@@ -1,4 +1,6 @@
 import "@ccms/nashorn"
+
+export * from './chat'
 export * from './task'
 export * from './event'
 export * from './console'
