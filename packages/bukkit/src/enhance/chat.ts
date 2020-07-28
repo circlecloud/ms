@@ -1,29 +1,28 @@
 /*global Java, base, module, exports, require*/
-var nmsChatSerializerClass;
-var nmsChatSerializerMethod;
-var packetTypeConstructor;
-var nmsChatMessageTypeClass;
-var chatMessageTypes;
+let ChatSerializer: any
+let nmsChatSerializerMethodName: string
+let PacketPlayOutChat: any
+let chatMessageTypes: any
 
-var RemapUtils;
+let RemapUtils: any
 
-var playerConnectionFieldName;
-var sendPacketMethod;
+let playerConnectionFieldName: string
+let sendPacketMethodName: string
 
-var downgrade = false;
+let downgrade = false
 /**
  * 获取NMS版本
  */
 //@ts-ignore
-var nmsVersion = org.bukkit.Bukkit.server.class.name.split('.')[3];
+let nmsVersion = org.bukkit.Bukkit.server.class.name.split('.')[3]
 /**
  * 获取NMS类
  */
-function nmsCls(name) {
+function nmsCls(name: string) {
     return base.getClass(['net.minecraft.server', nmsVersion, name].join('.'))
 }
 
-function remapMethod(clazz: any, origin: string, test: string, params) {
+function remapMethod(clazz: any, origin: string, test: string, params: any) {
     try {
         return clazz.getMethod(origin, params)
     } catch (ex) {
@@ -49,66 +48,57 @@ function remapFieldName(clazz: any, origin: string, test: string) {
 
 function init() {
     try {
-        RemapUtils = Java.type('catserver.server.remapper.RemapUtils');
+        RemapUtils = Java.type('catserver.server.remapper.RemapUtils')
     } catch (ex) {
     }
-    nmsChatSerializerClass = nmsCls(nmsVersion.split("_")[1] > 7 ? "IChatBaseComponent$ChatSerializer" : "ChatSerializer");
-    nmsChatSerializerMethod = remapMethod(nmsChatSerializerClass, 'a', 'func_150699_a', base.getClass('java.lang.String'))
-    var packetTypeClass = nmsCls("PacketPlayOutChat");
-    Java.from(packetTypeClass.constructors).forEach(function(c) {
+    let nmsChatSerializerClass = nmsCls(nmsVersion.split("_")[1] > 7 ? "IChatBaseComponent$ChatSerializer" : "ChatSerializer")
+    let nmsChatSerializerMethod = remapMethod(nmsChatSerializerClass, 'a', 'func_150699_a', base.getClass('java.lang.String'))
+    nmsChatSerializerMethodName = nmsChatSerializerMethod.getName()
+    ChatSerializer = Java.type(nmsChatSerializerClass.getName())
+    let packetTypeClass = nmsCls("PacketPlayOutChat")
+    PacketPlayOutChat = Java.type(packetTypeClass.getName())
+    let packetTypeConstructor: { parameterTypes: any[] }
+    Java.from(packetTypeClass.constructors).forEach(function (c) {
         if (c.parameterTypes.length === 2) {
             packetTypeConstructor = c
         }
-    });
-    nmsChatMessageTypeClass = packetTypeConstructor.parameterTypes[1];
+    })
+    let nmsChatMessageTypeClass = packetTypeConstructor.parameterTypes[1]
     if (nmsChatMessageTypeClass.isEnum()) {
-        chatMessageTypes = nmsChatMessageTypeClass.getEnumConstants();
-    } else {
-        switch (nmsChatMessageTypeClass.name) {
-            case "int":
-                //@ts-ignore
-                nmsChatMessageTypeClass = java.lang.Integer;
-                break;
-            case "byte":
-                //@ts-ignore
-                nmsChatMessageTypeClass = java.lang.Byte;
-                break;
-        }
+        chatMessageTypes = nmsChatMessageTypeClass.getEnumConstants()
     }
-    var entityPlayerClass = nmsCls('EntityPlayer');
-    var packetClass = nmsCls('Packet');
-    var playerConnectionField = remapFieldName(entityPlayerClass, 'playerConnection', 'field_71135_a')
+    let playerConnectionField = remapFieldName(nmsCls('EntityPlayer'), 'playerConnection', 'field_71135_a')
     playerConnectionFieldName = playerConnectionField.getName()
-    sendPacketMethod = remapMethod(playerConnectionField.getType(), 'sendPacket', 'func_179290_a', packetClass)
+    sendPacketMethodName = remapMethod(playerConnectionField.getType(), 'sendPacket', 'func_179290_a', nmsCls('Packet')).getName()
 }
 
-function json(sender, json) {
+function json(sender: { name: string }, json: string) {
     if (downgrade) {
         return '/tellraw ' + sender.name + ' ' + json
     } else {
-        send(sender, json, 0);
-        return false;
+        send(sender, json, 0)
+        return false
     }
 }
 
-function send(sender, json, type) {
-    //@ts-ignore
-    sendPacket(sender, packetTypeConstructor.newInstance(nmsChatSerializerMethod.invoke(null, json), chatMessageTypes == null ? nmsChatMessageTypeClass.valueOf(java.lang.String.valueOf(type)) : chatMessageTypes[type]))
+function send(sender: any, json: any, type: number) {
+    sendPacket(sender, new PacketPlayOutChat(ChatSerializer[nmsChatSerializerMethodName](json), chatMessageTypes == null ? type : chatMessageTypes[type]))
 }
 
-function sendPacket(player, p) {
-    sendPacketMethod.invoke(player.handle[playerConnectionFieldName], p)
+function sendPacket(player: { handle: { [x: string]: { [x: string]: (arg0: any) => void } } }, p: any) {
+    player.handle[playerConnectionFieldName][sendPacketMethodName](p)
 }
 
 try {
-    init();
+    init()
 } catch (ex) {
     org.bukkit.Bukkit.getConsoleSender().sendMessage(`§6[§cMS§6][§bbukkit§6][§achat§6] §cNMS Inject Error §4${ex} §cDowngrade to Command Mode...`)
-    downgrade = true;
+    downgrade = true
 }
 
 let chat = {
-    json
+    json,
+    send
 }
 
 export default chat
