@@ -4,7 +4,6 @@ import { plugin, server, task, constants } from '@ccms/api'
 import { DefaultContainer as container, inject, provideSingleton, ContainerInstance, buildProviderModule } from '@ccms/container'
 console.i18n("ms.core.ioc.completed", { scope: global.scope, time: (Date.now() - containerStartTime) / 1000 })
 import http from '@ccms/common/dist/http'
-import { EventEmitter } from 'events'
 
 @provideSingleton(MiaoScriptCore)
 class MiaoScriptCore {
