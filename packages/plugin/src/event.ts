@@ -20,7 +20,7 @@ export class PluginEventManager {
             // ignore space listener
             if (!this.ServerChecker.check(event.servers)) { continue }
             // here must bind this to pluginInstance
-            this.EventManager.listen(pluginInstance, event.name, pluginInstance[event.executor].bind(pluginInstance))
+            this.EventManager.listen(pluginInstance, event.name, pluginInstance[event.executor].bind(pluginInstance), event.priority, event.ignoreCancel)
         }
     }
 
