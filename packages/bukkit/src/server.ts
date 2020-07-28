@@ -1,18 +1,18 @@
 import { server, constants } from '@ccms/api'
-import { provideSingleton } from '@ccms/container';
+import { provideSingleton } from '@ccms/container'
 
 import * as reflect from '@ccms/common/dist/reflect'
 import chat from './enhance/chat'
 
-let Bukkit = org.bukkit.Bukkit;
+let Bukkit = org.bukkit.Bukkit
 
 @provideSingleton(server.Server)
 export class BukkitServer extends server.ReflectServer {
-    private pluginsFolder: string;
+    private pluginsFolder: string
 
     constructor() {
-        super();
-        this.pluginsFolder = Bukkit.getUpdateFolderFile().getParentFile().getCanonicalPath();
+        super()
+        this.pluginsFolder = Bukkit.getUpdateFolderFile().getParentFile().getCanonicalPath()
     }
 
     getPlayer(name: string) {
@@ -40,25 +40,25 @@ export class BukkitServer extends server.ReflectServer {
         return Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command)
     }
     getPluginsFolder(): string {
-        return this.pluginsFolder;
+        return this.pluginsFolder
     }
     getNativePluginManager() {
-        return Bukkit.getPluginManager() as any;
+        return Bukkit.getPluginManager() as any
     }
     getDedicatedServer() {
         return reflect.on(Bukkit.getServer()).get('console').get()
     }
     getNettyPipeline() {
-        return this.pipeline;
+        return this.pipeline
     }
     getRootLogger() {
-        return this.rootLogger;
+        return this.rootLogger
     }
     sendJson(sender: string | any, json: object | string): void {
         if (typeof sender === "string") {
             sender = this.getPlayer(sender)
         }
-        let result = chat.json(sender, json)
+        let result = chat.json(sender, typeof json == "string" ? json : JSON.stringify(json))
         if (result !== false) {
             this.dispatchConsoleCommand(result)
         }
