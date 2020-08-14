@@ -43,7 +43,7 @@ function loadConfig(plugin: plugin.Plugin) {
                 base.save(configFile, configFactory.dump(plugin[config.variable]))
                 console.i18n("ms.plugin.manager.config.save.default", { plugin: plugin.description.name, name: config.name, format: config.format })
             } else {
-                plugin[config.variable] = configFactory.load(base.read(configFile))
+                Object.defineProperty(plugin, config.variable, { value: configFactory.load(base.read(configFile)) })
                 plugin[config.variable].save = () => {
                     let result = configFactory.dump(plugin[config.variable])
                     base.save(configFile, result)
