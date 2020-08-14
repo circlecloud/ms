@@ -1,8 +1,8 @@
-import { plugin as pluginApi, task, server } from '@ccms/api'
+import { plugin as pluginApi, task, server, plugin, channel, constants } from '@ccms/api'
 
 import { Translate } from '@ccms/i18n'
-import { inject, DefaultContainer as container } from '@ccms/container'
-import { interfaces, plugin, cmd, tab } from '@ccms/plugin'
+import { inject, DefaultContainer as container, optional, JSClass } from '@ccms/container'
+import { interfaces, JSPlugin, Cmd, Tab, enable, Listener, disable } from '@ccms/plugin'
 
 import * as fs from '@ccms/common/dist/fs'
 import * as reflect from '@ccms/common/dist/reflect'
@@ -26,15 +26,16 @@ let langMap = {
     'main.command.not.exists': '§4未知的子命令: §c{command}',
     'main.command.help.tip': '§6请执行 §b/{command} §ahelp §6查看帮助!',
     'list.install.header': '§6当前 §bMiaoScript §6已安装下列插件:',
-    'list.install.body': '§6插件名称: §b{name} §6版本: §a{version} §6作者: §3{author} §6来源: §c{from}',
+    'list.install.body': '§6插件名称: §b{name}\n§6版本: §a{version}\n§6作者: §3{author}\n§6来源: §c{from}',
     'list.header': '§6当前 §bMiaoScriptPackageCenter §6中存在下列插件:',
-    'list.body': '§6插件名称: §b{name} §6版本: §a{version} §6作者: §3{author} §6更新时间: §9{updated_at}',
+    'list.body': '§6插件名称: §b{name}\n§6版本: §a{version}\n§6作者: §3{author}\n§6更新时间: §9{updated_at}',
     'plugin.not.exists': '§6插件 §b{name} §c不存在!',
     'plugin.unload.finish': '§6插件 §b{name} §a已卸载!',
     'plugin.reload.finish': '§6插件 §b{name} §a重载完成!',
     'plugin.name.empty': '§c请输入插件名称!',
     'cloud.update.finish': '§6成功从 §aMiaoScriptPackageCenter §6获取到 §a{length} §6个插件!',
     'cloud.not.exists': '§6当前 §aMiaoScriptPackageCenter §c不存在 §a{name} §c插件!',
+    'cloud.update.exists': '§6插件 §b{name} §a发现新版本 §3{new_version} §6当前版本 §3{old_version}!',
     'download.start': '§6开始下载插件: §b{name}',
     'download.url': '§6插件下载地址: §b{url}',
     'download.finish': '§6插件 §b{name} §a下载完毕 开始加载 ...',
@@ -51,9 +52,9 @@ let langMap = {
 
 let fallbackMap = langMap
 
-@plugin({ name: 'MiaoScriptPackageManager', prefix: 'PM', version: '1.0.2', author: 'MiaoWoo', source: __filename })
+@JSPlugin({ prefix: 'PM', version: '1.2.0', author: 'MiaoWoo', source: __filename })
 export class MiaoScriptPackageManager extends interfaces.Plugin {
-    @inject(pluginApi.PluginManager)
+    @inject(plugin.PluginManager)
     private pluginManager: pluginApi.PluginManager
     @inject(task.TaskManager)
     private taskManager: task.TaskManager
@@ -63,11 +64,22 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     private server: server.Server
     @inject(pluginApi.PluginFolder)
     private pluginFolder: string
+    @inject(channel.Channel)
+    @optional() private channel: channel.Channel
+
+    @JSClass('java.io.ByteArrayOutputStream')
+    private ByteArrayOutputStream: any
+    @JSClass('java.io.DataOutputStream')
+    private DataOutputStream: any
+    @JSClass('com.google.common.io.ByteStreams')
+    private ByteStreams: any
 
     private packageCache: any[] = [];
     private packageNameCache: string[] = [];
 
+    private serverName: string
     private translate: Translate
+    private channelOff: { off: () => void }
 
     load() {
         this.translate = new Translate({
@@ -77,13 +89,100 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         this.updateRepo(this.server.getConsoleSender())
     }
 
-    @cmd()
+    @enable({ servers: [constants.ServerType.Bukkit, constants.ServerType.Sponge] })
+    serverEnbale() {
+        this.channelOff = this.channel?.listen(this, 'BungeeCord', (data) => {
+            let input = this.ByteStreams.newDataInput(data)
+            let subChannel = input.readUTF()
+            switch (subChannel) {
+                case "GetServer":
+                    this.serverName = input.readUTF()
+                    break
+                case "MiaoScriptPackageManager":
+                    this.readForward(input)
+                    break
+            }
+        })
+        let players = this.server.getOnlinePlayers()
+        if (players.length) this.bungeeCordDetect(players[0])
+    }
+
+    @disable({ servers: [constants.ServerType.Bukkit, constants.ServerType.Sponge] })
+    serverDisable() {
+        this.channelOff?.off()
+    }
+
+    private bungeeCordDetect(player) {
+        if (player) {
+            let byteArray = new this.ByteArrayOutputStream()
+            let out = new this.DataOutputStream(byteArray)
+            out.writeUTF("GetServer")
+            player.sendPluginMessage(base.getInstance(), "BungeeCord", byteArray.toByteArray())
+        }
+    }
+    private bungeeCordForward(player, command) {
+        if (player) {
+            let byteArray = new this.ByteArrayOutputStream()
+            let out = new this.DataOutputStream(byteArray)
+            out.writeUTF("Forward")
+            out.writeUTF("ALL")
+            out.writeUTF("MiaoScriptPackageManager")
+            out.writeUTF(JSON.stringify(command))
+            player.sendPluginMessage(base.getInstance(), "BungeeCord", byteArray.toByteArray())
+        }
+    }
+    private readForward(input) {
+        let message = JSON.parse(input.readUTF())
+        this.taskManager.create(() => this.main(this.server.getConsoleSender(), message.command, message.args)).async().submit()
+        this.sendBungeeCordMessage(message.sender, `§6[§cMS§6][§bPM§6] [§3BPM§6][§a${this.serverName}§6] §6命令 §b/mpm ${message.args?.join?.(' ')} §a执行成功!`)
+    }
+
+    @Listener({ servers: [constants.ServerType.Bukkit] })
+    PlayerJoinEvent(event: org.bukkit.event.player.PlayerJoinEvent) {
+        this.bungeeCordDetect(event.getPlayer())
+        if (event.getPlayer().isOp()) {
+            this.updateRepo(event.getPlayer())
+        }
+    }
+
+    @Listener({ servers: [constants.ServerType.Sponge] })
+    ClientConnectionEvent$Join(event: org.spongepowered.api.event.network.ClientConnectionEvent.Join) {
+        if (event.getTargetEntity().hasPermission('ms.mpm.admin')) {
+            this.updateRepo(event.getTargetEntity())
+        }
+    }
+
+    private sendBungeeCordMessage(sender, message) {
+        let players = this.server.getOnlinePlayers()
+        if (players.length) {
+            let byteArray = new this.ByteArrayOutputStream()
+            let out = new this.DataOutputStream(byteArray)
+            out.writeUTF("Message")
+            out.writeUTF(sender)
+            out.writeUTF(message)
+            this.channel.send(players[0], "BungeeCord", byteArray.toByteArray())
+        }
+    }
+
+    disable() {
+        this.channelOff?.off()
+    }
+
+    @Cmd()
+    bmpm(sender: any, command: string, args: string[]) {
+        if (!sender.isOp()) { return this.logger.sender(sender, '§c你没有此命令的权限!') }
+        this.bungeeCordForward(sender, { sender: sender.getName(), command, args })
+        this.logger.sender(sender, `[§3BPM§6][§a${this.serverName}§6] §6命令 §b/mpm ${args.join?.(' ')} §a发布成功!`)
+    }
+
+    @Cmd()
     mpm(sender: any, command: string, args: string[]) {
+        if (!sender.isOp()) { return this.logger.sender(sender, '§c你没有此命令的权限!') }
         this.taskManager.create(() => this.main(sender, command, args)).async().submit()
     }
 
     i18n(sender: any, name: string, params?: any) {
-        this.logger.sender(sender, this.translate.translate(name, params))
+        this.logger.sender(sender, this.translate.translate(name, params).split('\n'))
     }
 
     main(sender: any, command: string, args: string[]) {
@@ -255,7 +354,7 @@ return '§a返回结果: §r'+ eval(${JSON.stringify(code)});`)
         }
     }
 
-    @tab()
+    @Tab()
     tabmpm(sender: any, command: any, args: string | any[]) {
         if (args.length === 1) { return ['list', 'install', 'update', 'upgrade', 'reload', 'restart', 'run', 'help', 'create', 'deploy'] }
         if (args.length > 1) {
@@ -284,6 +383,13 @@ return '§a返回结果: §r'+ eval(${JSON.stringify(code)});`)
             for (const pl of result.data) { this.packageCache[pl.name] = pl }
             this.packageNameCache = Object.keys(this.packageCache)
             this.i18n(sender, 'cloud.update.finish', { length: this.packageNameCache.length })
+            this.pluginManager.getPlugins().forEach(p => {
+                let cloudPlugin = this.packageCache[p.description.name]
+                //§6插件名称: §b{name}\n§6版本: §a{version}\n§6作者: §3{author}\§6更新时间: §9{updated_at}
+                if (cloudPlugin && cloudPlugin.version != p.description.version) {
+                    this.i18n(sender, 'cloud.update.exists', { name: p.description.name, new_version: cloudPlugin.version, old_version: p.description.version })
+                }
+            })
         }).async().submit()
     }
 

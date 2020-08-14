@@ -157,7 +157,7 @@ class SearchRankingController {
 
     private createKeyworkSearch(keyword: string, type: string) {
         let cacheDate = Date.now()
-        this.redisTemplate.opsForValue().set(this.getCacheKey(keyword, type), cacheDate)
+        this.redisTemplate.opsForValue().set(this.getCacheKey(keyword, type), cacheDate, 15, java.util.concurrent.TimeUnit.DAYS)
         this.sendSearchCmd(keyword, type, cacheDate)
         return { status: 201, msg: `关键词: ${keyword} 排名类型: ${type} 查询任务以创建...`, createTime: cacheDate }
     }
