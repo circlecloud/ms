@@ -13,8 +13,7 @@ let downgrade = false
 /**
  * 获取NMS版本
  */
-//@ts-ignore
-let nmsVersion = org.bukkit.Bukkit.server.class.name.split('.')[3]
+let nmsVersion = undefined
 /**
  * 获取NMS类
  */
@@ -47,6 +46,8 @@ function remapFieldName(clazz: any, origin: string, test: string) {
 }
 
 function init() {
+    //@ts-ignore
+    nmsVersion = org.bukkit.Bukkit.server.class.name.split('.')[3]
     try {
         RemapUtils = Java.type('catserver.server.remapper.RemapUtils')
     } catch (ex) {
