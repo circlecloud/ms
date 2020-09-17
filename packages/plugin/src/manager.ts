@@ -19,6 +19,8 @@ export class PluginManagerImpl implements plugin.PluginManager {
     private serverType: string
     @inject(event.Event)
     private EventManager: event.Event
+    @inject(server.ServerChecker)
+    private serverChecker: server.ServerChecker
 
     @inject(PluginCommandManager)
     private commandManager: PluginCommandManager
@@ -74,7 +76,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
                     try {
                         this.loadPlugin(scanner.load(loadMetadata))
                     } catch (error) {
-                        console.error(`plugin scanner ${scanner.type} load ${loadMetadata.name} occurred error ${error}`)
+                        console.error(`plugin scanner ${scanner.type} load ${loadMetadata.file} occurred error ${error}`)
                         console.ex(error)
                     }
                 })
@@ -102,7 +104,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
             process.emit(`plugin.before.${stage}`, plugin)
             this.runCatch(plugin, stage)
             this.runCatch(plugin, `${this.serverType}${stage}`)
-            plugin.description.loadMetadata.loader[stage](plugin)
+            plugin.description.loadMetadata.loader[stage]?.(plugin)
             process.emit(`plugin.after.${stage}`, plugin)
         } catch (ex) {
             console.i18n("ms.plugin.manager.stage.exec.error", { plugin: plugin.description.name, executor: stage, error: ex })
@@ -112,7 +114,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
     private loadPlugin(loadMetadata: plugin.PluginLoadMetadata) {
         if (!loadMetadata) { throw new Error('loadMetadata can\'t be undefiend when loadPlugin!') }
-        if (loadMetadata.loaded) { throw new Error(`Plugin ${loadMetadata.name} is already loaded by ${loadMetadata.loader?.type}!`) }
+        if (loadMetadata.loaded) { throw new Error(`Plugin file ${loadMetadata.file} is already loaded by ${loadMetadata.loader?.type}!`) }
         try {
             for (const [, loader] of this.loaderMap) {
                 if (this.loaderRequirePlugin(loadMetadata, loader)?.loaded) return loadMetadata.metadata
@@ -215,16 +217,17 @@ export class PluginManagerImpl implements plugin.PluginManager {
             try {
                 this.buildPlugin(metadata)
             } catch (error) {
-                console.error(error)
+                console.console(error)
             }
         })
     }
 
     private buildPlugin(metadata: plugin.PluginMetadata) {
         if (!this.loaderMap.has(metadata.type)) { throw new Error(`§4无法加载插件 §c${metadata.name} §4请检查 §c${metadata.type} §4加载器是否正常启用!`) }
+        if (this.instanceMap.has(metadata.name)) { throw new Error(`Plugin ${metadata.name} is already load from ${metadata.source}...`) }
+        if (!this.serverChecker.check(metadata.servers)) { throw new Error(`§6插件 §b${metadata.name} §c服务器类型不兼容(${metadata.servers.join(',')}) §6忽略加载...`) }
         let pluginInstance = this.loaderMap.get(metadata.type).build(metadata)
         if (!pluginInstance) { throw new Error(`§4加载器 §c${metadata.type} §4加载插件 §c${metadata.name} §4失败!`) }
-        if (this.instanceMap.has(metadata.name)) { throw new Error(`Plugin ${metadata.name} is already load from ${metadata.source}...`) }
         this.instanceMap.set(metadata.name, pluginInstance)
         return pluginInstance
     }

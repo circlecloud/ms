@@ -39,10 +39,6 @@ export namespace plugin {
          */
         type: string
         /**
-         * 插件名称
-         */
-        name?: string
-        /**
          * 插件文件
          */
         file?: string
@@ -116,22 +112,22 @@ export namespace plugin {
          * Load 阶段
          * @param plugin 插件
          */
-        load(plugin: Plugin): void
+        load?(plugin: Plugin): void
         /**
          * Enable 阶段
          * @param plugin 插件
          */
-        enable(plugin: Plugin): void
+        enable?(plugin: Plugin): void
         /**
          * Disable 阶段
          * @param plugin 插件
          */
-        disable(plugin: Plugin): void
+        disable?(plugin: Plugin): void
         /**
          * Reload 阶段
          * @param plugin 插件
          */
-        reload(plugin: Plugin): void
+        reload?(plugin: Plugin): void
     }
     export interface Plugin {
         description: PluginMetadata

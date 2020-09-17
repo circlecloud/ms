@@ -2,9 +2,11 @@ import { plugin } from "@ccms/api"
 import * as fs from '@ccms/common/dist/fs'
 import { provideSingletonNamed } from "@ccms/container"
 
-@provideSingletonNamed(plugin.PluginScanner, 'file')
+const SCANNER_TYPE_NAME = 'file'
+
+@provideSingletonNamed(plugin.PluginScanner, SCANNER_TYPE_NAME)
 export class JSFileScanner implements plugin.PluginScanner {
-    type: string = 'file'
+    type: string = SCANNER_TYPE_NAME
 
     scan(target: any): plugin.PluginLoadMetadata[] {
         return this.scanFolder(fs.concat(root, target)).map((file) => this.read(file))

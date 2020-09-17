@@ -63,4 +63,7 @@ export class BukkitServer extends server.ReflectServer {
             this.dispatchConsoleCommand(result)
         }
     }
+    tabComplete?(sender: any, input: string, index?: number): string[] {
+        throw new Error("Method not implemented.")
+    }
 }

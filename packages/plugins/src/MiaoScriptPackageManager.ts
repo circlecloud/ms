@@ -25,6 +25,7 @@ let help = [
 let langMap = {
     'main.command.not.exists': '§4未知的子命令: §c{command}',
     'main.command.help.tip': '§6请执行 §b/{command} §ahelp §6查看帮助!',
+    'main.command.no.permission': '§c你没有此命令的权限!',
     'list.install.header': '§6当前 §bMiaoScript §6已安装下列插件:',
     'list.install.body': '§6插件名称: §b{name}\n§6版本: §a{version}\n§6作者: §3{author}\n§6来源: §c{from}',
     'list.header': '§6当前 §bMiaoScriptPackageCenter §6中存在下列插件:',
@@ -117,7 +118,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
             let byteArray = new this.ByteArrayOutputStream()
             let out = new this.DataOutputStream(byteArray)
             out.writeUTF("GetServer")
-            player.sendPluginMessage(base.getInstance(), "BungeeCord", byteArray.toByteArray())
+            this.channel.send(player, "BungeeCord", byteArray.toByteArray())
         }
     }
     private bungeeCordForward(player, command) {
@@ -128,7 +129,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
             out.writeUTF("ALL")
             out.writeUTF("MiaoScriptPackageManager")
             out.writeUTF(JSON.stringify(command))
-            player.sendPluginMessage(base.getInstance(), "BungeeCord", byteArray.toByteArray())
+            this.channel.send(player, "BungeeCord", byteArray.toByteArray())
         }
     }
     private readForward(input) {
@@ -147,6 +148,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
 
     @Listener({ servers: [constants.ServerType.Sponge] })
     ClientConnectionEvent$Join(event: org.spongepowered.api.event.network.ClientConnectionEvent.Join) {
+        this.bungeeCordDetect(event.getTargetEntity())
         if (event.getTargetEntity().hasPermission('ms.mpm.admin')) {
             this.updateRepo(event.getTargetEntity())
         }
@@ -168,16 +170,22 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         this.channelOff?.off()
     }
 
-    @Cmd()
+    @Cmd({ servers: [`!${constants.ServerType.Bungee}`] })
     bmpm(sender: any, command: string, args: string[]) {
-        if (!sender.isOp()) { return this.logger.sender(sender, '§c你没有此命令的权限!') }
+        if (!sender.isOp()) { return this.i18n(sender, 'main.command.no.permission') }
         this.bungeeCordForward(sender, { sender: sender.getName(), command, args })
-        this.logger.sender(sender, `[§3BPM§6][§a${this.serverName}§6] §6命令 §b/mpm ${args.join?.(' ')} §a发布成功!`)
+        this.logger.sender(sender, `§6[§3BPM§6][§a${this.serverName}§6] §6命令 §b/mpm ${args.join?.(' ')} §a发布成功!`)
     }
 
-    @Cmd()
+    @Cmd({ servers: [constants.ServerType.Bungee] })
+    mpmanager(sender: any, command: string, args: string[]) {
+        if (!sender.isOp()) { return this.i18n(sender, 'main.command.no.permission') }
+        this.taskManager.create(() => this.main(sender, command, args)).async().submit()
+    }
+
+    @Cmd({ servers: [`!${constants.ServerType.Bungee}`] })
     mpm(sender: any, command: string, args: string[]) {
-        if (!sender.isOp()) { return this.logger.sender(sender, '§c你没有此命令的权限!') }
+        if (!sender.isOp()) { return this.i18n(sender, 'main.command.no.permission') }
         this.taskManager.create(() => this.main(sender, command, args)).async().submit()
     }
 
@@ -225,6 +233,10 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
 
     cmdinstall(sender: any, name: string) {
         if (!name) { return this.i18n(sender, 'plugin.name.empty') }
+        if (this.pluginManager.getPlugins().has(name)) {
+
+            return
+        }
         this.download(sender, name)
     }
 

@@ -26,6 +26,10 @@ export namespace interfaces {
     }
     export interface ExecMetadata extends plugin.BaseMetadata {
         /**
+         * 执行器所在对象 用于绑定this
+         */
+        target?: any
+        /**
          * 执行器
          */
         executor?: string
@@ -68,5 +72,4 @@ export namespace interfaces {
          */
         readonly?: boolean
     }
-    export type PluginLike = Plugin | string
 }

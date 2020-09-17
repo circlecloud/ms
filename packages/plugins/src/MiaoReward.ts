@@ -1,34 +1,48 @@
-import { constants, task, server, channel } from "@ccms/api"
+import { constants, task, server, channel, chat } from "@ccms/api"
 import { JSPlugin, interfaces, Cmd, Tab, Listener, Config } from "@ccms/plugin"
 
 import { QRCode, QRErrorCorrectLevel } from '@ccms/common/dist/qrcode'
 
 import { inject, JSClass, optional } from '@ccms/container'
 import http from '@ccms/common/dist/http'
-import chat from '@ccms/bukkit/dist/enhance/chat'
 
-const MapView = Java.type('org.bukkit.map.MapView')
-const Bukkit = Java.type('org.bukkit.Bukkit')
-const MapRenderer = Java.type('org.bukkit.map.MapRenderer')
-const ItemStack = Java.type('org.bukkit.inventory.ItemStack')
-const Material = Java.type('org.bukkit.Material')
+let MapView
+let Bukkit
+let MapRenderer
+let ItemStack
+let Material
+
+try {
+  MapView = Java.type('org.bukkit.map.MapView')
+  Bukkit = Java.type('org.bukkit.Bukkit')
+  MapRenderer = Java.type('org.bukkit.map.MapRenderer')
+  ItemStack = Java.type('org.bukkit.inventory.ItemStack')
+  Material = Java.type('org.bukkit.Material')
+} catch (error) {
+}
 
 const BufferedImage = Java.type('java.awt.image.BufferedImage')
-const Graphics2D = Java.type('java.awt.Graphics2D')
 const Color = Java.type('java.awt.Color')
-const Image = Java.type('java.awt.Image')
-const Font = Java.type('java.awt.Font')
-const RenderingHints = Java.type('java.awt.RenderingHints')
 
 class QRCodeRender {
   private _proxy
-  constructor(image: any) {
-    const ProxyAdapter = Java.extend(MapRenderer, {
-      render: (_mapView, mapCanvas) => {
-        mapCanvas.drawImage(0, 0, image)
+  private image
+  private rendered = false
+  constructor() {
+    const MapRendererAdapter = Java.extend(MapRenderer, {
+      render: (_mapView, mapCanvas, _player) => {
+        if (this.rendered) return
+        if (this.image) {
+          mapCanvas.drawImage(0, 0, this.image)
+        }
+        this.rendered = true
       }
     })
-    this._proxy = new ProxyAdapter()
+    this._proxy = new MapRendererAdapter()
+  }
+  setImage(image) {
+    this.image = image
+    this.rendered = false
   }
   getHandler() {
     return this._proxy
@@ -40,14 +54,21 @@ interface PlaceholderAPI {
   setPlaceholders: (player: any, str: string) => string
 }
 
-@JSPlugin({ prefix: 'MRD', version: '1.1.0', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], source: __filename })
+@JSPlugin({ prefix: 'MRD', version: '1.2.0', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], source: __filename })
 export class MiaoReward extends interfaces.Plugin {
+  private serverInfo
   private cacheBindUuid = ''
-  private cacheTasks = new Map<number, task.Cancelable>()
+  private zeroMapView = undefined
+  private zeroMapRender: QRCodeRender = undefined
   private isBinding = false
-  private isBindingUser = 'unknow'
+  private bindingUser = 'unknow'
+  private bindingTask = undefined
+  private bindingLeftTime = 45
+  private bindingNotify = new java.util.HashSet<org.bukkit.entity.Player>()
   private drawCooldown = new Map<string, number>()
 
+  @inject(chat.Chat)
+  private chat: chat.Chat
   @inject(server.Server)
   private server: server.Server
   @inject(task.TaskManager)
@@ -76,9 +97,32 @@ export class MiaoReward extends interfaces.Plugin {
     this.config.prefix = this.config.prefix || '§6[§b广告系统§6]§r'
     this.config.drawCommand = this.config.drawCommand || 'p give %player_name% %amount%'
     this.config.drawCooldown = this.config.drawCooldown || 300
+    this.taskManager.create(() => {
+      if (this.config.serverId) {
+        let result = this.httpPost(`https://reward.yumc.pw/server/server`, {
+          id: this.config.serverId,
+          token: this.config.serverToken
+        })
+        if (result.code == 200) {
+          this.serverInfo = result.data
+        }
+      }
+    }).async().submit()
   }
 
   enable() {
+    this.initPlaceholderAPI()
+    this.channelOff = this.Channel?.listen(this, 'BungeeCord', () => {
+      this.isBungeeCord = true
+      this.PlayerJoinEvent['off']()
+      this.channelOff.off()
+    })
+    let players = this.server.getOnlinePlayers()
+    if (players.length) this.bungeeCordDetect(players[0])
+    this.initZeroMap()
+  }
+
+  private initPlaceholderAPI() {
     if (!this.PlaceholderAPI) {
       console.console("§cCan't found me.clip.placeholderapi.PlaceholderAPI variable will not be replaced!")
     } else {
@@ -93,13 +137,17 @@ export class MiaoReward extends interfaces.Plugin {
         }
       }))
     }
-    this.channelOff = this.Channel?.listen(this, 'BungeeCord', (data) => { this.isBungeeCord = true })
-    let players = this.server.getOnlinePlayers()
-    if (players.length) this.bungeeCordDetect(players[0])
+  }
+
+  private initZeroMap() {
+    this.zeroMapRender = new QRCodeRender()
+    this.zeroMapView = Bukkit.getMap(0) || Bukkit.createMap(Bukkit.getWorlds()[0])
+    this.zeroMapView.setScale(MapView.Scale.FARTHEST)
+    this.zeroMapView.getRenderers().forEach(r => this.zeroMapView.removeRenderer(r))
+    this.zeroMapView.addRenderer(this.zeroMapRender.getHandler())
   }
 
   disable() {
-    this.cacheTasks.forEach(t => t.cancel())
     this.server.getOnlinePlayers().forEach(p => this.checkAndClear(p))
     this.channelOff?.off()
   }
@@ -117,31 +165,83 @@ export class MiaoReward extends interfaces.Plugin {
     this.taskManager.create(() => this[cmdKey](sender, ...args)).async().submit()
   }
 
-  cmdbind(sender: org.bukkit.entity.Player, server: boolean) {
+  private scanAuth(sender: org.bukkit.entity.Player, scanType: string, scanObj: { title: string, content: string }, success: (token: string, user: any) => void, cancel?: () => void) {
+    this.chat.sendTitle(sender, this.config.prefix, '§a正在获取授权二维码...')
+    let scan = this.httpPost('https://reward.yumc.pw/auth/scan', { ...scanObj, type: scanType })
+    if (scan.code == 200) {
+      let sync = { scaned: false, timeout: false }
+      this.taskManager.create(() => {
+        let result = this.httpPost('https://reward.yumc.pw/auth/scanCheck', {
+          token: scan.data.token,
+          type: scanType,
+          status: 'noscan'
+        })
+        sync.scaned = true
+        if (result.code == 200 && result.data.status == "scaned") {
+          this.chat.sendTitle(sender, "§3已扫码", "§a请在手机上确认")
+          let result = this.httpPost('https://reward.yumc.pw/auth/scanCheck', {
+            token: scan.data.token,
+            type: scanType,
+            status: 'scaned'
+          })
+          if (result.code == 200) {
+            if (result.data.status == "confirm") {
+              this.chat.sendTitle(sender, '§3扫码完成')
+              success(scan.data.token, result.data.user)
+            } else if (result.data.status == "cancel") {
+              this.chat.sendTitle(sender, '§c已取消授权')
+              cancel?.()
+            } else {
+              this.chat.sendTitle(sender, "§c未知的结果", result.data.status)
+            }
+          } else {
+            this.chat.sendTitle(sender, "§4扫码异常", result.msg)
+          }
+        }
+        sync.scaned = true
+      }).async().submit()
+      this.setItemAndTp(sender, scan.data.url, sync)
+      this.chat.sendTitle(sender, '')
+    } else {
+      this.logger.sender(sender, '§4授权二维码获取失败!')
+    }
+  }
+
+  private bindCheck(sender: org.bukkit.entity.Player, cooldown: number) {
     if (this.isBinding) {
-      let bindUser = Bukkit.getPlayerExact(this.isBindingUser)
+      let bindUser = Bukkit.getPlayerExact(this.bindingUser)
       if (bindUser && bindUser.isOnline() && this.isQrCodeItem(bindUser.getItemInHand())[0]) {
-        return this.logger.sender(sender, "§c当前 §a" + this.isBindingUser + " §c玩家正在绑定账号 请稍候重试...")
+        this.bindingNotify.add(sender)
+        this.logger.sender(sender, "§c当前 §a" + this.bindingUser + " §c玩家正在扫码 §6请稍候 §e" + this.bindingLeftTime + "秒 §6后重试...")
+        return true
       }
     }
-    if (sender.getItemInHand()?.getType() !== Material.AIR) { return this.logger.sender(sender, "§c请空手执行此命令!") }
+    if (this.drawCooldown.has(sender.getName())) {
+      let leftTime = cooldown - (Date.now() - this.drawCooldown.get(sender.getName())) / 1000
+      if (leftTime > 0) {
+        return this.logger.sender(sender, `§c扫码功能冷却中 剩余 ${leftTime} 秒!`)
+      }
+    }
+    this.drawCooldown.set(sender.getName(), Date.now())
     this.isBinding = true
-    this.isBindingUser = sender.getDisplayName() || sender.getName()
+    this.bindingUser = sender.getName()
+    this.bindingNotify.clear()
+    return false
+  }
+
+  cmdbind(sender: org.bukkit.entity.Player, server: boolean) {
+    if (this.bindCheck(sender, 60)) return
+    if (sender.getItemInHand()?.getType() !== Material.AIR) { return this.logger.sender(sender, "§c请空手执行此命令!") }
     if (server) {
       if (!sender.isOp()) { return this.logger.sender(sender, '§4您没有配置服务器的权限!') }
       this.bindServer(sender)
     } else {
+      if (!this.serverInfo) { return this.logger.sender(sender, '§4当前服务器尚未配置绑定ID 请联系腐竹进行配置!') }
       this.bindUser(sender)
     }
   }
 
   cmddraw(sender: org.bukkit.entity.Player, amount: number) {
-    if (this.drawCooldown.has(sender.getName())) {
-      let leftTime = this.config.drawCooldown - (Date.now() - this.drawCooldown.get(sender.getName())) / 1000
-      if (leftTime > 0) {
-        return this.logger.sender(sender, `§c点券兑换冷却中 剩余 ${leftTime} 秒!`)
-      }
-    }
     amount = Number(amount)
     if (!Number.isInteger(amount)) {
       return this.logger.sender(sender, '§4金额必须是数字!')
@@ -149,8 +249,26 @@ export class MiaoReward extends interfaces.Plugin {
     if (amount % 100 !== 0) {
       return this.logger.sender(sender, '§4金额必须是100倍数!')
     }
-    let address = `https://reward.yumc.pw/server/draw/id/${this.config.serverId}/token/${this.config.serverToken}/uuid/${sender.getUniqueId().toString()}/username/${sender.getName()}/amount/${amount}`
-    let draw = http.get(address)
+    if (this.bindCheck(sender, this.config.drawCooldown)) { return }
+    this.scanAuth(sender,
+      'draw', {
+      title: '兑换授权',
+      content: "是否授权 " + this.serverInfo.name + " 服务器\n兑换 " + amount + " 喵币 到 " + sender.getName()
+    }, (token: string) => {
+      this.drawCoin(sender, amount, token)
+    })
+  }
+
+  private drawCoin(sender: org.bukkit.entity.Player, amount: number, token: string) {
+    if (!token) return
+    let draw = this.httpPost('https://reward.yumc.pw/server/draw', {
+      id: this.config.serverId,
+      token: this.config.serverToken,
+      uuid: sender.getUniqueId().toString(),
+      username: sender.getName(),
+      amount,
+      userToken: token
+    })
     if (draw.code !== 200) {
       return this.sendError(sender, `§4兑换异常 §6服务器返回: §c${draw.msg}`)
     }
@@ -158,14 +276,15 @@ export class MiaoReward extends interfaces.Plugin {
     if (!drawAmount) {
       return this.sendError(sender, '§c服务器返回金额 ' + draw.data + ' 可能存在异常')
     }
-    let command = `p give ${sender.getName()} ${draw.data}`
-    if (!this.server.dispatchConsoleCommand(command)) {
-      return this.sendError(sender, '§6执行命令 §3/' + command + ' §c可能存在异常')
-    }
-    this.logger.sender(sender, draw.msg.split('\n'))
-    this.drawCooldown.set(sender.getName(), Date.now())
-    this.sendBoardcast(sender, `${this.config.prefix}§6玩家 §b${sender.getName()} §6成功将 §a${amount}喵币 §6兑换成 §c${draw.data}点券!`)
-    this.sendBoardcast(sender, `${this.config.prefix}§c/mrd help §b查看广告系统帮助 §6快来一起看广告赚点券吧!`)
+    this.taskManager.create(() => {
+      let command = this.config.drawCommand.replace('%player_name%', sender.getName()).replace('%amount%', draw.data)
+      if (!this.server.dispatchConsoleCommand(command)) {
+        return this.sendError(sender, '§6执行命令 §3/' + command + ' §c可能存在异常')
+      }
+      this.logger.sender(sender, draw.msg.split('\n'))
+      this.sendBoardcast(sender, `${this.config.prefix}§6玩家 §b${sender.getName()} §6成功将 §a${amount}喵币 §6兑换成 §c${draw.data}点券!`)
+      this.sendBoardcast(sender, `${this.config.prefix}§c/mrd help §b查看广告系统帮助 §6快来一起看广告赚点券吧!`)
+    }).submit()
   }
 
   private sendError(sender, error) {
@@ -181,7 +300,10 @@ export class MiaoReward extends interfaces.Plugin {
 
   cmdrank(sender: any, boardcast: boolean) {
     if (!sender.isOp()) { return this.logger.sender(sender, '§4你没有此命令的权限!') }
-    let result = http.get(`https://reward.yumc.pw/server/rank/id/${this.config.serverId}/token/${this.config.serverToken}`)
+    let result = this.httpPost(`https://reward.yumc.pw/server/rank`, {
+      id: this.config.serverId,
+      token: this.config.serverToken
+    })
     if (result.code !== 200) {
       return this.logger.sender(sender, `§c今日未查询到数据!`)
     }
@@ -199,7 +321,10 @@ export class MiaoReward extends interfaces.Plugin {
 
   cmdserver(sender: any) {
     if (!sender.isOp()) { return this.logger.sender(sender, '§4你没有此命令的权限!') }
-    let result = http.get(`https://reward.yumc.pw/server/server/id/${this.config.serverId}/token/${this.config.serverToken}`)
+    let result = this.httpPost(`https://reward.yumc.pw/server/server`, {
+      id: this.config.serverId,
+      token: this.config.serverToken
+    })
     if (result.code !== 200) {
       return this.logger.sender(sender, `§4操作异常 §6服务器返回: §c${result.msg}`)
     }
@@ -225,7 +350,11 @@ export class MiaoReward extends interfaces.Plugin {
       ])
     }
     if (confirm != 'confirm') return this.logger.sender(sender, `§6请执行 §b/mrd ratio §c${ratio} §econfirm §c确认修改!`)
-    let result = http.get(`https://reward.yumc.pw/server/ratio/id/${this.config.serverId}/token/${this.config.serverToken}/ratio/${ratio}`)
+    let result = this.httpPost(`https://reward.yumc.pw/server/ratio`, {
+      id: this.config.serverId,
+      token: this.config.serverToken,
+      ratio
+    })
     if (result.code !== 200) {
       return this.logger.sender(sender, `§4操作异常 §6服务器返回: §c${result.msg}`)
     }
@@ -249,77 +378,88 @@ export class MiaoReward extends interfaces.Plugin {
   }
 
   private bindServer(sender: org.bukkit.entity.Player) {
+    this.logger.sender(sender, '§a正在请求二维码 请稍候...')
     let scanObj = http.get(`https://reward.yumc.pw/server/scan`)
     if (scanObj.code !== 200) {
       return this.logger.sender(sender, '§c获取服务器绑定码失败! Error: ' + scanObj.msg)
     }
     this.cacheBindUuid = scanObj.data.uuid
-    this.setItemAndTp(sender, scanObj.data.url, () => {
-      let check = http.get(`https://reward.yumc.pw/server/check/token/${this.cacheBindUuid}`)
+    let sync = { scaned: false }
+    this.taskManager.create(() => {
+      let check = this.httpPost(`https://reward.yumc.pw/server/check`, {
+        token: this.cacheBindUuid,
+        sync: true
+      })
       if (check.code == 200) {
         this.config.serverId = check.data.serverId
         this.config.serverToken = check.data.serverToken
         // @ts-ignore
         this.config.save()
-        this.checkAndClear(sender)
         this.logger.sender(sender, '§a已成功绑定服务器: §b' + check.data.serverName)
-        return true
       }
-    })
+      sync.scaned = true
+    }).async().submit()
+    this.setItemAndTp(sender, scanObj.data.url, sync)
   }
 
   private bindUser(sender: org.bukkit.entity.Player) {
     if (!this.config.serverId || !this.config.serverToken) { return this.logger.sender(sender, '§4当前服务器尚未配置绑定ID 请联系腐竹进行配置!') }
-    let check = http.get(`https://reward.yumc.pw/server/query?id=${this.config.serverId}&token=${this.config.serverToken}`)
+    this.logger.sender(sender, '§a正在请求二维码 请稍候...')
+    let check = this.httpPost(`https://reward.yumc.pw/server/query`, {
+      id: this.config.serverId,
+      token: this.config.serverToken
+    })
     if (check.code !== 200) {
       return this.logger.sender(sender, '§4获取绑定参数异常! §cError: ' + check.msg)
     }
     let queryUser = this.queryUser(sender)
     if (queryUser.code == 200) {
-      return this.logger.sender(sender, ['§4当前用户已绑定! §c如需解绑 请联系腐竹!', '§b如需看广告请进QQ群 点击聊天框上的圈云盒子!'])
+      return this.logger.sender(sender, ['§4当前用户已绑定! §c如需解绑 请联系腐竹!', '§b如需看广告请进QQ群 §a点击聊天框上的圈云盒子!'])
     }
     let bindUrl = 'https://m.q.qq.com/a/p/1110360279?s=' + encodeURIComponent(`pages/my/index?bindType=user&serverId=${this.config.serverId}&uuid=${sender.getUniqueId().toString()}&username=${sender.getName()}`)
-    this.setItemAndTp(sender, bindUrl, () => {
-      let queryUser = this.queryUser(sender)
+    let sync = { scaned: false, timeout: false }
+    this.taskManager.create(() => {
+      let queryUser = this.queryUser(sender, true)
       if (queryUser.code == 200) {
         this.sendResult(sender, '绑定成功', queryUser.data)
-        this.checkAndClear(sender)
-        return true
+        sync.scaned = true
       }
-    })
+    }).async().submit()
+    this.setItemAndTp(sender, bindUrl, sync)
   }
 
-  private setItemAndTp(sender: org.bukkit.entity.Player, content: string, func: () => boolean) {
+  private setItemAndTp(sender: org.bukkit.entity.Player, content: string, sync: { scaned: boolean }) {
     this.taskManager.create(() => {
-      let [id, item] = this.createQrCodeMapItem(content)
-      let times = 0
-      let task = this.taskManager.create(() => {
-        chat.send(sender, JSON.stringify({
-          text: '§c§l请使用手机QQ扫描二维码绑定!'
-        }), 2)
-        if (func() || !sender.isOnline()) {
-          task.cancel()
-          this.cacheTasks.delete(id)
-          this.isBinding = false
-        }
-        if (times++ > 120) {
-          this.logger.sender(sender, '§c绑定超时!')
-          this.checkAndClear(sender)
-          task.cancel()
-          this.cacheTasks.delete(id)
-          this.isBinding = false
+      this.bindingLeftTime = 30
+      this.bindingTask = this.taskManager.create(() => {
+        try {
+          if (sync.scaned || !sender.isOnline() || !this.isHoldQrCodeItem(sender) || --this.bindingLeftTime < 0) {
+            if (this.bindingLeftTime < 0) {
+              this.logger.sender(sender, '§c二维码已过期 请重新获取!')
+            }
+            this.cancelTask(sender)
+            return
+          }
+          this.chat.sendActionBar(sender, `§c§l手机QQ扫描二维码 剩余 ${this.bindingLeftTime} 秒...`)
+        } catch (error) {
+          console.ex(error)
         }
       }).async().later(20).timer(20).submit()
-      this.cacheTasks.set(id, task)
-      sender.setItemInHand(item)
+      sender.setItemInHand(this.createQrCodeMapItem(content))
       let temp = sender.getLocation()
       temp.setPitch(90)
       sender.teleport(temp)
     }).submit()
   }
 
-  private queryUser(sender: org.bukkit.entity.Player) {
-    return http.get(`https://reward.yumc.pw/server/queryUser/id/${this.config.serverId}/token/${this.config.serverToken}/uuid/${sender.getUniqueId().toString()}/username/${sender.getName()}`)
+  private queryUser(sender: org.bukkit.entity.Player, sync = false) {
+    return this.httpPost(`https://reward.yumc.pw/server/queryUser`, {
+      id: this.config.serverId,
+      token: this.config.serverToken,
+      uuid: sender.getUniqueId().toString(),
+      username: sender.getName(),
+      sync
+    })
   }
 
   cmdquery(sender: org.bukkit.entity.Player) {
@@ -343,26 +483,81 @@ export class MiaoReward extends interfaces.Plugin {
     ])
   }
 
-  private createQrCodeMapItem(contents: string): [number, any] {
-    let view = Bukkit.createMap(Bukkit.getWorlds()[0])
-    view.setScale(MapView.Scale.FARTHEST)
-    view.getRenderers().forEach(r => view.removeRenderer(r))
-    view.addRenderer(new QRCodeRender(this.createQrcode(contents)).getHandler())
-    let item: org.bukkit.inventory.ItemStack = new ItemStack(Material.MAP)
-    let meta = item.getItemMeta()
-    meta.setDisplayName('§c请使用手机QQ扫描二维码绑定!')
-    meta.setLore(["QRCODE"])
-    item.setDurability(view.getId())
-    item.setItemMeta(meta)
-    return [view.getId(), item]
+  private httpPost(url, data) {
+    let startTime = Date.now()
+    let result = http.post(url, data)
+    console.debug(`
+====== HTTP POST ======
+REQUEST URL : ${url}
+REQUEST DATA: ${JSON.stringify(data)}
+RESPONSE    : ${JSON.stringify(result)}
+CAST TIME   : ${Date.now() - startTime}`)
+    return result
   }
 
-  private createQrcode(contents: string) {
+  // var server = container.get(api.server.Server)
+  // var console = server.getDedicatedServer()
+  // var mainWorld = reflect.on(console).get('field_71305_c').get()[0]
+  // 设置新的Data
+  // mapdata = new MapData(s);
+  // mapdata.field_76197_d = (byte)3;
+  // mapdata.func_176054_a((double)worldIn.func_72912_H().func_76079_c(), (double)worldIn.func_72912_H().func_76074_e(), (int)mapdata.field_76197_d);
+  // mapdata.field_76200_c = ((WorldServer)worldIn).dimension;
+  // mapdata.func_76185_a();
+  // worldMain.func_72823_a(s, (WorldSavedData)mapdata);
+  // s = "map_" + stack.getMetadata();
+  // mapdata = new MapData(s);
+  // mapdata.scale = 3;
+  // mapdata.calculateMapCenter((double)worldIn.getWorldInfo().getSpawnX(), (double)worldIn.getWorldInfo().getSpawnZ(), mapdata.scale);
+  // // mapdata.dimension = worldIn.provider.getDimension();
+  // mapdata.dimension = ((WorldServer) worldIn).dimension; // CraftBukkit - fixes Bukkit multiworld maps
+  // mapdata.markDirty();
+  // worldMain.setData(s, mapdata);
+  // var mapStorage = mainWorld.field_72988_C
+
+  // var loadedDataMap = reflect.on(mapStorage).get('field_75749_b').get()
+  // var loadedDataList = reflect.on(mapStorage).get('field_75750_c').get()
+  // var idCounts = reflect.on(mapStorage).get('field_75748_d').get()
+
+  // @Override
+  // public CraftMapView createMap(World world) {
+  //     Validate.notNull((Object)world, (String)"World cannot be null", (Object[])new Object[0]);
+  //     net.minecraft.item.ItemStack stack = new net.minecraft.item.ItemStack((Item)Items.field_151148_bJ, 1, -1);
+  //     MapData worldmap = Items.field_151098_aY.func_77873_a(stack, (net.minecraft.world.World)((CraftWorld)world).getHandle());
+  //     return worldmap.mapView;
+  // }
+  //net.minecraft.item.ItemMap
+  // @Override
+  // public CraftMapView createMap(World world) {
+  //     Validate.notNull(world, "World cannot be null");
+
+  //     net.minecraft.item.ItemStack stack = new net.minecraft.item.ItemStack(Items.MAP, 1, -1, true); // CatServer
+  //     MapData worldmap = Items.FILLED_MAP.getMapData(stack, ((CraftWorld) world).getHandle());
+  //     return worldmap.mapView;
+  // }
+
+  private createQrCodeMapItem(content: string) {
+    let item: org.bukkit.inventory.ItemStack
+    item = new ItemStack(Material.FILLED_MAP || Material.MAP)
+    let meta = <org.bukkit.inventory.meta.MapMeta>item.getItemMeta()
+    if (meta.setMapId) {
+      meta.setMapId(this.zeroMapView.getId())
+    } else {
+      item.setDurability(this.zeroMapView.getId())
+    }
+    meta.setDisplayName('§c请使用手机QQ扫描二维码!')
+    meta.setLore(["QRCODE"])
+    item.setItemMeta(meta)
+    this.zeroMapRender.setImage(this.createQrcode(content))
+    return item
+  }
+
+  private createQrcode(content: string) {
     let bufferedImage = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB)
     let graphics2D = bufferedImage.getGraphics()
     graphics2D.setPaint(Color.WHITE)
     graphics2D.fillRect(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight())
-    let qrcode = this.js2qr(contents)
+    let qrcode = this.js2qr(content)
     let startPoint = Math.round((bufferedImage.getWidth() - qrcode.getWidth()) / 2)
     graphics2D.drawImage(qrcode, startPoint, startPoint, null)
     // let font = new Font("DejaVuSans", Font.PLAIN, 10)
@@ -392,11 +587,6 @@ export class MiaoReward extends interfaces.Plugin {
     return image
   }
 
-  // let byteArray = new this.ByteArrayOutputStream()
-  // let out = new this.DataOutputStream(byteArray)
-  // out.writeUTF("GetServer")
-  // player.sendPluginMessage(base.getInstance(), "BungeeCord", byteArray.toByteArray())
-
   private bungeeCordDetect(player) {
     if (this.isBungeeCord === undefined && player) {
       let byteArray = new this.ByteArrayOutputStream()
@@ -416,7 +606,7 @@ export class MiaoReward extends interfaces.Plugin {
     let [cancelled, id] = this.isQrCodeItem(event.getItemDrop().getItemStack())
     if (id != null && id != undefined && cancelled) {
       event.getItemDrop().remove()
-      this.cancelTask(id)
+      this.cancelTask(event.getPlayer())
     }
   }
 
@@ -426,7 +616,7 @@ export class MiaoReward extends interfaces.Plugin {
     let [cancelled, id] = this.isQrCodeItem(inv.getItem(event.getPreviousSlot() as any))
     if (id != null && id != undefined && cancelled) {
       inv.setItem(event.getPreviousSlot(), null)
-      this.cancelTask(id)
+      this.cancelTask(event.getPlayer())
     }
   }
 
@@ -436,7 +626,7 @@ export class MiaoReward extends interfaces.Plugin {
     let [cancelled, id] = this.isQrCodeItem(item)
     if (id != null && id != undefined && cancelled) {
       event.getInventory().setItem(event.getSlot(), null)
-      this.cancelTask(id)
+      this.cancelTask(event.getWhoClicked())
       event.setCancelled(true)
     }
   }
@@ -446,14 +636,28 @@ export class MiaoReward extends interfaces.Plugin {
     this.checkAndClear(event.getPlayer())
   }
 
-  private cancelTask(id) {
-    this.cacheTasks.get(id)?.cancel()
-    this.cacheTasks.delete(id)
+  private cancelTask(player) {
+    console.ex(new Error())
     this.isBinding = false
+    this.bindingTask.cancel()
+    this.bindingUser = 'unknow'
+    this.checkAndClear(player)
+    this.chat.sendActionBar(player, "")
+    this.zeroMapRender.setImage(undefined)
+    //@ts-ignore
+    this.bindingNotify.forEach(p => {
+      if (p.isOnline()) {
+        this.logger.sender(p, `§6用户 §a${player.getName()} §6扫码已完成 §a您可以继续操作!`)
+      }
+    })
+  }
+
+  private isHoldQrCodeItem(player: org.bukkit.entity.Player) {
+    return this.isQrCodeItem(player.getItemInHand())[0]
   }
 
   private checkAndClear(player: org.bukkit.entity.Player) {
-    if (this.isQrCodeItem(player.getItemInHand())[0]) {
+    if (this.isHoldQrCodeItem(player)) {
       player.setItemInHand(null)
     }
   }
@@ -492,7 +696,7 @@ export class MiaoReward extends interfaces.Plugin {
 
   @Tab()
   tabmrd(sender: any, _command: any, args: string | any[]) {
-    if (args.length === 1) return ['help', 'bind', 'show', 'query', 'draw', 'ratio', 'rank', 'server']
+    if (args.length === 1) return ['help', 'bind', 'show', 'statistic', 'query', 'draw', 'ratio', 'rank', 'server']
     if (args.length === 2 && args[0] === "bind" && sender.isOp()) return ['server']
   }
 }
