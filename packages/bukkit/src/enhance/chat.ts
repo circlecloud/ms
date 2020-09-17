@@ -9,6 +9,7 @@ let RemapUtils: any
 let playerConnectionFieldName: string
 let sendPacketMethodName: string
 
+let above_1_16 = false
 let downgrade = false
 /**
  * 获取NMS版本
@@ -59,12 +60,18 @@ function init() {
     let packetTypeClass = nmsCls("PacketPlayOutChat")
     PacketPlayOutChat = Java.type(packetTypeClass.getName())
     let packetTypeConstructor: { parameterTypes: any[] }
-    Java.from(packetTypeClass.constructors).forEach(function (c) {
+    let constructors = packetTypeClass.constructors
+    Java.from(constructors).forEach(function (c) {
         if (c.parameterTypes.length === 2) {
             packetTypeConstructor = c
         }
+        if (c.parameterTypes.length === 3) {
+            packetTypeConstructor = c
+            above_1_16 = true
+        }
     })
-    let nmsChatMessageTypeClass = packetTypeConstructor.parameterTypes[1]
+    let parameterTypes = packetTypeConstructor.parameterTypes
+    let nmsChatMessageTypeClass = parameterTypes[1]
     if (nmsChatMessageTypeClass.isEnum()) {
         chatMessageTypes = nmsChatMessageTypeClass.getEnumConstants()
     }
@@ -83,7 +90,13 @@ function json(sender: { name: string }, json: string) {
 }
 
 function send(sender: any, json: any, type: number) {
-    sendPacket(sender, new PacketPlayOutChat(ChatSerializer[nmsChatSerializerMethodName](json), chatMessageTypes == null ? type : chatMessageTypes[type]))
+    let packet
+    if (above_1_16) {
+        packet = new PacketPlayOutChat(ChatSerializer[nmsChatSerializerMethodName](json), chatMessageTypes == null ? type : chatMessageTypes[type], sender.getUniqueId())
+    } else {
+        packet = new PacketPlayOutChat(ChatSerializer[nmsChatSerializerMethodName](json), chatMessageTypes == null ? type : chatMessageTypes[type])
+    }
+    sendPacket(sender, packet)
 }
 
 function sendPacket(player: { handle: { [x: string]: { [x: string]: (arg0: any) => void } } }, p: any) {

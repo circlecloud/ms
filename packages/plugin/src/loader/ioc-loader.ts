@@ -1,16 +1,18 @@
 import { plugin, server } from "@ccms/api"
-import { inject, ContainerInstance, Container, provideSingleton } from "@ccms/container"
+import { inject, ContainerInstance, Container, provideSingletonNamed } from "@ccms/container"
 
 import { interfaces } from "../interfaces"
 import { getPluginStageMetadata, getPluginSources } from "../utils"
 
-@provideSingleton(plugin.PluginLoader)
+const LOADER_TYPE_NAME = 'ioc'
+
+@provideSingletonNamed(plugin.PluginLoader, LOADER_TYPE_NAME)
 export class IocLoader implements plugin.PluginLoader {
-    type: string = 'ioc'
+    type: string = LOADER_TYPE_NAME
     @inject(ContainerInstance)
     private container: Container
-    @inject(server.ServerType)
-    private serverType: string
+    @inject(server.ServerChecker)
+    private serverChecker: server.ServerChecker
 
     private pluginMetadataMap: Map<string, plugin.PluginMetadata>
 
@@ -28,7 +30,6 @@ export class IocLoader implements plugin.PluginLoader {
     }
 
     build(metadata: plugin.PluginMetadata) {
-        if (!this.allowProcess(metadata.servers)) { return }
         let pluginInstance: plugin.Plugin
         try {
             this.bindPlugin(metadata)
@@ -73,23 +74,10 @@ export class IocLoader implements plugin.PluginLoader {
         }
     }
 
-    private allowProcess(servers: string[]) {
-        // Not set servers -> allow
-        if (!servers || !servers.length) return true
-        // include !type -> deny
-        let denyServers = servers.filter(svr => svr.startsWith("!"))
-        if (denyServers.length !== 0) {
-            return !denyServers.includes(`!${this.serverType}`)
-        } else {
-            // only include -> allow
-            return servers.includes(this.serverType)
-        }
-    }
-
     private stage(pluginInstance: plugin.Plugin, stageName: string) {
         let stages = getPluginStageMetadata(pluginInstance, stageName)
         for (const stage of stages) {
-            if (!this.allowProcess(stage.servers)) { continue }
+            if (!this.serverChecker.check(stage.servers)) { continue }
             console.i18n("ms.plugin.manager.stage.exec", { plugin: pluginInstance.description.name, name: stage.executor, stage: stageName, servers: stage.servers })
             try {
                 pluginInstance[stage.executor].apply(pluginInstance)

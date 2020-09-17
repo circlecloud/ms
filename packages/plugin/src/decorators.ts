@@ -30,6 +30,7 @@ export function plugin(metadata: pluginApi.PluginMetadata | any) {
 export function cmd(metadata: interfaces.CommandMetadata = {}) {
     return function (target: any, key: string, value: any) {
         metadata.name = metadata.name || key
+        metadata.target = target
         metadata.executor = key
         metadata.paramtypes = Reflect.getMetadata("design:paramtypes", target, key)
         const previousMetadata: Map<string, interfaces.CommandMetadata> = getPluginCommandMetadata(target)
@@ -46,6 +47,7 @@ export function tab(metadata: interfaces.CommandMetadata = {}) {
     return function (target: any, key: string, value: any) {
         metadata.name = metadata.name || (key.startsWith('tab') ? key.split('tab', 2)[1] : key)
         if (!metadata.name) { return }
+        metadata.target = target
         metadata.executor = key
         metadata.paramtypes = Reflect.getMetadata("design:paramtypes", target, key)
         const previousMetadata: Map<string, interfaces.CommandMetadata> = getPluginTabCompleterMetadata(target)
@@ -61,9 +63,11 @@ export function tab(metadata: interfaces.CommandMetadata = {}) {
 export function listener(metadata: interfaces.ListenerMetadata = {}) {
     return function (target: any, key: string, value: any) {
         metadata.name = metadata.name || key
+        metadata.target = target
         metadata.executor = key
         const previousMetadata: interfaces.ListenerMetadata[] = getPluginListenerMetadata(target)
         Reflect.defineMetadata(METADATA_KEY.listener, [metadata, ...previousMetadata], target.constructor)
+        Reflect.defineMetadata(METADATA_KEY.listener, metadata, target[key])
     }
 }
 

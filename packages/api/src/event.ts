@@ -130,23 +130,20 @@ export namespace event {
             }
             priority = priority || EventPriority.NORMAL
             ignoreCancel = ignoreCancel || false
+            // @ts-ignore
+            let executor = exec.name || exec.executor || '[anonymous]'
             // noinspection JSUnusedGlobalSymbols
             var listener = this.register(eventCls, this.execute(name, exec, eventCls), priority, ignoreCancel)
             var listenerMap = this.listenerMap
             // add to cache Be used for close plugin to close event
             if (!listenerMap[name]) listenerMap[name] = []
-            var offExec = () => {
+            var off = () => {
                 this.unregister(eventCls, listener)
-                console.debug(i18n.translate("ms.api.event.unregister", { name, event: this.class2Name(eventCls), exec: exec.name || '[anonymous]' }))
-            }
-            var off = {
-                event: eventCls,
-                listener: listener,
-                off: offExec
+                console.debug(i18n.translate("ms.api.event.unregister", { name, event: this.class2Name(eventCls), exec: executor }))
             }
             listenerMap[name].push(off)
             // noinspection JSUnresolvedVariable
-            console.debug(i18n.translate("ms.api.event.register", { name, event: this.class2Name(eventCls), exec: exec.name || '[anonymous]' }))
+            console.debug(i18n.translate("ms.api.event.register", { name, event: this.class2Name(eventCls), exec: executor }))
             return off
         }
 
@@ -157,7 +154,7 @@ export namespace event {
         disable(plugin: any) {
             var eventCache = this.listenerMap[plugin.description.name]
             if (eventCache) {
-                eventCache.forEach(t => t.off())
+                eventCache.forEach(off => off())
                 delete this.listenerMap[plugin.description.name]
             }
         }

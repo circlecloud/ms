@@ -1,9 +1,11 @@
 import { plugin } from "@ccms/api"
-import { provideSingleton } from "@ccms/container"
+import { provideSingletonNamed } from "@ccms/container"
 
-@provideSingleton(plugin.PluginLoader)
+const LOADER_TYPE_NAME = 'basic'
+
+@provideSingletonNamed(plugin.PluginLoader, LOADER_TYPE_NAME)
 export class BasicLoader implements plugin.PluginLoader {
-    type: string = 'basic'
+    type: string = LOADER_TYPE_NAME
 
     private pluginRequireMap: Map<string, any>
 
@@ -22,8 +24,4 @@ export class BasicLoader implements plugin.PluginLoader {
     build(metadata: plugin.PluginMetadata) {
         return this.pluginRequireMap.get(metadata.source.toString())
     }
-    load(plugin: plugin.Plugin): void { }
-    enable(plugin: plugin.Plugin): void { }
-    disable(plugin: plugin.Plugin): void { }
-    reload(plugin: plugin.Plugin): void { }
 }
