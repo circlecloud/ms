@@ -27,25 +27,28 @@ let langMap = {
     'main.command.help.tip': '§6请执行 §b/{command} §ahelp §6查看帮助!',
     'main.command.no.permission': '§c你没有此命令的权限!',
     'list.install.header': '§6当前 §bMiaoScript §6已安装下列插件:',
-    'list.install.body': '§6插件名称: §b{name}\n§6版本: §a{version}\n§6作者: §3{author}\n§6来源: §c{from}',
+    'list.install.body': '§6插件名称: §b{name} §6版本: §a{version}\n§6作者: §3{author} §6来源: §c{from}',
     'list.header': '§6当前 §bMiaoScriptPackageCenter §6中存在下列插件:',
-    'list.body': '§6插件名称: §b{name}\n§6版本: §a{version}\n§6作者: §3{author}\n§6更新时间: §9{updated_at}',
+    'list.body': '§6插件名称: §b{name} §6版本: §a{version}\n§6作者: §3{author} §6更新时间: §9{updated_at}',
     'plugin.not.exists': '§6插件 §b{name} §c不存在!',
-    'plugin.unload.finish': '§6插件 §b{name} §a已卸载!',
-    'plugin.reload.finish': '§6插件 §b{name} §a重载完成!',
+    'plugin.unload.start': '§c开始卸载 §6插件 §b{name} §6版本 §3{version}!',
+    'plugin.unload.finish': '§6插件 §b{name} §6版本 §3{version} §a已卸载!',
+    'plugin.reload.start': '§a开始重载 §6插件 §b{name} §6版本 §3{version}!',
+    'plugin.reload.finish': '§6插件 §b{name} §6版本 §3{version} §a重载完成!',
     'plugin.name.empty': '§c请输入插件名称!',
     'cloud.update.finish': '§6成功从 §aMiaoScriptPackageCenter §6获取到 §a{length} §6个插件!',
     'cloud.not.exists': '§6当前 §aMiaoScriptPackageCenter §c不存在 §a{name} §c插件!',
     'cloud.update.exists': '§6插件 §b{name} §a发现新版本 §3{new_version} §6当前版本 §3{old_version}!',
-    'download.start': '§6开始下载插件: §b{name}',
+    'download.start': '§6开始下载插件: §b{name} §6版本 §3{version}',
     'download.url': '§6插件下载地址: §b{url}',
-    'download.finish': '§6插件 §b{name} §a下载完毕 开始加载 ...',
-    'install.finish': '§6插件 §b{name} §a安装成功!',
-    'update.finish': '§6插件 §b{name} §a更新成功!',
-    'upgrade.confirm': '§6您正在尝试升级 §bMiaoScript §c核心 §6请执行 §b/mpm §aupgrade §cconfirm §6确认执行!',
+    'download.finish': '§6插件 §b{name} §6版本 §3{version} §a下载完毕 开始加载 ...',
+    'install.finish': '§6插件 §b{name} §6版本 §3{version} §a安装成功!',
+    'update.finish': '§6插件 §b{name} §6版本 §3{version} §a更新成功!',
+    'upgrade.confirm': '§6您正在尝试更新 §bMiaoScript §c核心 §6请执行 §b/mpm §aupgrade §cconfirm §6确认执行!',
+    'upgrade.failed': '§6尝试热更新 §bMiaoScript §c核心 §4失败! §6请重启服务器完成更新...',
     'deploy.token.not.exists': '§4请先配置发布Token!',
-    'deploy.success': '§6插件 §b{name} §a发布成功! §6服务器返回: §a{msg}',
-    'deploy.fail': '§6插件 §b{name} §c发布失败! §6服务器返回: §c{msg}',
+    'deploy.success': '§6插件 §b{name} §6版本 §3{version} §a发布成功! §6服务器返回: §a{msg}',
+    'deploy.fail': '§6插件 §b{name} §6版本 §3{version} §c发布失败! §6服务器返回: §c{msg}',
     'run.script': '§b运行脚本:§r {script}',
     'run.result': '§a返回结果:§r {result}',
     'run.noresult': '§4没有返回结果!',
@@ -53,7 +56,26 @@ let langMap = {
 
 let fallbackMap = langMap
 
-@JSPlugin({ prefix: 'PM', version: '1.2.0', author: 'MiaoWoo', source: __filename })
+class FakeSender {
+    private _proxy
+    private name: string
+    private plugin: MiaoScriptPackageManager
+    constructor(name: string, plugin: MiaoScriptPackageManager, superclass: any) {
+        this.name = name
+        this.plugin = plugin
+        let FakeSenderAdapter = Java.extend(superclass, {
+            getName: () => this.name,
+            isOp: () => true,
+            sendMessage: (message) => this.plugin.sendBungeeCordMessage(this.name, `§6[§3BPM§6][§a${this.plugin.serverName}§6] ${message}`)
+        })
+        this._proxy = new FakeSenderAdapter()
+    }
+    getHandler() {
+        return this._proxy
+    }
+}
+
+@JSPlugin({ prefix: 'PM', version: '1.3.0', author: 'MiaoWoo', source: __filename })
 export class MiaoScriptPackageManager extends interfaces.Plugin {
     @inject(plugin.PluginManager)
     private pluginManager: pluginApi.PluginManager
@@ -78,7 +100,8 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     private packageCache: any[] = [];
     private packageNameCache: string[] = [];
 
-    private serverName: string
+    private isBungeeCord = false
+    public serverName: string
     private translate: Translate
     private channelOff: { off: () => void }
 
@@ -97,6 +120,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
             let subChannel = input.readUTF()
             switch (subChannel) {
                 case "GetServer":
+                    this.isBungeeCord = true
                     this.serverName = input.readUTF()
                     break
                 case "MiaoScriptPackageManager":
@@ -134,8 +158,20 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     }
     private readForward(input) {
         let message = JSON.parse(input.readUTF())
-        this.taskManager.create(() => this.main(this.server.getConsoleSender(), message.command, message.args)).async().submit()
-        this.sendBungeeCordMessage(message.sender, `§6[§cMS§6][§bPM§6] [§3BPM§6][§a${this.serverName}§6] §6命令 §b/mpm ${message.args?.join?.(' ')} §a执行成功!`)
+        let fakeSender = this.getProxySender(message.sender)
+        this.taskManager.create(() => this.main(fakeSender, message.command, message.args)).async().submit()
+        this.logger.sender(fakeSender, `§6命令 §b/mpm ${message.args?.join?.(' ')} §a执行成功!`)
+    }
+
+    private getProxySender(name: string) {
+        switch (this.serverType) {
+            case constants.ServerType.Bukkit:
+                return new FakeSender(name, this, Java.type('org.bukkit.command.CommandSender')).getHandler()
+            case constants.ServerType.Sponge:
+                return new FakeSender(name, this, Java.type('org.spongepowered.api.command.CommandSource')).getHandler()
+            default:
+                return this.server.getConsoleSender()
+        }
     }
 
     @Listener({ servers: [constants.ServerType.Bukkit] })
@@ -154,7 +190,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         }
     }
 
-    private sendBungeeCordMessage(sender, message) {
+    sendBungeeCordMessage(sender, message) {
         let players = this.server.getOnlinePlayers()
         if (players.length) {
             let byteArray = new this.ByteArrayOutputStream()
@@ -172,20 +208,22 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
 
     @Cmd({ servers: [`!${constants.ServerType.Bungee}`] })
     bmpm(sender: any, command: string, args: string[]) {
-        if (!sender.isOp()) { return this.i18n(sender, 'main.command.no.permission') }
+        if (!sender?.isOp()) { return this.i18n(sender, 'main.command.no.permission') }
+        if (!this.isBungeeCord) return this.logger.sender(sender, '§c当前服务器尚未检测到BungeeCord链接...')
+        this.taskManager.create(() => this.main(sender, command, args)).async().submit()
         this.bungeeCordForward(sender, { sender: sender.getName(), command, args })
         this.logger.sender(sender, `§6[§3BPM§6][§a${this.serverName}§6] §6命令 §b/mpm ${args.join?.(' ')} §a发布成功!`)
     }
 
     @Cmd({ servers: [constants.ServerType.Bungee] })
     mpmanager(sender: any, command: string, args: string[]) {
-        if (!sender.isOp()) { return this.i18n(sender, 'main.command.no.permission') }
+        if (!sender?.isOp()) { return this.i18n(sender, 'main.command.no.permission') }
         this.taskManager.create(() => this.main(sender, command, args)).async().submit()
     }
 
     @Cmd({ servers: [`!${constants.ServerType.Bungee}`] })
     mpm(sender: any, command: string, args: string[]) {
-        if (!sender.isOp()) { return this.i18n(sender, 'main.command.no.permission') }
+        if (!sender?.isOp()) { return this.i18n(sender, 'main.command.no.permission') }
         this.taskManager.create(() => this.main(sender, command, args)).async().submit()
     }
 
@@ -206,6 +244,12 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
 
     cmdhelp(sender: any) {
         this.logger.sender(sender, help)
+    }
+
+    cmdinfo(sender: any) {
+        this.logger.sender(sender, [
+
+        ])
     }
 
     cmdload(sender: any, name: string) {
@@ -237,7 +281,10 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
 
             return
         }
-        this.download(sender, name)
+        this.download(sender, name, false, () => {
+            let plugin = this.pluginManager.loadFromFile(fs.concat(root, this.pluginFolder, name + '.js'))
+            this.i18n(sender, 'install.finish', { name, version: plugin.description.version })
+        })
     }
 
     cmdupdate(sender: any, name: string) {
@@ -253,29 +300,46 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
             if (!confirm) { return this.i18n(sender, 'upgrade.confirm') }
             let enginePath = fs.path(fs.file(root, 'node_modules'))
             if (enginePath.startsWith(root)) {
-                base.delete(enginePath)
-                this.cmdrestart(sender)
+                try {
+                    base.delete(enginePath)
+                    this.cmdrestart(sender)
+                } catch (ex) {
+                    if (global.debug) {
+                        console.ex(ex)
+                    }
+                    if (fs.exists(enginePath)) {
+                        this.i18n(sender, 'upgrade.failed')
+                        fs.create(fs.file(root, 'upgrade'))
+                    }
+                }
             }
             return
         }
         if (this.checkPlugin(sender, name)) {
-            this.update(sender, name)
-            this.pluginManager.reload(name)
+            this.update(sender, name, () => this.reload(sender, name))
         }
     }
 
     cmdunload(sender: any, name: string) {
         if (this.checkPlugin(sender, name)) {
-            this.pluginManager.disable(name)
-            this.i18n(sender, 'plugin.unload.finish', { name })
+            let plugin = this.pluginManager.getPlugins().get(name)
+            this.i18n(sender, 'plugin.unload.start', { name, version: plugin.description.version })
+            this.pluginManager.disable(plugin)
+            this.i18n(sender, 'plugin.unload.finish', { name, version: plugin.description.version })
         }
     }
 
     cmdreload(sender: any, name: string) {
         name = name || this.description.name
+        this.reload(sender, name)
+    }
+
+    private reload(sender: any, name: string) {
         if (this.checkPlugin(sender, name)) {
-            this.pluginManager.reload(name)
-            this.i18n(sender, 'plugin.reload.finish', { name })
+            let plugin = this.pluginManager.getPlugins().get(name)
+            this.i18n(sender, 'plugin.reload.start', { name, version: plugin.description.version })
+            this.pluginManager.reload(plugin)
+            this.i18n(sender, 'plugin.reload.finish', { name, version: this.pluginManager.getPlugins().get(name).description.version })
         }
     }
 
@@ -360,13 +424,16 @@ return '§a返回结果: §r'+ eval(${JSON.stringify(code)});`)
         }).async().submit()
     }
 
-    update(sender: any, name: string) {
+    private update(sender: any, name: string, callback?: () => void) {
         if (this.checkCloudPlugin(sender, name)) {
-            this.download(sender, name, true)
+            this.download(sender, name, true, () => {
+                this.i18n(sender, 'update.finish', { name, version: this.packageCache[name].version })
+                callback?.()
+            })
         }
     }
 
-    @Tab()
+    @Tab({ alias: ['bmpm'] })
     tabmpm(sender: any, command: any, args: string | any[]) {
         if (args.length === 1) { return ['list', 'install', 'update', 'upgrade', 'reload', 'restart', 'run', 'help', 'create', 'deploy'] }
         if (args.length > 1) {
@@ -405,19 +472,15 @@ return '§a返回结果: §r'+ eval(${JSON.stringify(code)});`)
         }).async().submit()
     }
 
-    download(sender: any, name: string, update: boolean = false) {
+    download(sender: any, name: string, update: boolean, callback?: () => void) {
         this.taskManager.create(() => {
-            this.i18n(sender, 'download.start', { name })
-            this.i18n(sender, 'download.url', { url: this.packageCache[name].url })
+            let pluginPkg = this.packageCache[name]
+            this.i18n(sender, 'download.start', { name, version: pluginPkg.version })
+            this.i18n(sender, 'download.url', { url: pluginPkg.url })
             let pluginFile = update ? fs.concat(root, this.pluginFolder, 'update', name + '.js') : fs.concat(root, this.pluginFolder, name + '.js')
-            http.download(this.packageCache[name].url, pluginFile)
-            this.i18n(sender, 'download.finish', { name })
-            if (!update) {
-                this.pluginManager.loadFromFile(fs.concat(root, this.pluginFolder, name + '.js'))
-                this.i18n(sender, 'install.finish', { name })
-            } else {
-                this.i18n(sender, 'update.finish', { name })
-            }
+            http.download(pluginPkg.url, pluginFile)
+            this.i18n(sender, 'download.finish', { name, version: pluginPkg.version })
+            callback?.()
         }).async().submit()
     }
 }

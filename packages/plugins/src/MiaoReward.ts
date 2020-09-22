@@ -3,7 +3,7 @@ import { JSPlugin, interfaces, Cmd, Tab, Listener, Config } from "@ccms/plugin"
 
 import { QRCode, QRErrorCorrectLevel } from '@ccms/common/dist/qrcode'
 
-import { inject, JSClass, optional } from '@ccms/container'
+import { Autowired, JSClass, optional, inject } from '@ccms/container'
 import http from '@ccms/common/dist/http'
 
 let MapView
@@ -54,9 +54,9 @@ interface PlaceholderAPI {
   setPlaceholders: (player: any, str: string) => string
 }
 
-@JSPlugin({ prefix: 'MRD', version: '1.2.0', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], source: __filename })
+@JSPlugin({ prefix: 'MRD', version: '1.2.3', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], source: __filename })
 export class MiaoReward extends interfaces.Plugin {
-  private serverInfo
+  private serverInfo: any
   private cacheBindUuid = ''
   private zeroMapView = undefined
   private zeroMapRender: QRCodeRender = undefined
@@ -67,14 +67,16 @@ export class MiaoReward extends interfaces.Plugin {
   private bindingNotify = new java.util.HashSet<org.bukkit.entity.Player>()
   private drawCooldown = new Map<string, number>()
 
-  @inject(chat.Chat)
+  @Autowired()
   private chat: chat.Chat
-  @inject(server.Server)
+  @Autowired()
   private server: server.Server
-  @inject(task.TaskManager)
+  @Autowired()
   private taskManager: task.TaskManager
-  @inject(channel.Channel)
-  @optional() private Channel: channel.Channel
+  @Autowired()
+  private channel: channel.Channel
+  @Autowired()
+  private bungee: channel.proxy.BungeeCord
 
   @Config()
   private config = {
@@ -97,6 +99,10 @@ export class MiaoReward extends interfaces.Plugin {
     this.config.prefix = this.config.prefix || '§6[§b广告系统§6]§r'
     this.config.drawCommand = this.config.drawCommand || 'p give %player_name% %amount%'
     this.config.drawCooldown = this.config.drawCooldown || 300
+    this.updateServerInfo()
+  }
+
+  private updateServerInfo(player?: any) {
     this.taskManager.create(() => {
       if (this.config.serverId) {
         let result = this.httpPost(`https://reward.yumc.pw/server/server`, {
@@ -105,21 +111,61 @@ export class MiaoReward extends interfaces.Plugin {
         })
         if (result.code == 200) {
           this.serverInfo = result.data
+          if (player) this.bungee.for(player).forward("ALL", "MiaoReward", { type: "updateServerInfo", data: result.data }).send()
         }
       }
     }).async().submit()
   }
 
+  @JSClass('com.google.common.io.ByteStreams')
+  private ByteStreams: any
+
   enable() {
     this.initPlaceholderAPI()
-    this.channelOff = this.Channel?.listen(this, 'BungeeCord', () => {
-      this.isBungeeCord = true
-      this.PlayerJoinEvent['off']()
-      this.channelOff.off()
+    this.initBungeeCord()
+    this.initZeroMap()
+  }
+
+  private initBungeeCord() {
+    this.channelOff = this.channel?.listen(this, 'BungeeCord', (data) => {
+      if (!this.isBungeeCord) {
+        this.isBungeeCord = true
+        this.PlayerJoinEvent['off']()
+      }
+      let input = this.ByteStreams.newDataInput(data)
+      let subChannel = input.readUTF()
+      switch (subChannel) {
+        case "GetServer":
+          this.isBungeeCord = true
+          let serverName = input.readUTF()
+          break
+        case "MiaoReward":
+          this.readForward(input)
+          break
+      }
     })
     let players = this.server.getOnlinePlayers()
     if (players.length) this.bungeeCordDetect(players[0])
-    this.initZeroMap()
+  }
+
+  cmdrun(sender: any, ...args: any[]) {
+    try {
+      let tfunc = new Function(`return '§a返回结果: §r'+ eval(${JSON.stringify(args.join(' '))});`)
+      this.logger.sender(sender, tfunc.apply(this) + '')
+    } catch (ex) {
+      this.logger.sender(sender, this.logger.stack(ex))
+    }
+  }
+
+  private readForward(input) {
+    let message = JSON.parse(input.readUTF())
+    console.log(message)
+    switch (message.type) {
+      case "updateServerInfo":
+        this.serverInfo = message.data
+        console.console(this.config.prefix, '§6兑换比例已更新为:§a', message.data.ratio)
+        break
+    }
   }
 
   private initPlaceholderAPI() {
@@ -140,11 +186,13 @@ export class MiaoReward extends interfaces.Plugin {
   }
 
   private initZeroMap() {
-    this.zeroMapRender = new QRCodeRender()
-    this.zeroMapView = Bukkit.getMap(0) || Bukkit.createMap(Bukkit.getWorlds()[0])
-    this.zeroMapView.setScale(MapView.Scale.FARTHEST)
-    this.zeroMapView.getRenderers().forEach(r => this.zeroMapView.removeRenderer(r))
-    this.zeroMapView.addRenderer(this.zeroMapRender.getHandler())
+    this.taskManager.create(() => {
+      this.zeroMapRender = new QRCodeRender()
+      this.zeroMapView = Bukkit.getMap(0) || Bukkit.createMap(Bukkit.getWorlds()[0])
+      this.zeroMapView.setScale(MapView.Scale.FARTHEST)
+      this.zeroMapView.getRenderers().forEach(r => this.zeroMapView.removeRenderer(r))
+      this.zeroMapView.addRenderer(this.zeroMapRender.getHandler())
+    }).submit()
   }
 
   disable() {
@@ -167,9 +215,10 @@ export class MiaoReward extends interfaces.Plugin {
 
   private scanAuth(sender: org.bukkit.entity.Player, scanType: string, scanObj: { title: string, content: string }, success: (token: string, user: any) => void, cancel?: () => void) {
     this.chat.sendTitle(sender, this.config.prefix, '§a正在获取授权二维码...')
+    this.logger.sender(sender, '§a正在获取授权二维码...')
     let scan = this.httpPost('https://reward.yumc.pw/auth/scan', { ...scanObj, type: scanType })
     if (scan.code == 200) {
-      let sync = { scaned: false, timeout: false }
+      let sync = { scaned: false }
       this.taskManager.create(() => {
         let result = this.httpPost('https://reward.yumc.pw/auth/scanCheck', {
           token: scan.data.token,
@@ -212,14 +261,19 @@ export class MiaoReward extends interfaces.Plugin {
       let bindUser = Bukkit.getPlayerExact(this.bindingUser)
       if (bindUser && bindUser.isOnline() && this.isQrCodeItem(bindUser.getItemInHand())[0]) {
         this.bindingNotify.add(sender)
-        this.logger.sender(sender, "§c当前 §a" + this.bindingUser + " §c玩家正在扫码 §6请稍候 §e" + this.bindingLeftTime + "秒 §6后重试...")
+        this.logger.sender(sender, [
+          "§c当前 §a" + this.bindingUser + " §c玩家正在扫码",
+          "§6请等待 §e" + this.bindingLeftTime + "秒 §6后重试...",
+          "§a玩家操作完成后将会通知您继续操作..."
+        ])
         return true
       }
     }
-    if (this.drawCooldown.has(sender.getName())) {
+    if (this.drawCooldown.has(sender.getName()) && !sender.isOp()) {
       let leftTime = cooldown - (Date.now() - this.drawCooldown.get(sender.getName())) / 1000
       if (leftTime > 0) {
-        return this.logger.sender(sender, `§c扫码功能冷却中 剩余 ${leftTime} 秒!`)
+        this.logger.sender(sender, `§c扫码功能冷却中 剩余 ${leftTime} 秒!`)
+        return true
       }
     }
     this.drawCooldown.set(sender.getName(), Date.now())
@@ -253,7 +307,14 @@ export class MiaoReward extends interfaces.Plugin {
     this.scanAuth(sender,
       'draw', {
       title: '兑换授权',
-      content: "是否授权 " + this.serverInfo.name + " 服务器\n兑换 " + amount + " 喵币 到 " + sender.getName()
+      content: [
+        "是否授权 " + this.serverInfo.name + " 兑换喵币",
+        "兑换玩家: " + sender.getName(),
+        "兑换数量: " + amount,
+        "兑换比例: " + parseFloat(this.serverInfo.ratio),
+        "预计到帐: " + (amount * this.serverInfo.ratio).toFixed(0),
+        "注意: 数据可能更新不及时 请以实际到账金额为准!"
+      ].join('\n')
     }, (token: string) => {
       this.drawCoin(sender, amount, token)
     })
@@ -282,8 +343,8 @@ export class MiaoReward extends interfaces.Plugin {
         return this.sendError(sender, '§6执行命令 §3/' + command + ' §c可能存在异常')
       }
       this.logger.sender(sender, draw.msg.split('\n'))
-      this.sendBoardcast(sender, `${this.config.prefix}§6玩家 §b${sender.getName()} §6成功将 §a${amount}喵币 §6兑换成 §c${draw.data}点券!`)
-      this.sendBoardcast(sender, `${this.config.prefix}§c/mrd help §b查看广告系统帮助 §6快来一起看广告赚点券吧!`)
+      this.sendBroadcast(sender, `${this.config.prefix}§6玩家 §b${sender.getName()} §6成功将 §a${amount}喵币 §6兑换成 §c${draw.data}点券!`)
+      this.sendBroadcast(sender, `${this.config.prefix}§c/mrd help §b查看广告系统帮助 §6快来一起看广告赚点券吧!`)
     }).submit()
   }
 
@@ -313,7 +374,7 @@ export class MiaoReward extends interfaces.Plugin {
       `§6====== ${this.config.prefix} §a喵币兑换排行 §6======`,
     ]
     if (boardcast) {
-      ranks.forEach(l => this.sendBoardcast(sender, l))
+      ranks.forEach(l => this.sendBroadcast(sender, l))
     } else {
       this.logger.sender(sender, ranks)
     }
@@ -338,13 +399,13 @@ export class MiaoReward extends interfaces.Plugin {
     ])
   }
 
-  cmdratio(sender: any, ratio: number, confirm: string) {
+  cmdratio(sender: any, ratioStr: string, confirm: string) {
     if (!sender.isOp()) { return this.logger.sender(sender, '§4你没有此命令的权限!') }
-    let mbr = (1 / ratio).toFixed(4)
+    let [ratio, mbr, msg] = this.ratio2string(ratioStr)
     if (!confirm) {
       return this.logger.sender(sender, [
         '§4警告: 您正在设置服务器喵币/点券兑换比例 设置后将实时生效!',
-        `§6您设置的兑换比例为 §c${ratio} §6=> §a${mbr}喵币 §6兑换 §c1点券`,
+        `§6您设置的兑换比例为 ` + msg,
         `§6玩家至少需要 §a${mbr}喵币 §6才可以兑换点券!`,
         `§6请执行 §b/mrd ratio §c${ratio} §econfirm §c确认修改!`
       ])
@@ -359,22 +420,22 @@ export class MiaoReward extends interfaces.Plugin {
       return this.logger.sender(sender, `§4操作异常 §6服务器返回: §c${result.msg}`)
     }
     this.logger.sender(sender, `§a操作成功 §6服务器返回: §a${result.msg}`)
-    this.sendBoardcast(sender, `${this.config.prefix} §6当前兑换比例已调整为 §c${ratio} §6=> §a${mbr}喵币 §6兑换 §c1点券!`)
+    this.updateServerInfo(sender)
+    this.sendBroadcast(sender, `${this.config.prefix} §6当前兑换比例已调整为 ` + msg)
   }
 
-  @JSClass('java.io.ByteArrayOutputStream')
-  private ByteArrayOutputStream
-  @JSClass('java.io.DataOutputStream')
-  private DataOutputStream
+  private ratio2string(ratio) {
+    ratio = parseFloat(ratio)
+    if (ratio > 1) {
+      return [ratio, 1, `§c${ratio} §6就是 §a1喵币 §6=> §c${ratio}点券!`]
+    }
+    let mbr = Math.round(1 / ratio * 10000) / 10000
+    return [ratio, mbr, `§c${ratio} §6就是 §a${mbr}喵币 §6=> §c1点券!`]
+  }
 
-  private sendBoardcast(player, message) {
+  private sendBroadcast(player, message) {
     if (!this.isBungeeCord) { return org.bukkit.Bukkit.broadcastMessage(message) }
-    let byteArray = new this.ByteArrayOutputStream()
-    let out = new this.DataOutputStream(byteArray)
-    out.writeUTF("Message")
-    out.writeUTF("ALL")
-    out.writeUTF(message)
-    player.sendPluginMessage(base.getInstance(), "BungeeCord", byteArray.toByteArray())
+    this.bungee.for(player).broadcast(message).send()
   }
 
   private bindServer(sender: org.bukkit.entity.Player) {
@@ -589,10 +650,7 @@ CAST TIME   : ${Date.now() - startTime}`)
 
   private bungeeCordDetect(player) {
     if (this.isBungeeCord === undefined && player) {
-      let byteArray = new this.ByteArrayOutputStream()
-      let out = new this.DataOutputStream(byteArray)
-      out.writeUTF("GetServer")
-      player.sendPluginMessage(base.getInstance(), "BungeeCord", byteArray.toByteArray())
+      this.bungee.for(player).getServer().send()
     }
   }
 
@@ -606,7 +664,6 @@ CAST TIME   : ${Date.now() - startTime}`)
     let [cancelled, id] = this.isQrCodeItem(event.getItemDrop().getItemStack())
     if (id != null && id != undefined && cancelled) {
       event.getItemDrop().remove()
-      this.cancelTask(event.getPlayer())
     }
   }
 
@@ -616,7 +673,6 @@ CAST TIME   : ${Date.now() - startTime}`)
     let [cancelled, id] = this.isQrCodeItem(inv.getItem(event.getPreviousSlot() as any))
     if (id != null && id != undefined && cancelled) {
       inv.setItem(event.getPreviousSlot(), null)
-      this.cancelTask(event.getPlayer())
     }
   }
 
@@ -626,7 +682,6 @@ CAST TIME   : ${Date.now() - startTime}`)
     let [cancelled, id] = this.isQrCodeItem(item)
     if (id != null && id != undefined && cancelled) {
       event.getInventory().setItem(event.getSlot(), null)
-      this.cancelTask(event.getWhoClicked())
       event.setCancelled(true)
     }
   }
@@ -637,9 +692,10 @@ CAST TIME   : ${Date.now() - startTime}`)
   }
 
   private cancelTask(player) {
-    console.ex(new Error())
+    if (!this.isBinding) return
     this.isBinding = false
     this.bindingTask.cancel()
+    this.bindingTask = undefined
     this.bindingUser = 'unknow'
     this.checkAndClear(player)
     this.chat.sendActionBar(player, "")

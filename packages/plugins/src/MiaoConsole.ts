@@ -1,6 +1,6 @@
 /// <reference types="@ccms/nashorn" />
 
-import { plugin as pluginApi, server, task, constants } from '@ccms/api'
+import { plugin as pluginApi, server, task, constants, command } from '@ccms/api'
 import { plugin, interfaces, cmd, tab, enable, config, disable } from '@ccms/plugin'
 import { inject, ContainerInstance, Container } from '@ccms/container'
 import io, { Server as SocketIOServer, Socket as SocketIOSocket } from '@ccms/websocket'
@@ -27,6 +27,8 @@ export class MiaoConsole extends interfaces.Plugin {
     private serverType: string
     @inject(server.Server)
     private server: server.Server
+    @inject(command.Command)
+    private command: command.Command
     @inject(task.TaskManager)
     private task: task.TaskManager
     @inject(pluginApi.PluginManager)
@@ -248,7 +250,7 @@ export class MiaoConsole extends interfaces.Plugin {
             client.emit('log', `§6命令: §b${cmd} §a执行成功!`)
         })
         client.on('tabComplate', (input, index, callback) => {
-            callback && callback(this.server.tabComplete(this.server.getConsoleSender(), input, index))
+            callback?.(this.command.tabComplete(this.server.getConsoleSender(), input, index))
         })
         client.on('exec', (code) => {
             try {

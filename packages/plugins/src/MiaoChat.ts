@@ -2,16 +2,16 @@
 /// <reference types="@javatypes/spigot-api" />
 /// <reference types="@javatypes/sponge-api" />
 
-import { server, plugin as pluginApi, channel, constants } from '@ccms/api'
-import { inject, optional } from '@ccms/container';
+import { server, plugin as pluginApi, channel, constants, chat } from '@ccms/api'
+import { inject, optional } from '@ccms/container'
 import { plugin, interfaces, cmd, listener, tab, config, enable } from '@ccms/plugin'
 import Tellraw from '@ccms/common/dist/tellraw'
 
-const ByteArrayInputStream = Java.type("java.io.ByteArrayInputStream");
-const ByteArrayOutputStream = Java.type("java.io.ByteArrayOutputStream");
-const StandardCharsets = Java.type("java.nio.charset.StandardCharsets");
-const GZIPInputStream = Java.type("java.util.zip.GZIPInputStream");
-const GZIPOutputStream = Java.type("java.util.zip.GZIPOutputStream");
+const ByteArrayInputStream = Java.type("java.io.ByteArrayInputStream")
+const ByteArrayOutputStream = Java.type("java.io.ByteArrayOutputStream")
+const StandardCharsets = Java.type("java.nio.charset.StandardCharsets")
+const GZIPInputStream = Java.type("java.util.zip.GZIPInputStream")
+const GZIPOutputStream = Java.type("java.util.zip.GZIPOutputStream")
 const BiConsumer = Java.type('java.util.function.BiConsumer')
 const ByteArray = Java.type("byte[]")
 
@@ -22,31 +22,31 @@ class MiaoMessage {
     private static MAX_MESSAGE_LENGTH = 32000;
 
     private static copy(input, output) {
-        let buffer = new ByteArray(1024);
-        let n: number;
+        let buffer = new ByteArray(1024)
+        let n: number
         while ((n = input.read(buffer)) != -1) {
-            output.write(buffer, 0, n);
+            output.write(buffer, 0, n)
         }
-        input.close();
-        output.close();
+        input.close()
+        output.close()
     }
     public static encode(input: any): any {
-        return new MiaoMessage(input).encode();
+        return new MiaoMessage(input).encode()
     }
     public static decode(input: any): MiaoMessage {
-        let baos = new ByteArrayOutputStream();
-        MiaoMessage.copy(new GZIPInputStream(new ByteArrayInputStream(input)), baos);
-        return new MiaoMessage(baos.toString(StandardCharsets.UTF_8.name()));
+        let baos = new ByteArrayOutputStream()
+        MiaoMessage.copy(new GZIPInputStream(new ByteArrayInputStream(input)), baos)
+        return new MiaoMessage(baos.toString(StandardCharsets.UTF_8.name()))
     }
 
     // private String json;
     constructor(public json: any) { }
 
     public encode(): any {
-        let baos = new ByteArrayOutputStream();
-        MiaoMessage.copy(new ByteArrayInputStream(this.json.getBytes(StandardCharsets.UTF_8)), new GZIPOutputStream(baos));
-        if (baos.size() > MiaoMessage.MAX_MESSAGE_LENGTH) { return null; }
-        return baos.toByteArray();
+        let baos = new ByteArrayOutputStream()
+        MiaoMessage.copy(new ByteArrayInputStream(this.json.getBytes(StandardCharsets.UTF_8)), new GZIPOutputStream(baos))
+        if (baos.size() > MiaoMessage.MAX_MESSAGE_LENGTH) { return null }
+        return baos.toByteArray()
     }
 }
 
@@ -54,10 +54,12 @@ class MiaoMessage {
 export class MiaoChat extends interfaces.Plugin {
     @inject(server.Server)
     private Server: server.Server
+    @inject(chat.Chat)
+    private chat: chat.Chat
     @inject(channel.Channel)
     @optional() private Channel: channel.Channel
 
-    private channelOff: { off: () => void };
+    private channelOff: { off: () => void }
 
     @config()
     private config = {
@@ -129,34 +131,34 @@ export class MiaoChat extends interfaces.Plugin {
         }
     }
 
-    private chatFormats: any[];
-    private styleFormats: any;
+    private chatFormats: any[]
+    private styleFormats: any
     // 用于匹配 '[xx]' 聊天格式
     private FORMAT_PATTERN = /[\[]([^\[\]]+)[\]]/ig;
 
-    private PlaceholderAPI: { setPlaceholders: (player: any, str: string) => string };
+    private PlaceholderAPI: { setPlaceholders: (player: any, str: string) => string }
 
     load() {
-        this.chatFormats = Object.values(this.config.ChatFormats);
-        this.chatFormats.sort(this.compare('index'));
-        this.initFormat(this.chatFormats);
-        this.styleFormats = this.config.StyleFormats;
+        this.chatFormats = Object.values(this.config.ChatFormats)
+        this.chatFormats.sort(this.compare('index'))
+        this.initFormat(this.chatFormats)
+        this.styleFormats = this.config.StyleFormats
     }
 
     private compare(prop: string) {
-        return function (obj1: { [x: string]: any; }, obj2: { [x: string]: any; }) {
-            var val1 = obj1[prop];
-            var val2 = obj2[prop];
+        return function (obj1: { [x: string]: any }, obj2: { [x: string]: any }) {
+            var val1 = obj1[prop]
+            var val2 = obj2[prop]
             if (!isNaN(Number(val1)) && !isNaN(Number(val2))) {
-                val1 = Number(val1);
-                val2 = Number(val2);
+                val1 = Number(val1)
+                val2 = Number(val2)
             }
             if (val1 < val2) {
-                return -1;
+                return -1
             } else if (val1 > val2) {
-                return 1;
+                return 1
             } else {
-                return 0;
+                return 0
             }
         }
     }
@@ -164,7 +166,7 @@ export class MiaoChat extends interfaces.Plugin {
     enable() {
         this.PlaceholderAPI = {
             setPlaceholders: (player: any, string: string) => {
-                return string;
+                return string
             }
         }
     }
@@ -177,7 +179,7 @@ export class MiaoChat extends interfaces.Plugin {
         // 尝试加载 Bukkit 的 PlaceholderAPI
         try {
             //@ts-ignore
-            this.PlaceholderAPI = base.getClass("me.clip.placeholderapi.PlaceholderAPI").static;
+            this.PlaceholderAPI = base.getClass("me.clip.placeholderapi.PlaceholderAPI").static
             this.logger.log('[PAPI] Found Bukkit PlaceholderAPI Hooking...')
         } catch (ex) {
             this.logger.console("§cCan't found me.clip.placeholderapi.PlaceholderAPI variable will not be replaced! Err: " + ex)
@@ -187,14 +189,14 @@ export class MiaoChat extends interfaces.Plugin {
     spongeenable() {
         // 尝试加载 Sponge 的 PlaceholderAPI
         try {
-            var spongePapi = this.Server.getService('me.rojo8399.placeholderapi.PlaceholderService');
-            var s = org.spongepowered.api.text.serializer.TextSerializers.formattingCode('§');
+            var spongePapi = this.Server.getService('me.rojo8399.placeholderapi.PlaceholderService')
+            var s = org.spongepowered.api.text.serializer.TextSerializers.formattingCode('§')
             if (spongePapi) {
                 this.PlaceholderAPI = {
                     setPlaceholders: (player: any, string: string) => {
-                        return s.serialize(spongePapi.replacePlaceholders(string, player, player));
+                        return s.serialize(spongePapi.replacePlaceholders(string, player, player))
                     }
-                };
+                }
                 this.logger.log('[PAPI] Found Sponge PlaceholderAPI Hooking...')
             }
         } catch (ex) {
@@ -213,7 +215,7 @@ export class MiaoChat extends interfaces.Plugin {
         this.channelOff = this.Channel?.listen(this, MiaoMessage.CHANNEL, (data, event: net.md_5.bungee.api.event.PluginMessageEvent) => {
             let bungee: net.md_5.bungee.api.ProxyServer = base.getInstance().getProxy()
             if (event.getTag() == MiaoMessage.CHANNEL) {
-                let origin = event.getSender().getAddress();
+                let origin = event.getSender().getAddress()
                 bungee.getServers().forEach(new BiConsumer({
                     accept: (s, server) => {
                         if (server.getAddress() != origin && server.getPlayers().size() > 0) {
@@ -227,13 +229,13 @@ export class MiaoChat extends interfaces.Plugin {
 
     @cmd({ servers: ["bungee"] })
     mct(sender: any, command: string, args: string[]) {
-        this.logger.log(sender, command, args);
+        this.logger.log(sender, command, args)
         sender.sendMessage(JSON.stringify({ command, ...args }))
     }
 
     @cmd({ servers: ["!bungee"] })
     mchat(sender: any, command: string, args: string[]) {
-        this.logger.log(sender, command, args);
+        this.logger.log(sender, command, args)
         sender.sendMessage(JSON.stringify({ command, ...args }))
     }
 
@@ -243,102 +245,97 @@ export class MiaoChat extends interfaces.Plugin {
 
     @listener({ servers: ['bukkit'] })
     AsyncPlayerChatEvent(event: org.bukkit.event.player.AsyncPlayerChatEvent) {
-        this.sendChat(event.getPlayer(), event.getMessage(), function () {
-            event.setCancelled(true);
-        });
+        this.sendChat(event.getPlayer(), event.getMessage(), () => event.setCancelled(true))
     }
 
     @listener({ servers: ['sponge'] })
     MessageChannelEvent$Chat(event: org.spongepowered.api.event.message.MessageChannelEvent.Chat) {
         //@ts-ignore
-        var player = event.getCause().first(org.spongepowered.api.entity.living.player.Player.class).orElse(null);
+        var player = event.getCause().first(org.spongepowered.api.entity.living.player.Player.class).orElse(null)
         if (player == null) {
-            return;
+            return
         }
-        var plain = event.getRawMessage().toPlain();
+        var plain = event.getRawMessage().toPlain()
         if (plain.startsWith(Tellraw.duplicateChar)) {
-            return;
+            return
         }
-        this.sendChat(player, plain, function () {
-            event.setMessageCancelled(true)
-        });
+        this.sendChat(player, plain, () => event.setMessageCancelled(true))
     }
 
     initFormat(chatFormats: any[]) {
         chatFormats.forEach(chatFormat => {
-            var chat_format_str = chatFormat.format;
-            var temp = [];
-            var r: any[];
+            var chat_format_str = chatFormat.format
+            var temp = []
+            var r: any[]
             while (r = this.FORMAT_PATTERN.exec(chat_format_str)) {
-                temp.push(r[1]);
+                temp.push(r[1])
             }
-            var format_list = [];
+            var format_list = []
             temp.forEach(t => {
-                var arr = chat_format_str.split('[' + t + ']', 2);
+                var arr = chat_format_str.split('[' + t + ']', 2)
                 if (arr[0]) {
-                    format_list.push(arr[0]);
+                    format_list.push(arr[0])
                 }
-                format_list.push(t);
-                chat_format_str = arr[1];
-            });
+                format_list.push(t)
+                chat_format_str = arr[1]
+            })
             if (chat_format_str) {
-                format_list.push(chat_format_str);
+                format_list.push(chat_format_str)
             }
-            chatFormat.format_list = format_list;
+            chatFormat.format_list = format_list
         })
     }
 
-    sendChat(player: any, plain: string, callback: { (): void; }) {
-        var chat_format = this.getChatFormat(player);
+    sendChat(player: any, plain: string, callback: { (): void }) {
+        var chat_format = this.getChatFormat(player)
         if (!chat_format) {
-            console.debug('未获得用户', player.getName(), '的 ChatRule 跳过执行...');
-            return;
+            console.debug('未获得用户', player.getName(), '的 ChatRule 跳过执行...')
+            return
         }
-        callback();
-        var tr = Tellraw.create();
+        callback()
+        var tr = Tellraw.create()
         chat_format.format_list.forEach((format) => {
-            var style = this.styleFormats[format];
+            var style = this.styleFormats[format]
             if (style) {
-                tr.then(this.replace(player, style.text.replace(/&(\w)/g, '§$1')));
+                tr.then(this.replace(player, style.text.replace(/&(\w)/g, '§$1')))
                 if (style.hover) {
-                    tr.tip(this.replace(player, style.hover.join('\n')));
+                    tr.tip(this.replace(player, style.hover.join('\n')))
                 }
                 if (style.click && style.click.type && style.click.command) {
-                    var command = this.replace(player, style.click.command);
+                    var command = this.replace(player, style.click.command)
                     switch (style.click.type.toUpperCase()) {
                         case "COMMAND":
-                            tr.command(command);
-                            break;
+                            tr.command(command)
+                            break
                         case "OPENURL":
-                            tr.link(command);
-                            break;
+                            tr.link(command)
+                            break
                         case "SUGGEST":
-                            tr.suggest(command);
-                            break;
+                            tr.suggest(command)
+                            break
                         default:
                     }
                 }
             } else {
-                tr.then(this.replace(player, format));
+                tr.then(this.replace(player, format))
             }
-        });
+        })
         let json = tr.then(this.replace(player, plain)).json()
         this.sendChatAll(json)
         this.Channel?.send(player, MiaoMessage.CHANNEL, MiaoMessage.encode(json))
     }
 
     sendChatAll(json: string) {
-        this.Server.getOnlinePlayers().forEach(player => this.Server.sendJson(player, json))
+        this.Server.getOnlinePlayers().forEach(player => this.chat.sendJson(player, json))
     }
 
     getChatFormat(player: any) {
-        for (var i in this.chatFormats) {
-            var format = this.chatFormats[i];
+        for (let format of this.chatFormats) {
             if (player.hasPermission(format.permission)) {
-                return format;
+                return format
             }
         }
-        return null;
+        return null
     }
 
     replace(player: any, target: string) {

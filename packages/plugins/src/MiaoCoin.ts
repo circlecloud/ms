@@ -81,6 +81,7 @@ export class MiaoCoin extends interfaces.Plugin {
     }
 
     disable() {
+        // {"app":"com.tencent.autoreply","desc":"","view":"autoreply","ver":"0.0.0.1","prompt":"[动画表情]","meta":{"metadata":{"title":"点击蓝色字体有惊喜","buttons":[{"slot":1,"action_data":"我是傻逼","name":"点我","action":"notify"}],"type":"guest","token":"LAcV49xqyE57S17B8ZT6FU7odBveNMYJzux288tBD3c="}},"config":{"forward":1,"showSender":1}}
     }
 
     @Cmd()
