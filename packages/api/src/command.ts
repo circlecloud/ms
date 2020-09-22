@@ -24,6 +24,9 @@ export namespace command {
                 this.onTabComplete(plugin, cmd, exec.tab)
             }
         }
+        public tabComplete(sender: any, input: string, index?: number): string[] {
+            throw new Error("Method not implemented.")
+        }
         /**
          * 取消命令注册
          * @param plugin 插件

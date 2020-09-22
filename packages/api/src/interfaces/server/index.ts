@@ -4,6 +4,8 @@ import { injectable, inject } from '@ccms/container'
 import { NativePluginManager } from './native_plugin'
 import { constants } from '../../constants'
 
+export { NativePluginManager } from './native_plugin'
+
 export namespace server {
     /**
      * Runtime ServerType
@@ -14,31 +16,25 @@ export namespace server {
      */
     export const Console = Symbol("Console")
     /**
-     * MiaoScript Server
-     */
-    export const Server = Symbol("Server")
-    /**
      * Runtime Server Instance
      */
     export const ServerInstance = Symbol("ServerInstance")
     /**
      * MiaoScript Server
      */
-    export interface Server {
-        getVersion(): string
-        getPlayer(name: string): any
-        getOnlinePlayers(): any[]
-        getConsoleSender(): any
-        getService(service: string): any
-        dispatchCommand(sender: string | any, command: string): boolean
-        dispatchConsoleCommand(command: string): boolean
-        getPluginsFolder(): string
-        getNativePluginManager(): NativePluginManager
-        getDedicatedServer?(): any
-        getNettyPipeline(): any
-        getRootLogger(): any
-        sendJson(sender: string | any, json: object | string): void
-        tabComplete?(sender: string | any, input: string, index?: number): string[]
+    export abstract class Server {
+        abstract getVersion(): string
+        abstract getPlayer(name: string): any
+        abstract getOnlinePlayers(): any[]
+        abstract getConsoleSender(): any
+        abstract getService(service: string): any
+        abstract dispatchCommand(sender: string | any, command: string): boolean
+        abstract dispatchConsoleCommand(command: string): boolean
+        abstract getPluginsFolder(): string
+        abstract getNativePluginManager(): NativePluginManager
+        abstract getDedicatedServer?(): any
+        abstract getNettyPipeline(): any
+        abstract getRootLogger(): any
     }
     @injectable()
     export class ServerChecker {
@@ -100,12 +96,6 @@ export namespace server {
             throw new Error("Method not implemented.")
         }
         getRootLogger() {
-            throw new Error("Method not implemented.")
-        }
-        sendJson(sender: any, json: string | object): void {
-            throw new Error("Method not implemented.")
-        }
-        tabComplete?(sender: any, input: string, index?: number): string[] {
             throw new Error("Method not implemented.")
         }
         protected reflect() {

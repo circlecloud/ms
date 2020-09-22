@@ -13,6 +13,9 @@ export class SpringCommand extends command.Command {
     protected create(plugin: any, command: string) {
         return this.commandMap.register(plugin, command)
     }
+    public tabComplete(sender: any, input: string, index?: number): string[] {
+        return this.commandMap.tabComplate(sender, input, index)
+    }
     protected remove(plugin: any, command: string) {
         this.commandMap.unregister(plugin, command)
     }
