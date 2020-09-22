@@ -4,8 +4,9 @@ import { inject, provideSingleton, Container, ContainerInstance } from '@ccms/co
 
 import './config'
 import { interfaces } from './interfaces'
-import { PluginCommandManager } from './command'
+import { PluginTaskManager } from './task'
 import { PluginEventManager } from './event'
+import { PluginCommandManager } from './command'
 
 const Thread = Java.type('java.lang.Thread')
 
@@ -22,10 +23,12 @@ export class PluginManagerImpl implements plugin.PluginManager {
     @inject(server.ServerChecker)
     private serverChecker: server.ServerChecker
 
-    @inject(PluginCommandManager)
-    private commandManager: PluginCommandManager
+    @inject(PluginTaskManager)
+    private taskManager: PluginTaskManager
     @inject(PluginEventManager)
     private eventManager: PluginEventManager
+    @inject(PluginCommandManager)
+    private commandManager: PluginCommandManager
 
     private initialized: boolean = false
 
@@ -43,8 +46,9 @@ export class PluginManagerImpl implements plugin.PluginManager {
         this.metadataMap = new Map()
 
         // ignore unused
-        this.commandManager
+        this.taskManager
         this.eventManager
+        this.commandManager
     }
 
     initialize() {
@@ -131,7 +135,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
             if (loader.require(loadMetadata).loaded) {
                 loadMetadata.loader = loader
                 let metadata = loadMetadata.metadata
-                if (this.metadataMap.has(metadata.name)) {
+                if (this.metadataMap.has(metadata.name) && this.instanceMap.has(metadata.name)) {
                     let oldMetadata = this.metadataMap.get(metadata.name)
                     throw new Error(`Plugin ${oldMetadata.name} is already load from ${oldMetadata.source}...`)
                 }
