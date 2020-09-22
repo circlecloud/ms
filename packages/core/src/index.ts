@@ -49,10 +49,12 @@ class MiaoScriptCore {
     }
 
     disable() {
+        let disableStartTime = Date.now()
         console.i18n("ms.core.engine.disable")
         this.pluginManager.disable(this.pluginManager.getPlugins())
         this.taskManager.disable()
         process.exit(0)
+        console.i18n("ms.core.engine.disable.finish", { version: 'v' + global.ScriptEngineVersion, time: (new Date().getTime() - disableStartTime) / 1000 })
     }
 }
 
@@ -86,7 +88,7 @@ function detectServer(): constants.ServerType {
 }
 
 function initialize() {
-    // @ts-ignore
+    global.ScriptEngineVersion = require('../package.json').version
     try { engineLoad({ script: http.get("http://ms.yumc.pw/api/plugin/download/name/initialize"), name: 'core/initialize.js' }) } catch (error) { console.debug(error) }
     try {
         let corePackageStartTime = new Date().getTime()
@@ -103,7 +105,7 @@ function initialize() {
         container.load(buildProviderModule())
         console.i18n("ms.core.package.completed", { scope: global.scope, type, time: (Date.now() - corePackageStartTime) / 1000 })
         let disable = container.get<MiaoScriptCore>(MiaoScriptCore).enable()
-        console.i18n("ms.core.engine.completed", { time: (Date.now() - global.NashornEngineStartTime) / 1000 })
+        console.i18n("ms.core.engine.completed", { version: 'v' + global.ScriptEngineVersion, time: (Date.now() - global.ScriptEngineStartTime) / 1000 })
         return disable
     } catch (error) {
         console.i18n("ms.core.initialize.error", { error })

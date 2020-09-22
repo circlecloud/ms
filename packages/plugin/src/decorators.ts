@@ -35,6 +35,7 @@ export function cmd(metadata: interfaces.CommandMetadata = {}) {
         metadata.paramtypes = Reflect.getMetadata("design:paramtypes", target, key)
         const previousMetadata: Map<string, interfaces.CommandMetadata> = getPluginCommandMetadata(target)
         previousMetadata.set(metadata.name, metadata)
+        metadata.alias?.forEach((name) => previousMetadata.set(name, metadata))
         Reflect.defineMetadata(METADATA_KEY.cmd, previousMetadata, target.constructor)
     }
 }
@@ -52,6 +53,7 @@ export function tab(metadata: interfaces.CommandMetadata = {}) {
         metadata.paramtypes = Reflect.getMetadata("design:paramtypes", target, key)
         const previousMetadata: Map<string, interfaces.CommandMetadata> = getPluginTabCompleterMetadata(target)
         previousMetadata.set(metadata.name, metadata)
+        metadata.alias?.forEach((name) => previousMetadata.set(name, metadata))
         Reflect.defineMetadata(METADATA_KEY.tab, previousMetadata, target.constructor)
     }
 }

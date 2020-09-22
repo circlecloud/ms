@@ -22,19 +22,44 @@ export namespace server {
     /**
      * MiaoScript Server
      */
+    @injectable()
     export abstract class Server {
-        abstract getVersion(): string
-        abstract getPlayer(name: string): any
-        abstract getOnlinePlayers(): any[]
-        abstract getConsoleSender(): any
-        abstract getService(service: string): any
-        abstract dispatchCommand(sender: string | any, command: string): boolean
-        abstract dispatchConsoleCommand(command: string): boolean
-        abstract getPluginsFolder(): string
-        abstract getNativePluginManager(): NativePluginManager
-        abstract getDedicatedServer?(): any
-        abstract getNettyPipeline(): any
-        abstract getRootLogger(): any
+        getVersion(): string {
+            throw new Error("Method not implemented.")
+        }
+        getPlayer(name: string): any {
+            throw new Error("Method not implemented.")
+        }
+        getOnlinePlayers(): any[] {
+            throw new Error("Method not implemented.")
+        }
+        getConsoleSender(): any {
+            throw new Error("Method not implemented.")
+        }
+        getService(service: string): any {
+            throw new Error("Method not implemented.")
+        }
+        dispatchCommand(sender: string | any, command: string): boolean {
+            throw new Error("Method not implemented.")
+        }
+        dispatchConsoleCommand(command: string): boolean {
+            throw new Error("Method not implemented.")
+        }
+        getPluginsFolder(): string {
+            throw new Error("Method not implemented.")
+        }
+        getNativePluginManager(): NativePluginManager {
+            throw new Error("Method not implemented.")
+        }
+        getDedicatedServer?(): any {
+            throw new Error("Method not implemented.")
+        }
+        getNettyPipeline(): any {
+            throw new Error("Method not implemented.")
+        }
+        getRootLogger(): any {
+            throw new Error("Method not implemented.")
+        }
     }
     @injectable()
     export class ServerChecker {
@@ -54,50 +79,15 @@ export namespace server {
         }
     }
     @injectable()
-    export abstract class ReflectServer implements server.Server {
+    export abstract class ReflectServer extends server.Server {
         protected pipeline: any
         protected rootLogger: any
 
         constructor() {
+            super()
             this.reflect()
         }
 
-        getVersion(): string {
-            throw new Error("Method not implemented.")
-        }
-        getPlayer(name: string) {
-            throw new Error("Method not implemented.")
-        }
-        getOnlinePlayers(): any[] {
-            throw new Error("Method not implemented.")
-        }
-        getConsoleSender() {
-            throw new Error("Method not implemented.")
-        }
-        getService(service: string) {
-            throw new Error("Method not implemented.")
-        }
-        dispatchCommand(sender: any, command: string): boolean {
-            throw new Error("Method not implemented.")
-        }
-        dispatchConsoleCommand(command: string): boolean {
-            throw new Error("Method not implemented.")
-        }
-        getPluginsFolder(): string {
-            throw new Error("Method not implemented.")
-        }
-        getNativePluginManager(): NativePluginManager {
-            throw new Error("Method not implemented.")
-        }
-        getDedicatedServer() {
-            throw new Error("Method not implemented.")
-        }
-        getNettyPipeline() {
-            throw new Error("Method not implemented.")
-        }
-        getRootLogger() {
-            throw new Error("Method not implemented.")
-        }
         protected reflect() {
             try {
                 let consoleServer = this.getDedicatedServer()

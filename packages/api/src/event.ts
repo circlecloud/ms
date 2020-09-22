@@ -138,6 +138,8 @@ export namespace event {
             // add to cache Be used for close plugin to close event
             if (!listenerMap[name]) listenerMap[name] = []
             var off = () => {
+                if (off['offed']) return
+                off['offed'] = true
                 this.unregister(eventCls, listener)
                 console.debug(i18n.translate("ms.api.event.unregister", { name, event: this.class2Name(eventCls), exec: executor }))
             }
