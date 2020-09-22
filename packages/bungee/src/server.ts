@@ -3,29 +3,29 @@ import { provideSingleton, inject, postConstruct } from '@ccms/container'
 
 import * as reflect from '@ccms/common/dist/reflect'
 
-let Bungee: net.md_5.bungee.api.ProxyServer = base.getInstance().getProxy();
+let Bungee: net.md_5.bungee.api.ProxyServer = base.getInstance().getProxy()
 
 @provideSingleton(server.Server)
 export class BungeeServer implements server.Server {
-    private pluginsFolder: string;
-    private pipeline: any;
-    private rootLogger: any;
+    private pluginsFolder: string
+    private pipeline: any
+    private rootLogger: any
 
     @inject(task.TaskManager)
     private task: task.TaskManager
 
     constructor() {
-        this.pluginsFolder = Bungee.getPluginsFolder().getCanonicalPath();
+        this.pluginsFolder = Bungee.getPluginsFolder().getCanonicalPath()
     }
 
     @postConstruct()
     initialize() {
-        let count = 0;
+        let count = 0
         let wait = this.task.create(() => {
             try {
                 // @ts-ignore
                 this.pipeline = reflect.on(base.getInstance().getProxy()).get('listeners').get().toArray()[0].pipeline()
-                wait.cancel();
+                wait.cancel()
             } catch (ex) {
                 count++
                 if (count > 50) {
@@ -44,7 +44,7 @@ export class BungeeServer implements server.Server {
     }
 
     getPlayer(name: string) {
-        return Bungee.getPlayer(name);
+        return Bungee.getPlayer(name)
     }
     getVersion(): string {
         return Bungee.getVersion()
@@ -56,7 +56,7 @@ export class BungeeServer implements server.Server {
         return Bungee.getConsole()
     }
     getService(service: string) {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented.")
     }
     dispatchCommand(sender: string | any, command: string): boolean {
         if (typeof sender === 'string') {
@@ -68,18 +68,15 @@ export class BungeeServer implements server.Server {
         return Bungee.getPluginManager().dispatchCommand(Bungee.getConsole(), command)
     }
     getPluginsFolder(): string {
-        return this.pluginsFolder;
+        return this.pluginsFolder
     }
     getNativePluginManager() {
         return Bungee.getPluginManager() as any
     }
     getNettyPipeline() {
-        return this.pipeline;
+        return this.pipeline
     }
     getRootLogger() {
-        return this.rootLogger;
-    }
-    sendJson(sender: string | any, json: string): void {
-        throw new Error("Method not implemented.");
+        return this.rootLogger
     }
 }

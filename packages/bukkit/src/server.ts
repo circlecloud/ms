@@ -54,16 +54,4 @@ export class BukkitServer extends server.ReflectServer {
     getRootLogger() {
         return this.rootLogger
     }
-    sendJson(sender: string | any, json: object | string): void {
-        if (typeof sender === "string") {
-            sender = this.getPlayer(sender)
-        }
-        let result = chat.json(sender, typeof json == "string" ? json : JSON.stringify(json))
-        if (result !== false) {
-            this.dispatchConsoleCommand(result)
-        }
-    }
-    tabComplete?(sender: any, input: string, index?: number): string[] {
-        throw new Error("Method not implemented.")
-    }
 }

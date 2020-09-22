@@ -1,6 +1,6 @@
 import { server } from '@ccms/api'
 import { provideSingleton, inject } from '@ccms/container'
-import { NativePluginManager } from '@ccms/api/dist/interfaces/server/native_plugin'
+import { NativePluginManager } from '@ccms/api'
 import { CommandMap } from './internal/command'
 
 @provideSingleton(server.Server)
@@ -8,8 +8,6 @@ export class SpringServer implements server.Server {
     @inject(CommandMap)
     private commandMap: CommandMap
 
-    constructor() {
-    }
     getVersion(): string {
         return "SpringFramework"
     }
@@ -46,11 +44,5 @@ export class SpringServer implements server.Server {
     }
     getRootLogger() {
         return Packages.org.slf4j.LoggerFactory.getLogger("root") || global.logger
-    }
-    sendJson(sender: any, json: string | object): void {
-        throw new Error("Method not implemented.")
-    }
-    tabComplete(sender: any, input: string, index?: number) {
-        return this.commandMap.tabComplate(sender, input, index)
     }
 }
