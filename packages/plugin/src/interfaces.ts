@@ -36,6 +36,10 @@ export namespace interfaces {
     }
     export interface CommandMetadata extends ExecMetadata {
         /**
+         * 命令别名
+         */
+        alias?: string[]
+        /**
          * 命令描述
          */
         description?: string

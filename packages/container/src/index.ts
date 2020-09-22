@@ -60,8 +60,22 @@ export const JSClass = (className: string) => {
  * @param className 类名
  */
 export const Autowired = (className?: string | any) => {
-    return function (target: any, propertyKey: string) {
-        target[propertyKey] = getContainer().getNamed(ioc.Autowired, className || propertyKey)
+    return function (target: any, propertyKey: string, index?: number) {
+        let container = getContainer()
+        let type = Reflect.getMetadata('design:type', target, propertyKey)
+        if (type && type !== Object) {
+            try {
+                return target[propertyKey] = container.getNamed(type, className || propertyKey)
+            } catch (error) {
+                try {
+                    return target[propertyKey] = container.get(type)
+                } catch (error) {
+                }
+            }
+        }
+        if (container.isBound(ioc.Autowired)) {
+            target[propertyKey] = container.getNamed(ioc.Autowired, className || propertyKey)
+        }
     }
 }
 
@@ -70,7 +84,7 @@ export const Autowired = (className?: string | any) => {
  * @param className 类名
  */
 export const Resource = (resourceName?: string | any) => {
-    return function (target: any, propertyKey: string) {
+    return function (target: any, propertyKey: string, index?: number) {
         target[propertyKey] = getContainer().getNamed(ioc.Resource, resourceName || propertyKey)
     }
 }
@@ -82,8 +96,18 @@ export const reduceMetadata = (ctx: interfaces.Context): any => {
     }, {})
 }
 
+function initAutowired(container: Container) {
+    container.bind(ioc.Autowired).toDynamicValue((ctx) => {
+        var metadata: any = reduceMetadata(ctx)
+        let key = Object.toString.call(metadata.named)
+        if (key === "[object Function]" || key === "[object Symbol]") { return container.get(metadata.named) }
+        return undefined
+    })
+}
+
 export const DefaultContainer = new Container()
 initContainer(DefaultContainer)
+initAutowired(DefaultContainer)
 
 export * from 'inversify'
 export * from './constants'

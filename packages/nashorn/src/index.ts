@@ -48,7 +48,8 @@ declare global {
             logger: any
             debug: boolean
             level: string
-            NashornEngineStartTime: number
+            ScriptEngineVersion: string
+            ScriptEngineStartTime: number
             setGlobal: (key: string, value: any, config?: PropertyDescriptor & ThisType<any>) => void
             noop: () => void
             console: Console

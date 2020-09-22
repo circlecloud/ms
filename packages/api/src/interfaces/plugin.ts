@@ -1,3 +1,5 @@
+import { injectable } from '@ccms/container'
+
 export namespace plugin {
     /**
      * MiaoScript Plugin
@@ -12,22 +14,19 @@ export namespace plugin {
      */
     export const PluginInstance = Symbol("PluginInstance")
     /**
-     * MiaoScript Plugin Manager Symbol
-     */
-    export const PluginManager = Symbol("PluginManager")
-    /**
      * MiaoScript Plugin Manager Interface
      */
-    export interface PluginManager {
-        scan(folder: string): void
-        build(): void
-        loadFromFile(file: string, scanner?: plugin.PluginScanner): Plugin
-        load(...args: any[]): void
-        enable(...args: any[]): void
-        disable(...args: any[]): void
-        reload(...args: any[]): void
-        getPlugin(name: string): plugin.Plugin
-        getPlugins(): Map<string, plugin.Plugin>
+    @injectable()
+    export abstract class PluginManager {
+        abstract scan(folder: string): void
+        abstract build(): void
+        abstract loadFromFile(file: string, scanner?: plugin.PluginScanner): Plugin
+        abstract load(...args: any[]): void
+        abstract enable(...args: any[]): void
+        abstract disable(...args: any[]): void
+        abstract reload(...args: any[]): void
+        abstract getPlugin(name: string): plugin.Plugin
+        abstract getPlugins(): Map<string, plugin.Plugin>
     }
     export const PluginScanner = Symbol("PluginScanner")
     /**

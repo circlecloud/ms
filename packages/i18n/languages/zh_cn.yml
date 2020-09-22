@@ -10,8 +10,9 @@ ms.core.package.initialize: "初始化 MiaoScript 扩展 {scope}/core {scope}/{t
 ms.core.package.completed: "MiaoScript 扩展 {scope}/core {scope}/{type} {scope}/plugin 加载完成 耗时({time}s)"
 ms.core.plugin.initialize: "MiaoScript 开始引导插件系统. 请稍候..."
 ms.core.plugin.completed: "MiaoScript 插件加载完毕 耗时({time}s)!"
-ms.core.engine.completed: "MiaoScript 脚本引擎 加载完毕... 耗时({time}s)!"
-ms.core.engine.disable: "关闭 MiaoScript 引擎..."
+ms.core.engine.completed: "MiaoScript 脚本引擎 {version} 加载完毕... 耗时({time}s)!"
+ms.core.engine.disable: "MiaoScript 关闭脚本引擎 请稍候..."
+ms.core.engine.disable.finish: "MiaoScript 脚本引擎 {version} 关闭完成... 耗时({time}s)!"
 ms.core.engine.disable.abnormal: "引擎异常启动或初始化未完成 跳过关闭流程..."
 
 ms.api.event.resource.not.found: "无法映射事件 未找到资源文件 {resource}!"
