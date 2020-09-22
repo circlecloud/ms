@@ -6,43 +6,56 @@ const AtomicInteger = Java.type("java.util.concurrent.atomic.AtomicInteger")
 const AtomicBoolean = Java.type("java.util.concurrent.atomic.AtomicBoolean")
 const Thread = Java.type('java.lang.Thread')
 
-const taskId = new AtomicInteger(0)
-const tasks: { [key: number]: task.Cancelable } = {}
-const executor = thread_pool.create({
-    groupName: '@ccms/spring'
-})
-
 @provideSingleton(task.TaskManager)
-export class SpringTaskManager implements task.TaskManager {
+export class SpringTaskManager extends task.TaskManager {
     @inject(plugin.PluginInstance)
     private pluginInstance: any
 
-    private innerTaskId: any
-    private innerTasks: { [s: string]: task.Cancelable }
-    private innerExecutor: java.util.concurrent.ThreadPoolExecutor
+    private taskId: any
+    private tasks: { [s: string]: task.Cancelable }
+    private executor: java.util.concurrent.ThreadPoolExecutor
 
     constructor() {
-        this.innerTaskId = taskId
-        this.innerTasks = tasks
-        this.innerExecutor = executor
+        super()
+        this.taskId = new AtomicInteger(0)
+        this.tasks = {}
+        this.executor = thread_pool.create({
+            groupName: '@ccms/spring'
+        })
     }
 
-    create(func: Function): task.Task {
-        if (Object.prototype.toString.call(func) !== "[object Function]") { throw TypeError('第一个参数 Task 必须为 function !') }
-        return new SpringTask(this.pluginInstance, func)
+    create0(func: Function): task.Task {
+        return new SpringTask(this.pluginInstance, func, this)
     }
     callSyncMethod(func: Function): any {
         return func()
     }
-    disable() {
-        Object.values(this.innerTasks).forEach((task) => task?.cancel())
-        this.innerExecutor.shutdown()
+    disable0() {
+        Object.values(this.tasks).forEach((task) => task?.cancel())
+        this.executor.shutdown()
+    }
+    nextId() {
+        return this.taskId.incrementAndGet()
+    }
+    submit(id: number, task: SpringTask, func: Function) {
+        this.tasks[id] = task
+        this.executor.execute(func as any)
+    }
+    cancel(id: number) {
+        delete this.tasks[id]
     }
 }
 
 export class SpringTask extends task.Task {
-    public id = taskId.incrementAndGet()
+    private id: number
+    private taskManager: SpringTaskManager
     private running = new AtomicBoolean(true)
+
+    constructor(plugin: any, func: Function, taskManager: SpringTaskManager) {
+        super(plugin, func)
+        this.id = taskManager.nextId()
+        this.taskManager = taskManager
+    }
 
     run(...args: any[]) {
         if (this.laterTime > 0) {
@@ -70,19 +83,18 @@ export class SpringTask extends task.Task {
         this.cancel()
     }
 
-    cancel(): any {
+    cancel0(): any {
         var wasRunning = this.running.getAndSet(false)
         if (wasRunning) {
-            delete tasks[this.id]
+            this.taskManager.cancel(this.id)
         }
     }
 
-    submit(...args: any[]): task.Cancelable {
-        tasks[this.id] = this
-        executor.execute((() => this.run(...args)) as any)
+    submit0(...args: any[]) {
+        this.taskManager.submit(this.id, this, () => this.run(...args))
         return {
             cancel: () => {
-                return this.cancel()
+                return this.cancel0()
             }
         }
     }

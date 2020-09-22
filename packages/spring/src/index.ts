@@ -20,10 +20,11 @@ export default function SpringImpl(container: Container) {
     }
     const beanFactory = base.getInstance().getAutowireCapableBeanFactory()
     container.bind(server.Console).toConstantValue(SpringConsole)
-    container.bind(ioc.Autowired).toDynamicValue((ctx) => {
+    container.rebind(ioc.Autowired).toDynamicValue((ctx) => {
         var metadata: any = reduceMetadata(ctx)
-        if (toString.call(metadata.named) === "[object Symbol]") { return container.get(metadata.named) }
-        if (toString.call(metadata.named) === '[object jdk.internal.dynalink.beans.StaticClass]') { metadata.named = metadata.named.class }
+        let key = toString.call(metadata.named)
+        if (key === "[object Function]" || key === "[object Symbol]") { return container.get(metadata.named) }
+        if (key === '[object jdk.internal.dynalink.beans.StaticClass]') { metadata.named = metadata.named.class }
         return beanFactory.getBean(metadata.named)
     })
 }
