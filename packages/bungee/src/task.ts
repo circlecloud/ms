@@ -9,17 +9,13 @@ export class BungeeTaskManager extends task.TaskManager {
     @inject(plugin.PluginInstance)
     private pluginInstance: any
 
-    create(func: Function, plugin?: plugin.Plugin): task.Task {
-        if (Object.prototype.toString.call(func) !== "[object Function]") { throw TypeError('第一个参数 Task 必须为 function !') };
-        let task = new BungeeTask(this.pluginInstance, func)
-        if (plugin) { return this.pluginCreate(plugin, task) }
-        return task
+    create0(func: Function): task.Task {
+        return new BungeeTask(this.pluginInstance, func)
     }
     callSyncMethod(func: Function): any {
         return func()
     }
-    disable(plugin?: plugin.Plugin) {
-        if (plugin) { return this.pluginDisable(plugin) }
+    disable0() {
         this.pluginInstance.getProxy().getScheduler().cancel(this.pluginInstance)
     }
 }
