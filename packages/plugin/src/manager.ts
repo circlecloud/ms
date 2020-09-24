@@ -1,12 +1,13 @@
 import i18n from '@ccms/i18n'
 import { plugin, server, event } from '@ccms/api'
-import { inject, provideSingleton, Container, ContainerInstance } from '@ccms/container'
+import { inject, provideSingleton, Container, ContainerInstance, Autowired } from '@ccms/container'
 
 import './config'
 import { interfaces } from './interfaces'
 import { PluginTaskManager } from './task'
 import { PluginEventManager } from './event'
 import { PluginCommandManager } from './command'
+import { PluginConfigManager } from './config'
 
 const Thread = Java.type('java.lang.Thread')
 
@@ -18,16 +19,17 @@ export class PluginManagerImpl implements plugin.PluginManager {
     private pluginInstance: any
     @inject(server.ServerType)
     private serverType: string
-    @inject(event.Event)
-    private EventManager: event.Event
-    @inject(server.ServerChecker)
+
+    @Autowired()
     private serverChecker: server.ServerChecker
 
-    @inject(PluginTaskManager)
+    @Autowired()
     private taskManager: PluginTaskManager
-    @inject(PluginEventManager)
+    @Autowired()
     private eventManager: PluginEventManager
-    @inject(PluginCommandManager)
+    @Autowired()
+    private configManager: PluginConfigManager
+    @Autowired()
     private commandManager: PluginCommandManager
 
     private initialized: boolean = false
@@ -48,6 +50,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
         // ignore unused
         this.taskManager
         this.eventManager
+        this.configManager
         this.commandManager
     }
 
@@ -55,7 +58,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
         if (this.pluginInstance === undefined) { throw new Error("Can't found Plugin Instance!") }
         if (this.initialized !== true) {
             console.i18n('ms.plugin.initialize', { plugin: this.pluginInstance, loader: Thread.currentThread().contextClassLoader })
-            console.i18n('ms.plugin.event.map', { count: this.EventManager.mapEventName().toFixed(0), type: this.serverType })
+            console.i18n('ms.plugin.event.map', { count: this.eventManager.mapEventName(), type: this.serverType })
             let pluginScanner = this.container.getAll<plugin.PluginScanner>(plugin.PluginScanner)
             pluginScanner.forEach((scanner) => {
                 console.debug(`loading plugin sacnner ${scanner.type}...`)

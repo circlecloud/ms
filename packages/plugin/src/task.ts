@@ -1,9 +1,9 @@
 import { plugin, task } from '@ccms/api'
-import { provideSingleton, inject } from '@ccms/container'
+import { provideSingleton, Autowired } from '@ccms/container'
 
 @provideSingleton(PluginTaskManager)
 export class PluginTaskManager {
-    @inject(task.TaskManager)
+    @Autowired()
     private taskManager: task.TaskManager
 
     constructor() {

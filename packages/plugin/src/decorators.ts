@@ -19,7 +19,7 @@ export function plugin(metadata: pluginApi.PluginMetadata | any) {
         Reflect.defineMetadata(METADATA_KEY.plugin, previousMetadata, Reflect)
         const previousSources: Map<string, pluginApi.PluginMetadata> = getPluginSources()
         previousSources.set(metadata.source.toString(), metadata)
-        Reflect.defineMetadata(METADATA_KEY.souece, previousSources, Reflect)
+        Reflect.defineMetadata(METADATA_KEY.source, previousSources, Reflect)
     }
 }
 
@@ -77,9 +77,11 @@ export function config(metadata: interfaces.ConfigMetadata = {}) {
         metadata.variable = key
         metadata.version = metadata.version ?? 1
         metadata.format = metadata.format ?? 'yml'
+        metadata.filename = metadata.filename ?? metadata.name + '.' + metadata.format
         let previousMetadata = getPluginConfigMetadata(target)
         previousMetadata.set(metadata.name, metadata)
         Reflect.defineMetadata(METADATA_KEY.config, previousMetadata, target.constructor)
+        Reflect.defineMetadata(METADATA_KEY.config, metadata, target[key])
     }
 }
 

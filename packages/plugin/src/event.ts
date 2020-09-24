@@ -1,17 +1,21 @@
 import { event, plugin, server } from '@ccms/api'
-import { provideSingleton, postConstruct, inject } from '@ccms/container'
+import { provideSingleton, Autowired } from '@ccms/container'
 import { getPluginListenerMetadata } from './utils'
 
 @provideSingleton(PluginEventManager)
 export class PluginEventManager {
-    @inject(server.ServerChecker)
-    private ServerChecker: server.ServerChecker
-    @inject(event.Event)
+    @Autowired()
     private EventManager: event.Event
+    @Autowired()
+    private ServerChecker: server.ServerChecker
 
     constructor() {
-        process.on('plugin.before.enable', (plugin: plugin.Plugin) => this.registryListener(plugin))
-        process.on('plugin.after.disable', (plugin: plugin.Plugin) => this.unregistryListener(plugin))
+        process.on('plugin.before.enable', this.registryListener.bind(this))
+        process.on('plugin.after.disable', this.unregistryListener.bind(this))
+    }
+
+    mapEventName() {
+        return this.EventManager.mapEventName().toFixed(0)
     }
 
     private registryListener(pluginInstance: plugin.Plugin) {
