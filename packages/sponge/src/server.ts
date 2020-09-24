@@ -35,10 +35,10 @@ export class SpongeServer extends server.ReflectServer {
         if (typeof sender === 'string') {
             sender = this.getPlayer(sender)
         }
-        return Sponge.getCommandManager().process(sender, command).getQueryResult().get() != 0
+        return Sponge.getCommandManager().process(sender, command).getSuccessCount().get() != 0
     }
     dispatchConsoleCommand(command: string): boolean {
-        return Sponge.getCommandManager().process(Sponge.getServer().getConsole(), command).getQueryResult().get() != 0
+        return Sponge.getCommandManager().process(Sponge.getServer().getConsole(), command).getSuccessCount().get() != 0
     }
     getPluginsFolder(): string {
         return this.pluginsFolder
@@ -54,11 +54,5 @@ export class SpongeServer extends server.ReflectServer {
     }
     getRootLogger() {
         return this.rootLogger
-    }
-    sendJson(sender: string | any, json: string): void {
-        if (typeof sender === "string") {
-            sender = this.getPlayer(sender)
-        }
-        sender.sendMessage(TextSerializers.JSON.deserialize(json))
     }
 }
