@@ -13,7 +13,7 @@ export namespace command {
          */
         on(plugin: plugin.Plugin, name: string, exec: { cmd: Function, tab?: Function }) {
             var cmd = this.create(plugin, name)
-            if (!cmd) { throw Error("") }
+            if (!cmd) { throw Error(`Plugin ${plugin.description.name} can't create Command ${name}!`) }
             console.debug(i18n.translate("ms.api.command.register", { plugin: plugin.description.name, name, cmd }))
             if (exec.cmd && typeof exec.cmd === "function") {
                 this.onCommand(plugin, cmd, exec.cmd)
