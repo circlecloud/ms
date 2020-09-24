@@ -54,6 +54,7 @@ let langMap = {
     'deploy.token.not.exists': '§4请先配置发布Token!',
     'deploy.success': '§6插件 §b{name} §6版本 §3{version} §a发布成功! §6服务器返回: §a{msg}',
     'deploy.fail': '§6插件 §b{name} §6版本 §3{version} §c发布失败! §6服务器返回: §c{msg}',
+    'prun.script': '§6指定插件:§b {name}',
     'run.script': '§b运行脚本:§r {script}',
     'run.result': '§a返回结果:§r {result}',
     'run.noresult': '§4没有返回结果!',
@@ -387,14 +388,27 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         try {
             let script = args.join(' ')
             this.i18n(sender, 'run.script', { script })
-            let result = this.runCode(script, sender)
+            let result = this.runCode(script, sender, this)
             this.i18n(sender, 'run.result', { result: result == undefined ? this.translate.translate('run.noresult') : result + '' })
         } catch (ex) {
             this.logger.sender(sender, this.logger.stack(ex))
         }
     }
 
-    private runCode(code: string, sender: any) {
+    cmdprun(sender: any, name: string, ...args: any[]) {
+        try {
+            if (!this.pluginManager.getPlugins().has(name)) { return this.logger.sender(sender, `§4插件 §c${name} §4不存在!`) }
+            let script = args.join(' ')
+            this.i18n(sender, 'prun.script', { name })
+            this.i18n(sender, 'run.script', { script })
+            let result = this.runCode(script, sender, this.pluginManager.getPlugins().get(name))
+            this.i18n(sender, 'run.result', { result: result == undefined ? this.translate.translate('run.noresult') : result + '' })
+        } catch (ex) {
+            this.logger.sender(sender, this.logger.stack(ex))
+        }
+    }
+
+    private runCode(code: string, sender: any, _this: any) {
         let paramNames = [
             'sender',
             'reflect',
@@ -416,7 +430,7 @@ if (this.serverType == "spring") {
     var df = base.getInstance().getAutowireCapableBeanFactory()
 }
 return ''+ eval(${JSON.stringify(code)});`)
-        return tfunc.apply(this, params) + ''
+        return tfunc.apply(_this, params) + ''
     }
 
     cmddeploy(sender: any, name: any) {
@@ -446,7 +460,7 @@ return ''+ eval(${JSON.stringify(code)});`)
 
     @Tab({ alias: ['gmspm', 'bungeemspm'] })
     tabmspm(_sender: any, _command: any, args: string | any[]) {
-        if (args.length === 1) { return ['list', 'install', 'update', 'upgrade', 'reload', 'restart', 'run', 'help', 'create', 'deploy'] }
+        if (args.length === 1) { return ['list', 'install', 'update', 'upgrade', 'reload', 'restart', 'run', 'prun', 'help', 'create', 'deploy'] }
         if (args.length > 1) {
             switch (args[0]) {
                 case "list":
@@ -456,6 +470,9 @@ return ''+ eval(${JSON.stringify(code)});`)
                 case "upgrade":
                     if (args.length == 2) return ["system", ...this.pluginManager.getPlugins().keys()]
                     if (args.length == 3 && args[1] == "system") return ["confirm"]
+                    return []
+                case "prun":
+                    if (args.length == 2) return [...this.pluginManager.getPlugins().keys()]
                     return []
                 case "update":
                 case "load":

@@ -289,6 +289,7 @@ export class MiaoReward extends interfaces.Plugin {
 
   cmdbind(sender: org.bukkit.entity.Player, server: boolean) {
     if (this.bindCheck(sender, 60)) return
+    if (!sender.getItemInHand) { return this.logger.sender(sender, '§c手持物品检测异常 请检查是否在客户端执行命令!') }
     if (sender.getItemInHand()?.getType() !== Material.AIR) { return this.logger.sender(sender, "§c请空手执行此命令!") }
     if (server) {
       if (!sender.isOp()) { return this.logger.sender(sender, '§4您没有配置服务器的权限!') }
@@ -300,6 +301,7 @@ export class MiaoReward extends interfaces.Plugin {
   }
 
   cmddraw(sender: org.bukkit.entity.Player, amount: number) {
+    if (!sender.getItemInHand) { return this.logger.sender(sender, '§c手持物品检测异常 请检查是否在客户端执行命令!') }
     amount = Number(amount)
     if (!Number.isInteger(amount)) {
       return this.logger.sender(sender, '§4金额必须是数字!')
@@ -405,6 +407,7 @@ export class MiaoReward extends interfaces.Plugin {
 
   cmdratio(sender: any, ratioStr: string, confirm: string) {
     if (!sender.isOp()) { return this.logger.sender(sender, '§4你没有此命令的权限!') }
+    if (!sender.getItemInHand) { return this.logger.sender(sender, '§c手持物品检测异常 请检查是否在客户端执行命令!') }
     let [ratio, mbr, msg] = this.ratio2string(ratioStr)
     if (!confirm) {
       return this.logger.sender(sender, [
