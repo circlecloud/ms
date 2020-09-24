@@ -37,10 +37,10 @@ function getPluginMetadata(target: any) {
 }
 
 function getPluginCommandMetadata(target: any) {
-    let commandMetadata: Map<string, interfaces.CommandMetadata> = Reflect.getMetadata(
+    let commandMetadata: interfaces.CommandMetadata[] = Reflect.getMetadata(
         METADATA_KEY.cmd,
         target.constructor
-    ) || new Map<string, interfaces.CommandMetadata>()
+    ) || []
     return commandMetadata
 }
 

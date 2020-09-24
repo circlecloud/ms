@@ -18,7 +18,10 @@ export class PluginEventManager {
         let events = getPluginListenerMetadata(pluginInstance)
         for (const event of events) {
             // ignore space listener
-            if (!this.ServerChecker.check(event.servers)) { continue }
+            if (!this.ServerChecker.check(event.servers)) {
+                console.debug(`[${pluginInstance.description.name}] ${event.target.constructor.name} incompatible event ${event.name} server(${event.servers}) ignore.`)
+                continue
+            }
             // here must bind this to pluginInstance
             let exec = event.target[event.executor]
             let execBinded = exec.bind(pluginInstance)

@@ -62,9 +62,9 @@ export namespace command {
                     var complete = tabCompleter(sender, command, Java.from(args)) || []
                     return this.copyPartialMatches(complete, token)
                 } catch (ex) {
-                    console.i18n("ms.api.command.tab.completer.error", { sender: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex })
+                    console.i18n("ms.api.command.tab.completer.error", { player: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex })
                     console.ex(ex)
-                    console.sender(sender, [i18n.translate("ms.api.command.tab.completer.error", { sender: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex }), ...console.stack(ex)])
+                    console.sender(sender, [i18n.translate("ms.api.command.tab.completer.error", { player: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex }), ...console.stack(ex)])
                     return []
                 }
             }
