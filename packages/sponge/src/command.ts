@@ -49,11 +49,11 @@ class SimpleCommandCallable {
         this.callable = new CommandCallable({
             //CommandResult process(CommandSource source, String arguments) throws CommandException
             process: (sender: any, args) => {
-                return this.executor(sender, '', command, Java.to(args.split(" ").filter(e => e))) ? CommandResult.success() : CommandResult.empty()
+                return this.executor(sender, '', command, Java.to(args.split(" "))) ? CommandResult.success() : CommandResult.empty()
             },
             //List<String> getSuggestions(CommandSource source, String arguments, @Nullable  Location<World> targetPosition) throws CommandException
             getSuggestions: (sender: any, args, target) => {
-                return this.tabCompleter(sender, '', command, Java.to(args.split(" ").filter(e => e)))
+                return this.tabCompleter(sender, '', command, Java.to(args.split(" ")))
             },
             //boolean testPermission(CommandSource source)
             testPermission: () => {

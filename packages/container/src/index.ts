@@ -2,7 +2,7 @@
 
 import "reflect-metadata"
 import { initContainer, getContainer } from './decorators'
-import { interfaces, Container } from 'inversify'
+import { interfaces, Container, inject, named } from 'inversify'
 import { fluentProvide } from 'inversify-binding-decorators'
 import { ioc } from "./constants"
 
@@ -59,22 +59,20 @@ export const JSClass = (className: string) => {
  * 自动注入实例由平台实现
  * @param className 类名
  */
-export const Autowired = (className?: string | any) => {
+export const Autowired = (className?: any) => {
     return function (target: any, propertyKey: string, index?: number) {
         let container = getContainer()
+        if (className instanceof Symbol || className instanceof Function) {
+            return inject(className)(target, propertyKey, index)
+        }
         let type = Reflect.getMetadata('design:type', target, propertyKey)
         if (type && type !== Object) {
-            try {
-                return target[propertyKey] = container.getNamed(type, className || propertyKey)
-            } catch (error) {
-                try {
-                    return target[propertyKey] = container.get(type)
-                } catch (error) {
-                }
-            }
-        }
-        if (container.isBound(ioc.Autowired)) {
+            inject(type)(target, propertyKey, index)
+            named(className || propertyKey)(target, propertyKey, index)
+        } else if (container.isBound(ioc.Autowired)) {
             target[propertyKey] = container.getNamed(ioc.Autowired, className || propertyKey)
+        } else {
+            throw new Error(`No matching bindings found for target: ${target.constructor.name} type: ${type} named: ${className || propertyKey}`)
         }
     }
 }
