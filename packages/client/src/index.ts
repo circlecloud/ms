@@ -5,33 +5,52 @@ import { attachForge } from './forge'
 import { attachEvents } from './event'
 
 let username = process.argv[2] || 'Mr_jtb'
-let version = process.argv[3] || '1.12.2'
-let address = process.argv[4] || '192.168.2.5:25577'
-let realAddress = address.split(":");
-let client = createConnection(realAddress[0], parseInt(realAddress[1] || "25565"), username)
+let password = process.argv[3] || ''
+let version = process.argv[4] || '1.12.2'
+let readAddress = process.argv[5] || '192.168.2.5:25577'
+let realAddress = readAddress.split(":")
+let address = realAddress[0]
+let port = parseInt(realAddress[1] || "25565")
+let client = commandLineCreateClient()
 
-function createConnection(host: string, port: number, username: string) {
+function commandLineCreateClient() {
+    return createConnection(address, port, username, password)
+}
+
+function createConnection(host: string, port: number, username: string, password: string) {
     let client = createClient({
         version,
         host,
         port,
         username,
-        skipValidation: true
+        password,
+        clientToken: 'd02c7f39-2376-45da-a5a5-50e24fa8b185',
+        //@ts-ignore
+        authServer: 'https://mcsso.yumc.pw/api/yggdrasil/authserver',
+        sessionServer: 'https://mcsso.yumc.pw/api/yggdrasil/sessionserver'
     })
 
+    attachCommon(client)
     attachForge(client)
     attachEvents(client)
-    return client;
+    return client
 }
 
-client.on('error', (error) => {
-    console.log("Client Error", error)
-})
-
-client.on('end', (resone) => {
-    console.log("Client End Resone:", resone)
-    client = createConnection('192.168.2.5', 25577, username)
-})
+function attachCommon(client) {
+    client.on('error', (error) => {
+        console.log("Client Error", error)
+    })
+    client.on('end', (resone) => {
+        console.log("Client End Resone:", resone)
+        if (`${resone}` != "SocketClosed") {
+            setTimeout(() => {
+                client = commandLineCreateClient()
+            }, 500)
+        } else {
+            process.exit(0)
+        }
+    })
+}
 
 const rl = createInterface({
     input: process.stdin,
@@ -54,22 +73,22 @@ const rl = createInterface({
 rl.on('line', function (line) {
     switch (line) {
         case "":
-            break;
+            break
         case "eval":
-            break;
+            break
         case "write":
-            break;
+            break
         case "/respawn":
             client.write('client_command', { payload: 0 })
-            break;
+            break
         case "//reco":
             client.end("")
-            client = createConnection('192.168.2.5', 25577, username)
-            break;
+            client = commandLineCreateClient()
+            break
         case "//quit":
             console.info('Disconnected')
             client.end("")
-            break;
+            break
         case "//end":
             console.info('Forcibly ended client')
             process.exit(0)
