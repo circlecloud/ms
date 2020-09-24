@@ -2,8 +2,8 @@
 /// <reference types="@javatypes/spigot-api" />
 /// <reference types="@javatypes/sponge-api" />
 
-import { server, plugin as pluginApi, channel, constants, chat } from '@ccms/api'
-import { inject, optional } from '@ccms/container'
+import { server, channel, constants, chat } from '@ccms/api'
+import { optional, Autowired } from '@ccms/container'
 import { plugin, interfaces, cmd, listener, tab, config, enable } from '@ccms/plugin'
 import Tellraw from '@ccms/common/dist/tellraw'
 
@@ -52,12 +52,13 @@ class MiaoMessage {
 
 @plugin({ name: 'MiaoChat', version: '1.0.0', author: 'MiaoWoo', source: __filename })
 export class MiaoChat extends interfaces.Plugin {
-    @inject(server.Server)
+    @Autowired()
     private Server: server.Server
-    @inject(chat.Chat)
+    @optional()
+    @Autowired()
     private chat: chat.Chat
-    @inject(channel.Channel)
-    @optional() private Channel: channel.Channel
+    @Autowired()
+    private Channel: channel.Channel
 
     private channelOff: { off: () => void }
 
@@ -169,6 +170,11 @@ export class MiaoChat extends interfaces.Plugin {
                 return string
             }
         }
+        if (!this.chat) {
+            this.logger.console('§4消息管理器注入失败 请检查当前服务器是否兼容...')
+            this.AsyncPlayerChatEvent['off']()
+            this.MessageChannelEvent$Chat['off']()
+        }
     }
 
     disable() {
@@ -227,13 +233,13 @@ export class MiaoChat extends interfaces.Plugin {
         })
     }
 
-    @cmd({ servers: ["bungee"] })
+    @cmd({ servers: [constants.ServerType.Bungee] })
     mct(sender: any, command: string, args: string[]) {
         this.logger.log(sender, command, args)
         sender.sendMessage(JSON.stringify({ command, ...args }))
     }
 
-    @cmd({ servers: ["!bungee"] })
+    @cmd({ servers: [`!${constants.ServerType.Bungee}`] })
     mchat(sender: any, command: string, args: string[]) {
         this.logger.log(sender, command, args)
         sender.sendMessage(JSON.stringify({ command, ...args }))
@@ -243,12 +249,12 @@ export class MiaoChat extends interfaces.Plugin {
     tabmchat(_sender: any, _command: string, _args: string[]) {
     }
 
-    @listener({ servers: ['bukkit'] })
+    @listener({ servers: [constants.ServerType.Bukkit] })
     AsyncPlayerChatEvent(event: org.bukkit.event.player.AsyncPlayerChatEvent) {
         this.sendChat(event.getPlayer(), event.getMessage(), () => event.setCancelled(true))
     }
 
-    @listener({ servers: ['sponge'] })
+    @listener({ servers: [constants.ServerType.Sponge] })
     MessageChannelEvent$Chat(event: org.spongepowered.api.event.message.MessageChannelEvent.Chat) {
         //@ts-ignore
         var player = event.getCause().first(org.spongepowered.api.entity.living.player.Player.class).orElse(null)

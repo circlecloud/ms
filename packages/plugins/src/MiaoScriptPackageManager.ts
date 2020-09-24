@@ -1,7 +1,6 @@
-import { plugin as pluginApi, task, server, plugin, channel, constants } from '@ccms/api'
-
+import { plugin as pluginApi, task, server, channel, constants, proxy } from '@ccms/api'
 import { Translate } from '@ccms/i18n'
-import { inject, DefaultContainer as container, optional, JSClass } from '@ccms/container'
+import { DefaultContainer as container, JSClass, Autowired } from '@ccms/container'
 import { interfaces, JSPlugin, Cmd, Tab, enable, Listener, disable } from '@ccms/plugin'
 
 import * as fs from '@ccms/common/dist/fs'
@@ -10,16 +9,16 @@ import http from '@ccms/common/dist/http'
 
 let help = [
     '§6========= §6[§aMiaoScriptPackageManager§6] 帮助 §aBy §bMiaoWoo §6=========',
-    '§6/mpm §ainstall §e<插件名称>  §6-  §3安装仓库插件',
-    '§6/mpm §aload §e<插件名称>     §6-  §3安装本地插件',
-    '§6/mpm §aunload §e<插件名称>   §6-  §3卸载已安装插件',
-    '§6/mpm §areload §e<插件名称>   §6-  §3重载已安装插件(无名称则重载自身)',
-    '§6/mpm §alist [i]            §6-  §3列出仓库插件[已安装的插件]',
-    '§6/mpm §aupdate §e[插件名称]   §6-  §3更新插件(无名称则更新源)',
-    '§6/mpm §aupgrade §e[插件名称]  §6-  §3升级插件/框架(§4无名称则升级框架§3)',
-    '§6/mpm §arun §e<JS代码>        §6-  §3运行JS代码',
-    '§6/mpm §adeploy §e<插件名称>   §6-  §3发布插件',
-    '§6/mpm §crestart             §6-  §4重启MiaoScript脚本引擎'
+    '§6/mspm §ainstall §e<插件名称>  §6-  §3安装仓库插件',
+    '§6/mspm §aload §e<插件名称>     §6-  §3安装本地插件',
+    '§6/mspm §aunload §e<插件名称>   §6-  §3卸载已安装插件',
+    '§6/mspm §areload §e<插件名称>   §6-  §3重载已安装插件(无名称则重载自身)',
+    '§6/mspm §alist [i]            §6-  §3列出仓库插件[已安装的插件]',
+    '§6/mspm §aupdate §e[插件名称]   §6-  §3更新插件(无名称则更新源)',
+    '§6/mspm §aupgrade §e[插件名称]  §6-  §3升级插件/框架(§4无名称则升级框架§3)',
+    '§6/mspm §arun §e<JS代码>        §6-  §3运行JS代码',
+    '§6/mspm §adeploy §e<插件名称>   §6-  §3发布插件',
+    '§6/mspm §crestart             §6-  §4重启MiaoScript脚本引擎'
 ]
 
 let langMap = {
@@ -27,9 +26,15 @@ let langMap = {
     'main.command.help.tip': '§6请执行 §b/{command} §ahelp §6查看帮助!',
     'main.command.no.permission': '§c你没有此命令的权限!',
     'list.install.header': '§6当前 §bMiaoScript §6已安装下列插件:',
-    'list.install.body': '§6插件名称: §b{name} §6版本: §a{version}\n§6作者: §3{author} §6来源: §c{from}',
+    'list.install.body': `§6┌插件名称: §b{name}
+§6├版本: §a{version}
+§6├作者: §3{author}
+§6└来源: §c{from}`,
     'list.header': '§6当前 §bMiaoScriptPackageCenter §6中存在下列插件:',
-    'list.body': '§6插件名称: §b{name} §6版本: §a{version}\n§6作者: §3{author} §6更新时间: §9{updated_at}',
+    'list.body': `§6┌插件名称: §b{name}
+§6├版本: §a{version}
+§6├作者: §3{author}
+§6└更新时间: §9{updated_at}`,
     'plugin.not.exists': '§6插件 §b{name} §c不存在!',
     'plugin.unload.start': '§c开始卸载 §6插件 §b{name} §6版本 §3{version}!',
     'plugin.unload.finish': '§6插件 §b{name} §6版本 §3{version} §a已卸载!',
@@ -66,34 +71,54 @@ class FakeSender {
         let FakeSenderAdapter = Java.extend(superclass, {
             getName: () => this.name,
             isOp: () => true,
-            sendMessage: (message) => this.plugin.sendBungeeCordMessage(this.name, `§6[§3BPM§6][§a${this.plugin.serverName}§6] ${message}`)
+            hasPermission: () => true,
+            sendMessage: (message) => this.sendMessage(message)
         })
         this._proxy = new FakeSenderAdapter()
     }
+
+    sendMessage(message) {
+        return this.plugin.sendBungeeCordMessage(this.name, `§6[§3BPM§6][§a${this.plugin.serverName}§6] ${message}`)
+    }
+
     getHandler() {
         return this._proxy
     }
 }
 
+class BukkitFakeSender extends FakeSender {
+    constructor(name: string, plugin: MiaoScriptPackageManager) {
+        super(name, plugin, Java.type('org.bukkit.command.CommandSender'))
+    }
+}
+
+class SpongeFakeSender extends FakeSender {
+    constructor(name: string, plugin: MiaoScriptPackageManager) {
+        super(name, plugin, Java.type('org.spongepowered.api.command.CommandSource'))
+    }
+
+    sendMessage(message) {
+        return super.sendMessage(message.content)
+    }
+}
+
 @JSPlugin({ prefix: 'PM', version: '1.3.0', author: 'MiaoWoo', source: __filename })
 export class MiaoScriptPackageManager extends interfaces.Plugin {
-    @inject(plugin.PluginManager)
+    @Autowired()
     private pluginManager: pluginApi.PluginManager
-    @inject(task.TaskManager)
+    @Autowired()
     private taskManager: task.TaskManager
-    @inject(server.ServerType)
+    @Autowired(server.ServerType)
     private serverType: string
-    @inject(server.Server)
+    @Autowired()
     private server: server.Server
-    @inject(pluginApi.PluginFolder)
+    @Autowired(pluginApi.PluginFolder)
     private pluginFolder: string
-    @inject(channel.Channel)
-    @optional() private channel: channel.Channel
+    @Autowired()
+    private channel: channel.Channel
+    @Autowired()
+    private bungee: proxy.BungeeCord
 
-    @JSClass('java.io.ByteArrayOutputStream')
-    private ByteArrayOutputStream: any
-    @JSClass('java.io.DataOutputStream')
-    private DataOutputStream: any
     @JSClass('com.google.common.io.ByteStreams')
     private ByteStreams: any
 
@@ -139,21 +164,12 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
 
     private bungeeCordDetect(player) {
         if (player) {
-            let byteArray = new this.ByteArrayOutputStream()
-            let out = new this.DataOutputStream(byteArray)
-            out.writeUTF("GetServer")
-            this.channel.send(player, "BungeeCord", byteArray.toByteArray())
+            this.bungee.for(player).getServer().send()
         }
     }
     private bungeeCordForward(player, command) {
         if (player) {
-            let byteArray = new this.ByteArrayOutputStream()
-            let out = new this.DataOutputStream(byteArray)
-            out.writeUTF("Forward")
-            out.writeUTF("ALL")
-            out.writeUTF("MiaoScriptPackageManager")
-            out.writeUTF(JSON.stringify(command))
-            this.channel.send(player, "BungeeCord", byteArray.toByteArray())
+            this.bungee.for(player).forward("ALL", "MiaoScriptPackageManager", command).send()
         }
     }
     private readForward(input) {
@@ -166,9 +182,9 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     private getProxySender(name: string) {
         switch (this.serverType) {
             case constants.ServerType.Bukkit:
-                return new FakeSender(name, this, Java.type('org.bukkit.command.CommandSender')).getHandler()
+                return new BukkitFakeSender(name, this).getHandler()
             case constants.ServerType.Sponge:
-                return new FakeSender(name, this, Java.type('org.spongepowered.api.command.CommandSource')).getHandler()
+                return new SpongeFakeSender(name, this).getHandler()
             default:
                 return this.server.getConsoleSender()
         }
@@ -193,12 +209,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     sendBungeeCordMessage(sender, message) {
         let players = this.server.getOnlinePlayers()
         if (players.length) {
-            let byteArray = new this.ByteArrayOutputStream()
-            let out = new this.DataOutputStream(byteArray)
-            out.writeUTF("Message")
-            out.writeUTF(sender)
-            out.writeUTF(message)
-            this.channel.send(players[0], "BungeeCord", byteArray.toByteArray())
+            this.bungee.for(players[0]).message(sender, message).send()
         }
     }
 
@@ -207,23 +218,23 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     }
 
     @Cmd({ servers: [`!${constants.ServerType.Bungee}`] })
-    bmpm(sender: any, command: string, args: string[]) {
-        if (!sender?.isOp()) { return this.i18n(sender, 'main.command.no.permission') }
-        if (!this.isBungeeCord) return this.logger.sender(sender, '§c当前服务器尚未检测到BungeeCord链接...')
+    gmspm(sender: any, command: string, args: string[]) {
+        if (!sender.hasPermission('mspm.admin')) { return this.i18n(sender, 'main.command.no.permission') }
+        if (!this.isBungeeCord) return this.logger.sender(sender, '§c当前服务器尚未检测到 BungeeCord 链接...')
         this.taskManager.create(() => this.main(sender, command, args)).async().submit()
         this.bungeeCordForward(sender, { sender: sender.getName(), command, args })
         this.logger.sender(sender, `§6[§3BPM§6][§a${this.serverName}§6] §6命令 §b/mpm ${args.join?.(' ')} §a发布成功!`)
     }
 
     @Cmd({ servers: [constants.ServerType.Bungee] })
-    mpmanager(sender: any, command: string, args: string[]) {
-        if (!sender?.isOp()) { return this.i18n(sender, 'main.command.no.permission') }
+    bungeemspm(sender: any, command: string, args: string[]) {
+        if (!sender.hasPermission('mspm.admin')) { return this.i18n(sender, 'main.command.no.permission') }
         this.taskManager.create(() => this.main(sender, command, args)).async().submit()
     }
 
     @Cmd({ servers: [`!${constants.ServerType.Bungee}`] })
-    mpm(sender: any, command: string, args: string[]) {
-        if (!sender?.isOp()) { return this.i18n(sender, 'main.command.no.permission') }
+    mspm(sender: any, command: string, args: string[]) {
+        if (!sender.hasPermission('mspm.admin')) { return this.i18n(sender, 'main.command.no.permission') }
         this.taskManager.create(() => this.main(sender, command, args)).async().submit()
     }
 
@@ -404,7 +415,7 @@ if (this.serverType == "spring") {
     var db = dbm.getMainDatabase()
     var df = base.getInstance().getAutowireCapableBeanFactory()
 }
-return '§a返回结果: §r'+ eval(${JSON.stringify(code)});`)
+return ''+ eval(${JSON.stringify(code)});`)
         return tfunc.apply(this, params) + ''
     }
 
@@ -433,8 +444,8 @@ return '§a返回结果: §r'+ eval(${JSON.stringify(code)});`)
         }
     }
 
-    @Tab({ alias: ['bmpm'] })
-    tabmpm(sender: any, command: any, args: string | any[]) {
+    @Tab({ alias: ['gmspm', 'bungeemspm'] })
+    tabmspm(args: string | any[]) {
         if (args.length === 1) { return ['list', 'install', 'update', 'upgrade', 'reload', 'restart', 'run', 'help', 'create', 'deploy'] }
         if (args.length > 1) {
             switch (args[0]) {

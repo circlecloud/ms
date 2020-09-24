@@ -1,9 +1,9 @@
-import { constants, task, server, channel, chat } from "@ccms/api"
+import { constants, task, server, channel, chat, proxy } from "@ccms/api"
 import { JSPlugin, interfaces, Cmd, Tab, Listener, Config } from "@ccms/plugin"
 
 import { QRCode, QRErrorCorrectLevel } from '@ccms/common/dist/qrcode'
 
-import { Autowired, JSClass, optional, inject } from '@ccms/container'
+import { Autowired, JSClass, optional } from '@ccms/container'
 import http from '@ccms/common/dist/http'
 
 let MapView
@@ -54,7 +54,7 @@ interface PlaceholderAPI {
   setPlaceholders: (player: any, str: string) => string
 }
 
-@JSPlugin({ prefix: 'MRD', version: '1.2.3', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], source: __filename })
+@JSPlugin({ prefix: 'MRD', version: '1.3.0', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], source: __filename })
 export class MiaoReward extends interfaces.Plugin {
   private serverInfo: any
   private cacheBindUuid = ''
@@ -73,10 +73,11 @@ export class MiaoReward extends interfaces.Plugin {
   private server: server.Server
   @Autowired()
   private taskManager: task.TaskManager
+  @optional()
   @Autowired()
   private channel: channel.Channel
   @Autowired()
-  private bungee: channel.proxy.BungeeCord
+  private bungee: proxy.BungeeCord
 
   @Config()
   private config = {
@@ -240,6 +241,9 @@ export class MiaoReward extends interfaces.Plugin {
             } else if (result.data.status == "cancel") {
               this.chat.sendTitle(sender, '§c已取消授权')
               cancel?.()
+            } else if (result.data.status == "scaned") {
+              this.chat.sendTitle(sender, '§c授权操作超时')
+              cancel?.()
             } else {
               this.chat.sendTitle(sender, "§c未知的结果", result.data.status)
             }
@@ -269,7 +273,7 @@ export class MiaoReward extends interfaces.Plugin {
         return true
       }
     }
-    if (this.drawCooldown.has(sender.getName()) && !sender.isOp()) {
+    if (this.drawCooldown.has(sender.getName()) && !sender.hasPermission('mrd.admin')) {
       let leftTime = cooldown - (Date.now() - this.drawCooldown.get(sender.getName())) / 1000
       if (leftTime > 0) {
         this.logger.sender(sender, `§c扫码功能冷却中 剩余 ${leftTime} 秒!`)
@@ -340,7 +344,7 @@ export class MiaoReward extends interfaces.Plugin {
     this.taskManager.create(() => {
       let command = this.config.drawCommand.replace('%player_name%', sender.getName()).replace('%amount%', draw.data)
       if (!this.server.dispatchConsoleCommand(command)) {
-        return this.sendError(sender, '§6执行命令 §3/' + command + ' §c可能存在异常')
+        return this.sendError(sender, ...draw.msg.split('\n'), `§6执行结果: §4已扣除 §c${amount} §4喵币`, `§6执行命令: §3/${command} §c可能存在异常`)
       }
       this.logger.sender(sender, draw.msg.split('\n'))
       this.sendBroadcast(sender, `${this.config.prefix}§6玩家 §b${sender.getName()} §6成功将 §a${amount}喵币 §6兑换成 §c${draw.data}点券!`)
@@ -348,10 +352,10 @@ export class MiaoReward extends interfaces.Plugin {
     }).submit()
   }
 
-  private sendError(sender, error) {
+  private sendError(sender: any, ...error: string[]) {
     return this.logger.sender(sender, [
       `§c========== ${this.config.prefix}§4兑换异常 §c==========`,
-      error,
+      ...error,
       `§6异常账号: §b${sender.getName()}`,
       `§6异常时间: §a${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
       `§c如果喵币被扣除且未得到奖励 请截图发往QQ群!`,
@@ -411,17 +415,31 @@ export class MiaoReward extends interfaces.Plugin {
       ])
     }
     if (confirm != 'confirm') return this.logger.sender(sender, `§6请执行 §b/mrd ratio §c${ratio} §econfirm §c确认修改!`)
-    let result = this.httpPost(`https://reward.yumc.pw/server/ratio`, {
-      id: this.config.serverId,
-      token: this.config.serverToken,
-      ratio
+    if (this.bindCheck(sender, 60)) return
+    this.scanAuth(sender, "ratio", {
+      title: `是否授权 ${this.serverInfo.name} 调整兑换比例`,
+      content: [
+        `操作玩家: ${sender.getName()}`,
+        `调整前: ${this.serverInfo.ratio}`,
+        `调整后: ${msg.replace(/§./ig, '')}`,
+        '调整结果实时生效!',
+        '跨服端 将自动同步比例!',
+        '非跨服端 请重载插件同步比例!'
+      ].join('\n')
+    }, (token) => {
+      let result = this.httpPost(`https://reward.yumc.pw/server/ratio`, {
+        id: this.config.serverId,
+        token: this.config.serverToken,
+        ratio,
+        userToken: token
+      })
+      if (result.code !== 200) {
+        return this.logger.sender(sender, `§4操作异常 §6服务器返回: §c${result.msg}`)
+      }
+      this.logger.sender(sender, `§a操作成功 §6服务器返回: §a${result.msg}`)
+      this.updateServerInfo(sender)
+      this.sendBroadcast(sender, `${this.config.prefix} §6当前兑换比例已调整为 ` + msg)
     })
-    if (result.code !== 200) {
-      return this.logger.sender(sender, `§4操作异常 §6服务器返回: §c${result.msg}`)
-    }
-    this.logger.sender(sender, `§a操作成功 §6服务器返回: §a${result.msg}`)
-    this.updateServerInfo(sender)
-    this.sendBroadcast(sender, `${this.config.prefix} §6当前兑换比例已调整为 ` + msg)
   }
 
   private ratio2string(ratio) {
@@ -454,9 +472,9 @@ export class MiaoReward extends interfaces.Plugin {
       if (check.code == 200) {
         this.config.serverId = check.data.serverId
         this.config.serverToken = check.data.serverToken
-        // @ts-ignore
-        this.config.save()
+        this.config['save']()
         this.logger.sender(sender, '§a已成功绑定服务器: §b' + check.data.serverName)
+        this.updateServerInfo()
       }
       sync.scaned = true
     }).async().submit()
@@ -514,6 +532,7 @@ export class MiaoReward extends interfaces.Plugin {
   }
 
   private queryUser(sender: org.bukkit.entity.Player, sync = false) {
+    if (!this.config.serverId || !this.config.serverToken) { return this.logger.sender(sender, '§4当前服务器尚未配置绑定ID 请联系腐竹进行配置!') }
     return this.httpPost(`https://reward.yumc.pw/server/queryUser`, {
       id: this.config.serverId,
       token: this.config.serverToken,
