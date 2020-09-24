@@ -430,7 +430,7 @@ return ''+ eval(${JSON.stringify(code)});`)
                     version: plugin.description.version,
                     source: base.read((plugin.description.source || plugin.description.loadMetadata.file).toString())
                 })
-                this.i18n(sender, result.code == 200 ? 'deploy.success' : 'deploy.fail', { name, msg: result.msg })
+                this.i18n(sender, result.code == 200 ? 'deploy.success' : 'deploy.fail', { name, version: plugin.description.version, msg: result.msg })
             }
         }).async().submit()
     }
@@ -445,7 +445,7 @@ return ''+ eval(${JSON.stringify(code)});`)
     }
 
     @Tab({ alias: ['gmspm', 'bungeemspm'] })
-    tabmspm(args: string | any[]) {
+    tabmspm(_sender: any, _command: any, args: string | any[]) {
         if (args.length === 1) { return ['list', 'install', 'update', 'upgrade', 'reload', 'restart', 'run', 'help', 'create', 'deploy'] }
         if (args.length > 1) {
             switch (args[0]) {

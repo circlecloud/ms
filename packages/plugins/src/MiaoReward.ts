@@ -197,7 +197,7 @@ export class MiaoReward extends interfaces.Plugin {
   }
 
   disable() {
-    this.server.getOnlinePlayers().forEach(p => this.checkAndClear(p))
+    Java.from(this.server.getOnlinePlayers()).forEach(p => this.checkAndClear(p))
     this.channelOff?.off()
   }
 
