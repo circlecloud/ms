@@ -14,6 +14,10 @@ export class BukkitChat extends chat.Chat {
         this.sendJson(sender, { text: message }, 2)
     }
     sendTitle(sender: any, title: string, subtitle: string = '', fadeIn: number = 20, time: number = 100, fadeOut: number = 20) {
-        sender.sendTitle(title, subtitle, fadeIn, time, fadeOut)
+        try {
+            sender.sendTitle(title, subtitle, fadeIn, time, fadeOut)
+        } catch (error) {
+            sender.sendTitle(title, subtitle)
+        }
     }
 }
