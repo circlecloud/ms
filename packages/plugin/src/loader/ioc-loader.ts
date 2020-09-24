@@ -1,5 +1,5 @@
 import { plugin, server } from "@ccms/api"
-import { inject, ContainerInstance, Container, provideSingletonNamed } from "@ccms/container"
+import { inject, ContainerInstance, Container, provideSingletonNamed, Autowired } from "@ccms/container"
 
 import { interfaces } from "../interfaces"
 import { getPluginStageMetadata, getPluginSources } from "../utils"
@@ -11,7 +11,7 @@ export class IocLoader implements plugin.PluginLoader {
     type: string = LOADER_TYPE_NAME
     @inject(ContainerInstance)
     private container: Container
-    @inject(server.ServerChecker)
+    @Autowired()
     private serverChecker: server.ServerChecker
 
     private pluginMetadataMap: Map<string, plugin.PluginMetadata>
@@ -69,7 +69,7 @@ export class IocLoader implements plugin.PluginLoader {
                 console.i18n('ms.plugin.manager.build.duplicate', { exists: pluginInstance.description.source, source: metadata.source })
             }
             this.container.rebind(plugin.Plugin).to(metadata.target).inSingletonScope().whenTargetNamed(metadata.name)
-        } catch{
+        } catch {
             this.container.bind(plugin.Plugin).to(metadata.target).inSingletonScope().whenTargetNamed(metadata.name)
         }
     }

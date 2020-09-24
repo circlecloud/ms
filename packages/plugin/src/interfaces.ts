@@ -75,5 +75,13 @@ export namespace interfaces {
          * 是否为只读(关闭时将不会自动保存)
          */
         readonly?: boolean
+        /**
+         * 配置文件名称
+         */
+        filename?: string
+        /**
+         * 配置文件全路径
+         */
+        file?: any
     }
 }

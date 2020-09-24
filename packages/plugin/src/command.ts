@@ -1,17 +1,17 @@
 import { command, plugin, server } from '@ccms/api'
-import { provideSingleton, inject } from '@ccms/container'
+import { provideSingleton, inject, Autowired } from '@ccms/container'
 import { getPluginCommandMetadata, getPluginTabCompleterMetadata } from './utils'
 
 @provideSingleton(PluginCommandManager)
 export class PluginCommandManager {
-    @inject(server.ServerChecker)
-    private ServerChecker: server.ServerChecker
-    @inject(command.Command)
+    @Autowired()
     private CommandManager: command.Command
+    @Autowired()
+    private ServerChecker: server.ServerChecker
 
     constructor() {
-        process.on('plugin.before.enable', (plugin: plugin.Plugin) => this.registryCommand(plugin))
-        process.on('plugin.after.disable', (plugin: plugin.Plugin) => this.unregistryCommand(plugin))
+        process.on('plugin.before.enable', this.registryCommand.bind(this))
+        process.on('plugin.after.disable', this.unregistryCommand.bind(this))
     }
 
     private registryCommand(pluginInstance: plugin.Plugin) {

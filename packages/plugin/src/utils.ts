@@ -14,7 +14,7 @@ function getPlugin(name: string) {
 
 function getPluginSources() {
     let pluginSources: Map<string, plugin.PluginMetadata> = Reflect.getMetadata(
-        METADATA_KEY.souece,
+        METADATA_KEY.source,
         Reflect
     ) || pluginSourceCache
     return pluginSources
