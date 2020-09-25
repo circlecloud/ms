@@ -81,7 +81,6 @@ export function config(metadata: interfaces.ConfigMetadata = {}) {
         let previousMetadata = getPluginConfigMetadata(target)
         previousMetadata.set(metadata.name, metadata)
         Reflect.defineMetadata(METADATA_KEY.config, previousMetadata, target.constructor)
-        Reflect.defineMetadata(METADATA_KEY.config, metadata, target[key])
     }
 }
 
