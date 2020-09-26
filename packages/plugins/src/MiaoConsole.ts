@@ -250,7 +250,7 @@ export class MiaoConsole extends interfaces.Plugin {
             client.emit('log', `§6命令: §b${cmd} §a执行成功!`)
         })
         client.on('tabComplate', (input, index, callback) => {
-            callback?.(this.command.tabComplete(this.server.getConsoleSender(), input, index))
+            callback?.(this.command.tabComplete(this.server.getConsoleSender(), input, index) || [])
         })
         client.on('exec', (code) => {
             try {

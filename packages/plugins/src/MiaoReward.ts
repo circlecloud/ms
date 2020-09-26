@@ -54,7 +54,7 @@ interface PlaceholderAPI {
   setPlaceholders: (player: any, str: string) => string
 }
 
-@JSPlugin({ prefix: 'MRD', version: '1.3.0', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], source: __filename })
+@JSPlugin({ prefix: 'MRD', version: '1.3.1', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], source: __filename })
 export class MiaoReward extends interfaces.Plugin {
   private serverInfo: any
   private cacheBindUuid = ''
@@ -67,13 +67,14 @@ export class MiaoReward extends interfaces.Plugin {
   private bindingNotify = new java.util.HashSet<org.bukkit.entity.Player>()
   private drawCooldown = new Map<string, number>()
 
+  private downgrade = false
+
   @Autowired()
   private chat: chat.Chat
   @Autowired()
   private server: server.Server
   @Autowired()
   private taskManager: task.TaskManager
-  @optional()
   @Autowired()
   private channel: channel.Channel
   @Autowired()
@@ -100,6 +101,9 @@ export class MiaoReward extends interfaces.Plugin {
     this.config.prefix = this.config.prefix || '§6[§b广告系统§6]§r'
     this.config.drawCommand = this.config.drawCommand || 'p give %player_name% %amount%'
     this.config.drawCooldown = this.config.drawCooldown || 300
+    //@ts-ignore
+    this.logger.prefix = this.config.prefix
+    this.downgrade = Bukkit.getServer().class.name.split('.')[3] == "v1_7_R4"
     this.updateServerInfo()
   }
 
@@ -215,11 +219,11 @@ export class MiaoReward extends interfaces.Plugin {
   }
 
   private scanAuth(sender: org.bukkit.entity.Player, scanType: string, scanObj: { title: string, content: string }, success: (token: string, user: any) => void, cancel?: () => void) {
-    this.chat.sendTitle(sender, this.config.prefix, '§a正在获取授权二维码...')
     this.logger.sender(sender, '§a正在获取授权二维码...')
     let scan = this.httpPost('https://reward.yumc.pw/auth/scan', { ...scanObj, type: scanType })
     if (scan.code == 200) {
       let sync = { scaned: false }
+      this.logger.sender(sender, `§a授权二维码获取成功 §c如地图无法扫描 §6请点击链接\n§3§n${scan.data.qrcode}`)
       this.taskManager.create(() => {
         let result = this.httpPost('https://reward.yumc.pw/auth/scanCheck', {
           token: scan.data.token,
@@ -228,7 +232,7 @@ export class MiaoReward extends interfaces.Plugin {
         })
         sync.scaned = true
         if (result.code == 200 && result.data.status == "scaned") {
-          this.chat.sendTitle(sender, "§3已扫码", "§a请在手机上确认")
+          this.sendTitle(sender, "§3已扫码", "§a请在手机上确认")
           let result = this.httpPost('https://reward.yumc.pw/auth/scanCheck', {
             token: scan.data.token,
             type: scanType,
@@ -236,25 +240,25 @@ export class MiaoReward extends interfaces.Plugin {
           })
           if (result.code == 200) {
             if (result.data.status == "confirm") {
-              this.chat.sendTitle(sender, '§3扫码完成')
+              this.sendTitle(sender, '§3扫码完成')
               success(scan.data.token, result.data.user)
             } else if (result.data.status == "cancel") {
-              this.chat.sendTitle(sender, '§c已取消授权')
+              this.sendTitle(sender, '§c已取消授权')
               cancel?.()
             } else if (result.data.status == "scaned") {
-              this.chat.sendTitle(sender, '§c授权操作超时')
+              this.sendTitle(sender, '§c授权操作超时')
               cancel?.()
             } else {
-              this.chat.sendTitle(sender, "§c未知的结果", result.data.status)
+              this.sendTitle(sender, "§c未知的结果", result.data.status)
             }
           } else {
-            this.chat.sendTitle(sender, "§4扫码异常", result.msg)
+            this.sendTitle(sender, "§4扫码异常", result.msg)
           }
         }
         sync.scaned = true
       }).async().submit()
       this.setItemAndTp(sender, scan.data.url, sync)
-      this.chat.sendTitle(sender, '')
+      this.sendTitle(sender, '')
     } else {
       this.logger.sender(sender, '§4授权二维码获取失败!')
     }
@@ -510,6 +514,21 @@ export class MiaoReward extends interfaces.Plugin {
     this.setItemAndTp(sender, bindUrl, sync)
   }
 
+  private sendActionBar(sender, message) {
+    if (!this.downgrade) {
+      this.chat.sendActionBar(sender, message)
+    }
+  }
+
+  private sendTitle(sender, title, subtitle?) {
+    if (!title) return
+    if (this.downgrade) {
+      this.logger.sender(sender, `${title}${subtitle ? ` ${subtitle}` : ''}`)
+    } else {
+      this.chat.sendTitle(sender, title, subtitle)
+    }
+  }
+
   private setItemAndTp(sender: org.bukkit.entity.Player, content: string, sync: { scaned: boolean }) {
     this.taskManager.create(() => {
       this.bindingLeftTime = 30
@@ -517,20 +536,35 @@ export class MiaoReward extends interfaces.Plugin {
         try {
           if (sync.scaned || !sender.isOnline() || !this.isHoldQrCodeItem(sender) || --this.bindingLeftTime < 0) {
             if (this.bindingLeftTime < 0) {
-              this.logger.sender(sender, '§c二维码已过期 请重新获取!')
+              this.logger.sender(sender, '§c二维码已过期 请重新获取 如已扫码请忽略!')
             }
             this.cancelTask(sender)
             return
           }
-          this.chat.sendActionBar(sender, `§c§l手机QQ扫描二维码 剩余 ${this.bindingLeftTime} 秒...`)
+          this.sendActionBar(sender, `§c§l手机QQ扫描二维码 剩余 ${this.bindingLeftTime} 秒...`)
         } catch (error) {
           console.ex(error)
         }
       }).async().later(20).timer(20).submit()
       sender.setItemInHand(this.createQrCodeMapItem(content))
-      let temp = sender.getLocation()
-      temp.setPitch(90)
-      sender.teleport(temp)
+      if (this.downgrade) {
+        this.logger.sender(sender, '§c低版本客户端 二维码渲染中 请等待 6 秒 稍候扫码!')
+        let waitTask = this.taskManager.create(() => {
+          let temp = sender.getLocation()
+          temp.setPitch(-90)
+          sender.teleport(temp)
+        }).later(20).timer(20).submit()
+        this.taskManager.create(() => {
+          waitTask.cancel()
+          let temp = sender.getLocation()
+          temp.setPitch(90)
+          sender.teleport(temp)
+        }).later(150).submit()
+      } else {
+        let temp = sender.getLocation()
+        temp.setPitch(90)
+        sender.teleport(temp)
+      }
     }).submit()
   }
 
@@ -623,7 +657,9 @@ CAST TIME   : ${Date.now() - startTime}`)
     let item: org.bukkit.inventory.ItemStack
     item = new ItemStack(Material.FILLED_MAP || Material.MAP)
     let meta = <org.bukkit.inventory.meta.MapMeta>item.getItemMeta()
-    if (meta.setMapId) {
+    if (meta.setMapView) {
+      meta.setMapView(this.zeroMapView)
+    } else if (meta.setMapId) {
       meta.setMapId(this.zeroMapView.getId())
     } else {
       item.setDurability(this.zeroMapView.getId())
@@ -720,7 +756,7 @@ CAST TIME   : ${Date.now() - startTime}`)
     this.bindingTask = undefined
     this.bindingUser = 'unknow'
     this.checkAndClear(player)
-    this.chat.sendActionBar(player, "")
+    this.sendActionBar(player, "")
     this.zeroMapRender.setImage(undefined)
     //@ts-ignore
     this.bindingNotify.forEach(p => {

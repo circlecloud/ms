@@ -170,11 +170,6 @@ export class MiaoChat extends interfaces.Plugin {
                 return string
             }
         }
-        if (!this.chat) {
-            this.logger.console('§4消息管理器注入失败 请检查当前服务器是否兼容...')
-            this.AsyncPlayerChatEvent['off']()
-            this.MessageChannelEvent$Chat['off']()
-        }
     }
 
     disable() {
@@ -182,6 +177,10 @@ export class MiaoChat extends interfaces.Plugin {
     }
 
     bukkitenable() {
+        if (!this.chat) {
+            this.logger.console('§4消息管理器注入失败 请检查当前服务器是否兼容...')
+            this.AsyncPlayerChatEvent['off']()
+        }
         // 尝试加载 Bukkit 的 PlaceholderAPI
         try {
             //@ts-ignore
@@ -193,6 +192,10 @@ export class MiaoChat extends interfaces.Plugin {
     }
 
     spongeenable() {
+        if (!this.chat) {
+            this.logger.console('§4消息管理器注入失败 请检查当前服务器是否兼容...')
+            this.MessageChannelEvent$Chat['off']()
+        }
         // 尝试加载 Sponge 的 PlaceholderAPI
         try {
             var spongePapi = this.Server.getService('me.rojo8399.placeholderapi.PlaceholderService')
