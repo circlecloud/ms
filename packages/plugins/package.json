@@ -20,9 +20,9 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "devDependencies": {
-        "@javatypes/spring-data-redis": "^0.0.2",
-        "@javatypes/spring-web": "^0.0.2",
-        "@javatypes/tomcat": "^0.0.2",
+        "@javatypes/spring-data-redis": "^0.0.3",
+        "@javatypes/spring-web": "^0.0.3",
+        "@javatypes/tomcat": "^0.0.3",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
         "typescript": "^4.0.3"
