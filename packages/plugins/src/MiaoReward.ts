@@ -51,10 +51,18 @@ class QRCodeRender {
 
 interface PlaceholderAPI {
   registerPlaceholderHook: (key: string, onPlaceholderRequest: (player, s) => string) => void
+  unregisterPlaceholderHook: (key: string) => void
   setPlaceholders: (player: any, str: string) => string
 }
 
-@JSPlugin({ prefix: 'MRD', version: '1.3.1', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], source: __filename })
+interface UserInfo {
+  balance: number
+  sign: string
+  video: string
+  box: string
+}
+
+@JSPlugin({ prefix: 'MRD', version: '1.3.2', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], source: __filename })
 export class MiaoReward extends interfaces.Plugin {
   private serverInfo: any
   private cacheBindUuid = ''
@@ -66,6 +74,7 @@ export class MiaoReward extends interfaces.Plugin {
   private bindingLeftTime = 45
   private bindingNotify = new java.util.HashSet<org.bukkit.entity.Player>()
   private drawCooldown = new Map<string, number>()
+  private playerInfoCache = new Map<string, UserInfo>()
 
   private downgrade = false
 
@@ -105,6 +114,7 @@ export class MiaoReward extends interfaces.Plugin {
     this.logger.prefix = this.config.prefix
     this.downgrade = Bukkit.getServer().class.name.split('.')[3] == "v1_7_R4"
     this.updateServerInfo()
+    this.updatePlayerInfo()
   }
 
   private updateServerInfo(player?: any) {
@@ -122,6 +132,17 @@ export class MiaoReward extends interfaces.Plugin {
     }).async().submit()
   }
 
+  private updatePlayerInfo(player?: any) {
+    this.taskManager.create(() => {
+      Java.from(this.server.getOnlinePlayers()).forEach(p => {
+        let info = this.queryUser(p)
+        if (info.code == 200) {
+          this.playerInfoCache.set(p.getName(), info.data)
+        }
+      })
+    }).async().submit()
+  }
+
   @JSClass('com.google.common.io.ByteStreams')
   private ByteStreams: any
 
@@ -135,7 +156,6 @@ export class MiaoReward extends interfaces.Plugin {
     this.channelOff = this.channel?.listen(this, 'BungeeCord', (data) => {
       if (!this.isBungeeCord) {
         this.isBungeeCord = true
-        this.PlayerJoinEvent['off']()
       }
       let input = this.ByteStreams.newDataInput(data)
       let subChannel = input.readUTF()
@@ -151,15 +171,6 @@ export class MiaoReward extends interfaces.Plugin {
     })
     let players = this.server.getOnlinePlayers()
     if (players.length) this.bungeeCordDetect(players[0])
-  }
-
-  cmdrun(sender: any, ...args: any[]) {
-    try {
-      let tfunc = new Function(`return '§a返回结果: §r'+ eval(${JSON.stringify(args.join(' '))});`)
-      this.logger.sender(sender, tfunc.apply(this) + '')
-    } catch (ex) {
-      this.logger.sender(sender, this.logger.stack(ex))
-    }
   }
 
   private readForward(input) {
@@ -179,12 +190,20 @@ export class MiaoReward extends interfaces.Plugin {
     } else {
       this.PlaceholderAPI.registerPlaceholderHook("mrd", new this.PlaceholderHook({
         onPlaceholderRequest: (player: any, s: string) => {
+          if (!this.playerInfoCache.has(player.getName())) {
+            return '用户未绑定'
+          }
+          let data = this.playerInfoCache.get(player.getName())
           switch (s.toLowerCase()) {
-            case "server":
-            case "bserver":
+            case "balance":
+              return data.balance
+            case "sign":
+              return data.sign
+            case "box":
+              return data.box
             default:
           }
-          return "未知的参数"
+          return "未知的参数: " + s
         }
       }))
     }
@@ -201,6 +220,7 @@ export class MiaoReward extends interfaces.Plugin {
   }
 
   disable() {
+    this.PlaceholderAPI.unregisterPlaceholderHook("mrd")
     Java.from(this.server.getOnlinePlayers()).forEach(p => this.checkAndClear(p))
     this.channelOff?.off()
   }
@@ -267,7 +287,7 @@ export class MiaoReward extends interfaces.Plugin {
   private bindCheck(sender: org.bukkit.entity.Player, cooldown: number) {
     if (this.isBinding) {
       let bindUser = Bukkit.getPlayerExact(this.bindingUser)
-      if (bindUser && bindUser.isOnline() && this.isQrCodeItem(bindUser.getItemInHand())[0]) {
+      if (bindUser && bindUser.isOnline() && this.isHoldQrCodeItem(bindUser)) {
         this.bindingNotify.add(sender)
         this.logger.sender(sender, [
           "§c当前 §a" + this.bindingUser + " §c玩家正在扫码",
@@ -580,14 +600,15 @@ export class MiaoReward extends interfaces.Plugin {
   }
 
   cmdquery(sender: org.bukkit.entity.Player) {
-    let check = this.queryUser(sender)
-    if (check.code !== 200) {
-      return this.logger.sender(sender, '§4查询异常! §cError: ' + check.msg)
+    let info = this.queryUser(sender)
+    if (info.code !== 200) {
+      return this.logger.sender(sender, '§4查询异常! §cError: ' + info.msg)
     }
-    this.sendResult(sender, '查询结果', check.data)
+    this.sendResult(sender, '查询结果', info.data)
   }
 
   private sendResult(sender: any, title: string, data: any) {
+    this.playerInfoCache.set(sender.getName(), data)
     this.logger.sender(sender, [
       `§6====== ${this.config.prefix} §a${title} §6======`,
       `§6用 户 名: §a${sender.getName()}`,
@@ -611,47 +632,6 @@ RESPONSE    : ${JSON.stringify(result)}
 CAST TIME   : ${Date.now() - startTime}`)
     return result
   }
-
-  // var server = container.get(api.server.Server)
-  // var console = server.getDedicatedServer()
-  // var mainWorld = reflect.on(console).get('field_71305_c').get()[0]
-  // 设置新的Data
-  // mapdata = new MapData(s);
-  // mapdata.field_76197_d = (byte)3;
-  // mapdata.func_176054_a((double)worldIn.func_72912_H().func_76079_c(), (double)worldIn.func_72912_H().func_76074_e(), (int)mapdata.field_76197_d);
-  // mapdata.field_76200_c = ((WorldServer)worldIn).dimension;
-  // mapdata.func_76185_a();
-  // worldMain.func_72823_a(s, (WorldSavedData)mapdata);
-  // s = "map_" + stack.getMetadata();
-  // mapdata = new MapData(s);
-  // mapdata.scale = 3;
-  // mapdata.calculateMapCenter((double)worldIn.getWorldInfo().getSpawnX(), (double)worldIn.getWorldInfo().getSpawnZ(), mapdata.scale);
-  // // mapdata.dimension = worldIn.provider.getDimension();
-  // mapdata.dimension = ((WorldServer) worldIn).dimension; // CraftBukkit - fixes Bukkit multiworld maps
-  // mapdata.markDirty();
-  // worldMain.setData(s, mapdata);
-  // var mapStorage = mainWorld.field_72988_C
-
-  // var loadedDataMap = reflect.on(mapStorage).get('field_75749_b').get()
-  // var loadedDataList = reflect.on(mapStorage).get('field_75750_c').get()
-  // var idCounts = reflect.on(mapStorage).get('field_75748_d').get()
-
-  // @Override
-  // public CraftMapView createMap(World world) {
-  //     Validate.notNull((Object)world, (String)"World cannot be null", (Object[])new Object[0]);
-  //     net.minecraft.item.ItemStack stack = new net.minecraft.item.ItemStack((Item)Items.field_151148_bJ, 1, -1);
-  //     MapData worldmap = Items.field_151098_aY.func_77873_a(stack, (net.minecraft.world.World)((CraftWorld)world).getHandle());
-  //     return worldmap.mapView;
-  // }
-  //net.minecraft.item.ItemMap
-  // @Override
-  // public CraftMapView createMap(World world) {
-  //     Validate.notNull(world, "World cannot be null");
-
-  //     net.minecraft.item.ItemStack stack = new net.minecraft.item.ItemStack(Items.MAP, 1, -1, true); // CatServer
-  //     MapData worldmap = Items.FILLED_MAP.getMapData(stack, ((CraftWorld) world).getHandle());
-  //     return worldmap.mapView;
-  // }
 
   private createQrCodeMapItem(content: string) {
     let item: org.bukkit.inventory.ItemStack
@@ -679,15 +659,6 @@ CAST TIME   : ${Date.now() - startTime}`)
     let qrcode = this.js2qr(content)
     let startPoint = Math.round((bufferedImage.getWidth() - qrcode.getWidth()) / 2)
     graphics2D.drawImage(qrcode, startPoint, startPoint, null)
-    // let font = new Font("DejaVuSans", Font.PLAIN, 10)
-    // graphics2D.setFont(font)
-    // let fm = graphics2D.getFontMetrics(font)
-    // let text = "Use QQ Scan Bind!"
-    // let textWidth = fm.stringWidth(text)
-    // let widthX = (128 - textWidth) / 2
-    // graphics2D.setColor(Color.BLACK)
-    // graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB)
-    // graphics2D['drawString(java.lang.String, int, int)'](text, Math.round(widthX), 122)
     graphics2D.dispose()
     return bufferedImage
   }
@@ -714,13 +685,17 @@ CAST TIME   : ${Date.now() - startTime}`)
 
   @Listener()
   PlayerJoinEvent(event: org.bukkit.event.player.PlayerJoinEvent) {
-    this.bungeeCordDetect(event.getPlayer())
+    const player = event.getPlayer()
+    this.bungeeCordDetect(player)
+    let info = this.queryUser(player)
+    if (info.code == 200) {
+      this.playerInfoCache.set(player.getName(), info.data)
+    }
   }
 
   @Listener()
   PlayerDropItemEvent(event: org.bukkit.event.player.PlayerDropItemEvent) {
-    let [cancelled, id] = this.isQrCodeItem(event.getItemDrop().getItemStack())
-    if (id != null && id != undefined && cancelled) {
+    if (this.isQrCodeItem(event.getItemDrop().getItemStack())) {
       event.getItemDrop().remove()
     }
   }
@@ -728,8 +703,7 @@ CAST TIME   : ${Date.now() - startTime}`)
   @Listener()
   PlayerItemHeldEvent(event: org.bukkit.event.player.PlayerItemHeldEvent) {
     let inv = event.getPlayer().getInventory()
-    let [cancelled, id] = this.isQrCodeItem(inv.getItem(event.getPreviousSlot() as any))
-    if (id != null && id != undefined && cancelled) {
+    if (this.isQrCodeItem(inv.getItem(event.getPreviousSlot() as any))) {
       inv.setItem(event.getPreviousSlot(), null)
     }
   }
@@ -737,8 +711,7 @@ CAST TIME   : ${Date.now() - startTime}`)
   @Listener()
   InventoryClickEvent(event: org.bukkit.event.inventory.InventoryClickEvent) {
     let item = event.getCurrentItem()
-    let [cancelled, id] = this.isQrCodeItem(item)
-    if (id != null && id != undefined && cancelled) {
+    if (this.isQrCodeItem(item)) {
       event.getInventory().setItem(event.getSlot(), null)
       event.setCancelled(true)
     }
@@ -767,7 +740,7 @@ CAST TIME   : ${Date.now() - startTime}`)
   }
 
   private isHoldQrCodeItem(player: org.bukkit.entity.Player) {
-    return this.isQrCodeItem(player.getItemInHand())[0]
+    return this.isQrCodeItem(player.getItemInHand())
   }
 
   private checkAndClear(player: org.bukkit.entity.Player) {
@@ -776,13 +749,12 @@ CAST TIME   : ${Date.now() - startTime}`)
     }
   }
 
-  private isQrCodeItem(item: org.bukkit.inventory.ItemStack): [boolean, number?] {
-    if (!item) { return [false] }
-    if ((item?.getType() == Material.MAP || item?.getType() == Material.FILLED_MAP) && item.hasItemMeta()) {
-      let meta = item.getItemMeta()
-      return [!!(Java.from(meta.getLore()).indexOf('QRCODE') != -1), item.getDurability()]
+  private isQrCodeItem(item: org.bukkit.inventory.ItemStack): boolean {
+    if (!item) { return false }
+    if ((item.getType() == Material.MAP || item.getType() == Material.FILLED_MAP) && item.hasItemMeta()) {
+      return Java.from(item.getItemMeta().getLore()).indexOf('QRCODE') != -1
     }
-    return [false]
+    return false
   }
 
   cmdhelp(sender: any) {
