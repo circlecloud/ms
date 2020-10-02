@@ -42,15 +42,21 @@
 
 ### 基础准备工作
 - QQ搜索小程序 `圈云盒子` 并登录
-- 申请内测服务器账号 个人中心 => 配置面板 => 圈云盒子客服群 加群申请
+- 申请内测服务器账号
+  - 个人中心 => 配置面板 => 圈云盒子客服群
+  - 打开群详情 加群
+
+### 接下来就是赚钱的操作
 
 ### 服务器准备工作
-- 先安装 `MiaoScript` [站内地址]()
+- 打开 [圈云盒子管理后台](https://reward.yumc.pw)
+- 先安装 `MiaoScript` [站内地址](https://www.mcbbs.net/thread-774401-1-1.html)
   - 可以通过 Yum 快速安装 `/yum install MiaoScript`
 - 等待 MiaoScript 引擎启动完成(首次启动可能需要10-20秒 依赖于您的网络环境)
 - 执行 `/mspm install MiaoReward`
 
 ### 绑定服务器
+- 由于当前框架存在BUG 请先执行 `/mspm reload MiaoReward` 生成配置文件
 - 执行 `/mrd bind server`
 - 使用QQ扫码
 - 选择需要绑定的服务器
@@ -59,7 +65,11 @@
 - 执行 `/mrd ratio 0.001` (最低为 1:0.0001)
 - 执行兑换比例确认指令
 - 执行 `/mrd server` 查看服务器信息
-- 如需绑定多台 可以直接复制绑定之后的 `MiaoScript/plugins/MiaoReward/config.yml` 文件到多台服务器上 然后 `/mrd reload` 重载插件
+- 如果群组服需要绑定多台服务器(前提是每个服务器都有玩家在)
+  - 执行 `/gmspm install MiaoReward` 批量安装
+  - 可以直接复制绑定之后的 `MiaoScript/plugins/MiaoReward/config.yml`
+  - 黏贴配置文件到所有需要绑定的服务器上
+  - 然后 `/gmspm reload MiaoReward` 批量重载插件
 
 ### QQ群配置
 - 打开小程序
@@ -72,6 +82,7 @@
 - 执行 `/mrd bind`
 - 使用QQ扫码
 - 完成绑定
+- 执行 `/mrd query` 查询信息
 
 ## 使用说明
 - 玩家可以通过下列方式获取喵币
@@ -82,13 +93,21 @@
 - 腐竹可以在平台将喵币兑换成RMB(兑换比例请加群联系客服详谈)
 - 登录小程序后 个人中心 => 配置面板 => 圈云盒子客服群
 
+## PAPI兼容
+- 目前已经兼容 PAPI 变量
+  - `%mrd_balance%` 玩家喵币
+  - `%mrd_sign%` 玩家签到(*/1)
+  - `%mrd_video%` 玩家视频观看次数(*/300)
+  - `%mrd_box%` 玩家盒子观看次数(*/300)
+- 如果玩家变量没有及时更新 执行 `/mrd query` 或 `重新登录游戏` 即可
+
 ## 配置文件
 
-``` yaml
+```yml
 # 服务器ID
-serverId: '16'
+serverId: 16
 # 服务器Token
-serverToken: d50d3f6e-2a59-460a-2b29-82b66c4bbf52
+serverToken: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
 # 兑换指令
 drawCommand: 'p give %player_name% %amount%'
 # 冷却时间
@@ -96,6 +115,10 @@ drawCooldown: 300
 # 提示前缀
 prefix: '§6[§b广告系统§6]§r'
 ```
+
+## 插件源码
+
+- [MiaoScript包管理中心](http://ms.yumc.pw/api/plugin/download/name/MiaoReward)
 
 ## Roadmap
 - 绑定服务器(已完成)

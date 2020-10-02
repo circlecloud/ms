@@ -47,6 +47,7 @@ let langMap = {
     'download.start': '§6开始下载插件: §b{name} §6版本 §3{version}',
     'download.url': '§6插件下载地址: §b{url}',
     'download.finish': '§6插件 §b{name} §6版本 §3{version} §a下载完毕 开始加载 ...',
+    'install.already': '§6插件 §b{name} §6版本 §3{version} §c已安装在服务器 §3更新请用 update 命令!',
     'install.finish': '§6插件 §b{name} §6版本 §3{version} §a安装成功!',
     'update.finish': '§6插件 §b{name} §6版本 §3{version} §a更新成功!',
     'upgrade.confirm': '§6您正在尝试更新 §bMiaoScript §c核心 §6请执行 §b/mpm §aupgrade §cconfirm §6确认执行!',
@@ -177,7 +178,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         let message = JSON.parse(input.readUTF())
         let fakeSender = this.getProxySender(message.sender)
         this.taskManager.create(() => this.main(fakeSender, message.command, message.args)).async().submit()
-        this.logger.sender(fakeSender, `§6命令 §b/mpm ${message.args?.join?.(' ')} §a执行成功!`)
+        this.logger.sender(fakeSender, `§6命令 §b/mspm ${message.args?.join?.(' ')} §a执行成功!`)
     }
 
     private getProxySender(name: string) {
@@ -224,7 +225,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         if (!this.isBungeeCord) return this.logger.sender(sender, '§c当前服务器尚未检测到 BungeeCord 链接...')
         this.taskManager.create(() => this.main(sender, command, args)).async().submit()
         this.bungeeCordForward(sender, { sender: sender.getName(), command, args })
-        this.logger.sender(sender, `§6[§3BPM§6][§a${this.serverName}§6] §6命令 §b/mpm ${args.join?.(' ')} §a发布成功!`)
+        this.logger.sender(sender, `§6[§3BPM§6][§a${this.serverName}§6] §6命令 §b/mspm ${args.join?.(' ')} §a发布成功!`)
     }
 
     @Cmd({ servers: [constants.ServerType.Bungee] })
@@ -264,6 +265,18 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         ])
     }
 
+    cmdsudo(sender: any, name: string, ...args: string[]) {
+        this.taskManager.create(() => {
+            let player = this.server.getPlayer(name)
+            if (!player) {
+                return this.logger.sender(sender, `§4玩家 ${player.getName()} 不在线或不存在!`)
+            }
+            let command = args.join(' ')
+            this.server.dispatchCommand(player, command)
+            this.logger.sender(sender, `§6玩家 §a${player.getName()} §6命令 §b${command} §a执行完成!`)
+        }).submit()
+    }
+
     cmdload(sender: any, name: string) {
         let pluginFile = fs.concat(__dirname + '', name)
         if (!fs.exists(pluginFile)) {
@@ -290,7 +303,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     cmdinstall(sender: any, name: string) {
         if (!name) { return this.i18n(sender, 'plugin.name.empty') }
         if (this.pluginManager.getPlugins().has(name)) {
-
+            this.i18n(sender, 'install.already', { name, version: this.pluginManager.getPlugins().get(name).description.version })
             return
         }
         this.download(sender, name, false, () => {
@@ -402,7 +415,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
             this.i18n(sender, 'prun.script', { name })
             this.i18n(sender, 'run.script', { script })
             let result = this.runCode(script, sender, this.pluginManager.getPlugins().get(name))
-            this.i18n(sender, 'run.result', { result: result == undefined ? this.translate.translate('run.noresult') : result + '' })
+            this.i18n(sender, 'run.result', { result: result == undefined ? this.translate.translate('run.noresult') : typeof result == "string" ? result : JSON.stringify(result) })
         } catch (ex) {
             this.logger.sender(sender, this.logger.stack(ex))
         }
@@ -429,8 +442,8 @@ if (this.serverType == "spring") {
     var db = dbm.getMainDatabase()
     var df = base.getInstance().getAutowireCapableBeanFactory()
 }
-return ''+ eval(${JSON.stringify(code)});`)
-        return tfunc.apply(_this, params) + ''
+return eval(${JSON.stringify(code)});`)
+        return tfunc.apply(_this, params)
     }
 
     cmddeploy(sender: any, name: any) {
@@ -460,7 +473,7 @@ return ''+ eval(${JSON.stringify(code)});`)
 
     @Tab({ alias: ['gmspm', 'bungeemspm'] })
     tabmspm(_sender: any, _command: any, args: string | any[]) {
-        if (args.length === 1) { return ['list', 'install', 'update', 'upgrade', 'reload', 'restart', 'run', 'prun', 'help', 'create', 'deploy'] }
+        if (args.length === 1) { return ['list', 'install', 'update', 'upgrade', 'reload', 'restart', 'run', 'prun', 'sudo', 'help', 'create', 'deploy'] }
         if (args.length > 1) {
             switch (args[0]) {
                 case "list":
@@ -473,6 +486,9 @@ return ''+ eval(${JSON.stringify(code)});`)
                     return []
                 case "prun":
                     if (args.length == 2) return [...this.pluginManager.getPlugins().keys()]
+                    return []
+                case "sudo":
+                    if (args.length == 2) return Java.from(this.server.getOnlinePlayers()).map(p => p.getName())
                     return []
                 case "update":
                 case "load":
