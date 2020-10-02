@@ -16,13 +16,13 @@ export class BukkitServer extends server.ReflectServer {
     }
 
     getPlayer(name: string) {
-        return Bukkit.getPlayer(name)
+        return Bukkit.getPlayerExact(name)
     }
     getVersion(): string {
         return Bukkit.getVersion()
     }
     getOnlinePlayers() {
-        return Bukkit.getOnlinePlayers() as unknown as any[]
+        return Bukkit.getOnlinePlayers()
     }
     getConsoleSender() {
         return Bukkit.getConsoleSender()
