@@ -62,14 +62,15 @@ export const JSClass = (className: string) => {
 export const Autowired = (className?: any) => {
     return function (target: any, propertyKey: string, index?: number) {
         let container = getContainer()
-        if (className instanceof Symbol || className instanceof Function) {
+        if (className && (className instanceof Symbol || className instanceof Function)) {
             return inject(className)(target, propertyKey, index)
         }
         let type = Reflect.getMetadata('design:type', target, propertyKey)
-        if (type && type !== Object) {
+        if (type && type !== Object && Java.isJavaObject(type)) {
             inject(type)(target, propertyKey, index)
             named(className || propertyKey)(target, propertyKey, index)
         } else if (container.isBound(ioc.Autowired)) {
+            console.debug('Autowired', 'ioc.Autowired', 'named', className || propertyKey)
             target[propertyKey] = container.getNamed(ioc.Autowired, className || propertyKey)
         } else {
             throw new Error(`No matching bindings found for target: ${target.constructor.name} type: ${type} named: ${className || propertyKey}`)

@@ -17,6 +17,7 @@ declare global {
         function to<T = any>(array: T[], type?: T): T[]
         function extend(...parentTypes: any[]): any
         function synchronized(func: () => void, lock: any): Function
+        function isJavaObject(obj: any): boolean
         function asJSONCompatible<T = any>(obj: T): T
         //@ts-ignore
         // function super(type: any);
