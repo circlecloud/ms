@@ -29,7 +29,6 @@ export namespace task {
             if (plugin) { return this.pluginCreate(plugin, task) }
             return task
         }
-        abstract create0(func: Function): task.Task
         /**
          * 在主线程执行代码
          * @param func 执行内容
@@ -42,7 +41,8 @@ export namespace task {
             if (plugin) { return this.pluginDisable(plugin) }
             this.disable0()
         }
-        abstract disable0()
+        protected abstract create0(func: Function): task.Task
+        protected abstract disable0()
     }
     /**
      * 任务抽象
@@ -116,7 +116,7 @@ export namespace task {
          * 提交任务
          * @param args 任务参数
          */
-        abstract submit0(...args: any[]): Cancelable
+        protected abstract submit0(...args: any[]): Cancelable
     }
     /**
      * 返可取消的对象
