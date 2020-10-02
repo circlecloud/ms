@@ -29,6 +29,18 @@ export class JsonPluginConfig implements PluginConfigLoader {
     }
 }
 
+export interface PluginConfig {
+    /**
+     * Save Config to File
+     */
+    readonly save?: () => void
+    /**
+     * Reload Config from File
+     */
+    readonly reload?: () => void
+    [key: string]: any
+}
+
 @provideSingleton(PluginConfigManager)
 export class PluginConfigManager {
     private configLoaderMap = new Map<string, PluginConfigLoader>()
@@ -50,21 +62,7 @@ export class PluginConfigManager {
     loadConfig(plugin: plugin.Plugin) {
         let configs = getPluginConfigMetadata(plugin)
         for (let [_, config] of configs) {
-            try {
-                config.file = fs.concat(fs.file(plugin.description.loadMetadata.file).parent, plugin.description.name, config.filename)
-                let configLoader = this.getConfigLoader(config.format)
-                if (!fs.exists(config.file)) {
-                    base.save(config.file, configLoader.dump(plugin[config.variable]))
-                    console.i18n("ms.plugin.manager.config.save.default", { plugin: plugin.description.name, name: config.name, format: config.format })
-                } else {
-                    Object.defineProperty(plugin, config.variable, { value: configLoader.load(base.read(config.file)) })
-                    plugin[config.variable].save = () => this.saveConfig0(plugin, config)
-                    console.debug(`[${plugin.description.name}] Load Config ${config.variable} from file ${config.file} =>\n${JSON.stringify(plugin[config.variable], undefined, 4)}`)
-                }
-            } catch (error) {
-                console.i18n("ms.plugin.manager.config.load.error", { plugin: plugin.description.name, name: config.name, format: config.format, error })
-                console.ex(error)
-            }
+            this.loadConfig0(plugin, config)
         }
     }
 
@@ -72,6 +70,33 @@ export class PluginConfigManager {
         let configs = getPluginConfigMetadata(plugin)
         for (let [_, config] of configs) {
             this.saveConfig0(plugin, config)
+        }
+    }
+
+    private defienConfigProp(plugin: plugin.Plugin, metadata: interfaces.ConfigMetadata, value: any) {
+        Object.defineProperties(value, {
+            'save': { value: () => this.saveConfig0(plugin, metadata) },
+            'reload': { value: () => this.loadConfig0(plugin, metadata) }
+        })
+        Object.defineProperty(plugin, metadata.variable, { value })
+    }
+
+    private loadConfig0(plugin: plugin.Plugin, metadata: interfaces.ConfigMetadata) {
+        try {
+            metadata.file = fs.concat(fs.file(plugin.description.loadMetadata.file).parent, plugin.description.name, metadata.filename)
+            let configLoader = this.getConfigLoader(metadata.format)
+            let value = plugin[metadata.variable]
+            if (!fs.exists(metadata.file)) {
+                base.save(metadata.file, configLoader.dump(value))
+                console.i18n("ms.plugin.manager.config.save.default", { plugin: plugin.description.name, name: metadata.name, format: metadata.format })
+            } else {
+                value = configLoader.load(base.read(metadata.file))
+                console.debug(`[${plugin.description.name}] Load Config ${metadata.variable} from file ${metadata.file} =>\n${JSON.stringify(value, undefined, 4)}`)
+            }
+            this.defienConfigProp(plugin, metadata, value)
+        } catch (error) {
+            console.i18n("ms.plugin.manager.config.load.error", { plugin: plugin.description.name, name: metadata.name, format: metadata.format, error })
+            console.ex(error)
         }
     }
 
