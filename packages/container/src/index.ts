@@ -66,7 +66,7 @@ export const Autowired = (className?: any) => {
             return inject(className)(target, propertyKey, index)
         }
         let type = Reflect.getMetadata('design:type', target, propertyKey)
-        if (type && type !== Object && Java.isJavaObject(type)) {
+        if (type && type !== Object && !Java.isJavaObject(type)) {
             inject(type)(target, propertyKey, index)
             named(className || propertyKey)(target, propertyKey, index)
         } else if (container.isBound(ioc.Autowired)) {
