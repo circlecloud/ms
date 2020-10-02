@@ -46,7 +46,7 @@ export class AmqpAdmin {
     }
 
     declareBinding(queue: string, exchange: string, routerKey: string, argument: any = null) {
-        let binding = new this.Binding(queue, this.DestinationType.QUEUE, exchange, routerKey, argument)
+        let binding = new this.Binding(queue, org.springframework.amqp.core.Binding.DestinationType.QUEUE, exchange, routerKey, argument)
         this.amqpAdmin.declareBinding(binding)
         return this
     }
