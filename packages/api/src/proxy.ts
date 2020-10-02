@@ -1,4 +1,4 @@
-import { provideSingleton, Autowired } from '@ccms/container'
+import { provideSingleton, Autowired, optional } from '@ccms/container'
 import { channel } from './channel'
 
 export namespace proxy {
@@ -44,7 +44,7 @@ export namespace proxy {
              * Get a list of players connected on a certain server, or on ALL the servers.
              * @param server count server
              * Response:
-             * String server = in.readUTF(); // The name of the server you got the player list of, as given in args.  
+             * String server = in.readUTF(); // The name of the server you got the player list of, as given in args.
              * String[] playerList = in.readUTF().split(", ");
              */
             playerList(server: string | "ALL") {
@@ -98,7 +98,7 @@ export namespace proxy {
                 return this.forward("ALL", channel, data)
             }
             /**
-             * Send a custom plugin message to said server. This is one of the most useful channels ever.  
+             * Send a custom plugin message to said server. This is one of the most useful channels ever.
              * Remember, the sending and receiving server(s) need to have a player online.
              * @param server reciver
              * @param channel channelName
@@ -112,7 +112,7 @@ export namespace proxy {
                 return this.finalSend()
             }
             /**
-             * Send a custom plugin message to said server. This is one of the most useful channels ever.  
+             * Send a custom plugin message to said server. This is one of the most useful channels ever.
              * Remember, the sending and receiving server(s) need to have a player online.
              * @param server reciver
              * @param channel channelName
@@ -147,6 +147,7 @@ export namespace proxy {
     }
     @provideSingleton(BungeeCord)
     export class BungeeCord {
+        @optional()
         @Autowired()
         private channel: channel.Channel
         /**
