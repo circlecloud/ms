@@ -1,4 +1,14 @@
 export namespace constants {
+    export namespace ServiceIdentifier {
+        /**
+         * Runtime Server NettyPipeline
+         */
+        export const NettyPipeline = Symbol("NettyPipeline")
+        /**
+         * Runtime Server RootLogger
+         */
+        export const RootLogger = Symbol("RootLogger")
+    }
     export namespace Reflect {
         export const Method = {
             getServerConnection: [/*spigot 1.8.8*/'aq',/*spigot 1.12.2*/ 'an', /*spigot 1.14.4+*/'getServerConnection', /*catserver 1.12.2*/'func_147137_ag']

@@ -1,17 +1,9 @@
+import { ProxyHandle } from '@ccms/nashorn'
+
 // Nashorn JSAdapter See https://wiki.openjdk.java.net/display/Nashorn/Nashorn+extensions#Nashornextensions-JSAdapterconstructor
 let createProxy = eval(`
     function(handle){ return new JSAdapter(handle) }
 `)
-export interface ProxyHandle extends ProxyHandler<any> {
-    // get: (target: any, name: string) => any
-    // set: (target: any, name: string, value: any) => boolean
-    // construct: (target: any, ...args: any[]) => any
-    // has: (target: any, name: string) => boolean
-    // ownKeys: (target: any) => string[]
-    values: (target: any) => any[];
-    // call: (target: any, name: string, ...args: any[]) => any
-    // deleteProperty: (target: any, name: string) => boolean
-}
 export class Proxy {
     static newProxy(target: any, handle: Partial<ProxyHandle>): any {
         return new Proxy(target, handle)

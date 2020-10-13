@@ -1,6 +1,6 @@
 import i18n from '@ccms/i18n'
 import { injectable } from "@ccms/container"
-import { plugin } from './interfaces'
+import { plugin } from './plugin'
 
 export namespace command {
     @injectable()

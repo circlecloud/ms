@@ -1,14 +1,15 @@
 /// <reference types="@javatypes/jdk" />
 
+const JavaClass = Java.type('java.lang.Class')
+const JavaObject = Java.type('java.lang.Object')
+const NoSuchFieldException = Java.type('java.lang.NoSuchFieldException')
+const fieldCache = new Map<string, java.lang.reflect.Field>()
+const methodCache = new Map<string, java.lang.reflect.Method>()
+
 /**
  * 反射工具类
  * Created by MiaoWoo on 2017/2/9 0009.
  */
-const JavaClass = Java.type('java.lang.Class')
-const JavaObject = Java.type('java.lang.Object')
-const NoSuchFieldException = Java.type('java.lang.NoSuchFieldException')
-const methodCache = []
-
 class Reflect {
     private obj: java.lang.Object
     private class: java.lang.Class<any>
@@ -34,15 +35,26 @@ class Reflect {
         return Java.from(declaredMethods(this.class))
     }
 
-    field(name: string | java.lang.String): Reflect {
-        try {
-            // Try getting a public field
-            let field = this.class.getField(name)
-            return on(field.get(this.obj))
-        } catch (ex) {
-            // Try again, getting a non-public field
-            return on(accessible(declaredField(this.class, name)).get(this.obj))
+    field(nameOrIndex: string | java.lang.String | number, declared = false): java.lang.reflect.Field {
+        if (nameOrIndex == undefined || nameOrIndex == null) throw new Error(`reflect field name can't be ${nameOrIndex} from ${this.class.getName()}!`)
+        let key = this.class.getName() + ':' + nameOrIndex + ':' + declared
+        if (fieldCache.has(key)) {
+            return fieldCache.get(key)
         }
+        let field = null
+        if (typeof nameOrIndex == "number") {
+            field = this.fields(declared)[nameOrIndex]
+        } else {
+            try {
+                // Try getting a public field
+                field = this.class.getField(nameOrIndex)
+            } catch (ex) {
+                // Try again, getting a non-public field
+                field = declaredField(this.class, nameOrIndex)
+            }
+        }
+        if (!field) throw new Error(`can't reflect field ${typeof nameOrIndex == "number" ? 'index' : 'name'} ${nameOrIndex} from ${this.class.getName()}!`)
+        return accessible(field)
     }
 
     fields(declared = false): java.lang.reflect.Field[] {
@@ -50,7 +62,7 @@ class Reflect {
     }
 
     values(declared = false) {
-        return this.fields(declared).reduce((cache, field) => { return cache[field.getName()] = this.field(field.getName()).get() }, {}) as any
+        return this.fields(declared).reduce((cache, field) => { return cache[field.getName()] = this.get(field.getName()).get() }, {}) as any
     }
 
     call(...args: any[]): Reflect {
@@ -64,17 +76,12 @@ class Reflect {
     get(index: number, declared?: boolean): Reflect
     get(prop: string): Reflect
     get(param?: string | number, declared: boolean = true): Reflect | any {
-        if (param == undefined || param == null) return this.obj
-        if (typeof param == "number") {
-            return on(accessible(this.fields(declared)[param]).get(this.obj))
-        }
-        if (typeof param == "string") {
-            return this.field(param)
-        }
+        if (arguments.length === 0) return this.obj
+        return on(this.field(param, declared).get(this.obj))
     }
 
-    set(name: any, value: any): Reflect {
-        accessible(declaredField(this.class, name)).set(this.obj, value)
+    set(param: string | number, value: any, declared: boolean = true): Reflect {
+        this.field(param, declared).set(this.obj, value)
         return this
     }
 
@@ -136,62 +143,41 @@ function declaredField(clazz: java.lang.Class<any>, name: string | java.lang.Str
     return field
 }
 
-function declaredMethod(clazz: java.lang.Class<any>, name: string, ...clazzs: java.lang.Class<any>[]): java.lang.reflect.Method {
-    let key = clazz.getName() + '.' + name + ':' + (clazzs || []).join(':')
-    if (!methodCache[key]) {
+function declaredMethod(clazz: java.lang.Class<any>, nameOrIndex: string | number, ...clazzs: java.lang.Class<any>[]): java.lang.reflect.Method {
+    let key = clazz.getName() + '.' + nameOrIndex + ':' + (clazzs || []).map(c => c.getName()).join(':')
+    if (methodCache.has(key)) { return methodCache.get(key) }
+    if (typeof nameOrIndex === "number") {
+        methodCache.set(key, declaredMethods(clazz)[nameOrIndex])
+    } else {
         try {
-            // @ts-ignore
-            methodCache[key] = clazz.getMethod(name, clazzs)
+            methodCache.set(key, clazz.getMethod(nameOrIndex, clazzs as any))
         } catch (ex) {
             try {
-                methodCache[key] = clazz.getDeclaredMethod(name, clazzs as any)
+                methodCache.set(key, clazz.getDeclaredMethod(nameOrIndex, clazzs as any))
             } catch (ex) {
                 for (const m of Java.from(declaredMethods(clazz))) {
-                    if (m.getName() == name) {
-                        methodCache[key] = m
+                    if (m.getName() == nameOrIndex) {
+                        methodCache.set(key, m)
                         break
                     }
                 }
             }
         }
     }
-    return methodCache[key]
+    if (!methodCache.has(key)) throw new Error(`can't reflect method ${typeof nameOrIndex == "number" ? 'index' : 'name'} ${nameOrIndex} from ${clazz.getName()}!`)
+    return methodCache.get(key)
 }
 
 function declaredMethods(clazz: java.lang.Class<any>) {
     return clazz.getDeclaredMethods()
 }
 
-let classMethodsCache: any[] = []
-
 function mapToObject(javaObj) {
-    if (!javaObj || !javaObj.class) { throw new TypeError(`参数 ${javaObj} 不是一个Java对象!`) }
-    let target = {}
-    getJavaObjectMethods(javaObj).forEach(t => mapMethod(target, javaObj, t))
+    if (!Java.isJavaObject(javaObj)) { throw new TypeError(`参数 ${javaObj} 不是一个Java对象!`) }
+    let target = Proxy.newProxy(javaObj, {
+        apply: (target, name, args) => { return args ? javaObj[name](args) : javaObj[name]() }
+    })
     return target
-}
-
-function getJavaObjectMethods(javaObj) {
-    let className = javaObj.class.name
-    if (!classMethodsCache[className]) {
-        let names: any[] = []
-        let methods = javaObj.class.methods
-        for (let i in methods) {
-            names.push(methods[i].name)
-        }
-        classMethodsCache[className] = names
-    }
-    return classMethodsCache[className]
-}
-
-function mapMethod(target, source, name) {
-    target[name] = function __SimpleDynamicMethod__(...args) {
-        if (args.length > 0) {
-            return source[name](args)
-        } else {
-            return source[name]()
-        }
-    }
 }
 
 function on(obj) {
