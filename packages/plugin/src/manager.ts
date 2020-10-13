@@ -1,6 +1,6 @@
 import i18n from '@ccms/i18n'
-import { plugin, server, event } from '@ccms/api'
-import { inject, provideSingleton, Container, ContainerInstance, Autowired } from '@ccms/container'
+import { plugin, server } from '@ccms/api'
+import { provideSingleton, Container, ContainerInstance, Autowired } from '@ccms/container'
 
 import './config'
 import { interfaces } from './interfaces'
@@ -13,15 +13,17 @@ const Thread = Java.type('java.lang.Thread')
 
 @provideSingleton(plugin.PluginManager)
 export class PluginManagerImpl implements plugin.PluginManager {
-    @inject(ContainerInstance)
+    @Autowired(ContainerInstance)
     private container: Container
-    @inject(plugin.PluginInstance)
+    @Autowired(plugin.PluginInstance)
     private pluginInstance: any
-    @inject(server.ServerType)
+    @Autowired(server.ServerType)
     private serverType: string
 
     @Autowired()
     private serverChecker: server.ServerChecker
+    @Autowired()
+    private nativePluginManager: server.NativePluginManager
 
     @Autowired()
     private taskManager: PluginTaskManager
@@ -224,15 +226,28 @@ export class PluginManagerImpl implements plugin.PluginManager {
             try {
                 this.buildPlugin(metadata)
             } catch (error) {
-                console.console(error)
+                console.console(`§4无法加载插件 §b${metadata.name} §4构建插件失败!`)
+                console.ex(error)
             }
         })
     }
 
+    private checkDepends(depends: string | string[]) {
+        if (!depends) return true
+        for (const depend of depends) { if (!this.metadataMap.has(depend)) return false }
+        return true
+    }
+    private checkNativeDepends(depends: string | string[]) {
+        if (!depends) return true
+        for (const depend of depends) { if (!this.nativePluginManager.has(depend)) return false }
+        return true
+    }
     private buildPlugin(metadata: plugin.PluginMetadata) {
-        if (!this.loaderMap.has(metadata.type)) { throw new Error(`§4无法加载插件 §c${metadata.name} §4请检查 §c${metadata.type} §4加载器是否正常启用!`) }
         if (this.instanceMap.has(metadata.name)) { throw new Error(`Plugin ${metadata.name} is already load from ${metadata.source}...`) }
+        if (!this.loaderMap.has(metadata.type)) { throw new Error(`§4无法加载插件 §b${metadata.name} §4请检查 §c${metadata.type} §4加载器是否正常启用!`) }
         if (!this.serverChecker.check(metadata.servers)) { throw new Error(`§6插件 §b${metadata.name} §c服务器类型不兼容(${metadata.servers.join(',')}) §6忽略加载...`) }
+        if (!this.checkDepends(metadata.depends)) { throw new Error(`§4无法加载插件 §b${metadata.name} §4请检查依赖 §3${metadata.depends.join(',')} §4是否安装完整!`) }
+        if (!this.checkNativeDepends(metadata.nativeDepends)) { throw new Error(`§4无法加载插件 §b${metadata.name} §4请检查插件依赖 §3${metadata.nativeDepends.join(',')} §4是否安装完整!`) }
         let pluginInstance = this.loaderMap.get(metadata.type).build(metadata)
         if (!pluginInstance) { throw new Error(`§4加载器 §c${metadata.type} §4加载插件 §c${metadata.name} §4失败!`) }
         this.instanceMap.set(metadata.name, pluginInstance)

@@ -78,7 +78,7 @@ export namespace plugin {
         scan(target: any): PluginLoadMetadata[]
         /**
          * 读取插件 返回插件加载元信息
-         * @param target 
+         * @param target
          */
         read(target: any): PluginLoadMetadata
         /**
@@ -162,6 +162,14 @@ export namespace plugin {
          * 插件作者 不填默认为 Unknow
          */
         author?: string | string[]
+        /**
+         * 脚本依赖
+         */
+        depends?: string[]
+        /**
+         * 插件依赖
+         */
+        nativeDepends?: string[]
         /**
          * 插件源文件 必须指定为 __filename
          */

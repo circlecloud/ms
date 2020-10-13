@@ -1,30 +1,31 @@
-import { server } from '@ccms/api'
-import { provideSingleton, inject } from '@ccms/container'
-import { NativePluginManager } from '@ccms/api'
+import { constants, server } from '@ccms/api'
+import { provideSingleton, postConstruct, Autowired, Container, ContainerInstance } from '@ccms/container'
 import { CommandMap } from './internal/command'
 
 @provideSingleton(server.Server)
-export class SpringServer implements server.Server {
-    @inject(CommandMap)
+export class SpringServer extends server.Server {
+    @Autowired(ContainerInstance)
+    private container: Container
+    @Autowired()
     private commandMap: CommandMap
+
+    private nettyPipeline = base.getInstance().getAutowireCapableBeanFactory()
+    private rootLogger = Packages.org.slf4j.LoggerFactory.getLogger("root") || global.logger
+
+    @postConstruct()
+    initialize() {
+        this.container.bind(constants.ServiceIdentifier.NettyPipeline).toConstantValue(this.nettyPipeline)
+        this.container.bind(constants.ServiceIdentifier.RootLogger).toConstantValue(this.rootLogger)
+    }
 
     getVersion(): string {
         return "SpringFramework"
-    }
-    getPlayer(name: string) {
-        throw new Error("Method not implemented.")
-    }
-    getOnlinePlayers(): any[] {
-        throw new Error("Method not implemented.")
     }
     getConsoleSender() {
         return {
             name: 'CONSOLE',
             sendMessage: (message: string) => console.console(message)
         }
-    }
-    getService(service: string) {
-        throw new Error("Method not implemented.")
     }
     dispatchCommand(sender: any, command: string): boolean {
         let cmd_args = command.split(" ")
@@ -33,16 +34,10 @@ export class SpringServer implements server.Server {
     dispatchConsoleCommand(command: string): boolean {
         return this.dispatchCommand(this.getConsoleSender(), command)
     }
-    getPluginsFolder(): string {
-        throw new Error("Method not implemented.")
-    }
-    getNativePluginManager(): NativePluginManager {
-        throw new Error("Method not implemented.")
-    }
     getNettyPipeline() {
-        return base.getInstance().getAutowireCapableBeanFactory()
+        return this.nettyPipeline
     }
     getRootLogger() {
-        return Packages.org.slf4j.LoggerFactory.getLogger("root") || global.logger
+        return this.rootLogger
     }
 }

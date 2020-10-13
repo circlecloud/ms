@@ -1,10 +1,7 @@
 import * as reflect from '@ccms/common/dist/reflect'
-import { injectable, inject } from '@ccms/container'
+import { injectable, Autowired, ContainerInstance, Container, postConstruct } from '@ccms/container'
 
-import { NativePluginManager } from './native_plugin'
-import { constants } from '../../constants'
-
-export { NativePluginManager } from './native_plugin'
+import { constants } from './constants'
 
 export namespace server {
     /**
@@ -19,6 +16,24 @@ export namespace server {
      * Runtime Server Instance
      */
     export const ServerInstance = Symbol("ServerInstance")
+    @injectable()
+    export abstract class NativePluginManager {
+        has(name: string): boolean {
+            return true
+        }
+        load(name: string): boolean {
+            throw new Error("Method not implemented.")
+        }
+        unload(name: string): boolean {
+            throw new Error("Method not implemented.")
+        }
+        reload(name: string): boolean {
+            throw new Error("Method not implemented.")
+        }
+        delete(name: string): boolean {
+            throw new Error("Method not implemented.")
+        }
+    }
     /**
      * MiaoScript Server
      */
@@ -48,9 +63,6 @@ export namespace server {
         getPluginsFolder(): string {
             throw new Error("Method not implemented.")
         }
-        getNativePluginManager(): NativePluginManager {
-            throw new Error("Method not implemented.")
-        }
         getDedicatedServer?(): any {
             throw new Error("Method not implemented.")
         }
@@ -63,8 +75,9 @@ export namespace server {
     }
     @injectable()
     export class ServerChecker {
-        @inject(ServerType)
+        @Autowired(ServerType)
         private serverType: string
+
         check(servers: string[]) {
             // Not set servers -> allow
             if (!servers || !servers.length) return true
@@ -80,14 +93,17 @@ export namespace server {
     }
     @injectable()
     export abstract class ReflectServer extends server.Server {
+        @Autowired(ContainerInstance)
+        private container: Container
+
         protected pipeline: any
         protected rootLogger: any
 
         constructor() {
             super()
-            this.reflect()
         }
 
+        @postConstruct()
         protected reflect() {
             try {
                 let consoleServer = this.getDedicatedServer()
@@ -107,7 +123,11 @@ export namespace server {
                     if (connection.class.name.indexOf('ServerConnection') !== -1
                         || connection.class.name.indexOf('NetworkSystem') !== -1) { break }
                     connection = undefined
-                } catch (error) { }
+                } catch (error) {
+                    if (global.debug) {
+                        console.ex(error)
+                    }
+                }
             }
             if (!connection) { console.error("Can't found ServerConnection!"); return }
             for (const field of constants.Reflect.Field.listeningChannels) {
@@ -115,16 +135,30 @@ export namespace server {
                     promise = reflect.on(connection).get(field).get().get(0)
                     if (promise.class.name.indexOf('Promise') !== -1) { break }
                     promise = undefined
-                } catch (error) { }
+                } catch (error) {
+                    if (global.debug) {
+                        console.ex(error)
+                    }
+                }
             }
             if (!promise) { console.error("Can't found listeningChannels!"); return }
             this.pipeline = reflect.on(promise).get('channel').get().pipeline()
+            this.container.bind(constants.ServiceIdentifier.NettyPipeline).toConstantValue(this.pipeline)
         }
         protected reflectRootLogger(consoleServer: any) {
             try {
                 this.rootLogger = reflect.on(consoleServer).get('LOGGER').get().parent
             } catch (error) {
-                try { this.rootLogger = reflect.on(consoleServer).get(0).get().parent } catch (error) { }
+                if (global.debug) {
+                    console.ex(error)
+                }
+                try {
+                    this.rootLogger = reflect.on(consoleServer).get(0).get().parent
+                } catch (error) {
+                    if (global.debug) {
+                        console.ex(error)
+                    }
+                }
             }
             if (this.rootLogger && this.rootLogger.class.name.indexOf('Logger') === -1) {
                 console.error('Error Logger Class: ' + this.rootLogger.class.name)
@@ -135,6 +169,7 @@ export namespace server {
                 this.rootLogger = this.rootLogger.parent
             }
             if (!this.rootLogger) { console.error("Can't found rootLogger!") }
+            this.container.bind(constants.ServiceIdentifier.RootLogger).toConstantValue(this.rootLogger)
         }
     }
 }

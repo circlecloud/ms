@@ -81,8 +81,18 @@ declare global {
         i18n(name: string, ...params: any[]): void
     }
     interface ProxyConstructor {
-        newProxy<T extends object>(target: T, handler: ProxyHandler<T>): T
+        newProxy<T extends object>(target: T, handler: ProxyHandle<T>): T
     }
 }
-
+export interface ProxyHandle<T = any> extends ProxyHandler<any> {
+    setPrototypeOf?(target: T, v: any): any
+    // get: (target: any, name: string) => any
+    // set: (target: any, name: string, value: any) => boolean
+    // construct: (target: any, ...args: any[]) => any
+    // has: (target: any, name: string) => boolean
+    // ownKeys: (target: any) => string[]
+    values?: (target: T) => any[]
+    // call: (target: any, name: string, ...args: any[]) => any
+    // deleteProperty: (target: any, name: string) => boolean
+}
 export { }
