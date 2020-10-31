@@ -77,6 +77,7 @@ export function config(metadata: interfaces.ConfigMetadata = {}) {
         metadata.variable = key
         metadata.version = metadata.version ?? 1
         metadata.format = metadata.format ?? 'yml'
+        metadata.autosave = metadata.autosave ?? false
         metadata.filename = metadata.filename ?? metadata.name + '.' + metadata.format
         let previousMetadata = getPluginConfigMetadata(target)
         previousMetadata.set(metadata.name, metadata)

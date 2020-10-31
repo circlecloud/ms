@@ -69,7 +69,7 @@ export class PluginConfigManager {
     saveConfig(plugin: plugin.Plugin) {
         let configs = getPluginConfigMetadata(plugin)
         for (let [_, config] of configs) {
-            this.saveConfig0(plugin, config)
+            config.autosave && this.saveConfig0(plugin, config)
         }
     }
 
@@ -102,7 +102,6 @@ export class PluginConfigManager {
 
     private saveConfig0(plugin: plugin.Plugin, metadata: interfaces.ConfigMetadata) {
         try {
-            if (metadata.readonly) { console.debug(`[${plugin.description.name}] Skip Save Config ${metadata.variable} Because it's readonly!`) }
             metadata.file = fs.concat(fs.file(plugin.description.loadMetadata.file).parent, plugin.description.name, metadata.filename)
             let result = this.getConfigLoader(metadata.format).dump(plugin[metadata.variable])
             base.save(metadata.file, result)
