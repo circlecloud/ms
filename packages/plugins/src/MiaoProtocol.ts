@@ -1,18 +1,31 @@
-import { task, server, constants } from "@ccms/api";
-import { inject } from "@ccms/container";
-import { plugin, interfaces, cmd } from "@ccms/plugin";
+import { task, server, constants } from "@ccms/api"
+import { Autowired, JSClass } from "@ccms/container"
+import { plugin, interfaces } from "@ccms/plugin"
 
-import http from '@ccms/common/dist/http'
-import * as fs from '@ccms/common/dist/fs'
+let createPacketAdapterFunction = eval(`
+function(cls, plugin, type, onPacketSending){
+    return new cls(plugin, type) {
+        onPacketSending: onPacketSending
+    }
+}
+`)
 
-@plugin({ name: 'MiaoProtocol', prefix: 'MPTL', version: '1.0.0', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], source: __filename })
+@plugin({ prefix: 'MPTL', version: '1.0.0', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], source: __filename })
 export class MiaoProtocol extends interfaces.Plugin {
-    @inject(server.Server)
-    private server: server.Server;
-    @inject(task.TaskManager)
-    private taskManager: task.TaskManager;
+    @Autowired()
+    private server: server.Server
+    @Autowired()
+    private taskManager: task.TaskManager
+
+    @JSClass('com.comphenix.protocol.events.PacketAdapter')
+    private PacketAdapter
+    @JSClass('com.comphenix.protocol.PacketType')
+    private PacketType
+    @JSClass('com.comphenix.protocol.ProtocolLibrary')
+    private ProtocolLibrary
 
     private pipeline: any
+    private adapter: any
 
     enable() {
         let count = 0
@@ -25,6 +38,28 @@ export class MiaoProtocol extends interfaces.Plugin {
                 this.logger.console('§cNetty通道注入失败 §4所有功能将无法使用！')
             }
         }).later(20).timer(40).submit()
+        this.initPacketAdapter()
     }
 
+    disable() {
+        this.ProtocolLibrary.getProtocolManager().removePacketListener(this.adapter)
+    }
+
+    createPacketAdapter(onPacketSending: (event) => void) {
+        return createPacketAdapterFunction(this.PacketAdapter, base.getInstance(), [this.PacketType.Play.Server.MAP], onPacketSending)
+    }
+
+    initPacketAdapter() {
+        this.adapter = this.createPacketAdapter((event) => {
+            let integers = event.getPacket().getIntegers().getValues()
+            console.log(`ProtocolLib onPacketSending filter Map
+Player: ${event.getPlayer()}
+MapId: ${integers.get(0)}
+Size: ${integers.get(3)}x${integers.get(4)}
+Bytes: ${event.getPacket().getByteArrays().read(0).length}
+`)
+            // org.bukkit.map.MapPalette.imageToBytes()
+        })
+        this.ProtocolLibrary.getProtocolManager().addPacketListener(this.adapter)
+    }
 }

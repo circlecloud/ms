@@ -6,48 +6,8 @@ import { QRCode, QRErrorCorrectLevel } from '@ccms/common/dist/qrcode'
 import { Autowired, JSClass, optional } from '@ccms/container'
 import http from '@ccms/common/dist/http'
 
-let MapView
-let Bukkit
-let MapRenderer
-let ItemStack
-let Material
-
-try {
-    MapView = Java.type('org.bukkit.map.MapView')
-    Bukkit = Java.type('org.bukkit.Bukkit')
-    MapRenderer = Java.type('org.bukkit.map.MapRenderer')
-    ItemStack = Java.type('org.bukkit.inventory.ItemStack')
-    Material = Java.type('org.bukkit.Material')
-} catch (error) {
-}
-
 const BufferedImage = Java.type('java.awt.image.BufferedImage')
 const Color = Java.type('java.awt.Color')
-
-class QRCodeRender {
-    private _proxy
-    private image
-    private rendered = false
-    constructor() {
-        const MapRendererAdapter = Java.extend(MapRenderer, {
-            render: (_mapView, mapCanvas, _player) => {
-                if (this.rendered) return
-                if (this.image) {
-                    mapCanvas.drawImage(0, 0, this.image)
-                }
-                this.rendered = true
-            }
-        })
-        this._proxy = new MapRendererAdapter()
-    }
-    setImage(image) {
-        this.image = image
-        this.rendered = false
-    }
-    getHandler() {
-        return this._proxy
-    }
-}
 
 interface PlaceholderAPI {
     registerPlaceholderHook: (key: string, onPlaceholderRequest: (player, s) => string) => void
@@ -62,18 +22,20 @@ interface UserInfo {
     box: string
 }
 
-@JSPlugin({ prefix: 'MRD', version: '1.3.3', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], source: __filename })
+let createPacketAdapterFunction = eval(`
+function(cls, plugin, type, onPacketSending){
+    return new cls(plugin, type) {
+        onPacketSending: onPacketSending
+    }
+}`)
+
+@JSPlugin({ prefix: 'MRD', version: '1.4.1', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], source: __filename })
 export class MiaoReward extends interfaces.Plugin {
     private serverInfo: any
     private cacheBindUuid = ''
     private zeroMapView = undefined
-    private zeroMapRender: QRCodeRender = undefined
-    private isBinding = false
-    private bindingUser = 'unknow'
-    private bindingTask = undefined
-    private bindingLeftTime = 45
-    private bindingNotify = new java.util.HashSet<org.bukkit.entity.Player>()
-    private drawCooldown = new Map<string, number>()
+    private playerImageCache = new Map<string, any>()
+    private playerTaskCache = new Map<string, task.Cancelable>()
     private playerInfoCache = new Map<string, UserInfo>()
 
     private downgrade = false
@@ -90,18 +52,37 @@ export class MiaoReward extends interfaces.Plugin {
     private bungee: proxy.BungeeCord
 
     @Config()
-    private config: PluginConfig = {
-        prefix: '§6[§b广告系统§6]§r',
-        serverId: '',
-        serverToken: '',
-        drawCommand: 'p give %player_name% %amount%',
-        drawCooldown: 300
-    }
+    private config: PluginConfig & {
+        prefix: string
+        serverId: string
+        serverToken: string
+        drawCommand: string
+        coinName: string
+    } = {
+            prefix: '§6[§b广告系统§6]§r',
+            serverId: '',
+            serverToken: '',
+            drawCommand: 'p give %player_name% %amount%',
+            coinName: '点券'
+        }
+
+    @JSClass('org.bukkit.Bukkit')
+    private Bukkit: any
 
     @JSClass('me.clip.placeholderapi.PlaceholderAPI')
     private PlaceholderAPI: PlaceholderAPI
     @JSClass('me.clip.placeholderapi.PlaceholderHook')
     private PlaceholderHook: any
+
+    @JSClass('com.comphenix.protocol.ProtocolLibrary')
+    private ProtocolLibrary: any
+    @JSClass('com.comphenix.protocol.PacketType')
+    private PacketType: any
+    @JSClass('com.comphenix.protocol.events.PacketAdapter')
+    private PacketAdapter: any
+
+    private adapter: any
+    private itemStackArrayLength: number
 
     private isBungeeCord = undefined
     private channelOff: { off: () => void }
@@ -109,10 +90,13 @@ export class MiaoReward extends interfaces.Plugin {
     load() {
         this.config.prefix = this.config.prefix || '§6[§b广告系统§6]§r'
         this.config.drawCommand = this.config.drawCommand || 'p give %player_name% %amount%'
-        this.config.drawCooldown = this.config.drawCooldown || 300
+        if (!this.config.coinName) {
+            this.config.coinName = '点券'
+            this.config.save()
+        }
         //@ts-ignore
         this.logger.prefix = this.config.prefix
-        this.downgrade = Bukkit.getServer().class.name.split('.')[3] == "v1_7_R4"
+        this.downgrade = this.Bukkit.server.class.name.split('.')[3] == "v1_7_R4"
         this.updateServerInfo()
         this.updateOnlinePlayersInfo()
     }
@@ -203,16 +187,55 @@ export class MiaoReward extends interfaces.Plugin {
 
     private initZeroMap() {
         this.taskManager.create(() => {
-            this.zeroMapRender = new QRCodeRender()
-            this.zeroMapView = Bukkit.getMap(0) || Bukkit.createMap(Bukkit.getWorlds()[0])
-            this.zeroMapView.setScale(MapView.Scale.FARTHEST)
-            this.zeroMapView.getRenderers().forEach(r => this.zeroMapView.removeRenderer(r))
-            this.zeroMapView.addRenderer(this.zeroMapRender.getHandler())
+            this.zeroMapView = this.Bukkit.getMap(0) || this.Bukkit.createMap(this.Bukkit.getWorlds()[0])
+            this.zeroMapView.setScale(org.bukkit.map.MapView.Scale.FARTHEST)
+            this.zeroMapView.getRenderers().clear()
         }).submit()
+        var minecraftVersion = this.ProtocolLibrary.getProtocolManager().getMinecraftVersion()
+        this.itemStackArrayLength = minecraftVersion.getMinor() < 9 ? 45 : 46
+        this.initPacketAdapter()
+    }
+
+    createPacketAdapter(onPacketSending: (event) => void) {
+        return createPacketAdapterFunction(this.PacketAdapter, base.getInstance(), [this.PacketType.Play.Server.MAP], onPacketSending)
+    }
+
+    initPacketAdapter() {
+        this.adapter = this.createPacketAdapter((event) => {
+            let integers = event.getPacket().getIntegers().getValues()
+            let mapId = integers.get(0)
+            let player = event.getPlayer()
+            if (mapId == this.zeroMapView.getId() && this.playerImageCache.has(player.getName())) {
+                event.getPacket().getByteArrays().write(0, org.bukkit.map.MapPalette.imageToBytes(this.playerImageCache.get(player.getName())))
+                event.getPacket().getIntegers().write(3, 128)
+                event.getPacket().getIntegers().write(4, 128)
+            }
+        })
+        this.ProtocolLibrary.getProtocolManager().addPacketListener(this.adapter)
+    }
+
+    private sendWindowItems(player: org.bukkit.entity.Player, mapItem: any) {
+        var protocolManager = this.ProtocolLibrary.getProtocolManager()
+        try {
+            let ItemStackArray = Java.type('org.bukkit.inventory.ItemStack[]')
+            let arritemStack = new ItemStackArray(this.itemStackArrayLength)
+            java.util.Arrays.fill(arritemStack, new org.bukkit.inventory.ItemStack(org.bukkit.Material.AIR))
+            arritemStack[36 + player.getInventory().getHeldItemSlot()] = mapItem
+            var packetContainer = protocolManager.createPacket(this.PacketType.Play.Server.WINDOW_ITEMS)
+            if (packetContainer.getItemArrayModifier().size() > 0) {
+                packetContainer.getItemArrayModifier().write(0, arritemStack)
+            } else {
+                packetContainer.getItemListModifier().write(0, java.util.Arrays.asList(arritemStack))
+            }
+            protocolManager.sendServerPacket(player, packetContainer)
+        } catch (ex) {
+            console.ex(ex)
+        }
     }
 
     disable() {
-        this.PlaceholderAPI.unregisterPlaceholderHook("mrd")
+        this.PlaceholderAPI?.unregisterPlaceholderHook("mrd")
+        this.adapter && this.ProtocolLibrary.getProtocolManager().removePacketListener(this.adapter)
         Java.from(this.server.getOnlinePlayers()).forEach(p => this.checkAndClear(p))
         this.channelOff?.off()
     }
@@ -276,37 +299,17 @@ export class MiaoReward extends interfaces.Plugin {
         }
     }
 
-    private bindCheck(sender: org.bukkit.entity.Player, cooldown: number) {
-        if (this.isBinding) {
-            let bindUser = Bukkit.getPlayerExact(this.bindingUser)
-            if (bindUser && bindUser.isOnline() && this.isHoldQrCodeItem(bindUser)) {
-                this.bindingNotify.add(sender)
-                this.logger.sender(sender, [
-                    "§c当前 §a" + this.bindingUser + " §c玩家正在扫码",
-                    "§6请等待 §e" + this.bindingLeftTime + "秒 §6后重试...",
-                    "§a玩家操作完成后将会通知您继续操作..."
-                ])
-                return true
-            }
+    private bindCheck(sender: org.bukkit.entity.Player) {
+        let scanning = this.playerTaskCache.has(sender.getName())
+        if (scanning) {
+            this.logger.sender(sender, "§4当前正在进行扫码 请稍候重试!")
         }
-        if (this.drawCooldown.has(sender.getName()) && !sender.hasPermission('mrd.admin')) {
-            let leftTime = cooldown - (Date.now() - this.drawCooldown.get(sender.getName())) / 1000
-            if (leftTime > 0) {
-                this.logger.sender(sender, `§c扫码功能冷却中 剩余 ${leftTime} 秒!`)
-                return true
-            }
-        }
-        this.drawCooldown.set(sender.getName(), Date.now())
-        this.isBinding = true
-        this.bindingUser = sender.getName()
-        this.bindingNotify.clear()
-        return false
+        return scanning
     }
 
     cmdbind(sender: org.bukkit.entity.Player, server: boolean) {
-        if (this.bindCheck(sender, 60)) return
+        if (this.bindCheck(sender)) return
         if (!sender.getItemInHand) { return this.logger.sender(sender, '§c手持物品检测异常 请检查是否在客户端执行命令!') }
-        if (sender.getItemInHand()?.getType() !== Material.AIR) { return this.logger.sender(sender, "§c请空手执行此命令!") }
         if (server) {
             if (!sender.isOp()) { return this.logger.sender(sender, '§4您没有配置服务器的权限!') }
             this.bindServer(sender)
@@ -326,7 +329,7 @@ export class MiaoReward extends interfaces.Plugin {
         if (amount % 100 !== 0) {
             return this.logger.sender(sender, '§4金额必须是100倍数!')
         }
-        if (this.bindCheck(sender, this.config.drawCooldown)) { return }
+        if (this.bindCheck(sender)) { return }
         this.scanAuth(sender,
             'draw', {
             title: '兑换授权',
@@ -363,11 +366,11 @@ export class MiaoReward extends interfaces.Plugin {
         this.taskManager.create(() => {
             let command = this.config.drawCommand.replace('%player_name%', sender.getName()).replace('%amount%', draw.data)
             if (!this.server.dispatchConsoleCommand(command)) {
-                return this.sendError(sender, ...draw.msg.split('\n'), `§6执行结果: §4已扣除 §c${amount} §4喵币`, `§6执行命令: §3/${command} §c可能存在异常`)
+                return this.sendError(sender, ...draw.msg.split('\n').map(s => s.replace('点券', this.config.coinName)), `§6执行结果: §4已扣除 §c${amount} §4喵币`, `§6执行命令: §3/${command} §c可能存在异常`)
             }
-            this.logger.sender(sender, draw.msg.split('\n'))
-            this.sendBroadcast(sender, `${this.config.prefix}§6玩家 §b${sender.getName()} §6成功将 §a${amount}喵币 §6兑换成 §c${draw.data}点券!`)
-            this.sendBroadcast(sender, `${this.config.prefix}§c/mrd help §b查看广告系统帮助 §6快来一起看广告赚点券吧!`)
+            this.logger.sender(sender, draw.msg.split('\n').map(s => s.replace('点券', this.config.coinName)))
+            this.sendBroadcast(sender, `${this.config.prefix}§6玩家 §b${sender.getName()} §6成功将 §a${amount}喵币 §6兑换成 §c${draw.data}${this.config.coinName}!`)
+            this.sendBroadcast(sender, `${this.config.prefix}§c/mrd help §b查看广告系统帮助 §6快来一起看广告赚${this.config.coinName}吧!`)
         }).submit()
     }
 
@@ -429,14 +432,13 @@ export class MiaoReward extends interfaces.Plugin {
         let [ratio, mbr, msg] = this.ratio2string(ratioStr)
         if (!confirm) {
             return this.logger.sender(sender, [
-                '§4警告: 您正在设置服务器喵币/点券兑换比例 设置后将实时生效!',
+                `§4警告: 您正在设置服务器喵币/${this.config.coinName}兑换比例 设置后将实时生效!`,
                 `§6您设置的兑换比例为 ` + msg,
-                `§6玩家至少需要 §a${mbr}喵币 §6才可以兑换点券!`,
+                `§6玩家至少需要 §a${mbr}喵币 §6才可以兑换${this.config.coinName}!`,
                 `§6请执行 §b/mrd ratio §c${ratio} §econfirm §c确认修改!`
             ])
         }
         if (confirm != 'confirm') return this.logger.sender(sender, `§6请执行 §b/mrd ratio §c${ratio} §econfirm §c确认修改!`)
-        if (this.bindCheck(sender, 60)) return
         this.scanAuth(sender, "ratio", {
             title: `是否授权 ${this.serverInfo.name} 调整兑换比例`,
             content: [
@@ -470,10 +472,10 @@ export class MiaoReward extends interfaces.Plugin {
     private ratio2string(ratio) {
         ratio = parseFloat(ratio)
         if (ratio > 1) {
-            return [ratio, 1, `§c${ratio} §6就是 §a1喵币 §6=> §c${ratio}点券!`]
+            return [ratio, 1, `§c${ratio} §6就是 §a1喵币 §6=> §c${ratio}${this.config.coinName}!`]
         }
         let mbr = Math.round(1 / ratio * 10000) / 10000
-        return [ratio, mbr, `§c${ratio} §6就是 §a${mbr}喵币 §6=> §c1点券!`]
+        return [ratio, mbr, `§c${ratio} §6就是 §a${mbr}喵币 §6=> §c1${this.config.coinName}!`]
     }
 
     private sendBroadcast(player, message) {
@@ -550,29 +552,31 @@ export class MiaoReward extends interfaces.Plugin {
 
     private setItemAndTp(sender: org.bukkit.entity.Player, content: string, sync: { scaned: boolean }) {
         this.taskManager.create(() => {
-            this.bindingLeftTime = 30
-            this.bindingTask = this.taskManager.create(() => {
+            let bindingLeftTime = 55
+            let task = this.taskManager.create(() => {
                 try {
-                    if (sync.scaned || !sender.isOnline() || !this.isHoldQrCodeItem(sender) || --this.bindingLeftTime < 0) {
-                        if (this.bindingLeftTime < 0) {
+                    if (sync.scaned || !sender.isOnline() || !this.isHoldQrCodeItem(sender) || --bindingLeftTime < 0) {
+                        if (bindingLeftTime < 0) {
                             this.logger.sender(sender, '§c二维码已过期 请重新获取 如已扫码请忽略!')
+                            task.cancel()
                         }
                         this.cancelTask(sender)
                         return
                     }
-                    this.sendActionBar(sender, `§c§l手机QQ扫描二维码 剩余 ${this.bindingLeftTime} 秒...`)
+                    this.sendActionBar(sender, `§c§l手机QQ扫描二维码 剩余 ${bindingLeftTime} 秒...`)
                 } catch (error) {
                     console.ex(error)
                 }
-            }).async().later(20).timer(20).submit()
-            sender.setItemInHand(this.createQrCodeMapItem(content))
+            }, this).async().later(20).timer(20).submit()
+            this.playerTaskCache.set(sender.getName(), task)
+            this.playerImageCache.set(sender.getName(), this.createQrcode(content))
             if (this.downgrade) {
                 this.logger.sender(sender, '§c低版本客户端 二维码渲染中 请等待 6 秒 稍候扫码!')
                 let waitTask = this.taskManager.create(() => {
                     let temp = sender.getLocation()
                     temp.setPitch(-90)
                     sender.teleport(temp)
-                }).later(20).timer(20).submit()
+                }, this).later(20).timer(20).submit()
                 this.taskManager.create(() => {
                     waitTask.cancel()
                     let temp = sender.getLocation()
@@ -584,6 +588,8 @@ export class MiaoReward extends interfaces.Plugin {
                 temp.setPitch(90)
                 sender.teleport(temp)
             }
+            this.sendWindowItems(sender, this.createQrCodeMapItem())
+            sender.sendMap(this.zeroMapView)
         }).submit()
     }
 
@@ -636,9 +642,9 @@ CAST TIME   : ${Date.now() - startTime}`)
         return result
     }
 
-    private createQrCodeMapItem(content: string) {
+    private createQrCodeMapItem() {
         let item: org.bukkit.inventory.ItemStack
-        item = new ItemStack(Material.FILLED_MAP || Material.MAP)
+        item = new org.bukkit.inventory.ItemStack(org.bukkit.Material.FILLED_MAP || org.bukkit.Material.MAP)
         let meta = <org.bukkit.inventory.meta.MapMeta>item.getItemMeta()
         if (meta.setMapView) {
             meta.setMapView(this.zeroMapView)
@@ -650,7 +656,6 @@ CAST TIME   : ${Date.now() - startTime}`)
         meta.setDisplayName('§c请使用手机QQ扫描二维码!')
         meta.setLore(["QRCODE"])
         item.setItemMeta(meta)
-        this.zeroMapRender.setImage(this.createQrcode(content))
         return item
     }
 
@@ -695,26 +700,14 @@ CAST TIME   : ${Date.now() - startTime}`)
 
     @Listener()
     PlayerDropItemEvent(event: org.bukkit.event.player.PlayerDropItemEvent) {
-        if (this.isQrCodeItem(event.getItemDrop().getItemStack())) {
-            event.getItemDrop().remove()
+        if (this.checkAndClear(event.getPlayer())) {
+            event.setCancelled(true)
         }
     }
 
     @Listener()
     PlayerItemHeldEvent(event: org.bukkit.event.player.PlayerItemHeldEvent) {
-        let inv = event.getPlayer().getInventory()
-        if (this.isQrCodeItem(inv.getItem(event.getPreviousSlot() as any))) {
-            inv.setItem(event.getPreviousSlot(), null)
-        }
-    }
-
-    @Listener()
-    InventoryClickEvent(event: org.bukkit.event.inventory.InventoryClickEvent) {
-        let item = event.getCurrentItem()
-        if (this.isQrCodeItem(item)) {
-            event.getInventory().setItem(event.getSlot(), null)
-            event.setCancelled(true)
-        }
+        this.checkAndClear(event.getPlayer())
     }
 
     @Listener()
@@ -723,36 +716,23 @@ CAST TIME   : ${Date.now() - startTime}`)
     }
 
     private cancelTask(player) {
-        if (!this.isBinding) return
-        this.isBinding = false
-        this.bindingTask.cancel()
-        this.bindingTask = undefined
-        this.bindingUser = 'unknow'
+        if (!this.playerTaskCache.has(player.getName())) { return }
         this.checkAndClear(player)
         this.sendActionBar(player, "")
-        this.zeroMapRender.setImage(undefined)
-        //@ts-ignore
-        this.bindingNotify.forEach(p => {
-            if (p.isOnline()) {
-                this.logger.sender(p, `§6用户 §a${player.getName()} §6扫码已完成 §a您可以继续操作!`)
-            }
-        })
+        player.updateInventory()
+        this.playerTaskCache.get(player.getName()).cancel()
+        this.playerTaskCache.delete(player.getName())
+        this.playerImageCache.delete(player.getName())
     }
 
     private isHoldQrCodeItem(player: org.bukkit.entity.Player) {
-        return this.isQrCodeItem(player.getItemInHand())
+        return this.playerImageCache.has(player.getName())
     }
 
     private checkAndClear(player: org.bukkit.entity.Player) {
         if (this.isHoldQrCodeItem(player)) {
-            player.setItemInHand(null)
-        }
-    }
-
-    private isQrCodeItem(item: org.bukkit.inventory.ItemStack): boolean {
-        if (!item || item.getType() == Material.AIR) { return false }
-        if ((item.getType() == Material.MAP || item.getType() == Material.FILLED_MAP) && item.hasItemMeta()) {
-            return Java.from(item.getItemMeta().getLore()).indexOf('QRCODE') != -1
+            this.playerImageCache.delete(player.getName())
+            return true
         }
         return false
     }
@@ -762,18 +742,18 @@ CAST TIME   : ${Date.now() - startTime}`)
             `§6====== ${this.config.prefix} §a帮助菜单 §6======`,
             `§6/mrd bind §a绑定圈云盒子`,
             `§6/mrd query §a查询当前账户`,
-            `§6/mrd draw §e<兑换数量> §a兑换点券`
+            `§6/mrd draw §e<兑换数量> §a兑换${this.config.coinName}`
         ]
         if (sender.isOp()) {
             help = help.concat([
                 `§c由于您是管理员 以为您展示额外命令`,
                 `§6/mrd bind server §a绑定服务器`,
-                `§6/mrd ratio §e<兑换比例> §a设置喵币/点券兑换比例`,
+                `§6/mrd ratio §e<兑换比例> §a设置喵币/${this.config.coinName}兑换比例`,
                 `§6/mrd statistic §3近期收入统计`,
                 `§6/mrd rank <boardcast>(是否公告) §2今日兑换排行`,
                 `§6/mrd server §c当前服务器信息`,
-                `§6兑换比例设置说明: §b默认比例为 0.001 §6=> §a1000喵币 §6兑换 §c1点券`,
-                `§c注意 设置比例后 玩家兑换点券数量不能少于 1点券`,
+                `§6兑换比例设置说明: §b默认比例为 0.001 §6=> §a1000喵币 §6兑换 §c1${this.config.coinName}`,
+                `§c注意 设置比例后 玩家兑换${this.config.coinName}数量不能少于 1${this.config.coinName}`,
                 `§c比如 设置了0.001 那就是 玩家至少 1000喵币 才能兑换!`
             ])
         }

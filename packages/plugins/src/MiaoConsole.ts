@@ -185,8 +185,8 @@ export class MiaoConsole extends interfaces.Plugin {
     @disable({ servers: [constants.ServerType.Bukkit, constants.ServerType.Sponge] })
     removeLog4jForward() {
         try {
-            this.appender.stop()
-            this.rootLogger.removeAppender(this.appender)
+            this.appender?.stop()
+            this.rootLogger?.removeAppender(this.appender)
         } catch (error) {
             console.ex(error)
         }
@@ -195,7 +195,7 @@ export class MiaoConsole extends interfaces.Plugin {
     @disable({ servers: [constants.ServerType.Bungee] })
     removeLoggerForward() {
         try {
-            this.rootLogger.removeHandler(this.handler)
+            this.rootLogger?.removeHandler(this.handler)
         } catch (error) {
             console.ex(error)
         }
@@ -204,7 +204,7 @@ export class MiaoConsole extends interfaces.Plugin {
     @disable({ servers: [constants.ServerType.Spring] })
     removeLogbackForward() {
         try {
-            this.rootLogger.detachAppender(this.LOGBACK_APPENDER_NAME)
+            this.rootLogger?.detachAppender(this.LOGBACK_APPENDER_NAME)
         } catch (error) {
             console.ex(error)
         }

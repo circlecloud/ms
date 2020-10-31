@@ -51,6 +51,7 @@ let langMap = {
     'install.finish': '§6插件 §b{name} §6版本 §3{version} §a安装成功!',
     'update.finish': '§6插件 §b{name} §6版本 §3{version} §a更新成功!',
     'upgrade.confirm': '§6您正在尝试更新 §bMiaoScript §c核心 §6请执行 §b/mpm §aupgrade §cconfirm §6确认执行!',
+    'upgrade.start': '§6开始§a更新 §bMiaoScript §6核心 §c正在清理 node_modules 请稍候...',
     'upgrade.failed': '§6尝试热更新 §bMiaoScript §c核心 §4失败! §6请重启服务器完成更新...',
     'deploy.token.not.exists': '§4请先配置发布Token!',
     'deploy.success': '§6插件 §b{name} §6版本 §3{version} §a发布成功! §6服务器返回: §a{msg}',
@@ -104,7 +105,7 @@ class SpongeFakeSender extends FakeSender {
     }
 }
 
-@JSPlugin({ prefix: 'PM', version: '1.3.0', author: 'MiaoWoo', source: __filename })
+@JSPlugin({ prefix: 'PM', version: '1.3.1', author: 'MiaoWoo', source: __filename })
 export class MiaoScriptPackageManager extends interfaces.Plugin {
     @Autowired()
     private pluginManager: pluginApi.PluginManager
@@ -326,6 +327,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
             let enginePath = fs.path(fs.file(root, 'node_modules'))
             if (enginePath.startsWith(root)) {
                 try {
+                    this.i18n(sender, 'upgrade.start')
                     base.delete(enginePath)
                     this.cmdrestart(sender)
                 } catch (ex) {
@@ -381,20 +383,22 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     }
 
     cmdrestart(sender: any) {
-        if (this.serverType === "sponge") {
-            setTimeout(() => this.server.dispatchConsoleCommand('sponge plugins reload'), 0)
-            return
-        }
-        try {
-            this.logger.sender(sender, '§6Reloading §3MiaoScript Engine...')
-            ScriptEngineContextHolder.disableEngine()
-            Packages.java.lang.System.gc()
-            ScriptEngineContextHolder.enableEngine()
-            this.logger.sender(sender, '§3MiaoScript Engine §6Reload §aSuccessful...')
-        } catch (ex) {
-            this.logger.sender(sender, "§3MiaoScript Engine §6Reload §cError! ERR: " + ex)
-            this.logger.sender(sender, this.logger.stack(ex))
-        }
+        setTimeout(() => {
+            if (this.serverType === "sponge") {
+                this.server.dispatchConsoleCommand('sponge plugins reload')
+                return
+            }
+            try {
+                this.logger.sender(sender, '§6Reloading §3MiaoScript Engine...')
+                ScriptEngineContextHolder.disableEngine()
+                Packages.java.lang.System.gc()
+                ScriptEngineContextHolder.enableEngine()
+                this.logger.sender(sender, '§3MiaoScript Engine §6Reload §aSuccessful...')
+            } catch (ex) {
+                this.logger.sender(sender, "§3MiaoScript Engine §6Reload §cError! ERR: " + ex)
+                this.logger.sender(sender, this.logger.stack(ex))
+            }
+        }, 0)
     }
 
     cmdrun(sender: any, ...args: any[]) {
