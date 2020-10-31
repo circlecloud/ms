@@ -6,7 +6,16 @@
 - 快来接入 喵式奖励
 - 通过QQ小程序广告 增加服务器收入
 
+### 先来一张近期的服务器提现订单
+
+![image.png](https://i.loli.net/2020/10/16/LmXAklot43WOy1P.png)
+
 ## 插件展示
+
+> 多图预警 折叠了
+
+`[spoiler]`
+
 - 插件帮助![image.png](https://i.loli.net/2020/09/12/uNbwO2sCVriZzJx.png)
 - 扫码绑定![image.png](https://i.loli.net/2020/09/13/hOtyV8bP9kGeuCD.png)
 - 查看个人信息![image.png](https://i.loli.net/2020/09/12/bTLGjQC7eqxAUSi.png)
@@ -20,6 +29,9 @@
 - 玩家扫码兑换完成![image.png](https://i.loli.net/2020/09/24/JG2SBtgHLzNeaEO.png)
 - 腐竹扫码确认![image.png](https://i.loli.net/2020/09/24/c7sS18KJvQ3MRuZ.png)
 - 腐竹扫码完成![image.png](https://i.loli.net/2020/09/24/RtsoSdV7j6OmE8Q.png)
+
+`[/spoiler]`
+
 ## 插件命令
 ```
 >mrd
@@ -38,6 +50,8 @@
 [17:56:54 INFO]: [MS][MRD] 比如 设置了0.001 那就是 玩家至少 1000喵币 才能兑换!
 ```
 
+## 接下来就是赚钱的操作
+
 ## 插件安装/配置
 
 ### 基础准备工作
@@ -46,23 +60,25 @@
   - 个人中心 => 配置面板 => 圈云盒子客服群
   - 打开群详情 加群
 
-### 接下来就是赚钱的操作
+### 申请账号
+- 打开 [圈云盒子管理后台](https://reward.yumc.pw)
+- 扫码登录 并且加入客服群
+- 创建一个服务器 等待管理员审核通过
+
+`[hide]`
 
 ### 服务器准备工作
-- 打开 [圈云盒子管理后台](https://reward.yumc.pw)
-- 先安装 `MiaoScript` [站内地址](https://www.mcbbs.net/thread-774401-1-1.html)
-  - 可以通过 Yum 快速安装 `/yum install MiaoScript`
+- 安装 `MiaoScript` [站内地址](https://www.mcbbs.net/thread-774401-1-1.html)
+  - 如果你已经安装了 Yum 可以通过 Yum 快速安装 `/yum install MiaoScript`
 - 等待 MiaoScript 引擎启动完成(首次启动可能需要10-20秒 依赖于您的网络环境)
-- 执行 `/mspm install MiaoReward`
+- 执行 `/mspm install MiaoReward` 安装 MiaoReward 脚本插件
+- 完成安装
 
 ### 绑定服务器
-- 由于当前框架存在BUG 请先执行 `/mspm reload MiaoReward` 生成配置文件
 - 执行 `/mrd bind server`
-- 使用QQ扫码
-- 选择需要绑定的服务器
-- 完成绑定
+- 使用QQ扫码 => 选择需要绑定的服务器 => 完成绑定
 - 配置服务器兑换比例
-- 执行 `/mrd ratio 0.001` (最低为 1:0.0001)
+- 执行 `/mrd ratio <兑换比例>` (最低为 1:0.0001)
 - 执行兑换比例确认指令
 - 执行 `/mrd server` 查看服务器信息
 - 如果群组服需要绑定多台服务器(前提是每个服务器都有玩家在)
@@ -118,12 +134,18 @@ prefix: '§6[§b广告系统§6]§r'
 
 ## 插件源码
 
-- [MiaoScript包管理中心](http://ms.yumc.pw/api/plugin/download/name/MiaoReward)
+- [MiaoScript包管理中心](https://git.yumc.pw/circlecloud/ms/src/branch/master/packages/plugins/src/MiaoReward.ts)
+
+`[/hide]`
+
+## 更新日志
+- 2020-10-12 完成提现功能
+- 2020-10-06 使用发包的方式展示地图
 
 ## Roadmap
 - 绑定服务器(已完成)
 - 绑定玩家(已完成)
 - 兑换喵币(已完成)
-- 自助开通服务器(开发中)
-- 自助兑换RMB(开发中)
-- 自助提现(开发中)
+- [自助开通](https://reward.yumc.pw)服务器(已完成)
+- [自助兑换](https://reward.yumc.pw)RMB(已完成)
+- [自助提现](https://reward.yumc.pw)(已完成)
