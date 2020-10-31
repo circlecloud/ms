@@ -1,0 +1,27 @@
+{
+    "name": "@ccms/protocol",
+    "version": "0.9.8",
+    "description": "MiaoScript protocol package",
+    "keywords": [
+        "miaoscript",
+        "minecraft",
+        "bukkit",
+        "sponge"
+    ],
+    "author": "MiaoWoo <admin@yumc.pw>",
+    "homepage": "https://github.com/circlecloud/ms.git",
+    "license": "ISC",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "clean": "rimraf dist",
+        "watch": "tsc --watch",
+        "build": "yarn clean && tsc",
+        "test": "echo \"Error: run tests from root\" && exit 1"
+    },
+    "devDependencies": {
+        "reflect-metadata": "^0.1.13",
+        "rimraf": "^3.0.2",
+        "typescript": "^4.0.3"
+    }
+}
