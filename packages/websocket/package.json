@@ -1,6 +1,6 @@
 {
     "name": "@ccms/websocket",
-    "version": "0.9.8",
+    "version": "0.10.0",
     "description": "MiaoScript websocket package",
     "keywords": [
         "miaoscript",
@@ -19,7 +19,7 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "devDependencies": {
-        "@ccms/nashorn": "^0.9.8",
+        "@ccms/nashorn": "^0.10.0",
         "@javatypes/tomcat-websocket-api": "^0.0.3",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
