@@ -72,9 +72,9 @@ export namespace interfaces {
          */
         format?: string
         /**
-         * 是否为只读(关闭时将不会自动保存)
+         * 自动保存 默认为 false
          */
-        readonly?: boolean
+        autosave?: boolean
         /**
          * 配置文件名称
          */

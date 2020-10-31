@@ -35,8 +35,6 @@ export class PluginCommandManager {
 
     private unregistryCommand(pluginInstance: plugin.Plugin) {
         let cmds = getPluginCommandMetadata(pluginInstance)
-        cmds.forEach(cmd => {
-            this.CommandManager.off(pluginInstance, cmd.name)
-        })
+        cmds.forEach(cmd => this.CommandManager.off(pluginInstance, cmd.name))
     }
 }
