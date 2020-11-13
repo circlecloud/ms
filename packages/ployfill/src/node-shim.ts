@@ -22,6 +22,19 @@ class Process extends EventEmitter {
         }
     }
     platform = Packages.java.lang.System.getProperty("os.name")
+    on(event: string | symbol, listener: (...args: any[]) => void) {
+        return super.on(event, (...args) => {
+            try {
+                listener(...args)
+            } catch (error) {
+                try {
+                    super.emit('error', error)
+                } catch (error) {
+                    console.ex(error)
+                }
+            }
+        })
+    }
     nextTick(func: Function) {
         microTaskPool.execute(func)
     }

@@ -1,5 +1,5 @@
 import { command, plugin, server } from '@ccms/api'
-import { provideSingleton, inject, Autowired } from '@ccms/container'
+import { provideSingleton, Autowired } from '@ccms/container'
 import { getPluginCommandMetadata, getPluginTabCompleterMetadata } from './utils'
 
 @provideSingleton(PluginCommandManager)

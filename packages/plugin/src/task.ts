@@ -7,7 +7,7 @@ export class PluginTaskManager {
     private taskManager: task.TaskManager
 
     constructor() {
-        process.on('plugin.after.disable', (plugin: plugin.Plugin) => this.cancelTask(plugin))
+        process.on('plugin.after.disable', this.cancelTask.bind(this))
     }
 
     private cancelTask(pluginInstance: plugin.Plugin) {
