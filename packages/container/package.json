@@ -1,6 +1,6 @@
 {
     "name": "@ccms/container",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "description": "MiaoScript container package",
     "keywords": [
         "miaoscript",
@@ -19,7 +19,7 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "devDependencies": {
-        "@ccms/nashorn": "^0.10.0",
+        "@ccms/nashorn": "^0.10.1",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
         "typescript": "^4.0.5"
