@@ -52,12 +52,13 @@ export class MiaoProtocol extends interfaces.Plugin {
     initPacketAdapter() {
         this.adapter = this.createPacketAdapter((event) => {
             let integers = event.getPacket().getIntegers().getValues()
-            console.log(`ProtocolLib onPacketSending filter Map
-Player: ${event.getPlayer()}
-MapId: ${integers.get(0)}
-Size: ${integers.get(3)}x${integers.get(4)}
-Bytes: ${event.getPacket().getByteArrays().read(0).length}
-`)
+            //             console.log(`ProtocolLib onPacketSending filter Map
+            // Player: ${event.getPlayer()}
+            // MapId: ${integers.get(0)}
+            // Short: ${event.getPacket().getShorts().read(0)}
+            // Bytes: ${event.getPacket().getByteArrays().read(0).length}
+            // `)
+            //Size: ${integers.get(3)}x${integers.get(4)}
             // org.bukkit.map.MapPalette.imageToBytes()
         })
         this.ProtocolLibrary.getProtocolManager().addPacketListener(this.adapter)

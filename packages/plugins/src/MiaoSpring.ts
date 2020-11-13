@@ -94,7 +94,7 @@ export class MiaoSpring extends interfaces.Plugin {
             preHandle: (ctx: Context) => {
                 const index = foundMap.indexOf(ctx.request.getRequestURI())
                 if (index != -1) {
-                    return this.ResponseEntity.status(this.HttpStatus.FOUND).header('Location', foundMap[index + 1]).build()
+                    return this.ResponseEntity.status(org.springframework.http.HttpStatus.FOUND).header('Location', foundMap[index + 1]).build()
                 }
             }
         })

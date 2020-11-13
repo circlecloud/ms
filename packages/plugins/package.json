@@ -20,6 +20,9 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "devDependencies": {
+        "@javatypes/bukkit-api": "^0.0.3",
+        "@javatypes/bungee-api": "^0.0.3",
+        "@javatypes/sponge-api": "^0.0.3",
         "@javatypes/spring-data-redis": "^0.0.3",
         "@javatypes/spring-web": "^0.0.3",
         "@javatypes/tomcat": "^0.0.3",

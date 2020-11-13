@@ -1,8 +1,8 @@
 /// <reference types="@ccms/nashorn" />
 
 import { plugin as pluginApi, server, task, constants, command } from '@ccms/api'
-import { plugin, interfaces, cmd, tab, enable, config, disable } from '@ccms/plugin'
-import { inject, ContainerInstance, Container } from '@ccms/container'
+import { plugin, interfaces, cmd, tab, enable, config, disable, PluginConfig } from '@ccms/plugin'
+import { ContainerInstance, Container, Autowired } from '@ccms/container'
 import io, { Server as SocketIOServer, Socket as SocketIOSocket } from '@ccms/websocket'
 import * as fs from '@ccms/common/dist/fs'
 import * as reflect from '@ccms/common/dist/reflect'
@@ -19,22 +19,22 @@ let help = [
     '§6/mconsole §areload               §6-  §3重载插件',
 ]
 
-@plugin({ name: 'MiaoConsole', prefix: 'Console', version: '1.0.0', author: 'MiaoWoo', servers: ['!nukkit'], source: __filename })
+@plugin({ prefix: 'Console', version: '1.0.0', author: 'MiaoWoo', servers: ['!nukkit'], source: __filename })
 export class MiaoConsole extends interfaces.Plugin {
-    @inject(ContainerInstance)
+    @Autowired(ContainerInstance)
     private container: Container
-    @inject(server.ServerType)
+    @Autowired(server.ServerType)
     private serverType: string
-    @inject(server.Server)
-    private server: server.Server
-    @inject(command.Command)
-    private command: command.Command
-    @inject(task.TaskManager)
-    private task: task.TaskManager
-    @inject(pluginApi.PluginManager)
-    private pluginManager: pluginApi.PluginManager
-    @inject(pluginApi.PluginFolder)
+    @Autowired(pluginApi.PluginFolder)
     private pluginFolder: string
+    @Autowired()
+    private server: server.Server
+    @Autowired()
+    private command: command.Command
+    @Autowired()
+    private task: task.TaskManager
+    @Autowired()
+    private pluginManager: pluginApi.PluginManager
 
     private token: string
     private instance: any
@@ -46,7 +46,7 @@ export class MiaoConsole extends interfaces.Plugin {
     private logCache: string[] = []
 
     @config()
-    private secret = { token: undefined }
+    private secret: PluginConfig = { token: undefined }
 
     load() {
         if (this.secret.token) {
@@ -90,6 +90,7 @@ export class MiaoConsole extends interfaces.Plugin {
     cmdtoken(sender: any, sub: string, token: string) {
         if (sub == "set") {
             this.secret.token = this.token = token
+            this.secret.save()
             this.logger.sender(sender, '§a已保存§6服务器登录Token:§3', this.token, '§4请勿分享给其他人 防止服务器被攻击!')
             return
         }
@@ -216,6 +217,7 @@ export class MiaoConsole extends interfaces.Plugin {
             root: fs.concat(root, 'wwwroot')
         })
         this.container.bind(io.Instance).toConstantValue(this.socketIOServer)
+        process.emit('websocket.create', this.socketIOServer)
     }
 
     startSocketIOServer() {
@@ -224,20 +226,19 @@ export class MiaoConsole extends interfaces.Plugin {
         namespace.on('connect', (client: SocketIOSocket) => {
             if (!this.token) {
                 this.logger.console(`§6客户端 §b${client.id} §a请求连接 §4服务器尚未设置 Token 无法连接!`)
-                client.emit('unauthorized')
-                client.disconnect(true)
+                client.emit('unauthorized', () => client.disconnect(true))
                 return
             }
             if (this.token != client.handshake.query.token) {
                 this.logger.console(`§6客户端 §b${client.id} §c无效请求 §4请提供正确Token后再次连接!`)
-                client.emit('unauthorized')
-                client.disconnect(true)
+                client.emit('unauthorized', () => client.disconnect(true))
                 return
             }
             this.initWebSocketClient(client)
             this.logCache.forEach(msg => client.emit('log', msg))
             this.logger.console(`§6客户端 §b${client.id} §a新建连接 ${this.rootLogger ? '启动日志转发' : '§4转发日志启动失败'}...`)
         })
+        process.emit('websocket.start', this.socketIOServer)
     }
 
     private initWebSocketClient(client: SocketIOSocket) {
@@ -280,7 +281,7 @@ export class MiaoConsole extends interfaces.Plugin {
             if (!dir.isDirectory()) {
                 return fn(undefined, `${file} 不是一个目录!`)
             }
-            fn(fs.list(dir))
+            fn(fs.list(dir).map(f => f.name))
         })
         client.on('error', (error) => {
             this.logger.console(`§6客户端 §b${client.id} §c触发异常: ${error}`)
