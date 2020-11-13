@@ -21,7 +21,7 @@ interface WebSocketServer extends EventEmitter {
 
 class Server implements SocketIO.Server {
     private websocketServer: WebSocketServer
-    private allClients: { [key: string]: Client }
+    private allClients: Map<string, Client>
 
     engine: { ws: any }
     nsps: { [namespace: string]: Namespace }
@@ -35,7 +35,7 @@ class Server implements SocketIO.Server {
 
     constructor(instance: any, options: ServerOptions) {
         if (!instance) { throw new Error('instance can\'t be undefiend!') }
-        this.allClients = {}
+        this.allClients = new Map()
         this.nsps = {}
         this.sockets = new Namespace('/', this)
         this.nsps['/'] = this.sockets
@@ -99,18 +99,17 @@ class Server implements SocketIO.Server {
     bind(srv: any): SocketIO.Server {
         throw new Error("Method not implemented.")
     }
-    onconnection(socket: Client): SocketIO.Server {
-        this.allClients[socket.id] = socket
-        socket.packet({
+    onconnection(client: Client): SocketIO.Server {
+        client.packet({
             type: PacketTypes.OPEN,
             data: {
-                sid: socket.id,
+                sid: client.id,
                 upgrades: [],
                 pingInterval: 25000,
                 pingTimeout: 5000
             }
         })
-        this.sockets.add(socket)
+        this.sockets.add(client)
         return this
     }
     of(nsp: string): Namespace {
@@ -164,20 +163,35 @@ class Server implements SocketIO.Server {
     private initServer() {
         this.websocketServer.on(ServerEvent.connect, (socket: SocketIO.EngineSocket) => {
             let client = new Client(this, socket)
+            this.allClients.set(socket.id, client)
             this.onconnection(client)
         })
         this.websocketServer.on(ServerEvent.message, (socket: SocketIO.EngineSocket, text) => {
-            this.processPacket(this.parser.decode(text), this.allClients[socket.id])
+            if (this.allClients.has(socket.id)) {
+                this.processPacket(this.parser.decode(text), this.allClients.get(socket.id))
+            } else {
+                console.error(`unknow engine socket ${socket.id} reciver message ${text}`)
+            }
         })
         this.websocketServer.on(ServerEvent.disconnect, (socket: SocketIO.EngineSocket, reason) => {
-            this.allClients[socket.id].onclose(reason)
-            delete this.allClients[socket.id]
+            if (this.allClients.has(socket.id)) {
+                this.allClients.get(socket.id).onclose(reason)
+                this.allClients.delete(socket.id)
+            } else {
+                console.error(`unknow engine socket ${socket?.id} disconnect cause ${reason}`)
+            }
         })
         this.websocketServer.on(ServerEvent.error, (socket: SocketIO.EngineSocket, cause) => {
-            if (socket.listeners(ServerEvent.error).length) {
-                socket.emit(ServerEvent.error, cause)
+            if (this.allClients.has(socket?.id)) {
+                if (socket.listeners(ServerEvent.error).length) {
+                    socket.emit(ServerEvent.error, cause)
+                } else {
+                    console.error(`engine socket ${socket.id} cause error: ${cause}`)
+                    console.ex(cause)
+                }
             } else {
-                console.error(`client ${socket.id} cause error: ${cause}`)
+                console.error(`unknow engine socket ${socket?.id} cause error: ${cause}`)
+                console.ex(cause)
             }
         })
     }
@@ -219,5 +233,6 @@ export {
     Server,
     Socket,
     Client,
+    Namespace,
     ServerOptions
 }
