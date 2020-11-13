@@ -2,7 +2,6 @@ import { task, plugin } from '@ccms/api'
 import { inject, provideSingleton } from '@ccms/container'
 import thread_pool from '@ccms/common/dist/thread-pool'
 
-const AtomicInteger = Java.type("java.util.concurrent.atomic.AtomicInteger")
 const AtomicBoolean = Java.type("java.util.concurrent.atomic.AtomicBoolean")
 const Thread = Java.type('java.lang.Thread')
 
@@ -11,21 +10,19 @@ export class SpringTaskManager extends task.TaskManager {
     @inject(plugin.PluginInstance)
     private pluginInstance: any
 
-    private taskId: any
     private tasks: { [s: string]: task.Cancelable }
     private executor: java.util.concurrent.ThreadPoolExecutor
 
     constructor() {
         super()
-        this.taskId = new AtomicInteger(0)
         this.tasks = {}
         this.executor = thread_pool.create({
             groupName: '@ccms/spring'
         })
     }
 
-    create0(func: Function): task.Task {
-        return new SpringTask(this.pluginInstance, func, this)
+    create0(owner: plugin.Plugin, func: Function, id: number): task.Task {
+        return new SpringTask(owner, func, id, this)
     }
     callSyncMethod(func: Function): any {
         return func()
@@ -51,8 +48,8 @@ export class SpringTask extends task.Task {
     private taskManager: SpringTaskManager
     private running = new AtomicBoolean(true)
 
-    constructor(plugin: any, func: Function, taskManager: SpringTaskManager) {
-        super(plugin, func)
+    constructor(owner: plugin.Plugin, func: Function, id: number, taskManager: SpringTaskManager) {
+        super(owner, func, id)
         this.id = taskManager.nextId()
         this.taskManager = taskManager
     }
@@ -83,19 +80,16 @@ export class SpringTask extends task.Task {
         this.cancel()
     }
 
-    cancel0(): any {
+    cancel0() {
         var wasRunning = this.running.getAndSet(false)
         if (wasRunning) {
             this.taskManager.cancel(this.id)
+            return true
         }
+        return false
     }
 
     submit0(...args: any[]) {
         this.taskManager.submit(this.id, this, () => this.run(...args))
-        return {
-            cancel: () => {
-                return this.cancel0()
-            }
-        }
     }
 }

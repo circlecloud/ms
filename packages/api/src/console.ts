@@ -133,6 +133,7 @@ export class MiaoScriptConsole implements Console {
         }
     }
     stack(ex: Error, color: boolean = true): string[] {
+        if (!ex) return []
         let stack = ex.getStackTrace()
         let cache = [(color ? '§c' : '') + ex]
         //@ts-ignore

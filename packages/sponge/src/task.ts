@@ -9,24 +9,22 @@ const TimeUnit = Java.type('java.util.concurrent.TimeUnit')
 
 @provideSingleton(task.TaskManager)
 export class SpongeTaskManager extends task.TaskManager {
-    @inject(plugin.PluginInstance)
-    private pluginInstance: any
     private syncExecutor: any
 
     @postConstruct()
     initialize() {
-        this.syncExecutor = Sponge.getScheduler().createSyncExecutor(this.pluginInstance)
+        this.syncExecutor = Sponge.getScheduler().createSyncExecutor(base.getInstance())
     }
 
-    create0(func: Function): task.Task {
-        return new SpongeTask(this.pluginInstance, func)
+    create0(owner: plugin.Plugin, func: Function, id: number): task.Task {
+        return new SpongeTask(owner, func, id)
     }
     callSyncMethod(func: Function): any {
         // @ts-ignore
         return this.syncExecutor.schedule(new Callable({ call: () => func() }), java.lang.Long.valueOf(0), TimeUnit.NANOSECONDS).get()
     }
     disable0() {
-        Sponge.getScheduler().getScheduledTasks(this.pluginInstance).forEach((task: task.Cancelable) => task.cancel())
+        Sponge.getScheduler().getScheduledTasks(base.getInstance()).forEach((task: task.Cancelable) => task.cancel())
     }
 }
 
@@ -36,6 +34,6 @@ export class SpongeTask extends task.Task {
         if (this.isAsync) { run.async() }
         if (this.laterTime) { run.delayTicks(this.laterTime) }
         if (this.interval) { run.intervalTicks(this.interval) }
-        return run.submit(this.plugin)
+        return run.submit(base.getInstance())
     }
 }
