@@ -1,6 +1,6 @@
 {
     "name": "@ccms/core",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "description": "MiaoScript api package",
     "keywords": [
         "miaoscript",
@@ -24,8 +24,8 @@
         "typescript": "^4.0.5"
     },
     "dependencies": {
-        "@ccms/api": "^0.10.0",
-        "@ccms/container": "^0.10.0"
+        "@ccms/api": "^0.10.1",
+        "@ccms/container": "^0.10.1"
     },
     "gitHead": "781524f83e52cad26d7c480513e3c525df867121"
 }
