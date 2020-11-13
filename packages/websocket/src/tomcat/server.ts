@@ -15,28 +15,45 @@ type TomcatWebSocketSession = javax.websocket.Session
 class TomcatWebSocketServer extends EventEmitter {
     private beanFactory: any
     private executor: any
-    private allClients: { [key: string]: SocketIO.EngineSocket }
+    private clients: Map<string, SocketIO.EngineSocket>
 
     constructor(beanFactory: any, options: ServerOptions) {
         super()
-        this.allClients = {}
+        this.clients = new Map()
         this.beanFactory = beanFactory
         this.initThreadPool()
         try { this.beanFactory.destroySingleton(ProxyBeanName) } catch (error) { }
         let NashornWebSocketServerProxy = Java.extend(WebSocketServerProxy, {
             onOpen: (session: TomcatWebSocketSession) => {
+                let cid = `${session?.getId()}`
                 let tomcatClient = new TomcatClient(this, session)
-                this.allClients[session.getId()] = tomcatClient
+                this.clients.set(cid, tomcatClient)
                 this.emit(ServerEvent.connect, tomcatClient)
             },
             onMessage: (session: TomcatWebSocketSession, message: string) => {
-                this.executor.execute(() => this.emit(ServerEvent.message, this.allClients[session.getId()], message))
+                let cid = `${session?.getId()}`
+                if (this.clients.has(cid)) {
+                    this.executor.execute(() => this.emit(ServerEvent.message, this.clients.get(cid), message))
+                } else {
+                    console.error(`unknow client ${session} reciver message ${message}`)
+                }
             },
             onClose: (session: TomcatWebSocketSession, reason: any) => {
-                this.emit(ServerEvent.disconnect, this.allClients[session.getId()], reason)
+                let cid = `${session?.getId()}`
+                if (this.clients.has(cid)) {
+                    this.emit(ServerEvent.disconnect, this.clients.get(cid), reason)
+                } else {
+                    console.error(`unknow client ${session} disconnect cause ${reason}`)
+                }
             },
             onError: (session: TomcatWebSocketSession, error: Error) => {
-                this.emit(ServerEvent.error, this.allClients[session.getId()], error)
+                let cid = `${session?.getId()}`
+                if (this.clients.has(cid)) {
+                    this.emit(ServerEvent.error, this.clients.get(cid), error)
+                } else {
+                    console.error(`unknow client ${session} cause error ${error}`)
+                    console.ex(error)
+                }
             },
         })
         this.beanFactory.registerSingleton(ProxyBeanName, new NashornWebSocketServerProxy())
@@ -52,7 +69,7 @@ class TomcatWebSocketServer extends EventEmitter {
         this.executor.initialize()
     }
     close() {
-        Object.values(this.allClients).forEach(client => client.close())
+        this.clients.forEach(client => client.close())
         this.beanFactory.destroySingleton(ProxyBeanName)
         this.executor.shutdown()
     }

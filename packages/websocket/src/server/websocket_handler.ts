@@ -13,10 +13,10 @@ const HttpObjectAggregator = Java.type('io.netty.handler.codec.http.HttpObjectAg
 const WebSocketServerProtocolHandler = Java.type('io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler')
 
 export class WebSocketHandler extends WebSocketHandlerAdapter {
-    private options: ServerOptions;
+    private options: ServerOptions
     constructor(options: ServerOptions) {
         super()
-        this.options = options;
+        this.options = options
     }
     channelRead(ctx: any, msg: any) {
         msg.markReaderIndex()
@@ -32,6 +32,7 @@ export class WebSocketHandler extends WebSocketHandlerAdapter {
             pipeline.addLast('chunk', new ChunkedWriteHandler())
             pipeline.addLast('httpobj', new HttpObjectAggregator(64 * 1024))
             pipeline.addLast('http_request', new HttpRequestHandler(this.options).getHandler())
+            // this.options.path, null, false, 655360, false, true, false, 10000
             pipeline.addLast('websocket', new WebSocketServerProtocolHandler(this.options.path, true))
             pipeline.addLast('websocket_handler', new TextWebSocketFrameHandler(this.options).getHandler())
         }
@@ -39,6 +40,12 @@ export class WebSocketHandler extends WebSocketHandlerAdapter {
         msg.resetReaderIndex()
         ctx.fireChannelRead(msg)
     }
+
+    channelUnregistered(ctx: any) {
+        this.options.event.emit(ServerEvent.disconnect, ctx, 'client disconnect')
+        ctx.fireChannelUnregistered()
+    }
+
     exceptionCaught(ctx: any, cause: Error) {
         this.options.event.emit(ServerEvent.error, ctx, cause)
     }

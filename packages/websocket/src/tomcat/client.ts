@@ -25,7 +25,7 @@ export class TomcatClient extends EventEmitter implements SocketIO.EngineSocket 
         this.transport = null
 
         this.session = session
-        this._id = session.getId()
+        this._id = session.getId() + ''
     }
 
     get id() {
