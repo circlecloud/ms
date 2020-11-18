@@ -2,7 +2,6 @@ import { EventEmitter } from 'events'
 
 import { ServerOptions } from '../socket-io'
 import { ServerEvent } from '../socket-io/constants'
-import { SocketIO } from '../socket-io/interfaces'
 import { ProxyBeanName } from './constants'
 import { TomcatClient } from './client'
 
@@ -15,7 +14,7 @@ type TomcatWebSocketSession = javax.websocket.Session
 class TomcatWebSocketServer extends EventEmitter {
     private beanFactory: any
     private executor: any
-    private clients: Map<string, SocketIO.EngineSocket>
+    private clients: Map<string, any>
 
     constructor(beanFactory: any, options: ServerOptions) {
         super()

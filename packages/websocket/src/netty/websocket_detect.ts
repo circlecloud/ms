@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events'
-import { WebSocketHandlerAdapter } from "../netty"
+import { WebSocketHandlerAdapter } from "./adapter"
 import { ServerEvent } from '../socket-io/constants'
 
 export class WebSocketDetect extends WebSocketHandlerAdapter {
@@ -11,7 +11,13 @@ export class WebSocketDetect extends WebSocketHandlerAdapter {
     channelRead(ctx: any, channel: any) {
         this.event.emit(ServerEvent.detect, ctx, channel)
     }
+    channelInactive(ctx: any) {
+        console.debug('WebSocketDetect channelUnregistered ' + ctx)
+        this.event.emit(ServerEvent.disconnect, ctx, 'client disconnect')
+        ctx.channelInactive()
+    }
     channelUnregistered(ctx: any) {
+        console.debug('WebSocketDetect channelUnregistered ' + ctx)
         this.event.emit(ServerEvent.disconnect, ctx, 'client disconnect')
         ctx.fireChannelUnregistered()
     }

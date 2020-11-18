@@ -1,24 +1,23 @@
-const TypeParameterMatcher = Java.type('io.netty.util.internal.TypeParameterMatcher')
-const TextWebSocketFrameMatcher = TypeParameterMatcher.get(base.getClass('io.netty.handler.codec.http.websocketx.TextWebSocketFrame'))
-const SimpleChannelInboundHandler = Java.type('io.netty.channel.SimpleChannelInboundHandler')
+import { EventEmitter } from 'events'
+import { ServerOptions } from '../socket-io'
+import { ServerEvent } from '../socket-io/constants'
+import { TextWebSocketFrameHandlerAdapter } from './adapter'
 
-export abstract class TextWebSocketFrameHandlerAdapter {
-    private _Handler
-    constructor() {
-        let TextWebSocketFrameHandlerAdapterImpl = Java.extend(SimpleChannelInboundHandler, {
-            userEventTriggered: this.userEventTriggered.bind(this),
-            acceptInboundMessage: (msg: any) => {
-                return TextWebSocketFrameMatcher.match(msg)
-            },
-            channelRead0: this.channelRead0.bind(this),
-            exceptionCaught: this.exceptionCaught.bind(this)
-        })
-        this._Handler = new TextWebSocketFrameHandlerAdapterImpl()
+export class TextWebSocketFrameHandler extends TextWebSocketFrameHandlerAdapter {
+    private event: EventEmitter
+    constructor(options: ServerOptions) {
+        super()
+        this.event = options.event
     }
-    abstract userEventTriggered(ctx: any, evt: any)
-    abstract channelRead0(ctx: any, msg: any)
-    abstract exceptionCaught(ctx: any, cause: Error)
-    getHandler() {
-        return this._Handler
+    userEventTriggered(ctx: any, evt: any) {
+        if (evt == 'HANDSHAKE_COMPLETE') {
+            this.event.emit(ServerEvent.connect, ctx)
+        }
+    }
+    channelRead0(ctx: any, msg: any) {
+        this.event.emit(ServerEvent.message, ctx, msg)
+    }
+    exceptionCaught(ctx: any, cause: Error) {
+        this.event.emit(ServerEvent.error, ctx, cause)
     }
 }

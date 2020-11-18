@@ -1,10 +1,10 @@
 import { EventEmitter } from 'events'
-import { SocketIO } from '../socket-io/interfaces'
+import { InnerClient } from '../interfaces'
 import { AttributeKeys } from './constants'
 
 const TextWebSocketFrame = Java.type('io.netty.handler.codec.http.websocketx.TextWebSocketFrame')
 
-export class NettyClient extends EventEmitter implements SocketIO.EngineSocket {
+export class NettyClient extends EventEmitter implements InnerClient {
     private _id: string
     private channel: any
 
@@ -13,7 +13,6 @@ export class NettyClient extends EventEmitter implements SocketIO.EngineSocket {
     remoteAddress: string
     upgraded: boolean
     request: any
-    transport: any
 
     constructor(server: any, channel: any) {
         super()
@@ -22,7 +21,6 @@ export class NettyClient extends EventEmitter implements SocketIO.EngineSocket {
         this.remoteAddress = channel.remoteAddress() + ''
         this.upgraded = true
         this.request = channel.attr(AttributeKeys.Request).get()
-        this.transport = null
 
         this.channel = channel
         this._id = channel.id() + ''
@@ -32,9 +30,16 @@ export class NettyClient extends EventEmitter implements SocketIO.EngineSocket {
         return this._id
     }
     send(text: string) {
-        this.channel.writeAndFlush(new TextWebSocketFrame(text))
+        if (this.readyState == 'open') {
+            this.channel.writeAndFlush(new TextWebSocketFrame(text))
+        } else {
+            console.debug(`send message ${text} to close client ${this._id}`)
+        }
     }
     close() {
-        this.channel.close()
+        if (this.readyState = 'open') {
+            this.channel.close()
+            this.readyState = 'close'
+        }
     }
 }

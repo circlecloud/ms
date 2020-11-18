@@ -3,7 +3,7 @@ import { ServerEvent } from '../socket-io/constants'
 
 import { Keys } from './constants'
 import { HttpRequestHandler } from './httprequest'
-import { WebSocketHandlerAdapter } from "../netty"
+import { WebSocketHandlerAdapter } from "./adapter"
 import { TextWebSocketFrameHandler } from './text_websocket_frame'
 
 const CharsetUtil = Java.type('io.netty.util.CharsetUtil')
@@ -41,7 +41,14 @@ export class WebSocketHandler extends WebSocketHandlerAdapter {
         ctx.fireChannelRead(msg)
     }
 
+    channelInactive(ctx: any) {
+        console.debug('WebSocketHandler channelInactive ' + ctx)
+        this.options.event.emit(ServerEvent.disconnect, ctx, 'client disconnect')
+        ctx.channelInactive()
+    }
+
     channelUnregistered(ctx: any) {
+        console.debug('WebSocketHandler channelUnregistered ' + ctx)
         this.options.event.emit(ServerEvent.disconnect, ctx, 'client disconnect')
         ctx.fireChannelUnregistered()
     }

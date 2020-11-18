@@ -1,158 +1,117 @@
 import { EventEmitter } from 'events'
 
-import { SocketIO } from "./interfaces"
 import { Packet } from './packet'
 import { PacketTypes, SubPacketTypes } from './types'
 import { Client } from './client'
 import { Namespace } from './namespace'
 import * as querystring from 'querystring'
 import { ServerEvent } from './constants'
+import { Adapter, BroadcastFlags, Room, SocketId } from './adapter'
+import { Server } from 'index'
 
-export class Socket extends EventEmitter implements SocketIO.Socket {
+export const RESERVED_EVENTS = new Set([
+    "connect",
+    "connect_error",
+    "disconnect",
+    "disconnecting",
+    // EventEmitter reserved events: https://nodejs.org/api/events.html#events_event_newlistener
+    "newListener",
+    "removeListener"
+])
+
+/**
+ * The handshake details
+ */
+export interface Handshake {
+    /**
+     * The headers sent as part of the handshake
+     */
+    headers: object
+
+    /**
+     * The date of creation (as string)
+     */
+    time: string
+
+    /**
+     * The ip of the client
+     */
+    address: string
+
+    /**
+     * Whether the connection is cross-domain
+     */
+    xdomain: boolean
+
+    /**
+     * Whether the connection is secure
+     */
+    secure: boolean
+
+    /**
+     * The date of creation (as unix timestamp)
+     */
+    issued: number
+
+    /**
+     * The request URL string
+     */
+    url: string
+
+    /**
+     * The query object
+     */
+    query: any
+
+    /**
+     * The auth object
+     */
+    auth: any
+}
+export class Socket extends EventEmitter {
     nsp: Namespace
-    server: SocketIO.Server
-    adapter: SocketIO.Adapter
-    id: string
-    request: any
+
+    public readonly id: SocketId
+    public readonly handshake: Handshake
+
+    public connected: boolean
+    public disconnected: boolean
+
+    private readonly server: Server
+    private readonly adapter: Adapter
+
     client: Client
-    conn: SocketIO.EngineSocket
-    rooms: { [id: string]: string }
-    acks: { [id: string]: Function }
-    connected: boolean
-    disconnected: boolean
-    handshake: SocketIO.Handshake
+    private acks: Map<number, () => void>
+
     fns: any[]
-    flags: { [key: string]: boolean }
-    _rooms: string[]
+    private flags: BroadcastFlags = {};
+    private _rooms: Set<Room> = new Set();
+    private _anyListeners: Array<(...args: any[]) => void>
 
     private events = [
-        'error',
         'connect',
+        "connect_error",
         'disconnect',
         'disconnecting',
         'newListener',
         'removeListener'
     ]
 
-    constructor(nsp: Namespace, client: Client, query = {}) {
+    constructor(nsp: Namespace, client: Client, auth = {}) {
         super()
         this.nsp = nsp
         this.server = nsp.server
         this.adapter = this.nsp.adapter
         this.id = nsp.name !== '/' ? nsp.name + '#' + client.id : client.id
         this.client = client
-        this.request = client.request
-        this.conn = client.conn
-        this.rooms = {}
-        this.acks = {}
+        this.acks = new Map()
         this.connected = true
         this.disconnected = false
-        this.handshake = this.buildHandshake(query)
+        this.handshake = this.buildHandshake(auth)
+
         this.fns = []
         this.flags = {}
-        this._rooms = []
-    }
-
-    get json() {
-        this.flags.json = true
-        return this
-    }
-
-    get volatile() {
-        this.flags.volatile = true
-        return this
-    }
-    get broadcast() {
-        this.flags.broadcast = true
-        return this
-    }
-    get local() {
-        this.flags.local = true
-        return this
-    }
-
-    to(room: string): SocketIO.Socket {
-        if (!~this._rooms.indexOf(room)) this._rooms.push(room)
-        return this
-    }
-    in(room: string): SocketIO.Socket {
-        return this.to(room)
-    }
-    use(fn: (packet: SocketIO.Packet, next: (err?: any) => void) => void): SocketIO.Socket {
-        throw new Error("Method not implemented.")
-    }
-    send(...args: any[]): SocketIO.Socket {
-        this.emit("message", ...args)
-        return this
-    }
-    write(...args: any[]): SocketIO.Socket {
-        return this.send(...args)
-    }
-    join(rooms: string | string[], fn?: (err?: any) => void): SocketIO.Socket {
-        if (!Array.isArray(rooms)) {
-            rooms = [rooms]
-        }
-        rooms = rooms.filter((room) => {
-            return !this.rooms.hasOwnProperty(room)
-        })
-        if (!rooms.length) {
-            fn && fn(null)
-            return this
-        }
-        this.adapter.addAll(this.id, rooms, (err) => {
-            if (err) return fn && fn(err);
-            // debug('joined room %s', rooms);
-            (rooms as Array<string>).forEach((room) => {
-                this.rooms[room] = room
-            })
-            fn && fn(null)
-        })
-        return this
-    }
-    leave(name: string, fn?: Function): SocketIO.Socket {
-        delete this.rooms[name]
-        fn && fn(null)
-        return this
-    }
-    leaveAll(): void {
-        this.adapter.delAll(this.id)
-        this.rooms = {}
-    }
-    disconnect(close?: boolean): SocketIO.Socket {
-        if (!this.connected) return this
-        if (close) {
-            this.client.disconnect()
-        } else {
-            this.packet({ type: PacketTypes.MESSAGE, sub_type: SubPacketTypes.DISCONNECT })
-            this.onclose('server namespace disconnect')
-        }
-        return this
-    }
-    compress(compress: boolean): SocketIO.Socket {
-        throw new Error("Method not implemented.")
-    }
-    error(err: any): void {
-        this.packet({ type: PacketTypes.MESSAGE, sub_type: SubPacketTypes.ERROR, data: err })
-    }
-
-    // ==========================================
-    buildHandshake(query): SocketIO.Handshake {
-        let requestUri = this.request.uri()
-        let headers = {}
-        let nativeHeaders = this.request.headers()
-        nativeHeaders.forEach(function (header) {
-            headers[header.getKey()] = header.getValue()
-        })
-        return {
-            headers: headers,
-            time: (new Date) + '',
-            address: this.conn.remoteAddress + '',
-            xdomain: !!headers['origin'],
-            secure: false,
-            issued: +(new Date),
-            url: requestUri,
-            query: Object.assign(query, querystring.parse(requestUri.indexOf('?') != -1 ? requestUri.split('?')[1] : ''))
-        }
+        this._rooms = new Set()
     }
     emit(event: string, ...args: any[]): boolean {
         if (~this.events.indexOf(event)) {
@@ -169,25 +128,26 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
         }
 
         // access last argument to see if it's an ACK callback
-        if (typeof args[args.length - 1] === 'function') {
-            if (this._rooms.length || this.flags.broadcast) {
-                throw new Error('Callbacks are not supported when broadcasting')
+        if (typeof args[args.length - 1] === "function") {
+            if (this._rooms.size || this.flags.broadcast) {
+                throw new Error("Callbacks are not supported when broadcasting")
             }
-            // debug('emitting packet with ack id %d', this.nsp.ids);
-            this.acks[this.nsp.ids] = args.pop()
-            packet.id = this.nsp.ids++
+
+            // console.debug("emitting packet with ack id %d", this.nsp._ids)
+            this.acks.set(this.nsp._ids, args.pop())
+            packet.id = this.nsp._ids++
         }
 
-        let rooms = this._rooms.slice(0)
-        let flags = Object.assign({}, this.flags)
+        const rooms = new Set(this._rooms)
+        const flags = Object.assign({}, this.flags)
 
         // reset flags
-        this._rooms = []
+        this._rooms.clear()
         this.flags = {}
 
-        if (rooms.length || flags.broadcast) {
+        if (rooms.size || flags.broadcast) {
             this.adapter.broadcast(packet, {
-                except: [this.id],
+                except: new Set([this.id]),
                 rooms: rooms,
                 flags: flags
             })
@@ -195,47 +155,69 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
             // dispatch packet
             this.packet(packet, flags)
         }
-        // @ts-ignore
+        return true
+    }
+    to(name: Room): Socket {
+        this._rooms.add(name)
         return this
     }
-    packet(packet: Packet, opts: any = { preEncoded: false }) {
-        if (!opts.preEncoded) {
-            packet.nsp = this.nsp.name
-            opts.compress = false !== opts.compress
-        }
-        try {
-            this.client.packet(packet, opts)
-        } catch (error) {
-            this.onerror(error)
-        }
+    in(room: string): Socket {
+        return this.to(room)
     }
-    onconnect() {
-        this.nsp.connected[this.id] = this
-        this.client.sockets[this.id] = this
+    use(fn: (packet: Packet, next: (err?: any) => void) => void): Socket {
+        throw new Error("Method not implemented.")
+    }
+    send(...args: any[]): Socket {
+        this.emit("message", ...args)
+        return this
+    }
+    write(...args: any[]): Socket {
+        return this.send(...args)
+    }
+    public join(rooms: Room | Array<Room>): Promise<void> | void {
+        console.debug(`join room ${rooms}`)
+
+        return this.adapter.addAll(
+            this.id,
+            new Set(Array.isArray(rooms) ? rooms : [rooms])
+        )
+    }
+    /**
+     * Leaves a room.
+     *
+     * @param {String} room
+     * @return a Promise or nothing, depending on the adapter
+     * @public
+     */
+    public leave(room: string): Promise<void> | void {
+        console.debug(`leave room ${room}`)
+
+        return this.adapter.del(this.id, room)
+    }
+
+    /**
+     * Leave all rooms.
+     *
+     * @private
+     */
+    private leaveAll(): void {
+        this.adapter.delAll(this.id)
+    }
+
+    /**
+      * Called by `Namespace` upon successful
+      * middleware execution (ie: authorization).
+      * Socket is added to namespace array before
+      * call to join, so adapters can access it.
+      *
+      * @private
+      */
+    _onconnect(): void {
+        console.debug("socket connected - writing packet")
         this.join(this.id)
-        // let skip = this.nsp.name === '/' && this.nsp.fns.length === 0;
-        // if (skip) {
-        // debug('packet already sent in initial handshake');
-        // } else {
-        this.packet({
-            type: PacketTypes.MESSAGE,
-            sub_type: SubPacketTypes.CONNECT
-        })
-        // }
+        this.packet({ type: PacketTypes.MESSAGE, sub_type: SubPacketTypes.CONNECT })
     }
-    onclose(reason?: string) {
-        if (!this.connected) return this
-        // debug('closing socket - reason %s', reason);
-        this.emit('disconnecting', reason)
-        this.leaveAll()
-        this.nsp.remove(this)
-        this.client.remove(this)
-        this.connected = false
-        this.disconnected = true
-        delete this.nsp.connected[this.id]
-        this.emit('disconnect', reason)
-    }
-    onpacket(packet: Packet) {
+    _onpacket(packet: Packet) {
         switch (packet.sub_type) {
             // 2
             case SubPacketTypes.EVENT:
@@ -259,23 +241,12 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
                 break
             // 4
             case SubPacketTypes.ERROR:
-                this.onerror(new Error(packet.data))
+                this._onerror(new Error(packet.data))
         }
-    }
-    onerror(err: Error) {
-        if (this.listeners('error').length) {
-            this.emit('error', err)
-        } else {
-            console.error('Missing error handler on `socket`.')
-            console.error(err.stack)
-        }
-    }
-    ondisconnect() {
-        this.onclose('client namespace disconnect')
     }
     onevent(packet: Packet) {
         if (null != packet.id) {
-            // debug('attaching ack callback to event');
+            console.debug('attaching ack callback to event')
             this.dispatch(packet, this.ack(packet.id))
         } else {
             this.dispatch(packet)
@@ -297,11 +268,232 @@ export class Socket extends EventEmitter implements SocketIO.Socket {
     onack(packet: Packet) {
         let ack = this.acks[packet.id]
         if ('function' == typeof ack) {
-            // debug('calling ack %s with %j', packet.id, packet.data);
+            console.debug('calling ack %s with %j', packet.id, packet.data)
             ack.apply(this, packet.data)
             delete this.acks[packet.id]
         } else {
-            // debug('bad ack %s', packet.id);
+            console.debug('bad ack %s', packet.id)
+        }
+    }
+    /**
+     * Called upon client disconnect packet.
+     *
+     * @private
+     */
+    private ondisconnect(): void {
+        console.debug("got disconnect packet")
+        this._onclose("client namespace disconnect")
+    }
+
+    /**
+     * Handles a client error.
+     *
+     * @private
+     */
+    _onerror(err): void {
+        if (this.listeners("error").length) {
+            super.emit("error", err)
+        } else {
+            console.error("Missing error handler on `socket`.")
+            console.error(err.stack)
+        }
+    }
+
+    /**
+     * Called upon closing. Called by `Client`.
+     *
+     * @param {String} reason
+     * @throw {Error} optional error object
+     *
+     * @private
+     */
+    _onclose(reason: string) {
+        console.debug(`closing socket - reason: ${reason} connected: ${this.connected}`)
+        if (!this.connected) return this
+        this.emit('disconnecting', reason)
+        this.leaveAll()
+        this.nsp._remove(this)
+        this.client._remove(this)
+        this.connected = false
+        this.disconnected = true
+        this.emit('disconnect', reason)
+    }
+
+    /**
+     * Produces an `error` packet.
+     *
+     * @param {Object} err - error object
+     *
+     * @private
+     */
+    _error(err) {
+        this.packet({ type: PacketTypes.MESSAGE, sub_type: SubPacketTypes.ERROR, data: err })
+    }
+    disconnect(close?: boolean): Socket {
+        if (!this.connected) return this
+        if (close) {
+            this.client._disconnect()
+        } else {
+            this.packet({ type: PacketTypes.MESSAGE, sub_type: SubPacketTypes.DISCONNECT })
+            this._onclose('server namespace disconnect')
+        }
+        return this
+    }
+
+    compress(compress: boolean): Socket {
+        throw new Error("Method not implemented.")
+    }
+
+    /**
+    * Sets a modifier for a subsequent event emission that the event data may be lost if the client is not ready to
+    * receive messages (because of network slowness or other issues, or because they’re connected through long polling
+    * and is in the middle of a request-response cycle).
+    *
+    * @return {Socket} self
+    * @public
+    */
+    public get volatile(): Socket {
+        this.flags.volatile = true
+        return this
+    }
+
+    /**
+     * Sets a modifier for a subsequent event emission that the event data will only be broadcast to every sockets but the
+     * sender.
+     *
+     * @return {Socket} self
+     * @public
+     */
+    public get broadcast(): Socket {
+        this.flags.broadcast = true
+        return this
+    }
+
+    /**
+     * Sets a modifier for a subsequent event emission that the event data will only be broadcast to the current node.
+     *
+     * @return {Socket} self
+     * @public
+     */
+    public get local(): Socket {
+        this.flags.local = true
+        return this
+    }
+
+    /**
+     * A reference to the request that originated the underlying Engine.IO Socket.
+     *
+     * @public
+     */
+    public get request(): any {
+        return this.client.request
+    }
+
+    /**
+     * A reference to the underlying Client transport connection (Engine.IO Socket object).
+     *
+     * @public
+     */
+    public get conn() {
+        return this.client.conn
+    }
+
+    /**
+     * @public
+     */
+    public get rooms(): Set<Room> {
+        return this.adapter.socketRooms(this.id) || new Set()
+    }
+
+    /**
+     * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the
+     * callback.
+     *
+     * @param listener
+     * @public
+     */
+    public onAny(listener: (...args: any[]) => void): Socket {
+        this._anyListeners = this._anyListeners || []
+        this._anyListeners.push(listener)
+        return this
+    }
+
+    /**
+     * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the
+     * callback. The listener is added to the beginning of the listeners array.
+     *
+     * @param listener
+     * @public
+     */
+    public prependAny(listener: (...args: any[]) => void): Socket {
+        this._anyListeners = this._anyListeners || []
+        this._anyListeners.unshift(listener)
+        return this
+    }
+
+    /**
+     * Removes the listener that will be fired when any event is emitted.
+     *
+     * @param listener
+     * @public
+     */
+    public offAny(listener?: (...args: any[]) => void): Socket {
+        if (!this._anyListeners) {
+            return this
+        }
+        if (listener) {
+            const listeners = this._anyListeners
+            for (let i = 0; i < listeners.length; i++) {
+                if (listener === listeners[i]) {
+                    listeners.splice(i, 1)
+                    return this
+                }
+            }
+        } else {
+            this._anyListeners = []
+        }
+        return this
+    }
+
+    /**
+     * Returns an array of listeners that are listening for any event that is specified. This array can be manipulated,
+     * e.g. to remove listeners.
+     *
+     * @public
+     */
+    public listenersAny() {
+        return this._anyListeners || []
+    }
+
+    // ==========================================
+    buildHandshake(auth): Handshake {
+        let requestUri = this.request.uri()
+        let headers = {}
+        let nativeHeaders = this.request.headers()
+        nativeHeaders.forEach(function (header) {
+            headers[header.getKey()] = header.getValue()
+        })
+        return {
+            headers: headers,
+            time: new Date() + '',
+            address: this.conn.remoteAddress + '',
+            xdomain: !!headers['origin'],
+            secure: false,
+            issued: +new Date(),
+            url: requestUri,
+            query: querystring.parse(requestUri.indexOf('?') != -1 ? requestUri.split('?')[1] : ''),
+            auth
+        }
+    }
+    packet(packet: Packet, opts: any = { preEncoded: false }) {
+        if (!opts.preEncoded) {
+            packet.nsp = this.nsp.name
+            opts.compress = false !== opts.compress
+        }
+        try {
+            this.client._packet(packet, opts)
+        } catch (error) {
+            this._onerror(error)
         }
     }
     dispatch(packet: Packet, ack?: Function) {
