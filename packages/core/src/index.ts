@@ -1,25 +1,23 @@
 let containerStartTime = Date.now()
 console.i18n("ms.core.ioc.initialize", { scope: global.scope })
 import { plugin, server, task, constants } from '@ccms/api'
-import { DefaultContainer as container, inject, provideSingleton, ContainerInstance, buildProviderModule } from '@ccms/container'
+import { DefaultContainer as container, inject, provideSingleton, ContainerInstance, buildProviderModule, Autowired } from '@ccms/container'
 console.i18n("ms.core.ioc.completed", { scope: global.scope, time: (Date.now() - containerStartTime) / 1000 })
 import http from '@ccms/common/dist/http'
 
 @provideSingleton(MiaoScriptCore)
 class MiaoScriptCore {
-    @inject(server.Console)
+    @Autowired(server.Console)
     private Console: Console
-    @inject(task.TaskManager)
-    private taskManager: task.TaskManager
-    @inject(plugin.PluginFolder)
+    @Autowired(plugin.PluginFolder)
     private pluginFolder: string
-    @inject(plugin.PluginManager)
+    @Autowired()
+    private taskManager: task.TaskManager
+    @Autowired()
     private pluginManager: plugin.PluginManager
 
     enable() {
         this.loadServerConsole()
-        this.loadTaskFunction()
-        global.level = "TRACE"
         this.loadPlugins()
         return () => this.disable()
     }
@@ -27,15 +25,6 @@ class MiaoScriptCore {
     loadServerConsole() {
         //@ts-ignore
         global.setGlobal('console', new this.Console(), { writable: false, configurable: false })
-    }
-
-    loadTaskFunction() {
-        global.setGlobal('setTimeout', (func: Function, tick: number, ...args: any[]) => {
-            return this.taskManager.create(func).later(tick).submit(...args)
-        }, { writable: false, configurable: false })
-        global.setGlobal('setInterval', (func: Function, tick: number, ...args: any[]) => {
-            return this.taskManager.create(func).timer(tick).submit(...args)
-        }, { writable: false, configurable: false })
     }
 
     loadPlugins() {
