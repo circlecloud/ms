@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events'
-import { SocketIO } from '../socket-io/interfaces'
+import { InnerClient } from '../interfaces'
 
-export class TomcatClient extends EventEmitter implements SocketIO.EngineSocket {
+export class TomcatClient extends EventEmitter implements InnerClient {
     private _id: string
     private session: javax.websocket.Session
 
@@ -10,7 +10,6 @@ export class TomcatClient extends EventEmitter implements SocketIO.EngineSocket 
     remoteAddress: string
     upgraded: boolean
     request: any
-    transport: any
 
     constructor(server: any, session: javax.websocket.Session) {
         super()
@@ -22,7 +21,6 @@ export class TomcatClient extends EventEmitter implements SocketIO.EngineSocket 
             uri: () => `${session.getRequestURI()}`,
             headers: () => []
         }
-        this.transport = null
 
         this.session = session
         this._id = session.getId() + ''
@@ -34,6 +32,8 @@ export class TomcatClient extends EventEmitter implements SocketIO.EngineSocket 
     send(text: string) {
         if (this.readyState == 'open') {
             Java.synchronized(() => this.session.getBasicRemote().sendText(text), this.session)()
+        } else {
+            console.debug(`send message ${text} to close client ${this._id}`)
         }
     }
     close() {
