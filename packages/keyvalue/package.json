@@ -1,6 +1,6 @@
 {
     "name": "@ccms/keyvalue",
-    "version": "0.10.1",
+    "version": "0.11.0",
     "description": "MiaoScript keyvalue package",
     "keywords": [
         "miaoscript",
@@ -19,12 +19,12 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
-        "@ccms/api": "^0.10.1",
-        "@ccms/common": "^0.10.1",
-        "@ccms/container": "^0.10.1"
+        "@ccms/api": "^0.11.0",
+        "@ccms/common": "^0.11.0",
+        "@ccms/container": "^0.11.0"
     },
     "devDependencies": {
-        "@ccms/nashorn": "^0.10.1",
+        "@ccms/nashorn": "^0.11.0",
         "@javatypes/amqp-client": "^0.0.3",
         "@javatypes/spring-amqp": "^0.0.3",
         "@javatypes/spring-rabbit": "^0.0.3",
