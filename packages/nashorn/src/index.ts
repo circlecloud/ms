@@ -67,6 +67,7 @@ declare global {
     interface Core {
         getClass(name: String): any
         getProxyClass(): any
+        getJavaScriptTaskClass(): any
         getInstance(): any
         read(path: string): string
         save(path: string, content: string): void

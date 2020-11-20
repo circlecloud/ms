@@ -158,9 +158,11 @@ export class MiaoScriptConsole implements Console {
                     var { fileName, lineNumber } = this.readSourceMap(trace.fileName, trace.lineNumber)
                     if (fileName.startsWith(root)) { fileName = fileName.split(root)[1] }
                 } else {
-                    for (let prefix in ignoreLogPrefix) {
-                        if (className.startsWith(ignoreLogPrefix[prefix])) {
-                            return
+                    if (!global.debug) {
+                        for (let prefix in ignoreLogPrefix) {
+                            if (className.startsWith(ignoreLogPrefix[prefix])) {
+                                return
+                            }
                         }
                     }
                 }
