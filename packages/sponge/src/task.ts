@@ -20,8 +20,7 @@ export class SpongeTaskManager extends task.TaskManager {
         return new SpongeTask(owner, func, id)
     }
     callSyncMethod(func: Function): any {
-        // @ts-ignore
-        return this.syncExecutor.schedule(new Callable({ call: () => func() }), java.lang.Long.valueOf(0), TimeUnit.NANOSECONDS).get()
+        return this.syncExecutor.execute(() => func())
     }
     disable0() {
         Sponge.getScheduler().getScheduledTasks(base.getInstance()).forEach((task: task.Cancelable) => task.cancel())

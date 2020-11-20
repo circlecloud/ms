@@ -4,7 +4,6 @@ import { provideSingleton } from '@ccms/container'
 import * as reflect from '@ccms/common/dist/reflect'
 
 const Sponge = org.spongepowered.api.Sponge
-const TextSerializers = org.spongepowered.api.text.serializer.TextSerializers
 const File = Java.type("java.io.File")
 
 @provideSingleton(server.Server)
@@ -35,10 +34,10 @@ export class SpongeServer extends server.ReflectServer {
         if (typeof sender === 'string') {
             sender = this.getPlayer(sender)
         }
-        return Sponge.getCommandManager().process(sender, command).getSuccessCount().get() != 0
+        return Sponge.getCommandManager().process(sender, command).getSuccessCount().orElse(0) != 0
     }
     dispatchConsoleCommand(command: string): boolean {
-        return Sponge.getCommandManager().process(Sponge.getServer().getConsole(), command).getSuccessCount().get() != 0
+        return Sponge.getCommandManager().process(Sponge.getServer().getConsole(), command).getSuccessCount().orElse(0) != 0
     }
     getPluginsFolder(): string {
         return this.pluginsFolder
