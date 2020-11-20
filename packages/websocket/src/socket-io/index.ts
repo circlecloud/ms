@@ -8,7 +8,7 @@ import { PacketTypes, SubPacketTypes } from './types'
 import { Packet } from './packet'
 import { Socket } from './socket'
 import { Adapter } from './adapter'
-import { InnerClient } from '../interfaces'
+import { Transport } from '../transport'
 import { ParentNamespace } from './parent-namespace'
 
 interface EngineOptions {
@@ -144,7 +144,7 @@ class Server {
     /**
      * @private
      */
-    readonly _parser: Parser
+    _parser: Parser
     private readonly encoder
 
     /**
@@ -172,29 +172,33 @@ class Server {
      */
     _connectTimeout: number
 
-    options: ServerOptions
+    options: Partial<ServerOptions>
     private websocketServer: WebSocketServer
     private allClients: Map<string, Client>
 
     constructor(instance: any, options: Partial<ServerOptions>) {
         if (!instance) { throw new Error('instance can\'t be undefiend!') }
-        this.allClients = new Map()
-        this._nsps = new Map()
-        this.connectTimeout(options.connectTimeout || 45000)
-        this._parser = options.parser || new Parser()
-        this.adapter(options.adapter || Adapter)
+        this.options = Object.assign({
+            event: new EventEmitter(),
+            path: '/socket.io',
+            root: root + '/wwwroot',
+            serveClient: false,
+            connectTimeout: 45000,
+            wsEngine: process.env.EIO_WS_ENGINE || "ws",
+            pingTimeout: 5000,
+            pingInterval: 25000,
+            upgradeTimeout: 10000,
+            maxHttpBufferSize: 1e6,
+            transports: 'websocket',
+            allowUpgrades: true,
+            httpCompression: {
+                threshold: 1024
+            },
+            cors: false
+        }, options)
+        this.initServerConfig()
         this.sockets = this.of('/')
-        if (instance.class.name.startsWith('io.netty.channel')) {
-            let { NettyWebSocketServer } = require("../netty")
-            this.websocketServer = new NettyWebSocketServer(instance, Object.assign({
-                event: new EventEmitter(),
-                path: '/socket.io',
-                root: root + '/wwwroot'
-            }, options))
-        } else {
-            let { TomcatWebSocketServer } = require("../tomcat")
-            this.websocketServer = new TomcatWebSocketServer(instance, options)
-        }
+        this.selectServerImpl(instance)
         this.initServer()
     }
     /**
@@ -496,15 +500,6 @@ class Server {
         console.debug(`incoming connection with id ${conn.id}`)
         let client = new Client(this, conn)
         this.allClients.set(conn.id, client)
-        client._packet({
-            type: PacketTypes.OPEN,
-            data: {
-                sid: client.id,
-                upgrades: [],
-                pingInterval: 25000,
-                pingTimeout: 5000
-            }
-        })
         return this
     }
     // of(nsp: string): Namespace {
@@ -560,8 +555,9 @@ class Server {
         return nsp
     }
     close(fn?: () => void): void {
-        for (const socket of this.sockets.sockets.values()) {
-            socket._onclose("server shutting down")
+        this.clients.length
+        for (const client of this.allClients.values()) {
+            client._disconnect()
         }
 
         // this.engine.close()
@@ -605,69 +601,56 @@ class Server {
         return this.sockets.compress(args[0])
     }
     // ===============================
+    private initServerConfig() {
+        this.allClients = new Map()
+        this._nsps = new Map()
+        this.connectTimeout(this.options.connectTimeout || 45000)
+        this._parser = this.options.parser || new Parser()
+        this.adapter(this.options.adapter || Adapter)
+    }
+    private selectServerImpl(instance: any) {
+        let WebSocketServerImpl = undefined
+        if (instance.class.name.startsWith('io.netty.channel')) {
+            WebSocketServerImpl = require("../netty").NettyWebSocketServer
+        } else {
+            WebSocketServerImpl = require("../tomcat").TomcatWebSocketServer
+        }
+        this.websocketServer = new WebSocketServerImpl(instance, this.options)
+    }
     private initServer() {
-        this.websocketServer.on(ServerEvent.connect, (innerClient: InnerClient) => {
-            this.onconnection(innerClient)
+        this.websocketServer.on(ServerEvent.connect, (transport: Transport) => {
+            this.onconnection(transport)
         })
-        this.websocketServer.on(ServerEvent.message, (innerClient: InnerClient, text) => {
-            if (this.allClients.has(innerClient.id)) {
-                this.processPacket(this._parser.decode(text), this.allClients.get(innerClient.id))
+        this.websocketServer.on(ServerEvent.message, (transport: Transport, text) => {
+            if (this.allClients.has(transport.id)) {
+                let client = this.allClients.get(transport.id)
+                client.onPacket(this._parser.decode(text))
             } else {
-                console.error(`unknow engine socket ${innerClient.id} reciver message ${text}`)
+                console.error(`unknow transport ${transport.id} reciver message ${text}`)
             }
         })
-        this.websocketServer.on(ServerEvent.disconnect, (innerClient: InnerClient, reason) => {
-            if (this.allClients.has(innerClient.id)) {
-                this.allClients.get(innerClient.id).onclose(reason)
-                this.allClients.delete(innerClient.id)
+        this.websocketServer.on(ServerEvent.disconnect, (transport: Transport, reason) => {
+            if (this.allClients.has(transport.id)) {
+                this.allClients.get(transport.id).onclose(reason)
+                this.allClients.delete(transport.id)
             } else {
-                console.error(`unknow engine innerClient ${innerClient?.id} disconnect cause ${reason}`)
+                console.error(`unknow transport ${transport?.id} disconnect cause ${reason}`)
             }
         })
-        this.websocketServer.on(ServerEvent.error, (innerClient: InnerClient, cause) => {
-            if (this.allClients.has(innerClient?.id)) {
-                let client = this.allClients.get(innerClient?.id)
+        this.websocketServer.on(ServerEvent.error, (transport: Transport, cause) => {
+            if (this.allClients.has(transport?.id)) {
+                let client = this.allClients.get(transport?.id)
                 if (client.listeners(ServerEvent.error).length) {
                     client.emit(ServerEvent.error, cause)
                 } else {
-                    console.error(`engine innerClient ${innerClient.id} cause error: ${cause}`)
+                    console.error(`client ${client.id} cause error: ${cause}`)
                     console.ex(cause)
                 }
             } else {
-                console.error(`unknow innerClient ${innerClient?.id} cause error: ${cause}`)
+                console.error(`unknow transport ${transport?.id} cause error: ${cause}`)
                 console.ex(cause)
             }
         })
-    }
-
-    private processPacket(packet: Packet, client: Client) {
-        switch (packet.type) {
-            case PacketTypes.PING:
-                client._packet({
-                    type: PacketTypes.PONG,
-                    data: packet.data
-                })
-                break
-            case PacketTypes.UPGRADE:
-                break
-            case PacketTypes.MESSAGE:
-                this.processSubPacket(packet, client)
-                break
-            case PacketTypes.CLOSE:
-                client.onclose()
-                break
-        }
-    }
-
-    private processSubPacket(packet: Packet, client: Client) {
-        switch (packet.sub_type) {
-            case SubPacketTypes.CONNECT:
-                client.doConnect(packet.nsp, {})
-                break
-            default:
-                client.ondecoded(packet)
-                break
-        }
     }
 }
 

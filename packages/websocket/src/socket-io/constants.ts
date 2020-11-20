@@ -4,5 +4,6 @@ export enum ServerEvent {
     connection = 'connection',
     message = 'message',
     error = 'error',
-    disconnect = 'disconnect'
+    disconnecting = 'disconnecting',
+    disconnect = 'disconnect',
 }
