@@ -11,16 +11,6 @@ export class WebSocketDetect extends WebSocketHandlerAdapter {
     channelRead(ctx: any, channel: any) {
         this.event.emit(ServerEvent.detect, ctx, channel)
     }
-    channelInactive(ctx: any) {
-        console.debug('WebSocketDetect channelUnregistered ' + ctx)
-        this.event.emit(ServerEvent.disconnect, ctx, 'client disconnect')
-        ctx.channelInactive()
-    }
-    channelUnregistered(ctx: any) {
-        console.debug('WebSocketDetect channelUnregistered ' + ctx)
-        this.event.emit(ServerEvent.disconnect, ctx, 'client disconnect')
-        ctx.fireChannelUnregistered()
-    }
     exceptionCaught(ctx: any, cause: Error) {
         this.event.emit(ServerEvent.error, ctx, cause)
     }

@@ -43,14 +43,14 @@ export class WebSocketHandler extends WebSocketHandlerAdapter {
 
     channelInactive(ctx: any) {
         console.debug('WebSocketHandler channelInactive ' + ctx)
-        this.options.event.emit(ServerEvent.disconnect, ctx, 'client disconnect')
-        ctx.channelInactive()
+        this.options.event.emit(ServerEvent.disconnect, ctx, 'netty channelInactive')
+        super.channelInactive(ctx)
     }
 
     channelUnregistered(ctx: any) {
         console.debug('WebSocketHandler channelUnregistered ' + ctx)
-        this.options.event.emit(ServerEvent.disconnect, ctx, 'client disconnect')
-        ctx.fireChannelUnregistered()
+        this.options.event.emit(ServerEvent.disconnect, ctx, 'netty channelUnregistered')
+        super.channelUnregistered(ctx)
     }
 
     exceptionCaught(ctx: any, cause: Error) {

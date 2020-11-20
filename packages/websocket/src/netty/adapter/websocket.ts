@@ -12,8 +12,12 @@ export abstract class WebSocketHandlerAdapter {
         this._Handler = new ChannelInboundHandlerAdapterImpl()
     }
     abstract channelRead(ctx: any, channel: any)
-    abstract channelInactive(ctx: any)
-    abstract channelUnregistered(ctx: any)
+    channelInactive(ctx: any) {
+        ctx.fireChannelInactive()
+    }
+    channelUnregistered(ctx: any) {
+        ctx.fireChannelUnregistered()
+    }
     abstract exceptionCaught(ctx: any, cause: Error)
     getHandler() {
         return this._Handler

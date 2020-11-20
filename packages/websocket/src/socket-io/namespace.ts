@@ -58,7 +58,6 @@ export class Namespace extends EventEmitter {
     public use(
         fn: (socket: Socket, next: (err?: ExtendedError) => void) => void
     ): Namespace {
-        throw new Error("Method not implemented.")
         this._fns.push(fn)
         return this
     }
@@ -96,8 +95,8 @@ export class Namespace extends EventEmitter {
         return this.to(name)
     }
     _add(client: Client, query?: any, fn?: () => void) {
-        console.debug(`adding socket to nsp ${this.name}`)
         const socket = new Socket(this, client, query || {})
+        console.debug(`client ${client.id} adding socket ${socket.id} to nsp ${this.name}`)
         this.run(socket, err => {
             process.nextTick(() => {
                 if ("open" == client.conn.readyState) {
@@ -137,7 +136,7 @@ export class Namespace extends EventEmitter {
             console.debug(`namespace ${this.name} remove socket ${socket.id}`)
             this.sockets.delete(socket.id)
         } else {
-            console.debug(`ignoring remove for ${socket.id}`)
+            console.debug(`namespace ${this.name} ignoring remove for ${socket.id}`)
         }
     }
     emit(event: string, ...args: any[]): boolean {
@@ -185,9 +184,7 @@ export class Namespace extends EventEmitter {
      */
     public allSockets(): Promise<Set<SocketId>> {
         if (!this.adapter) {
-            throw new Error(
-                "No adapter for this namespace, are you trying to get the list of clients of a dynamic namespace?"
-            )
+            throw new Error("No adapter for this namespace, are you trying to get the list of clients of a dynamic namespace?")
         }
         const rooms = new Set(this._rooms)
         this._rooms.clear()
@@ -233,23 +230,8 @@ export class Namespace extends EventEmitter {
     hasBin(args: any[]) {
         return false
     }
-    del(client: Client) {
-        let socket = this.sockets[client.id]
-        socket.disconnect()
-        delete this.sockets[client.id]
-    }
     clients(fn: (sockets: Socket[]) => Namespace): Namespace {
         return fn(Object.values(this.sockets))
-    }
-    process(packet: Packet, client: Client) {
-        switch (packet.sub_type) {
-            case SubPacketTypes.CONNECT:
-                client.doConnect(this.name, {})
-                break
-            default:
-                this.sockets.get(client.id)._onpacket(packet)
-                break
-        }
     }
     close() {
         this.removeAllListeners(ServerEvent.connect)

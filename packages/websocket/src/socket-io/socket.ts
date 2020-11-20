@@ -88,15 +88,6 @@ export class Socket extends EventEmitter {
     private _rooms: Set<Room> = new Set();
     private _anyListeners: Array<(...args: any[]) => void>
 
-    private events = [
-        'connect',
-        "connect_error",
-        'disconnect',
-        'disconnecting',
-        'newListener',
-        'removeListener'
-    ]
-
     constructor(nsp: Namespace, client: Client, auth = {}) {
         super()
         this.nsp = nsp
@@ -114,12 +105,6 @@ export class Socket extends EventEmitter {
         this._rooms = new Set()
     }
     emit(event: string, ...args: any[]): boolean {
-        if (~this.events.indexOf(event)) {
-            super.emit(event, ...args)
-            // @ts-ignore
-            return this
-        }
-
         let packet: Packet = {
             type: PacketTypes.MESSAGE,
             sub_type: (this.flags.binary !== undefined ? this.flags.binary : this.hasBin(args)) ? SubPacketTypes.BINARY_EVENT : SubPacketTypes.EVENT,
@@ -213,9 +198,9 @@ export class Socket extends EventEmitter {
       * @private
       */
     _onconnect(): void {
-        console.debug("socket connected - writing packet")
+        console.debug(`socket ${this.id} connected - writing packet`)
         this.join(this.id)
-        this.packet({ type: PacketTypes.MESSAGE, sub_type: SubPacketTypes.CONNECT })
+        this.packet({ type: PacketTypes.MESSAGE, sub_type: SubPacketTypes.CONNECT, data: { sid: this.id } })
     }
     _onpacket(packet: Packet) {
         switch (packet.sub_type) {
@@ -246,7 +231,7 @@ export class Socket extends EventEmitter {
     }
     onevent(packet: Packet) {
         if (null != packet.id) {
-            console.debug('attaching ack callback to event')
+            console.trace(`attaching ack ${packet.id} callback to client ${this.id} event`)
             this.dispatch(packet, this.ack(packet.id))
         } else {
             this.dispatch(packet)
@@ -266,13 +251,13 @@ export class Socket extends EventEmitter {
         }
     }
     onack(packet: Packet) {
-        let ack = this.acks[packet.id]
+        let ack = this.acks.get(packet.id)
         if ('function' == typeof ack) {
-            console.debug('calling ack %s with %j', packet.id, packet.data)
+            console.trace(`calling ack ${packet.id} on socket ${this.id} with ${packet.data}`)
             ack.apply(this, packet.data)
-            delete this.acks[packet.id]
+            this.acks.delete(packet.id)
         } else {
-            console.debug('bad ack %s', packet.id)
+            console.trace(`bad ack ${packet.id} on socket ${this.id}`)
         }
     }
     /**
@@ -281,7 +266,7 @@ export class Socket extends EventEmitter {
      * @private
      */
     private ondisconnect(): void {
-        console.debug("got disconnect packet")
+        console.debug(`socket ${this.id} got disconnect packet`)
         this._onclose("client namespace disconnect")
     }
 
@@ -294,7 +279,7 @@ export class Socket extends EventEmitter {
         if (this.listeners("error").length) {
             super.emit("error", err)
         } else {
-            console.error("Missing error handler on `socket`.")
+            console.error(`Missing error handler on 'socket(${this.id})'.`)
             console.error(err.stack)
         }
     }
@@ -308,15 +293,15 @@ export class Socket extends EventEmitter {
      * @private
      */
     _onclose(reason: string) {
-        console.debug(`closing socket - reason: ${reason} connected: ${this.connected}`)
         if (!this.connected) return this
-        this.emit('disconnecting', reason)
+        console.debug(`closing socket ${this.id} - reason: ${reason} connected: ${this.connected}`)
+        super.emit(ServerEvent.disconnecting, reason)
         this.leaveAll()
         this.nsp._remove(this)
         this.client._remove(this)
         this.connected = false
         this.disconnected = true
-        this.emit('disconnect', reason)
+        super.emit(ServerEvent.disconnect, reason)
     }
 
     /**
@@ -496,8 +481,8 @@ export class Socket extends EventEmitter {
             this._onerror(error)
         }
     }
-    dispatch(packet: Packet, ack?: Function) {
-        if (ack) { this.acks[packet.id] = ack }
+    dispatch(packet: Packet, ack?: () => void) {
+        if (ack) { this.acks.set(packet.id, ack) }
         super.emit(packet.name, ...packet.data, ack)
     }
     private hasBin(obj: any) {
