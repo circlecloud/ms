@@ -18,8 +18,14 @@ export namespace server {
     export const ServerInstance = Symbol("ServerInstance")
     @injectable()
     export abstract class NativePluginManager {
+        list(): any[] {
+            throw new Error("Method not implemented.")
+        }
         has(name: string): boolean {
             return true
+        }
+        get(name: string): any {
+            throw new Error("Method not implemented.")
         }
         load(name: string): boolean {
             throw new Error("Method not implemented.")

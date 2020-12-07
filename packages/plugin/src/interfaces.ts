@@ -47,6 +47,10 @@ export namespace interfaces {
          * 参数列表
          */
         paramtypes?: string[]
+        /**
+         * 自动化主命令
+         */
+        autoMain?: boolean
     }
     export interface ListenerMetadata extends ExecMetadata {
         /**
