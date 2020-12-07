@@ -74,6 +74,7 @@ declare global {
         delete(path: string): void
     }
     interface Console {
+        prefix: string
         ex(err: Error): void
         stack(err: Error, color?: boolean): string[]
         sender(sender: any, ...args: any): void

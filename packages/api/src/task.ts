@@ -152,7 +152,7 @@ export namespace task {
          * 提交任务
          * @param args 任务参数
          */
-        submit(...args: any[]): Cancelable {
+        submit(...args: any[]): task.Task {
             this.innerTask = this.submit0(...args)
             return this
         }

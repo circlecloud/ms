@@ -1,13 +1,13 @@
 /// <reference types="@ccms/nashorn" />
 import * as yaml from 'js-yaml'
 
-const File = Java.type("java.io.File");
-const separatorChar = File.separatorChar;
+const File = Java.type("java.io.File")
+const separatorChar = File.separatorChar
 type TranslateParam = { [key: string]: any }
 
 declare global {
     interface Console {
-        i18n(name: string, param?: TranslateParam);
+        i18n(name: string, param?: TranslateParam)
     }
 }
 
@@ -23,20 +23,20 @@ export class Translate {
 
     constructor(root: string | TranslateContent) {
         if (typeof root == 'string') {
-            this.root = root;
+            this.root = root
         } else {
-            this.langMap = root.langMap;
-            this.fallbackMap = root.fallbackMap || {};
+            this.langMap = root.langMap
+            this.fallbackMap = root.fallbackMap || {}
         }
     }
 
     translate(name: string, param?: TranslateParam) {
-        let langText: string = this.langMap[name] || this.fallbackMap[name];
+        let langText: string = this.langMap[name] || this.fallbackMap[name]
         if (!langText) { return '[WARN] @ccms/i18n miss lang translate: ' + name }
         for (const key in param) {
             langText = langText.replace(new RegExp("{" + key + "}", 'gm'), param[key])
         }
-        return langText;
+        return langText
     }
 
     initialize(lang: string = 'zh_cn', fallback: string = 'zh_cn') {
@@ -49,7 +49,7 @@ export class Translate {
     }
 
     readYamlFile(dir: string, name: string) {
-        let langFile = this.concat(dir, 'languages', name + '.yml');
+        let langFile = this.concat(dir, 'languages', name + '.yml')
         return this.exists(langFile) && yaml.safeLoad(base.read(langFile))
     }
 

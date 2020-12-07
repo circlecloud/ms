@@ -27,7 +27,8 @@ export class MiaoScriptConsole implements Console {
     private _level: LogLevel = LogLevel.INFO
 
     protected logger: any
-    protected prefix: string = '§6[§bMiaoScript§6]§r '
+
+    public prefix: string = '§6[§bMiaoScript§6]§r '
 
     constructor(name?: string) {
         this.name = name
@@ -47,10 +48,10 @@ export class MiaoScriptConsole implements Console {
     set name(name: string) {
         if (name) {
             this._name = `[${name}] `
-            // noinspection JSUnusedGlobalSymbols
             this.prefix = `§6[§cMS§6][§b${name}§6]§r `
         }
     }
+
     log(...args: any[]): void {
         this.logger.info(this.name + args.join(' '))
     }

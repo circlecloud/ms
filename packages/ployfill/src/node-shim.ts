@@ -42,9 +42,8 @@ class Process extends EventEmitter {
     }
     exit(code: number) {
         process.emit('exit', code)
-        microTaskPool.shutdown()
-        console.log('process exit await microTaskPool termination...')
-        microTaskPool.awaitTermination(5000, TimeUnit.MILLISECONDS)
+        console.log(`process exit await microTaskPool termination! queueTask: ${microTaskPool.shutdownNow().size()} remainTask: ${threadGroup.activeCount()}`)
+        microTaskPool.awaitTermination(3000, TimeUnit.MILLISECONDS)
     }
 }
 
