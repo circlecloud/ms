@@ -94,7 +94,7 @@ export class Namespace extends EventEmitter {
     in(name: string): Namespace {
         return this.to(name)
     }
-    _add(client: Client, query?: any, fn?: () => void) {
+    _add(client: Client, query?: any, fn?: (socket: Socket) => void) {
         const socket = new Socket(this, client, query || {})
         console.debug(`client ${client.id} adding socket ${socket.id} to nsp ${this.name}`)
         this.run(socket, err => {
@@ -114,7 +114,8 @@ export class Namespace extends EventEmitter {
                     // violations (such as a disconnection before the connection
                     // logic is complete)
                     socket._onconnect()
-                    if (fn) fn()
+                    // !!! at java multi thread need direct callback socket
+                    if (fn) fn(socket)
 
                     // fire user-set events
                     super.emit(ServerEvent.connect, socket)

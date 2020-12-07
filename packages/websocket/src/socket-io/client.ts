@@ -111,7 +111,7 @@ export class Client extends EventEmitter {
         }
         const nsp = this.server.of(name)
 
-        const socket = nsp._add(this, auth, () => {
+        nsp._add(this, auth, (socket: Socket) => {
             this.sockets.set(socket.id, socket)
             this.nsps.set(nsp.name, socket)
         })
