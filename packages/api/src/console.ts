@@ -91,7 +91,7 @@ export class MiaoScriptConsole implements Console {
     ex(ex: Error) {
         this.stack(ex).forEach(line => this.console(line))
     }
-    readSourceMap(fileName: string, lineNumber: number) {
+    readSourceMap(fileName: string, lineNumber: any) {
         try {
             if (fileName.endsWith('js')) {
                 if (MiaoScriptConsole.sourceMaps[fileName] === undefined) {
@@ -154,9 +154,10 @@ export class MiaoScriptConsole implements Console {
             } else {
                 let className = trace.className
                 var fileName = trace.fileName as string
+                var lineNumber = trace.lineNumber
                 if (className.startsWith('jdk.nashorn.internal.scripts')) {
                     className = className.substr(className.lastIndexOf('$') + 1)
-                    var { fileName, lineNumber } = this.readSourceMap(trace.fileName, trace.lineNumber)
+                    var { fileName, lineNumber } = this.readSourceMap(fileName, lineNumber)
                     if (fileName.startsWith(root)) { fileName = fileName.split(root)[1] }
                 } else {
                     if (!global.debug) {
