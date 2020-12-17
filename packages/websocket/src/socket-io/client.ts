@@ -350,7 +350,7 @@ export class Client extends EventEmitter {
      *
      * @api private
      */
-    resetPingTimeout(timeout) {
+    resetPingTimeout(timeout: number) {
         clearTimeout(this.pingTimeoutTimer)
         this.pingTimeoutTimer = setTimeout(() => {
             if (this.conn.readyState === "closed") return
