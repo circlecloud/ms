@@ -92,6 +92,16 @@ export class PluginConfigManager {
             } else {
                 value = configLoader.load(base.read(metadata.file))
                 console.debug(`[${plugin.description.name}] Load Config ${metadata.variable} from file ${metadata.file} =>\n${JSON.stringify(value, undefined, 4)}`)
+                if (metadata.default) {
+                    let needSave = false
+                    for (const key of Object.keys(metadata.default)) {
+                        if (!value[key]) {
+                            value[key] = metadata.default[key]
+                            needSave = true
+                        }
+                    }
+                    needSave && base.save(metadata.file, configLoader.dump(value))
+                }
             }
             this.defienConfigProp(plugin, metadata, value)
         } catch (error) {

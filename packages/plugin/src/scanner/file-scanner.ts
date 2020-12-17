@@ -26,7 +26,6 @@ export class JSFileScanner implements plugin.PluginScanner {
 
     private scanFolder(folder: any): string[] {
         var files = []
-        console.i18n('ms.plugin.manager.scan', { folder })
         this.checkUpdateFolder(folder)
         // must check file is exist maybe is a illegal symbolic link file
         fs.list(folder).forEach((path: any) => {

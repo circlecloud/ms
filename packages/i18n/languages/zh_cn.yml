@@ -32,7 +32,8 @@ ms.api.command.tab.completer.error: "§6玩家 §a{player} §6执行 §b{plugin}
 
 ms.plugin.initialize: "初始化 MiaoScript 插件系统: 实例: {plugin} 加载器: {loader}..."
 ms.plugin.event.map: "总计 {count} 个 {type} 事件 映射完成..."
-ms.plugin.manager.scan: "扫描 {folder} 文件夹中插件..."
+ms.plugin.manager.scan: "扫描器 {scanner} 扫描 {folder} 中的插件..."
+ms.plugin.manager.scan.finish: "扫描器 {scanner} 在 {folder} 中 发现 {size} 个插件 开始构建..."
 ms.plugin.manager.initialize.error: "§6插件 §b{name} §6初始化错误 §4{ex}"
 ms.plugin.manager.stage: "{stage} {plugin} 版本 {version} 作者 {author}"
 ms.plugin.manager.stage.exec: "[{plugin}] 执行 {stage} 阶段函数 {name} 匹配类型 {servers}..."
@@ -40,6 +41,7 @@ ms.plugin.manager.stage.exec.error: "§6插件 §b{plugin} §6执行 §d{executo
 ms.plugin.manager.stage.load: "加载"
 ms.plugin.manager.stage.enable: "启用"
 ms.plugin.manager.stage.disable: "关闭"
+ms.plugin.manager.build: "插件 {name}({version}) 构建完成 来源: {file}({scanner}) 引导: {loader} 构建耗时: {cost}s."
 ms.plugin.manager.build.error: "§6从文件 §b{file} §6加载插件失败 §4错误: §c{error}"
 ms.plugin.manager.build.update: "自动更新插件 {name} ..."
 ms.plugin.manager.build.not.extends: "§4发现错误的插件 §b{source} §4未继承接口 interfaces.Plugin, 将不会被载入到服务器!"
