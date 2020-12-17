@@ -4,9 +4,9 @@ import i18n from '@ccms/i18n'
 let ployfillStartTime = new Date().getTime()
 i18n.initialize()
 console.i18n("ms.ployfill.initialize")
-require('./es5-ext')
-require('./node-shim')
-require('core-js')
+import './es5-ext'
+import './node-shim'
+import 'core-js'
 //@ts-ignore
 process.on('exit', () => require.disable())
 global.setGlobal('Proxy', require('./proxy').Proxy)
