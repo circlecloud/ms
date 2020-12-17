@@ -46,7 +46,7 @@ export class MiaoExplorer extends interfaces.Plugin {
         let consolePlugin: any = this.pluginManager.getPlugin('MiaoConsole')
         this.token = consolePlugin.token
         this.namespace = server.of('/MiaoExplorer')
-        this.namespace.on('connect', (client: SocketIOSocket) => {
+        this.namespace.on('connection', (client: SocketIOSocket) => {
             if (!this.token) {
                 this.logger.console(`§6客户端 §b${client.id} §a请求连接 §4服务器尚未设置 Token 无法连接!`)
                 client.emit('unauthorized', () => client.disconnect(true))

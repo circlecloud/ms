@@ -50,7 +50,7 @@ class MiaoMessage {
     }
 }
 
-@plugin({ name: 'MiaoChat', version: '1.0.0', author: 'MiaoWoo', source: __filename })
+@plugin({ version: '1.0.1', author: 'MiaoWoo', source: __filename })
 export class MiaoChat extends interfaces.Plugin {
     @Autowired()
     private Server: server.Server

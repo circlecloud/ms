@@ -21,6 +21,26 @@ interface UserInfo {
     sign: string
     video: string
     box: string
+    block: string
+}
+
+interface ServerInfo {
+    // 16,
+    id: number
+    // "圈云大陆",
+    name: string
+    // 1,
+    owner: number
+    // 48200,
+    score: number
+    // 1,
+    ratio: number
+    // 1,
+    audit: number
+    // 2,
+    status: number
+    // 0
+    today: number
 }
 
 let createPacketAdapterFunction = eval(`
@@ -30,9 +50,18 @@ function(cls, plugin, type, onPacketSending){
     }
 }`)
 
-@JSPlugin({ prefix: 'MRD', version: '1.4.2', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], source: __filename })
+const defaultConfig = {
+    prefix: '§6[§b广告系统§6]§r',
+    serverId: '',
+    serverToken: '',
+    drawCommand: 'p give %player_name% %amount%',
+    coinName: '点券',
+    joinTip: true
+}
+
+@JSPlugin({ prefix: 'MRD', version: '1.5.1', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], nativeDepends: ['ProtocolLib', 'PlaceholderAPI'], source: __filename })
 export class MiaoReward extends interfaces.Plugin {
-    private serverInfo: any
+    public serverInfo: ServerInfo
     private cacheBindUuid = ''
     private zeroMapView = undefined
     private playerImageCache = new Map<string, any>()
@@ -53,19 +82,7 @@ export class MiaoReward extends interfaces.Plugin {
     private bungee: proxy.BungeeCord
 
     @Config()
-    private config: PluginConfig & {
-        prefix: string
-        serverId: string
-        serverToken: string
-        drawCommand: string
-        coinName: string
-    } = {
-            prefix: '§6[§b广告系统§6]§r',
-            serverId: '',
-            serverToken: '',
-            drawCommand: 'p give %player_name% %amount%',
-            coinName: '点券'
-        }
+    private config: PluginConfig & typeof defaultConfig = defaultConfig
 
     @JSClass('org.bukkit.Bukkit')
     private Bukkit: any
@@ -93,6 +110,10 @@ export class MiaoReward extends interfaces.Plugin {
         this.config.drawCommand = this.config.drawCommand || 'p give %player_name% %amount%'
         if (!this.config.coinName) {
             this.config.coinName = '点券'
+            this.config.save()
+        }
+        if (!this.config.joinTip) {
+            this.config.joinTip = true
             this.config.save()
         }
         //@ts-ignore
@@ -172,13 +193,15 @@ export class MiaoReward extends interfaces.Plugin {
         } else {
             this.PlaceholderAPI.registerPlaceholderHook("mrd", new this.PlaceholderHook({
                 onPlaceholderRequest: (player: any, s: string) => {
-                    if (!this.playerInfoCache.has(player.getName())) { return '用户未绑定' }
+                    if (!this.playerInfoCache.has(player.getName())) { return '数据加载中' }
                     let data = this.playerInfoCache.get(player.getName())
+                    if (!data) { return '用户未绑定' }
                     switch (s.toLowerCase()) {
                         case "balance": return data.balance
                         case "sign": return data.sign
                         case "video": return data.video
                         case "box": return data.box
+                        case "block": return data.block
                         default: return "未知的参数: " + s
                     }
                 }
@@ -197,11 +220,14 @@ export class MiaoReward extends interfaces.Plugin {
         this.initPacketAdapter()
     }
 
-    createPacketAdapter(onPacketSending: (event) => void) {
+    private createPacketAdapter(onPacketSending: (event) => void) {
         return createPacketAdapterFunction(this.PacketAdapter, base.getInstance(), [this.PacketType.Play.Server.MAP], onPacketSending)
     }
 
-    initPacketAdapter() {
+    private initPacketAdapter() {
+        if (!this.ProtocolLibrary) {
+            return this.logger.console(`§4服务器未安装 ProtocolLib 无法扫码功能 请安装后重试!`)
+        }
         this.adapter = this.createPacketAdapter((event) => {
             let integers = event.getPacket().getIntegers().getValues()
             let mapId = integers.get(0)
@@ -247,6 +273,7 @@ export class MiaoReward extends interfaces.Plugin {
     }
 
     disable() {
+        if (!this.ProtocolLibrary) return
         this.PlaceholderAPI?.unregisterPlaceholderHook("mrd")
         this.adapter && this.ProtocolLibrary.getProtocolManager().removePacketListener(this.adapter)
         Java.from(this.server.getOnlinePlayers()).forEach(p => this.checkAndClear(p))
@@ -254,7 +281,7 @@ export class MiaoReward extends interfaces.Plugin {
     }
 
     @Cmd()
-    mrd(sender: any, command: string, args: string[]) {
+    private mrd(sender: any, command: string, args: string[]) {
         let cmd = args[0] || 'help'
         let cmdKey = 'cmd' + cmd
         if (!this[cmdKey]) {
@@ -266,7 +293,7 @@ export class MiaoReward extends interfaces.Plugin {
         this.taskManager.create(() => this[cmdKey](sender, ...args)).async().submit()
     }
 
-    private scanAuth(sender: org.bukkit.entity.Player, scanType: string, scanObj: { title: string, content: string }, success: (token: string, user: any) => void, cancel?: () => void) {
+    public scanAuth(sender: org.bukkit.entity.Player, scanType: string, scanObj: { title: string, content: string }, success: (token: string, user: any) => void, cancel?: () => void) {
         this.logger.sender(sender, '§a正在获取授权二维码...')
         let scan = this.httpPost('https://reward.yumc.pw/auth/scan', { ...scanObj, type: scanType })
         if (scan.code == 200) {
@@ -313,6 +340,9 @@ export class MiaoReward extends interfaces.Plugin {
     }
 
     private bindCheck(sender: org.bukkit.entity.Player) {
+        if (!this.ProtocolLibrary) {
+            return this.logger.sender(sender, `§4服务器未安装 ProtocolLib 无法扫码功能 请安装后重试!`)
+        }
         let scanning = this.playerTaskCache.has(sender.getName())
         if (scanning) {
             this.logger.sender(sender, "§4当前正在进行扫码 请稍候重试!")
@@ -320,7 +350,7 @@ export class MiaoReward extends interfaces.Plugin {
         return scanning
     }
 
-    cmdopen(sender: org.bukkit.entity.Player) {
+    private cmdopen(sender: org.bukkit.entity.Player) {
         if (this.bindCheck(sender)) return
         this.logger.sender(sender, '§a正在获取小程序二维码...')
         let sync = { scaned: false }
@@ -328,7 +358,7 @@ export class MiaoReward extends interfaces.Plugin {
         this.taskManager.create(() => sync.scaned = true).later(20 * 50).submit()
     }
 
-    cmdbind(sender: org.bukkit.entity.Player, server: boolean) {
+    private cmdbind(sender: org.bukkit.entity.Player, server: boolean) {
         if (!sender.getItemInHand) { return this.logger.sender(sender, '§c手持物品检测异常 请检查是否在客户端执行命令!') }
         if (this.bindCheck(sender)) return
         if (server) {
@@ -338,9 +368,9 @@ export class MiaoReward extends interfaces.Plugin {
         }
     }
 
-    cmddraw(sender: org.bukkit.entity.Player, amount: number) {
+    private cmddraw(sender: org.bukkit.entity.Player, amount: number) {
         if (!sender.getItemInHand) { return this.logger.sender(sender, '§c手持物品检测异常 请检查是否在客户端执行命令!') }
-        if (!this.playerInfoCache.has(sender.getName())) { return this.logger.sender(sender, '§c当前用户尚未绑定服务器玩家账号 请先执行 /mrd bind 绑定账号!') }
+        if (!this.playerInfoCache.get(sender.getName())) { return this.logger.sender(sender, '§c当前用户尚未绑定服务器玩家账号 请先执行 /mrd bind 绑定账号!') }
         amount = Number(amount)
         if (!Number.isInteger(amount)) {
             return this.logger.sender(sender, '§4金额必须是数字!')
@@ -356,7 +386,7 @@ export class MiaoReward extends interfaces.Plugin {
                 "是否授权 " + this.serverInfo.name + " 兑换喵币",
                 "兑换玩家: " + sender.getName(),
                 "兑换数量: " + amount,
-                "兑换比例: " + parseFloat(this.serverInfo.ratio),
+                "兑换比例: " + this.serverInfo.ratio,
                 "预计到帐: " + (amount * this.serverInfo.ratio).toFixed(0),
                 "注意: 数据可能更新不及时 请以实际到账金额为准!"
             ].join('\n')
@@ -404,7 +434,7 @@ export class MiaoReward extends interfaces.Plugin {
         ])
     }
 
-    cmdrank(sender: any, boardcast: boolean) {
+    private cmdrank(sender: any, boardcast: boolean) {
         if (!sender.isOp()) { return this.logger.sender(sender, '§4你没有此命令的权限!') }
         let result = this.httpPost(`https://reward.yumc.pw/server/rank`, {
             id: this.config.serverId,
@@ -425,7 +455,7 @@ export class MiaoReward extends interfaces.Plugin {
         }
     }
 
-    cmdserver(sender: any) {
+    private cmdserver(sender: any) {
         if (!sender.isOp()) { return this.logger.sender(sender, '§4你没有此命令的权限!') }
         let result = this.httpPost(`https://reward.yumc.pw/server/server`, {
             id: this.config.serverId,
@@ -445,7 +475,7 @@ export class MiaoReward extends interfaces.Plugin {
         ])
     }
 
-    cmdratio(sender: any, ratioStr: string, confirm: string) {
+    private cmdratio(sender: any, ratioStr: string, confirm: string) {
         if (!sender.isOp()) { return this.logger.sender(sender, '§4你没有此命令的权限!') }
         if (!sender.getItemInHand) { return this.logger.sender(sender, '§c手持物品检测异常 请检查是否在客户端执行命令!') }
         let [ratio, mbr, msg] = this.ratio2string(ratioStr)
@@ -484,7 +514,7 @@ export class MiaoReward extends interfaces.Plugin {
         })
     }
 
-    cmdreload() {
+    private cmdreload() {
         this.config.reload()
     }
 
@@ -556,35 +586,41 @@ export class MiaoReward extends interfaces.Plugin {
         this.setItemAndTp(sender, bindUrl, sync)
     }
 
-    private sendActionBar(sender, message) {
+    public sendActionBar(sender, message) {
         if (!this.downgrade) {
             this.chat.sendActionBar(sender, message)
         }
     }
 
-    private sendTitle(sender, title, subtitle?) {
+    public sendTitle(sender: any, title: string, subtitle: string = '', fadeIn: number = 20, time: number = 100, fadeOut: number = 20) {
         if (!title) return
         if (this.downgrade) {
             this.logger.sender(sender, `${title}${subtitle ? ` ${subtitle}` : ''}`)
         } else {
-            this.chat.sendTitle(sender, title, subtitle)
+            this.chat.sendTitle(sender, title, subtitle, fadeIn, time, fadeOut)
         }
     }
 
-    private setItemAndTp(sender: org.bukkit.entity.Player, content: string, sync: { scaned: boolean }) {
+    public clearTitle(sender) {
+        this.chat.clearTitle(sender)
+    }
+
+    public setItemAndTp(sender: org.bukkit.entity.Player, content: string, sync: { scaned: boolean, left?: number, cancelled?: boolean }, name: string = '手机QQ扫描二维码', tip: string = '手机QQ扫描二维码') {
         this.taskManager.create(() => {
-            let bindingLeftTime = 55
+            if (!sync.left) { sync.left = 55 }
+            sync.cancelled = false
             let task = this.taskManager.create(() => {
                 try {
-                    if (sync.scaned || !sender.isOnline() || !this.isHoldQrCodeItem(sender) || --bindingLeftTime < 0) {
-                        if (bindingLeftTime < 0) {
+                    if (sync.scaned || !sender.isOnline() || !this.isHoldQrCodeItem(sender) || --sync.left < 0) {
+                        if (sync.left < 0) {
                             this.logger.sender(sender, '§c二维码已过期 请重新获取 如已扫码请忽略!')
                             task.cancel()
                         }
                         this.cancelTask(sender)
+                        sync.cancelled = true
                         return
                     }
-                    this.sendActionBar(sender, `§c§l手机QQ扫描二维码 剩余 ${bindingLeftTime} 秒...`)
+                    this.sendActionBar(sender, `§c§l${tip} 剩余 ${sync.left} 秒...`)
                 } catch (error) {
                     console.ex(error)
                 }
@@ -610,7 +646,7 @@ export class MiaoReward extends interfaces.Plugin {
                 temp.setPitch(90)
                 sender.teleport(temp)
             }
-            this.sendWindowItems(sender, this.createQrCodeMapItem())
+            this.sendWindowItems(sender, this.createQrCodeMapItem(name))
             sender.sendMap(this.zeroMapView)
         }).submit()
     }
@@ -624,13 +660,11 @@ export class MiaoReward extends interfaces.Plugin {
             username: sender.getName(),
             sync
         })
-        if (result?.code == 200) {
-            this.playerInfoCache.set(sender.getName(), result.data)
-        }
+        this.playerInfoCache.set(sender.getName(), result?.code == 200 ? result.data : null)
         return result
     }
 
-    cmdquery(sender: org.bukkit.entity.Player) {
+    private cmdquery(sender: org.bukkit.entity.Player) {
         let info = this.queryUser(sender)
         if (info.code !== 200) {
             return this.logger.sender(sender, '§4查询异常! §cError: ' + info.msg)
@@ -648,11 +682,12 @@ export class MiaoReward extends interfaces.Plugin {
             `§6签    到: §b${data.sign}`,
             `§6视频广告: §b${data.video}`,
             `§6盒子广告: §b${data.box}`,
+            `§6积木广告: §b${data.block}`,
             '§6==========================='
         ])
     }
 
-    private httpPost(url, data) {
+    public httpPost(url, data) {
         let startTime = Date.now()
         let result = http.post(url, data)
         console.debug(`
@@ -664,7 +699,7 @@ CAST TIME   : ${Date.now() - startTime}`)
         return result
     }
 
-    private createQrCodeMapItem() {
+    private createQrCodeMapItem(name: string = '手机QQ扫描二维码') {
         let item: org.bukkit.inventory.ItemStack
         item = new org.bukkit.inventory.ItemStack(org.bukkit.Material.FILLED_MAP || org.bukkit.Material.MAP)
         let meta = <org.bukkit.inventory.meta.MapMeta>item.getItemMeta()
@@ -675,7 +710,7 @@ CAST TIME   : ${Date.now() - startTime}`)
         } else {
             item.setDurability(this.zeroMapView.getId())
         }
-        meta.setDisplayName('§c请使用手机QQ扫描二维码!')
+        meta.setDisplayName(`§c${name}`)
         meta.setLore(["QRCODE"])
         item.setItemMeta(meta)
         return item
@@ -714,31 +749,33 @@ CAST TIME   : ${Date.now() - startTime}`)
     }
 
     @Listener()
-    PlayerJoinEvent(event: org.bukkit.event.player.PlayerJoinEvent) {
+    private PlayerJoinEvent(event: org.bukkit.event.player.PlayerJoinEvent) {
         const player = event.getPlayer()
         this.bungeeCordDetect(player)
         this.updatePlayerInfo(player)
-        this.taskManager.create(() => this.logger.sender(player, `§a本服已使用喵式奖励 §3可以看广告赚${this.config.coinName} §c/mrd help §b查看帮助!`)).later(50).submit()
+        if (this.config.joinTip) {
+            this.taskManager.create(() => this.logger.sender(player, `§a本服已使用喵式奖励 §3可以看广告赚${this.config.coinName} §c/mrd help §b查看帮助!`)).later(50).submit()
+        }
     }
 
     @Listener()
-    PlayerDropItemEvent(event: org.bukkit.event.player.PlayerDropItemEvent) {
+    private PlayerDropItemEvent(event: org.bukkit.event.player.PlayerDropItemEvent) {
         if (this.checkAndClear(event.getPlayer())) {
             event.setCancelled(true)
         }
     }
 
     @Listener()
-    PlayerItemHeldEvent(event: org.bukkit.event.player.PlayerItemHeldEvent) {
+    private PlayerItemHeldEvent(event: org.bukkit.event.player.PlayerItemHeldEvent) {
         this.checkAndClear(event.getPlayer())
     }
 
     @Listener()
-    PlayerQuitEvent(event: org.bukkit.event.player.PlayerQuitEvent) {
+    private PlayerQuitEvent(event: org.bukkit.event.player.PlayerQuitEvent) {
         this.checkAndClear(event.getPlayer())
     }
 
-    private cancelTask(player) {
+    public cancelTask(player) {
         if (!this.playerTaskCache.has(player.getName())) { return }
         this.checkAndClear(player)
         this.sendActionBar(player, "")
@@ -760,7 +797,7 @@ CAST TIME   : ${Date.now() - startTime}`)
         return false
     }
 
-    cmdhelp(sender: any) {
+    private cmdhelp(sender: any) {
         let help = [
             `§6====== ${this.config.prefix} §a帮助菜单 §6======`,
             `§6/mrd bind §a绑定圈云盒子`,
@@ -785,7 +822,7 @@ CAST TIME   : ${Date.now() - startTime}`)
     }
 
     @Tab()
-    tabmrd(sender: any, _command: any, args: string | any[]) {
+    private tabmrd(sender: any, _command: any, args: string | any[]) {
         if (args.length === 1) return ['help', 'bind', 'show', 'statistic', 'query', 'draw', 'ratio', 'rank', 'server']
         if (args.length === 2 && args[0] === "bind" && sender.isOp()) return ['server']
     }

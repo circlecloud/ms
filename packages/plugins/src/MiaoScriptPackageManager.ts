@@ -15,8 +15,9 @@ let help = [
     '§6/mspm §areload §e<插件名称>   §6-  §3重载已安装插件(无名称则重载自身)',
     '§6/mspm §alist [i]            §6-  §3列出仓库插件[已安装的插件]',
     '§6/mspm §aupdate §e[插件名称]   §6-  §3更新插件(无名称则更新源)',
-    '§6/mspm §aupgrade §e[插件名称]  §6-  §3升级插件/框架(§4无名称则升级框架§3)',
-    '§6/mspm §arun §e<JS代码>        §6-  §3运行JS代码',
+    '§6/mspm §aupgrade §e[插件名称|system]  §6-  §3升级插件/§4框架(§csystem§3)',
+    '§6/mspm §arun §e[插件名称] §3<JS代码>        §6-  §3运行JS代码',
+    '§6/mspm §aprun  §e<JS代码>        §6-  §3运行JS代码',
     '§6/mspm §adeploy §e<插件名称>   §6-  §3发布插件',
     '§6/mspm §crestart             §6-  §4重启MiaoScript脚本引擎'
 ]
@@ -132,6 +133,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     public serverName: string
     private translate: Translate
     private channelOff: { off: () => void }
+    private subCommandCache = []
 
     load() {
         this.translate = new Translate({
@@ -139,6 +141,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
             fallbackMap
         })
         this.updateRepo(this.server.getConsoleSender())
+        this.subCommandCache = Object.keys(this).filter(c => c.startsWith('cmd') && typeof this[c] == "function")
     }
 
     @enable({ servers: [constants.ServerType.Bukkit, constants.ServerType.Sponge] })
@@ -383,7 +386,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     }
 
     cmdrestart(sender: any) {
-        setTimeout(() => {
+        this.taskManager.callSyncMethod(() => {
             if (this.serverType === "sponge") {
                 this.server.dispatchConsoleCommand('sponge plugins reload')
                 return
@@ -398,7 +401,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
                 this.logger.sender(sender, "§3MiaoScript Engine §6Reload §cError! ERR: " + ex)
                 this.logger.sender(sender, this.logger.stack(ex))
             }
-        }, 0)
+        })
     }
 
     cmdrun(sender: any, ...args: any[]) {
@@ -477,7 +480,7 @@ return eval(${JSON.stringify(code)});`)
 
     @Tab({ alias: ['gmspm', 'bungeemspm'] })
     tabmspm(_sender: any, _command: any, args: string | any[]) {
-        if (args.length === 1) { return ['list', 'install', 'update', 'upgrade', 'reload', 'restart', 'run', 'prun', 'sudo', 'help', 'create', 'deploy'] }
+        if (args.length === 1) { return ['list', 'install', 'update', 'load', 'unload', 'upgrade', 'reload', 'restart', 'run', 'prun', 'sudo', 'help', 'create', 'deploy'] }
         if (args.length > 1) {
             switch (args[0]) {
                 case "list":

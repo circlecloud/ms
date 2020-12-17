@@ -19,7 +19,7 @@ let help = [
     '§6/mconsole §areload               §6-  §3重载插件',
 ]
 
-@plugin({ prefix: 'Console', version: '1.0.0', author: 'MiaoWoo', servers: ['!nukkit'], source: __filename })
+@plugin({ prefix: 'Console', version: '1.1.0', author: 'MiaoWoo', servers: ['!nukkit'], source: __filename })
 export class MiaoConsole extends interfaces.Plugin {
     @Autowired(ContainerInstance)
     private container: Container
@@ -42,6 +42,7 @@ export class MiaoConsole extends interfaces.Plugin {
     private rootLogger: any
     private appender: any
     private handler: any
+    private babel: any
 
     private logCache: string[] = []
 
@@ -62,6 +63,15 @@ export class MiaoConsole extends interfaces.Plugin {
                 this.logCache = this.logCache.slice(this.logCache.length - 30, this.logCache.length)
             }
         })
+        this.task.create(() => {
+            if (!this.babel) {
+                this.logger.console('§3脚本 Babel 引擎初始化中 请稍候...')
+                let startTime = Date.now()
+                this.babel = require('@babel/standalone')
+                this.compileCode(`() => console.log("Babel ready!")`)
+                this.logger.console(`§3脚本 Babel 引擎初始化完毕 耗时 §a${Date.now() - startTime}ms...`)
+            }
+        }).async().submit()
     }
 
     @cmd()
@@ -81,8 +91,6 @@ export class MiaoConsole extends interfaces.Plugin {
     }
 
     cmdreload(sender: any) {
-        // @ts-ignore
-        require.clear('websocket')
         this.pluginManager.reload(this)
         return
     }
@@ -223,7 +231,7 @@ export class MiaoConsole extends interfaces.Plugin {
     startSocketIOServer() {
         let namespace = this.socketIOServer.of('/MiaoConsole')
         process.on('message', (msg) => namespace.emit('log', msg))
-        namespace.on('connect', (client: SocketIOSocket) => {
+        namespace.on('connection', (client: SocketIOSocket) => {
             if (!this.token) {
                 this.logger.console(`§6客户端 §b${client.id} §a请求连接 §4服务器尚未设置 Token 无法连接!`)
                 client.emit('unauthorized', () => client.disconnect(true))
@@ -247,14 +255,23 @@ export class MiaoConsole extends interfaces.Plugin {
             client.emit('log', `Currect Server Version is ${this.server.getVersion()}`)
         })
         client.on('command', (cmd) => {
-            setTimeout(() => this.server.dispatchConsoleCommand(cmd), 0)
+            this.task.callSyncMethod(() => this.server.dispatchConsoleCommand(cmd))
             client.emit('log', `§6命令: §b${cmd} §a执行成功!`)
         })
         client.on('tabComplate', (input, index, callback) => {
-            callback?.(this.command.tabComplete(this.server.getConsoleSender(), input, index) || [])
+            try {
+                callback?.(this.command.tabComplete(this.server.getConsoleSender(), input, index) || [])
+            } catch (error) {
+                callback?.([])
+                client.emit('log', `§4命令补全发生异常: ${error}!`)
+                console.ex(error)
+            }
         })
         client.on('exec', (code) => {
             try {
+                if (!this.babel) {
+                    return client.emit('log', '§cBabel 引擎初始化中 请稍候再试!')
+                }
                 client.emit('log', this.runCode(code, client.nsp, client))
             } catch (ex) {
                 client.emit('log', `§4代码执行异常 错误: ${ex}\n${console.stack(ex).join('\n')}`)
@@ -307,15 +324,30 @@ export class MiaoConsole extends interfaces.Plugin {
             this.container,
             this.pluginManager
         ]
-        let tfunc = new Function(
-            ...paramNames,
-            `var api = require('@ccms/api');
+        client.emit('log', '§3代码编译中 请稍候...')
+        let startTime = Date.now()
+        let tfunc = new Function(...paramNames, this.compileCode(code))
+        client.emit('log', `§3代码编译完成 耗时 §e${Date.now() - startTime}ms §b开始执行 请稍候...`)
+        return tfunc.apply(this, params) + ''
+    }
+
+    private compileCode(code: string) {
+        return `var api = require('@ccms/api');
 if (this.serverType == "spring") {
     var dbm = container.get(api.database.DataBaseManager)
     var db = dbm.getMainDatabase()
     var bf = base.getInstance().getAutowireCapableBeanFactory()
 }
-return '§a返回结果: §r'+ eval(${JSON.stringify(code)});`)
-        return this.task.callSyncMethod(() => tfunc.apply(this, params)) + ''
+var startTime = Date.now()
+var result = eval(${JSON.stringify(this.babel.transform(code, {
+            filename: 'miaoconsole-temp.ts',
+            presets: ['typescript', 'es2015'],
+            plugins: [
+                ['proposal-decorators', { legacy: true }],
+                'transform-runtime'
+            ],
+            sourceMaps: "inline"
+        }).code)});
+return '§3代码执行完成 耗时 §e' + (Date.now() - startTime) + 'ms §a返回结果: §r'+ result`
     }
 }
