@@ -31,7 +31,8 @@ ms.api.command.tab.completer.error: "§6Player {player} §6exec §b{plugin} §6P
 
 ms.plugin.initialize: "Initialization MiaoScript Plugin System: Plugin: {plugin} Loader: {loader}..."
 ms.plugin.event.map: "Total {count} {type} Event Mapping Complate..."
-ms.plugin.manager.scan: "Scanning Plugins in {folder} ..."
+ms.plugin.manager.scan: "Scanner {scanner} Scanning Plugins in {folder} ..."
+ms.plugin.manager.scan.finish: "Scanner {scanner} Found {size} Plugins in {folder} Start Build..."
 ms.plugin.manager.initialize.error: "§6Plugin §b{name} §6initialize error §4{ex}"
 ms.plugin.manager.stage: "{stage} {plugin} version {version} by {author}"
 ms.plugin.manager.stage.exec: "[{plugin}] Exec {name} Stage {stage} When servers is {servers}..."
@@ -39,6 +40,7 @@ ms.plugin.manager.stage.exec.error: "§6Plugin §b{plugin} §6exec §d{executor}
 ms.plugin.manager.stage.load: "Loading"
 ms.plugin.manager.stage.enable: "Enabling"
 ms.plugin.manager.stage.disable: "Disabling"
+ms.plugin.manager.build: "Plugin {name}({version}) Build Finish source: {file}({scanner}) loader: {loader} Cost: {cost}s."
 ms.plugin.manager.build.error: "§6Load Plugin From §b{file} §6failed. §4Error: §c{error}"
 ms.plugin.manager.build.update: "Auto Update Plugin {name} ..."
 ms.plugin.manager.build.not.extends: "§4Found error plugin §b{source} §4it's not extends interfaces.Plugin, the plugin will be ignore!"

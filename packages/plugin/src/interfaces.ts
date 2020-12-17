@@ -68,6 +68,10 @@ export namespace interfaces {
          */
         version?: number
         /**
+         * 默认配置
+         */
+        default?: any
+        /**
          * 实体变量名称
          */
         variable?: string

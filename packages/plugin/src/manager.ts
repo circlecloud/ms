@@ -81,9 +81,12 @@ export class PluginManagerImpl implements plugin.PluginManager {
         this.initialize()
         for (const [, scanner] of this.sacnnerMap) {
             try {
-                scanner.scan(folder).forEach(loadMetadata => {
+                console.i18n('ms.plugin.manager.scan', { scanner: scanner.type, folder })
+                let plugins = scanner.scan(folder)
+                console.i18n('ms.plugin.manager.scan.finish', { scanner: scanner.type, folder, size: plugins.length })
+                plugins.forEach(loadMetadata => {
                     try {
-                        this.loadPlugin(scanner.load(loadMetadata))
+                        this.loadAndRequirePlugin(loadMetadata)
                     } catch (error) {
                         console.error(`plugin scanner ${scanner.type} load ${loadMetadata.file} occurred error ${error}`)
                         console.ex(error)
@@ -158,6 +161,20 @@ export class PluginManagerImpl implements plugin.PluginManager {
         }
     }
 
+    private loadAndRequirePlugin(loadMetadata: plugin.PluginLoadMetadata) {
+        let startTime = Date.now()
+        let metadata = this.loadPlugin(loadMetadata.scanner.load(loadMetadata))
+        console.i18n('ms.plugin.manager.build', {
+            name: loadMetadata.metadata.name,
+            version: loadMetadata.metadata.version,
+            file: loadMetadata.file.toString().replace(root, ''),
+            scanner: loadMetadata.scanner.type,
+            loader: loadMetadata.loader.type,
+            cost: (Date.now() - startTime) / 1000
+        })
+        return metadata
+    }
+
     /**
      * 从文件加载插件
      * @param file java.io.File
@@ -165,7 +182,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     loadFromFile(file: string, scanner = this.sacnnerMap.get('file')): plugin.Plugin {
         if (!file) { throw new Error('plugin file can\'t be undefiend!') }
         if (!scanner) { throw new Error('plugin scanner can\'t be undefiend!') }
-        let metadata = this.loadPlugin(scanner.load(scanner.read(file)))
+        let metadata = this.loadAndRequirePlugin(scanner.read(file))
         let plugin = this.buildPlugin(metadata)
         this.load(plugin)
         this.enable(plugin)
