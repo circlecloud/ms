@@ -5,9 +5,7 @@ import { ServerEvent } from '../socket-io/constants'
 import { ProxyBeanName } from './constants'
 import { TomcatClient } from './client'
 
-const WebSocketServerProxy = Java.type("pw.yumc.MiaoScript.websocket.WebSocketProxy")
 const ThreadPoolExecutor = Java.type('java.util.concurrent.ThreadPoolExecutor')
-const ThreadPoolTaskExecutor = Java.type('org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor')
 
 type TomcatWebSocketSession = javax.websocket.Session
 
@@ -22,7 +20,7 @@ class TomcatWebSocketServer extends EventEmitter {
         this.beanFactory = beanFactory
         this.initThreadPool()
         try { this.beanFactory.destroySingleton(ProxyBeanName) } catch (error) { }
-        let NashornWebSocketServerProxy = Java.extend(WebSocketServerProxy, {
+        let NashornWebSocketServerProxy = Java.extend(Java.type("pw.yumc.MiaoScript.websocket.WebSocketProxy"), {
             onOpen: (session: TomcatWebSocketSession) => {
                 let cid = `${session?.getId()}`
                 let tomcatClient = new TomcatClient(this, session)
@@ -58,6 +56,7 @@ class TomcatWebSocketServer extends EventEmitter {
         this.beanFactory.registerSingleton(ProxyBeanName, new NashornWebSocketServerProxy())
     }
     private initThreadPool() {
+        const ThreadPoolTaskExecutor = Java.type('org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor')
         this.executor = new ThreadPoolTaskExecutor()
         this.executor.setCorePoolSize(10)
         this.executor.setMaxPoolSize(100)
@@ -76,6 +75,5 @@ class TomcatWebSocketServer extends EventEmitter {
 
 export {
     TomcatWebSocketServer,
-    ServerEvent,
     TomcatClient
 }

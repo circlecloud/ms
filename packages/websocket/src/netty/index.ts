@@ -65,6 +65,5 @@ class NettyWebSocketServer extends EventEmitter {
 
 export {
     NettyWebSocketServer,
-    ServerEvent,
     NettyClient
 }
