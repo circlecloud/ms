@@ -21,7 +21,7 @@
     "dependencies": {
         "@ccms/common": "^0.13.0",
         "@ccms/container": "^0.13.0",
-        "@ccms/ployfill": "^0.13.0",
+        "@ccms/polyfill": "^0.13.0",
         "base64-js": "^1.5.1",
         "source-map-builder": "^0.0.7"
     },

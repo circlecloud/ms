@@ -2,7 +2,6 @@ import { EventEmitter } from 'events'
 
 const System = Java.type('java.lang.System')
 const Thread = Java.type('java.lang.Thread')
-const Runnable = Java.type('java.lang.Runnable')
 const InterruptedException = Java.type('java.lang.InterruptedException')
 const ThreadGroup = Java.type("java.lang.ThreadGroup")
 const AtomicInteger = Java.type("java.util.concurrent.atomic.AtomicInteger")
@@ -55,6 +54,10 @@ class Process extends EventEmitter {
     exit(code: number) {
         console.log(`process exit by code ${code}!`)
         this.emit('exit', code)
+    }
+
+    toString() {
+        return "[object process]"
     }
 }
 
@@ -191,8 +194,9 @@ class EventLoop {
     }
 }
 global.setGlobal('process', new Process(), {})
+Object.defineProperty(process, require('core-js/es/symbol/to-string-tag'), { value: '[object process]' })
 const eventLoop = new EventLoop()
-global.setGlobal('eventLoop', eventLoop, {})
+Object.defineProperty(process, 'eventLoop', { value: eventLoop })
 eventLoop.startEventLoop()
 global.setGlobal('queueMicrotask', (func: any) => microTaskPool.execute(func), {})
 global.setGlobal('setTimeout', eventLoop.setTimeout.bind(eventLoop), {})
