@@ -12,8 +12,17 @@ const Bytes = Java.type('byte[]')
 
 interface PlaceholderAPI {
     registerPlaceholderHook: (key: string, onPlaceholderRequest: (player, s) => string) => void
+    registerExpansion: (expansion: PlaceholderExpansion) => void
     unregisterPlaceholderHook: (key: string) => void
     setPlaceholders: (player: any, str: string) => string
+}
+
+interface PlaceholderExpansion {
+    getIdentifier: () => string
+    getAuthor: () => string
+    getVersion: () => string
+    persist: () => string
+    onPlaceholderRequest: (player, s) => string
 }
 
 interface UserInfo {
@@ -54,14 +63,15 @@ const defaultConfig = {
     prefix: '§6[§b广告系统§6]§r',
     serverId: '',
     serverToken: '',
-    drawCommand: 'p give %player_name% %amount%',
+    drawCommand: 'points give %player_name% %amount%',
     coinName: '点券',
     joinTip: true
 }
 
-@JSPlugin({ prefix: 'MRD', version: '1.5.1', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], nativeDepends: ['ProtocolLib', 'PlaceholderAPI'], source: __filename })
+@JSPlugin({ prefix: 'MRD', version: '1.5.9', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], nativeDepends: ['ProtocolLib', 'PlaceholderAPI'], source: __filename })
 export class MiaoReward extends interfaces.Plugin {
     public serverInfo: ServerInfo
+    private notifyError = true
     private cacheBindUuid = ''
     private zeroMapView = undefined
     private playerImageCache = new Map<string, any>()
@@ -91,6 +101,9 @@ export class MiaoReward extends interfaces.Plugin {
     private PlaceholderAPI: PlaceholderAPI
     @JSClass('me.clip.placeholderapi.PlaceholderHook')
     private PlaceholderHook: any
+    @JSClass('me.clip.placeholderapi.expansion.PlaceholderExpansion')
+    private PlaceholderExpansion: any
+    private expansion: any
 
     @JSClass('com.comphenix.protocol.ProtocolLibrary')
     private ProtocolLibrary: any
@@ -108,11 +121,11 @@ export class MiaoReward extends interfaces.Plugin {
     load() {
         this.config.prefix = this.config.prefix || '§6[§b广告系统§6]§r'
         this.config.drawCommand = this.config.drawCommand || 'p give %player_name% %amount%'
-        if (!this.config.coinName) {
+        if (this.config.coinName == undefined) {
             this.config.coinName = '点券'
             this.config.save()
         }
-        if (!this.config.joinTip) {
+        if (this.config.joinTip == undefined) {
             this.config.joinTip = true
             this.config.save()
         }
@@ -191,21 +204,28 @@ export class MiaoReward extends interfaces.Plugin {
         if (!this.PlaceholderAPI) {
             console.console("§cCan't found me.clip.placeholderapi.PlaceholderAPI variable will not be replaced!")
         } else {
-            this.PlaceholderAPI.registerPlaceholderHook("mrd", new this.PlaceholderHook({
-                onPlaceholderRequest: (player: any, s: string) => {
-                    if (!this.playerInfoCache.has(player.getName())) { return '数据加载中' }
-                    let data = this.playerInfoCache.get(player.getName())
-                    if (!data) { return '用户未绑定' }
-                    switch (s.toLowerCase()) {
-                        case "balance": return data.balance
-                        case "sign": return data.sign
-                        case "video": return data.video
-                        case "box": return data.box
-                        case "block": return data.block
-                        default: return "未知的参数: " + s
-                    }
-                }
-            }))
+            this.expansion = new this.PlaceholderExpansion({
+                getIdentifier: () => 'mrd',
+                persist: () => true,
+                getAuthor: () => 'MiaoWoo',
+                getVersion: () => '1.0.0',
+                onPlaceholderRequest: this.onPlaceholderRequest.bind(this)
+            })
+            this.taskManager.create(() => this.expansion.register()).submit()
+        }
+    }
+
+    private onPlaceholderRequest(player: any, s: string) {
+        if (!this.playerInfoCache.has(player.getName())) { return '数据加载中' }
+        let data = this.playerInfoCache.get(player.getName())
+        if (!data) { return '用户未绑定' }
+        switch (s.toLowerCase()) {
+            case "balance": return data.balance
+            case "sign": return data.sign
+            case "video": return data.video
+            case "box": return data.box
+            case "block": return data.block
+            default: return "未知的参数: " + s
         }
     }
 
@@ -261,10 +281,19 @@ export class MiaoReward extends interfaces.Plugin {
             java.util.Arrays.fill(arritemStack, new org.bukkit.inventory.ItemStack(org.bukkit.Material.AIR))
             arritemStack[36 + player.getInventory().getHeldItemSlot()] = mapItem
             var packetContainer = protocolManager.createPacket(this.PacketType.Play.Server.WINDOW_ITEMS)
-            if (packetContainer.getItemArrayModifier().size() > 0) {
+            try {
                 packetContainer.getItemArrayModifier().write(0, arritemStack)
-            } else {
-                packetContainer.getItemListModifier().write(0, java.util.Arrays.asList(arritemStack))
+            } catch (error) {
+                try {
+                    packetContainer.getItemListModifier().write(0, java.util.Arrays.asList(arritemStack))
+                } catch (error) {
+                    if (this.notifyError) {
+                        console.console('§4发送虚拟物品包失败 可能是ProtocolLib版本不兼容!')
+                        console.ex(error)
+                        this.notifyError = false
+                        return
+                    }
+                }
             }
             protocolManager.sendServerPacket(player, packetContainer)
         } catch (ex) {
@@ -273,8 +302,7 @@ export class MiaoReward extends interfaces.Plugin {
     }
 
     disable() {
-        if (!this.ProtocolLibrary) return
-        this.PlaceholderAPI?.unregisterPlaceholderHook("mrd")
+        try { this.expansion?.unregister() } catch (error) { }
         this.adapter && this.ProtocolLibrary.getProtocolManager().removePacketListener(this.adapter)
         Java.from(this.server.getOnlinePlayers()).forEach(p => this.checkAndClear(p))
         this.channelOff?.off()
@@ -420,6 +448,7 @@ export class MiaoReward extends interfaces.Plugin {
             this.logger.sender(sender, draw.msg.split('\n').map(s => s.replace('点券', this.config.coinName)))
             this.sendBroadcast(sender, `${this.config.prefix}§6玩家 §b${sender.getName()} §6成功将 §a${amount}喵币 §6兑换成 §c${draw.data}${this.config.coinName}!`)
             this.sendBroadcast(sender, `${this.config.prefix}§c/mrd help §b查看广告系统帮助 §6快来一起看广告赚${this.config.coinName}吧!`)
+            this.queryUser(sender)
         }).submit()
     }
 
@@ -626,20 +655,7 @@ export class MiaoReward extends interfaces.Plugin {
                 }
             }, this).async().later(20).timer(20).submit()
             this.playerTaskCache.set(sender.getName(), task)
-            if (this.downgrade) {
-                this.logger.sender(sender, '§c低版本客户端 二维码渲染中 请等待 3 秒 稍候扫码!')
-                let waitTask = this.taskManager.create(() => {
-                    let temp = sender.getLocation()
-                    temp.setPitch(-90)
-                    sender.teleport(temp)
-                }, this).later(0).timer(20).submit()
-                this.taskManager.create(() => {
-                    waitTask.cancel()
-                    let temp = sender.getLocation()
-                    temp.setPitch(90)
-                    sender.teleport(temp)
-                }).later(80).submit()
-            }
+            if (this.downgrade) { this.downgradeTask(sender) }
             this.playerImageCache.set(sender.getName(), org.bukkit.map.MapPalette.imageToBytes(this.createQrcode(content)))
             if (!this.downgrade) {
                 let temp = sender.getLocation()
@@ -648,7 +664,23 @@ export class MiaoReward extends interfaces.Plugin {
             }
             this.sendWindowItems(sender, this.createQrCodeMapItem(name))
             sender.sendMap(this.zeroMapView)
+            this.taskManager.create(() => this.sendWindowItems(sender, this.createQrCodeMapItem(name))).later(20).async().submit()
         }).submit()
+    }
+
+    private downgradeTask(sender) {
+        this.logger.sender(sender, '§c低版本客户端 二维码渲染中 请等待 3 秒 稍候扫码!')
+        let waitTask = this.taskManager.create(() => {
+            let temp = sender.getLocation()
+            temp.setPitch(-90)
+            sender.teleport(temp)
+        }, this).later(0).timer(20).submit()
+        this.taskManager.create(() => {
+            waitTask.cancel()
+            let temp = sender.getLocation()
+            temp.setPitch(90)
+            sender.teleport(temp)
+        }).later(80).submit()
     }
 
     private queryUser(sender: org.bukkit.entity.Player, sync = false) {

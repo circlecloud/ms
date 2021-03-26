@@ -32,10 +32,6 @@ export class MiaoRobot extends interfaces.Plugin {
     }
 
     enable() {
-        if (!this.config.address || !this.config.token) {
-            return this.logger
-        }
-        this.cmdconnect(this.server.getConsoleSender(), this.config.address, this.config.token)
     }
 
     disable() {
@@ -46,13 +42,10 @@ export class MiaoRobot extends interfaces.Plugin {
     mbot() { }
 
     cmdconnect(sender: org.bukkit.entity.Player, address: string = this.config.address, token: string = this.config.token) {
-        if (this.client && this.client.readyState == WebSocket.OPEN) {
-            this.client.close()
-            this.client = undefined
-        }
         if (!address || !token) {
             return this.logger.sender(sender, '§4错误 请配置服务器地址和Token!')
         }
+        this.cmdclose(sender)
         try {
             this.client = new WebSocket(address, '', { Authorization: `Bearer ${token}` })
             this.initRobot(this.client)
@@ -83,7 +76,7 @@ export class MiaoRobot extends interfaces.Plugin {
     }
 
     cmdclose(sender: org.bukkit.entity.Player) {
-        if (this.client) {
+        if (this.client && this.client.readyState != WebSocket.CLOSED) {
             this.client.close(0, 'plugin close socket')
         }
     }

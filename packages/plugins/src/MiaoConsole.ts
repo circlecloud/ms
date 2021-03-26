@@ -19,7 +19,7 @@ let help = [
     '§6/mconsole §areload               §6-  §3重载插件',
 ]
 
-@plugin({ prefix: 'Console', version: '1.1.0', author: 'MiaoWoo', servers: ['!nukkit'], source: __filename })
+@plugin({ prefix: 'Console', version: '1.1.1', author: 'MiaoWoo', servers: ['!nukkit'], source: __filename })
 export class MiaoConsole extends interfaces.Plugin {
     @Autowired(ContainerInstance)
     private container: Container
@@ -43,6 +43,7 @@ export class MiaoConsole extends interfaces.Plugin {
     private appender: any
     private handler: any
     private babel: any
+    private downgrade = true
 
     private logCache: string[] = []
 
@@ -59,17 +60,23 @@ export class MiaoConsole extends interfaces.Plugin {
         }
         process.on('message', (msg) => {
             this.logCache.push(msg)
-            if (this.logCache.length > 30) {
-                this.logCache = this.logCache.slice(this.logCache.length - 30, this.logCache.length)
+            if (this.logCache.length > 100) {
+                this.logCache = this.logCache.slice(this.logCache.length - 100, this.logCache.length)
             }
         })
         this.task.create(() => {
             if (!this.babel) {
-                this.logger.console('§3脚本 Babel 引擎初始化中 请稍候...')
-                let startTime = Date.now()
-                this.babel = require('@babel/standalone')
-                this.compileCode(`() => console.log("Babel ready!")`)
-                this.logger.console(`§3脚本 Babel 引擎初始化完毕 耗时 §a${Date.now() - startTime}ms...`)
+                try {
+                    this.logger.console('§3脚本 Babel 引擎初始化中 请稍候...')
+                    let startTime = Date.now()
+                    this.babel = require('@babel/standalone')
+                    this.compileCode(`() => console.log("Babel ready!")`)
+                    this.logger.console(`§3脚本 Babel 引擎初始化完毕 耗时 §a${Date.now() - startTime}ms...`)
+                    this.downgrade = false
+                } catch (error) {
+                    this.logger.console(`§c脚本 Babel 引擎初始化失败 将无法使用ES5以上语法!`)
+                    console.ex(error)
+                }
             }
         }).async().submit()
     }
@@ -332,6 +339,17 @@ export class MiaoConsole extends interfaces.Plugin {
     }
 
     private compileCode(code: string) {
+        if (!this.downgrade && this.babel?.transform) {
+            code = this.babel.transform(code, {
+                filename: 'miaoconsole-temp.ts',
+                presets: ['typescript', 'es2015'],
+                plugins: [
+                    ['proposal-decorators', { legacy: true }],
+                    'transform-runtime'
+                ],
+                sourceMaps: "inline"
+            }).code
+        }
         return `var api = require('@ccms/api');
 if (this.serverType == "spring") {
     var dbm = container.get(api.database.DataBaseManager)
@@ -339,15 +357,7 @@ if (this.serverType == "spring") {
     var bf = base.getInstance().getAutowireCapableBeanFactory()
 }
 var startTime = Date.now()
-var result = eval(${JSON.stringify(this.babel.transform(code, {
-            filename: 'miaoconsole-temp.ts',
-            presets: ['typescript', 'es2015'],
-            plugins: [
-                ['proposal-decorators', { legacy: true }],
-                'transform-runtime'
-            ],
-            sourceMaps: "inline"
-        }).code)});
+var result = eval(${JSON.stringify(code)});
 return '§3代码执行完成 耗时 §e' + (Date.now() - startTime) + 'ms §a返回结果: §r'+ result`
     }
 }

@@ -11,8 +11,9 @@ let help = [
     '§6========= §6[§aMiaoScriptPackageManager§6] 帮助 §aBy §bMiaoWoo §6=========',
     '§6/mspm §ainstall §e<插件名称>  §6-  §3安装仓库插件',
     '§6/mspm §aload §e<插件名称>     §6-  §3安装本地插件',
-    '§6/mspm §aunload §e<插件名称>   §6-  §3卸载已安装插件',
+    '§6/mspm §cunload §e<插件名称>   §6-  §3卸载已安装插件',
     '§6/mspm §areload §e<插件名称>   §6-  §3重载已安装插件(无名称则重载自身)',
+    '§6/mspm §cdelete §e<插件名称>   §6-  §3删除已安装插件',
     '§6/mspm §alist [i]            §6-  §3列出仓库插件[已安装的插件]',
     '§6/mspm §aupdate §e[插件名称]   §6-  §3更新插件(无名称则更新源)',
     '§6/mspm §aupgrade §e[插件名称|system]  §6-  §3升级插件/§4框架(§csystem§3)',
@@ -44,7 +45,7 @@ let langMap = {
     'plugin.name.empty': '§c请输入插件名称!',
     'cloud.update.finish': '§6成功从 §aMiaoScriptPackageCenter §6获取到 §a{length} §6个插件!',
     'cloud.not.exists': '§6当前 §aMiaoScriptPackageCenter §c不存在 §a{name} §c插件!',
-    'cloud.update.exists': '§6插件 §b{name} §a发现新版本 §3{new_version} §6当前版本 §3{old_version}!',
+    'cloud.update.exists': '§6插件 §b{name} §6版本 §3{old_version} §a发现更新 §3{new_version} §r{changelog}§6!',
     'download.start': '§6开始下载插件: §b{name} §6版本 §3{version}',
     'download.url': '§6插件下载地址: §b{url}',
     'download.finish': '§6插件 §b{name} §6版本 §3{version} §a下载完毕 开始加载 ...',
@@ -106,7 +107,7 @@ class SpongeFakeSender extends FakeSender {
     }
 }
 
-@JSPlugin({ prefix: 'PM', version: '1.3.1', author: 'MiaoWoo', source: __filename })
+@JSPlugin({ prefix: 'PM', version: '1.3.2', author: 'MiaoWoo', source: __filename })
 export class MiaoScriptPackageManager extends interfaces.Plugin {
     @Autowired()
     private pluginManager: pluginApi.PluginManager
@@ -332,6 +333,8 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
                 try {
                     this.i18n(sender, 'upgrade.start')
                     base.delete(enginePath)
+                    // @ts-ignore
+                    require.setUpgradeMode?.(true)
                     this.cmdrestart(sender)
                 } catch (ex) {
                     if (global.debug) {
@@ -356,6 +359,15 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
             this.i18n(sender, 'plugin.unload.start', { name, version: plugin.description.version })
             this.pluginManager.disable(plugin)
             this.i18n(sender, 'plugin.unload.finish', { name, version: plugin.description.version })
+        }
+    }
+
+    cmddelete(sender: any, name: string) {
+        if (this.checkPlugin(sender, name)) {
+            let plugin = this.pluginManager.getPlugins().get(name)
+            this.i18n(sender, 'plugin.delete.start', { name, version: plugin.description.version })
+            base.delete(plugin.description.source)
+            this.i18n(sender, 'plugin.delete.finish', { name, version: plugin.description.version })
         }
     }
 
@@ -517,7 +529,12 @@ return eval(${JSON.stringify(code)});`)
                 let cloudPlugin = this.packageCache[p.description.name]
                 //§6插件名称: §b{name}\n§6版本: §a{version}\n§6作者: §3{author}\§6更新时间: §9{updated_at}
                 if (cloudPlugin && cloudPlugin.version != p.description.version) {
-                    this.i18n(sender, 'cloud.update.exists', { name: p.description.name, new_version: cloudPlugin.version, old_version: p.description.version })
+                    this.i18n(sender, 'cloud.update.exists', {
+                        name: p.description.name,
+                        new_version: cloudPlugin.version,
+                        old_version: p.description.version,
+                        changelog: cloudPlugin.changelog || ''
+                    })
                 }
             })
         }).async().submit()
