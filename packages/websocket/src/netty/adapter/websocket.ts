@@ -4,6 +4,7 @@ export abstract class WebSocketHandlerAdapter {
     private _Handler
     constructor() {
         let ChannelInboundHandlerAdapterImpl = Java.extend(ChannelInboundHandlerAdapter, {
+            isSharable: () => true,
             channelRead: this.channelRead.bind(this),
             channelInactive: this.channelInactive.bind(this),
             channelUnregistered: this.exceptionCaught.bind(this),
