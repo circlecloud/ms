@@ -95,7 +95,7 @@ export class PluginConfigManager {
                 if (metadata.default) {
                     let needSave = false
                     for (const key of Object.keys(metadata.default)) {
-                        if (!value[key]) {
+                        if (value[key] == undefined) {
                             value[key] = metadata.default[key]
                             needSave = true
                         }
