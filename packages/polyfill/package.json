@@ -15,14 +15,14 @@
     },
     "dependencies": {
         "@ccms/i18n": "^0.13.0",
-        "@ccms/nodejs": "^0.13.0",
         "@ccms/nashorn": "^0.13.0",
-        "core-js": "^3.7.0"
+        "@ccms/nodejs": "^0.13.0",
+        "core-js": "^3.9.1"
     },
     "devDependencies": {
         "@ccms/nashorn": "^0.13.0",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
-        "typescript": "^4.0.5"
+        "typescript": "^4.2.3"
     }
 }
