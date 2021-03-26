@@ -4,10 +4,12 @@ import { createClient } from 'minecraft-protocol'
 import { attachForge } from './forge'
 import { attachEvents } from './event'
 
-let username = process.argv[2] || 'Mr_jtb'
-let password = process.argv[3] || ''
-let version = process.argv[4] || '1.12.2'
-let readAddress = process.argv[5] || '192.168.2.5:25577'
+let readUserInfo = process.argv[2] || 'Mr_jtb'
+let realUserInfo = readUserInfo.split(":")
+let username = realUserInfo[0]
+let password = realUserInfo[1] || ''
+let version = process.argv[3] || '1.12.2'
+let readAddress = process.argv[4] || '192.168.2.25:25565'
 let realAddress = readAddress.split(":")
 let address = realAddress[0]
 let port = parseInt(realAddress[1] || "25565")
@@ -18,17 +20,23 @@ function commandLineCreateClient() {
 }
 
 function createConnection(host: string, port: number, username: string, password: string) {
-    let client = createClient({
+    let clientOptions: any = {
         version,
         host,
         port,
         username,
         password,
-        clientToken: 'd02c7f39-2376-45da-a5a5-50e24fa8b185',
+        // clientToken: 'd02c7f39-2376-45da-a5a5-50e24fa8b185',
         //@ts-ignore
-        authServer: 'https://mcsso.yumc.pw/api/yggdrasil/authserver',
-        sessionServer: 'https://mcsso.yumc.pw/api/yggdrasil/sessionserver'
-    })
+        // authServer: 'https://skin.yumc.pw/api/yggdrasil/authserver',
+        // sessionServer: 'https://skin.yumc.pw/api/yggdrasil/sessionserver'
+    }
+    if (clientOptions.password) {
+        clientOptions.clientToken = 'd02c7f39-2376-45da-a5a5-50e24fa8b185'
+        clientOptions.authServer = 'https://skin.yumc.pw/api/yggdrasil/authserver'
+        clientOptions.sessionServer = 'https://skin.yumc.pw/api/yggdrasil/sessionserver'
+    }
+    let client = createClient(clientOptions)
 
     attachCommon(client)
     attachForge(client)
