@@ -22,7 +22,7 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
-        "minecraft-protocol": "^1.19.0"
+        "minecraft-protocol": "^1.21.0"
     },
     "devDependencies": {
         "rimraf": "^3.0.2",
