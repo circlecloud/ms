@@ -1,7 +1,7 @@
 {
-    "name": "@ccms/ployfill",
+    "name": "@ccms/polyfill",
     "version": "0.13.0",
-    "description": "MiaoScript ployfill package",
+    "description": "MiaoScript polyfill package",
     "author": "MiaoWoo <admin@yumc.pw>",
     "homepage": "https://github.com/circlecloud/ms.git",
     "license": "ISC",
@@ -16,6 +16,7 @@
     "dependencies": {
         "@ccms/i18n": "^0.13.0",
         "@ccms/nodejs": "^0.13.0",
+        "@ccms/nashorn": "^0.13.0",
         "core-js": "^3.7.0"
     },
     "devDependencies": {

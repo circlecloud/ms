@@ -1,4 +1,4 @@
-import { ProxyHandle } from '@ccms/nashorn'
+import type { ProxyHandle } from '@ccms/nashorn'
 
 // Nashorn JSAdapter See https://wiki.openjdk.java.net/display/Nashorn/Nashorn+extensions#Nashornextensions-JSAdapterconstructor
 let createProxy = eval(`

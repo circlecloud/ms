@@ -1,6 +1,6 @@
 ms.i18n.completed: "Internationalization component initialization completed. Current Language: English"
-ms.ployfill.initialize: "Initialization Java Nashorn ployfill. Please wait..."
-ms.ployfill.completed: "Java Nashorn ployfill loading completed... Cost ({time}s)!"
+ms.polyfill.initialize: "Initialization Java Nashorn polyfill. Please wait..."
+ms.polyfill.completed: "Java Nashorn polyfill loading completed... Cost ({time}s)!"
 
 ms.core.ioc.initialize: "Initialization MiaoScript IOC Container {scope}/container. Please wait..."
 ms.core.ioc.completed: "MiaoScript IOC Container {scope}/container loading completed({time}s)!"

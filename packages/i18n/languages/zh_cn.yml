@@ -1,6 +1,6 @@
 ms.i18n.completed: "国际化组件 初始化完成 当前语言: 简体中文"
-ms.ployfill.initialize: "加载 Java Nashorn 补丁. 请稍候..."
-ms.ployfill.completed: "Java Nashorn 补丁 加载完成... 耗时 ({time}s)!"
+ms.polyfill.initialize: "加载 Java Nashorn 补丁. 请稍候..."
+ms.polyfill.completed: "Java Nashorn 补丁 加载完成... 耗时 ({time}s)!"
 
 ms.core.ioc.initialize: "初始化 MiaoScript IOC 容器 {scope}/container. 请稍候..."
 ms.core.ioc.completed: "MiaoScript IOC 容器 {scope}/container 加载完成 耗时({time}s)"
