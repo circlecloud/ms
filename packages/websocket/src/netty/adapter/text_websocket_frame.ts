@@ -6,6 +6,7 @@ export abstract class TextWebSocketFrameHandlerAdapter {
     private _Handler
     constructor() {
         let TextWebSocketFrameHandlerAdapterImpl = Java.extend(SimpleChannelInboundHandler, {
+            isSharable: () => true,
             userEventTriggered: this.userEventTriggered.bind(this),
             acceptInboundMessage: (msg: any) => {
                 return TextWebSocketFrameMatcher.match(msg)
