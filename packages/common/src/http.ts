@@ -23,7 +23,7 @@ interface RequestConfig {
 }
 
 function request(config: RequestConfig) {
-    // @ts-ignore
+    // @ts-ignore XMLHttpRequest class only exist nashorn polyfill
     let xhr = new XMLHttpRequest()
     xhr.open(config.method, config.url, false)
     for (const header in config.headers) {
@@ -44,6 +44,7 @@ function request(config: RequestConfig) {
     if (xhr.getResponseHeader("Content-Type").indexOf('application/json') != -1) {
         xhr.responseType = "json"
     }
+    // @ts-ignore get only exist nashorn polyfill
     return xhr.get()
 }
 

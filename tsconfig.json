@@ -5,6 +5,7 @@
         "outDir": "dist",
         "target": "es5",
         "module": "commonjs",
+        "moduleResolution": "node",
         "strict": true,
         "strictNullChecks": false,
         "importHelpers": true,
