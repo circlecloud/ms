@@ -13,10 +13,10 @@ export interface PluginConfigLoader {
 
 export class YamlPluginConfig implements PluginConfigLoader {
     load(content: string) {
-        return yaml.safeLoad(content)
+        return yaml.load(content)
     }
     dump(variable: any): string {
-        return yaml.safeDump(variable, { skipInvalid: true, lineWidth: 120 })
+        return yaml.dump(variable, { skipInvalid: true, lineWidth: 120 })
     }
 }
 

@@ -107,7 +107,7 @@ class SpongeFakeSender extends FakeSender {
     }
 }
 
-@JSPlugin({ prefix: 'PM', version: '1.3.2', author: 'MiaoWoo', source: __filename })
+@JSPlugin({ prefix: 'PM', version: '1.4.0', author: 'MiaoWoo', source: __filename })
 export class MiaoScriptPackageManager extends interfaces.Plugin {
     @Autowired()
     private pluginManager: pluginApi.PluginManager
@@ -407,6 +407,9 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
                 this.logger.sender(sender, '§6Reloading §3MiaoScript Engine...')
                 ScriptEngineContextHolder.disableEngine()
                 Packages.java.lang.System.gc()
+                if (ScriptEngineContextHolder.loadEngine) {
+                    ScriptEngineContextHolder.loadEngine()
+                }
                 ScriptEngineContextHolder.enableEngine()
                 this.logger.sender(sender, '§3MiaoScript Engine §6Reload §aSuccessful...')
             } catch (ex) {

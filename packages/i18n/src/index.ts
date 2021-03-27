@@ -50,7 +50,7 @@ export class Translate {
 
     readYamlFile(dir: string, name: string) {
         let langFile = this.concat(dir, 'languages', name + '.yml')
-        return this.exists(langFile) && yaml.safeLoad(base.read(langFile))
+        return this.exists(langFile) && yaml.load(base.read(langFile))
     }
 
     concat(...args: string[]) {
