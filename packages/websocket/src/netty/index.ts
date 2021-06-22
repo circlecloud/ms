@@ -33,7 +33,7 @@ class NettyWebSocketServer extends EventEmitter {
             let cid = ctx?.channel().id() + ''
             if (this.clients.has(cid)) {
                 this.emit(ServerEvent.message, this.clients.get(cid), msg.text())
-            } else {
+            } else if (global.debug) {
                 console.error(`unknow client ${ctx} reciver message ${msg.text()}`)
             }
         })
@@ -41,7 +41,7 @@ class NettyWebSocketServer extends EventEmitter {
             let cid = ctx?.channel().id() + ''
             if (this.clients.has(cid)) {
                 this.emit(ServerEvent.disconnect, this.clients.get(cid), cause)
-            } else {
+            } else if (global.debug) {
                 console.error(`unknow client ${ctx} disconnect cause ${cause}`)
             }
         })
@@ -49,7 +49,7 @@ class NettyWebSocketServer extends EventEmitter {
             let cid = ctx?.channel().id() + ''
             if (this.clients.has(cid)) {
                 this.emit(ServerEvent.error, this.clients.get(cid), cause)
-            } else {
+            } else if (global.debug) {
                 console.error(`unknow client ${ctx} cause error ${cause}`)
                 console.ex(cause)
             }
