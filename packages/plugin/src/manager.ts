@@ -41,6 +41,10 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
     private instanceMap: Map<string, plugin.Plugin>
     private metadataMap: Map<string, plugin.PluginMetadata>
+    /**
+     * 延时加载插件
+     */
+    private lazyMetadataMap: Map<string, plugin.PluginMetadata>
 
     constructor() {
         this.sacnnerMap = new Map()
@@ -48,6 +52,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
 
         this.instanceMap = new Map()
         this.metadataMap = new Map()
+        this.lazyMetadataMap = new Map()
 
         // ignore unused
         this.taskManager
@@ -239,14 +244,14 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     private buildPlugins() {
-        this.metadataMap.forEach((metadata) => {
-            try {
+        this.metadataMap.forEach((metadata, key) => {
+            if (metadata?.depends?.length) {
+                this.lazyMetadataMap.set(key, metadata)
+            } else {
                 this.buildPlugin(metadata)
-            } catch (error) {
-                console.console(`§4无法加载插件 §b${metadata.name} §4构建插件失败!`)
-                console.ex(error)
             }
         })
+        this.lazyMetadataMap.forEach((metadata, key) => this.buildPlugin(metadata))
     }
 
     private checkDepends(depends: string | string[]) {
@@ -262,16 +267,21 @@ export class PluginManagerImpl implements plugin.PluginManager {
         return loseDepends
     }
     private buildPlugin(metadata: plugin.PluginMetadata) {
-        if (this.instanceMap.has(metadata.name)) { throw new Error(`Plugin ${metadata.name} is already load from ${metadata.source}...`) }
-        if (!this.loaderMap.has(metadata.type)) { throw new Error(`§4无法加载插件 §b${metadata.name} §4请检查 §c${metadata.type} §4加载器是否正常启用!`) }
-        if (!this.serverChecker.check(metadata.servers)) { throw new Error(`§6插件 §b${metadata.name} §c服务器类型不兼容(${metadata.servers.join(',')}) §6忽略加载...`) }
-        let loseDepends = this.checkDepends(metadata.depends) || []
-        if (loseDepends.length) { throw new Error(`§4无法加载插件 §b${metadata.name} §4请检查依赖 §3[${loseDepends.join(',')}] §4是否安装完整!`) }
-        let loseNativeDepends = this.checkNativeDepends(metadata.nativeDepends) || []
-        if (loseNativeDepends.length) { throw new Error(`§4无法加载插件 §b${metadata.name} §4请检查插件依赖 §3[${loseNativeDepends.join(',')}] §4是否安装完整!`) }
-        let pluginInstance = this.loaderMap.get(metadata.type).build(metadata)
-        if (!pluginInstance) { throw new Error(`§4加载器 §c${metadata.type} §4加载插件 §c${metadata.name} §4失败!`) }
-        this.instanceMap.set(metadata.name, pluginInstance)
-        return pluginInstance
+        try {
+            if (this.instanceMap.has(metadata.name)) { throw new Error(`Plugin ${metadata.name} is already load from ${metadata.source}...`) }
+            if (!this.loaderMap.has(metadata.type)) { throw new Error(`§4无法加载插件 §b${metadata.name} §4请检查 §c${metadata.type} §4加载器是否正常启用!`) }
+            if (!this.serverChecker.check(metadata.servers)) { throw new Error(`§6插件 §b${metadata.name} §c服务器类型不兼容(${metadata.servers.join(',')}) §6忽略加载...`) }
+            let loseDepends = this.checkDepends(metadata.depends) || []
+            if (loseDepends.length) { throw new Error(`§4无法加载插件 §b${metadata.name} §4请检查脚本依赖 §3[${loseDepends.join(',')}] §4是否安装完整!`) }
+            let loseNativeDepends = this.checkNativeDepends(metadata.nativeDepends) || []
+            if (loseNativeDepends.length) { throw new Error(`§4无法加载插件 §b${metadata.name} §4请检查插件依赖 §3[${loseNativeDepends.join(',')}] §4是否安装完整!`) }
+            let pluginInstance = this.loaderMap.get(metadata.type).build(metadata)
+            if (!pluginInstance) { throw new Error(`§4加载器 §c${metadata.type} §4加载插件 §c${metadata.name} §4失败!`) }
+            this.instanceMap.set(metadata.name, pluginInstance)
+            return pluginInstance
+        } catch (error) {
+            console.console(`§4无法加载插件 §b${metadata.name} §4构建插件失败!`)
+            console.ex(error)
+        }
     }
 }
