@@ -4,6 +4,7 @@ import i18n from '@ccms/i18n'
 let polyfillStartTime = new Date().getTime()
 i18n.initialize()
 console.i18n("ms.polyfill.initialize")
+import './openjdk-nashorn-shim'
 import './es5-ext'
 import './node-shim'
 import 'core-js'
