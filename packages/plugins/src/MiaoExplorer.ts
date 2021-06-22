@@ -69,7 +69,7 @@ export class MiaoExplorer extends interfaces.Plugin {
 
     private readDir(dir) {
         let children = Java.from(dir.listFiles(new FileFilter({
-            accept: file => file.getName().endsWith('.yml') || file.isDirectory()
+            accept: file => file.getName().endsWith('.yml') || file.getName().endsWith('.js') || file.isDirectory()
         }))).sort().map(file => {
             if (file.isDirectory()) {
                 let children = this.readDir(file)

@@ -46,12 +46,14 @@ let langMap = {
     'cloud.update.finish': '§6成功从 §aMiaoScriptPackageCenter §6获取到 §a{length} §6个插件!',
     'cloud.not.exists': '§6当前 §aMiaoScriptPackageCenter §c不存在 §a{name} §c插件!',
     'cloud.update.exists': '§6插件 §b{name} §6版本 §3{old_version} §a发现更新 §3{new_version} §r{changelog}§6!',
+    'cloud.update.tip': `§6发现存在 §b{count}个 §6需要更新的插件 请使用 §aupdate §6或 §cupgrade §6命令更新!`,
     'download.start': '§6开始下载插件: §b{name} §6版本 §3{version}',
     'download.url': '§6插件下载地址: §b{url}',
     'download.finish': '§6插件 §b{name} §6版本 §3{version} §a下载完毕 开始加载 ...',
     'install.already': '§6插件 §b{name} §6版本 §3{version} §c已安装在服务器 §3更新请用 update 命令!',
     'install.finish': '§6插件 §b{name} §6版本 §3{version} §a安装成功!',
-    'update.finish': '§6插件 §b{name} §6版本 §3{version} §a更新成功!',
+    'update.finish': '§6插件 §b{name} §6版本 §3{version} §a更新完成!',
+    'update.tip': '§6插件 §b{name} §a更新完成 §6请使用 §areload §6命令重载生效!',
     'upgrade.confirm': '§6您正在尝试更新 §bMiaoScript §c核心 §6请执行 §b/mpm §aupgrade §cconfirm §6确认执行!',
     'upgrade.start': '§6开始§a更新 §bMiaoScript §6核心 §c正在清理 node_modules 请稍候...',
     'upgrade.failed': '§6尝试热更新 §bMiaoScript §c核心 §4失败! §6请重启服务器完成更新...',
@@ -107,7 +109,7 @@ class SpongeFakeSender extends FakeSender {
     }
 }
 
-@JSPlugin({ prefix: 'PM', version: '1.4.0', author: 'MiaoWoo', source: __filename })
+@JSPlugin({ prefix: 'PM', version: '1.5.0', author: 'MiaoWoo', source: __filename })
 export class MiaoScriptPackageManager extends interfaces.Plugin {
     @Autowired()
     private pluginManager: pluginApi.PluginManager
@@ -134,7 +136,6 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
     public serverName: string
     private translate: Translate
     private channelOff: { off: () => void }
-    private subCommandCache = []
 
     load() {
         this.translate = new Translate({
@@ -142,7 +143,6 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
             fallbackMap
         })
         this.updateRepo(this.server.getConsoleSender())
-        this.subCommandCache = Object.keys(this).filter(c => c.startsWith('cmd') && typeof this[c] == "function")
     }
 
     @enable({ servers: [constants.ServerType.Bukkit, constants.ServerType.Sponge] })
@@ -488,7 +488,11 @@ return eval(${JSON.stringify(code)});`)
         if (this.checkCloudPlugin(sender, name)) {
             this.download(sender, name, true, () => {
                 this.i18n(sender, 'update.finish', { name, version: this.packageCache[name].version })
-                callback?.()
+                if (callback) {
+                    callback()
+                } else {
+                    this.i18n(sender, 'update.tip', { name, version: this.packageCache[name].version })
+                }
             })
         }
     }
@@ -530,6 +534,7 @@ return eval(${JSON.stringify(code)});`)
             this.i18n(sender, 'cloud.update.finish', { length: this.packageNameCache.length })
             this.pluginManager.getPlugins().forEach(p => {
                 let cloudPlugin = this.packageCache[p.description.name]
+                let updateCount = 0
                 //§6插件名称: §b{name}\n§6版本: §a{version}\n§6作者: §3{author}\§6更新时间: §9{updated_at}
                 if (cloudPlugin && cloudPlugin.version != p.description.version) {
                     this.i18n(sender, 'cloud.update.exists', {
@@ -538,6 +543,10 @@ return eval(${JSON.stringify(code)});`)
                         old_version: p.description.version,
                         changelog: cloudPlugin.changelog || ''
                     })
+                    updateCount++
+                }
+                if (updateCount) {
+                    this.i18n(sender, 'cloud.update.tip', { count: updateCount })
                 }
             })
         }).async().submit()

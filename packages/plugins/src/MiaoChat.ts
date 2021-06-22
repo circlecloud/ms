@@ -50,7 +50,7 @@ class MiaoMessage {
     }
 }
 
-@plugin({ version: '1.0.1', author: 'MiaoWoo', source: __filename })
+@plugin({ version: '1.1.0', author: 'MiaoWoo', nativeDepends: ['PlaceholderAPI'], source: __filename })
 export class MiaoChat extends interfaces.Plugin {
     @Autowired()
     private Server: server.Server
