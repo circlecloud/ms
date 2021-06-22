@@ -47,8 +47,8 @@ export class PluginCommandManager {
                 let subcommand = args[0] || 'help'
                 let cmdKey = 'cmd' + subcommand
                 if (!pluginInstance[cmdKey]) {
-                    console.sender(sender, '§4未知的子命令: §c' + subcommand)
-                    pluginInstance['cmdhelp'] && console.sender(sender, `§6请执行 §b/${command} §ahelp §6查看帮助!`)
+                    pluginInstance.logger.sender(sender, '§4未知的子命令: §c' + subcommand)
+                    pluginInstance['cmdhelp'] && pluginInstance.logger.sender(sender, `§6请执行 §b/${command} §ahelp §6查看帮助!`)
                     return
                 }
                 args.shift()

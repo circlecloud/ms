@@ -85,25 +85,27 @@ export class PluginConfigManager {
         try {
             metadata.file = fs.concat(fs.file(plugin.description.loadMetadata.file).parent, plugin.description.name, metadata.filename)
             let configLoader = this.getConfigLoader(metadata.format)
-            let value = plugin[metadata.variable]
+            let defaultValue = metadata.default ?? plugin[metadata.variable]
+            let configValue = defaultValue
             if (!fs.exists(metadata.file)) {
-                base.save(metadata.file, configLoader.dump(value))
+                base.save(metadata.file, configLoader.dump(defaultValue))
                 console.i18n("ms.plugin.manager.config.save.default", { plugin: plugin.description.name, name: metadata.name, format: metadata.format })
             } else {
-                value = configLoader.load(base.read(metadata.file))
-                console.debug(`[${plugin.description.name}] Load Config ${metadata.variable} from file ${metadata.file} =>\n${JSON.stringify(value, undefined, 4)}`)
-                if (metadata.default) {
+                configValue = configLoader.load(base.read(metadata.file)) || {}
+                if (defaultValue) {
                     let needSave = false
-                    for (const key of Object.keys(metadata.default)) {
-                        if (value[key] == undefined) {
-                            value[key] = metadata.default[key]
+                    for (const key of Object.keys(defaultValue)) {
+                        // 当配置文件不存在当前属性时才进行赋值
+                        if (!Object.prototype.hasOwnProperty.call(configValue, key)) {
+                            configValue[key] = defaultValue[key]
                             needSave = true
                         }
                     }
-                    needSave && base.save(metadata.file, configLoader.dump(value))
+                    needSave && base.save(metadata.file, configLoader.dump(configValue))
                 }
+                console.debug(`[${plugin.description.name}] Load Config ${metadata.variable} from file ${metadata.file} =>\n${JSON.stringify(configValue, undefined, 4)}`)
             }
-            this.defienConfigProp(plugin, metadata, value)
+            this.defienConfigProp(plugin, metadata, configValue)
         } catch (error) {
             console.i18n("ms.plugin.manager.config.load.error", { plugin: plugin.description.name, name: metadata.name, format: metadata.format, error })
             console.ex(error)
