@@ -22,7 +22,8 @@
         "@ccms/nashorn": "^0.14.0",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
-        "typescript": "^4.2.3"
+        "tslib": "^2.3.0",
+        "typescript": "^4.3.4"
     },
     "gitHead": "781524f83e52cad26d7c480513e3c525df867121"
 }
