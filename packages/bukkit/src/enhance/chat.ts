@@ -15,6 +15,7 @@ let downgrade = false
  * 获取NMS版本
  */
 let nmsVersion = undefined
+let nmsSubVersion = undefined
 /**
  * 获取NMS类
  */
@@ -49,15 +50,23 @@ function remapFieldName(clazz: any, origin: string, test: string) {
 function init() {
     //@ts-ignore
     nmsVersion = org.bukkit.Bukkit.server.class.name.split('.')[3]
+    nmsSubVersion = nmsVersion.split("_")[1]
     try {
         RemapUtils = Java.type('catserver.server.remapper.RemapUtils')
     } catch (ex) {
     }
-    let nmsChatSerializerClass = nmsCls(nmsVersion.split("_")[1] > 7 ? "IChatBaseComponent$ChatSerializer" : "ChatSerializer")
+    let nmsChatSerializerClass = undefined
+    if (nmsSubVersion < 8) {
+        nmsChatSerializerClass = nmsCls("ChatSerializer")
+    } else if (nmsSubVersion < 17) {
+        nmsChatSerializerClass = nmsCls("IChatBaseComponent$ChatSerializer")
+    } else {
+        nmsChatSerializerClass = base.getClass('net.minecraft.network.chat.IChatBaseComponent$ChatSerializer')
+    }
     let nmsChatSerializerMethod = remapMethod(nmsChatSerializerClass, 'a', 'func_150699_a', base.getClass('java.lang.String'))
     nmsChatSerializerMethodName = nmsChatSerializerMethod.getName()
     ChatSerializer = Java.type(nmsChatSerializerClass.getName())
-    let packetTypeClass = nmsCls("PacketPlayOutChat")
+    let packetTypeClass = nmsSubVersion < 17 ? nmsCls("PacketPlayOutChat") : base.getClass('net.minecraft.network.protocol.game.PacketPlayOutChat')
     PacketPlayOutChat = Java.type(packetTypeClass.getName())
     let packetTypeConstructor: { parameterTypes: any[] }
     let constructors = packetTypeClass.constructors
@@ -75,9 +84,14 @@ function init() {
     if (nmsChatMessageTypeClass.isEnum()) {
         chatMessageTypes = nmsChatMessageTypeClass.getEnumConstants()
     }
-    let playerConnectionField = remapFieldName(nmsCls('EntityPlayer'), 'playerConnection', 'field_71135_a')
+    let playerConnectionField = undefined
+    if (nmsSubVersion < 17) {
+        playerConnectionField = remapFieldName(nmsCls('EntityPlayer'), 'playerConnection', 'field_71135_a')
+    } else {
+        playerConnectionField = base.getClass('net.minecraft.server.level.EntityPlayer').getField('b')
+    }
     playerConnectionFieldName = playerConnectionField.getName()
-    sendPacketMethodName = remapMethod(playerConnectionField.getType(), 'sendPacket', 'func_179290_a', nmsCls('Packet')).getName()
+    sendPacketMethodName = remapMethod(playerConnectionField.getType(), 'sendPacket', 'func_179290_a', nmsSubVersion < 17 ? nmsCls('Packet') : base.getClass('net.minecraft.network.protocol.Packet')).getName()
 }
 
 function json(sender: { name: string }, json: string) {
