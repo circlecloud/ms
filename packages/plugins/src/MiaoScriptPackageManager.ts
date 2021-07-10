@@ -109,7 +109,7 @@ class SpongeFakeSender extends FakeSender {
     }
 }
 
-@JSPlugin({ prefix: 'PM', version: '1.5.0', author: 'MiaoWoo', source: __filename })
+@JSPlugin({ prefix: 'PM', version: '1.5.1', author: 'MiaoWoo', source: __filename })
 export class MiaoScriptPackageManager extends interfaces.Plugin {
     @Autowired()
     private pluginManager: pluginApi.PluginManager
@@ -468,7 +468,7 @@ return eval(${JSON.stringify(code)});`)
         return tfunc.apply(_this, params)
     }
 
-    cmddeploy(sender: any, name: any) {
+    cmddeploy(sender: string, name: string, changelog: string) {
         if (!process.env.AccessToken) { return this.i18n(sender, 'deploy.token.not.exists') }
         this.taskManager.create(() => {
             if (this.checkPlugin(sender, name)) {
@@ -477,7 +477,8 @@ return eval(${JSON.stringify(code)});`)
                     name,
                     author: plugin.description.author,
                     version: plugin.description.version,
-                    source: base.read((plugin.description.source || plugin.description.loadMetadata.file).toString())
+                    source: base.read((plugin.description.source || plugin.description.loadMetadata.file).toString()),
+                    changelog: changelog.replace('&', '§')
                 })
                 this.i18n(sender, result.code == 200 ? 'deploy.success' : 'deploy.fail', { name, version: plugin.description.version, msg: result.msg })
             }
