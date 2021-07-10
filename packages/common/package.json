@@ -23,7 +23,7 @@
         "@javatypes/jdk": "^0.0.3",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
-        "typescript": "^4.3.4"
+        "typescript": "^4.3.5"
     },
     "gitHead": "562e2d00175c9d3a99c8b672aa07e6d92706a027"
 }
