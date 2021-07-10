@@ -5,7 +5,7 @@ import * as base64 from 'base64-js'
 const Arrays = Java.type('java.util.Arrays')
 const Level = Java.type('java.util.logging.Level')
 const Paths = Java.type('java.nio.file.Paths')
-const ignoreLogPrefix = ['java.', 'javax.', 'sun.', 'net.minecraft.', 'org.bukkit.', 'jdk.nashorn.', 'io.netty.', 'org.spongepowered.', 'org.apache', 'org.springframework']
+const ignoreLogPrefix = ['java.', 'javax.', 'sun.', 'net.minecraft.', 'org.bukkit.', 'jdk.nashorn.', 'org.openjdk.nashorn', 'io.netty.', 'org.spongepowered.', 'org.apache', 'org.springframework']
 
 enum LogLevel {
     ALL,
@@ -156,7 +156,7 @@ export class MiaoScriptConsole implements Console {
                 let className = trace.className
                 var fileName = trace.fileName as string
                 var lineNumber = trace.lineNumber
-                if (className.startsWith('jdk.nashorn.internal.scripts')) {
+                if (className.startsWith('jdk.nashorn.internal.scripts') || className.startsWith('org.openjdk.nashorn.internal.scripts')) {
                     className = className.substr(className.lastIndexOf('$') + 1)
                     var { fileName, lineNumber } = this.readSourceMap(fileName, lineNumber)
                     if (fileName.startsWith(root)) { fileName = fileName.split(root)[1] }

@@ -1,8 +1,6 @@
 import '@ccms/nashorn'
 
 const URL = Java.type("java.net.URL")
-const Files = Java.type("java.nio.file.Files")
-const StandardCopyOption = Java.type("java.nio.file.StandardCopyOption")
 const JavaString = Java.type("java.lang.String")
 const SecureRandom = Java.type("java.security.SecureRandom")
 const SSLContext = Java.type("javax.net.ssl.SSLContext")
@@ -13,7 +11,11 @@ const X509TrustManager = Java.type("javax.net.ssl.X509TrustManager")
 const SocketTimeoutException = Java.type('java.net.SocketTimeoutException')
 
 const Callable = Java.type('java.util.concurrent.Callable')
+const TimeUnit = Java.type('java.util.concurrent.TimeUnit')
 const Executors = Java.type('java.util.concurrent.Executors')
+
+const ByteArrayOutputStream = Java.type("java.io.ByteArrayOutputStream")
+const ByteArray = Java.type("byte[]")
 
 const UTF_8 = "UTF-8"
 
@@ -72,7 +74,7 @@ type HttpHeader = { [key: string]: string }
 const executor = Executors.newCachedThreadPool()
 
 export class XMLHttpRequest {
-    private _timeout: number
+    private _timeout: number = 5000;
     private _responseType: ResponseType = 'text';
     private _withCredentials: boolean
 
@@ -170,6 +172,7 @@ export class XMLHttpRequest {
         this._connection.setConnectTimeout(this._timeout)
         this._connection.setReadTimeout(this._timeout)
 
+        this.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
         this.setReadyState(ReadyState.OPENED)
     }
     send(body?: string | object): Future<string> {
@@ -178,7 +181,7 @@ export class XMLHttpRequest {
         }
         if (this._readyState !== ReadyState.OPENED) { throw new Error(`Error Status ${this._readyState}!`) }
         let future = executor.submit(new Callable({ call: () => this._send(body) }))
-        if (!this._async) { future.get() }
+        if (!this._async) { future.get(this._timeout, TimeUnit.MILLISECONDS) }
         return future
     }
     get() {
@@ -248,8 +251,16 @@ export class XMLHttpRequest {
     }
 
     private readOutput(input: any) {
-        var tempFile = Files.createTempFile('xhr', '.response')
-        Files.copy(input, tempFile, StandardCopyOption['REPLACE_EXISTING']); tempFile.toFile().deleteOnExit()
-        return new JavaString(Files.readAllBytes(tempFile), 'UTF-8')
+        let output = new ByteArrayOutputStream()
+        let buffer = new ByteArray(1024)
+        try {
+            let n: number
+            while ((n = input.read(buffer)) != -1) {
+                output.write(buffer, 0, n)
+            }
+            return output.toString(UTF_8)
+        } finally {
+            output.close()
+        }
     }
 }
