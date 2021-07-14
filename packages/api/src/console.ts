@@ -19,7 +19,7 @@ enum LogLevel {
 }
 
 export class MiaoScriptConsole implements Console {
-    Console: NodeJS.ConsoleConstructor
+    Console: any
     memory: any
 
     private static sourceMaps: { [key: string]: SourceMapBuilder } = {}
@@ -190,7 +190,7 @@ export class MiaoScriptConsole implements Console {
     countReset(label?: string): void {
         throw new Error("Method not implemented.")
     }
-    dir(obj: any, options?: NodeJS.InspectOptions): void {
+    dir(obj: any, options?: any): void {
         throw new Error("Method not implemented.")
     }
     dirxml(...data: any[]): void {
