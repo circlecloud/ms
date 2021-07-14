@@ -1,6 +1,6 @@
 {
     "name": "@ccms/polyfill",
-    "version": "0.16.0",
+    "version": "0.16.1",
     "description": "MiaoScript polyfill package",
     "author": "MiaoWoo <admin@yumc.pw>",
     "homepage": "https://github.com/circlecloud/ms.git",
