@@ -74,7 +74,7 @@ type HttpHeader = { [key: string]: string }
 const executor = Executors.newCachedThreadPool()
 
 export class XMLHttpRequest {
-    private _timeout: number = 5000;
+    private _timeout: number = 120000;
     private _responseType: ResponseType = 'text';
     private _withCredentials: boolean
 
