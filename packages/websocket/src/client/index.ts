@@ -23,7 +23,7 @@ export class WebSocketManager {
     }
 }
 
-export const managers = new WebSocketManager()
+export const manager = new WebSocketManager()
 
 export class WebSocket extends EventEmitter {
     public static CONNECTING = 0
@@ -31,6 +31,7 @@ export class WebSocket extends EventEmitter {
     public static CLOSING = 2
     public static CLOSED = 3
     public binaryType: 'blob' | 'arraybuffer'
+    protected manager: WebSocketManager
 
     protected _url: string
     protected _headers: WebSocketHeader = {}
@@ -39,6 +40,7 @@ export class WebSocket extends EventEmitter {
 
     constructor(url: string, subProtocol: string = '', headers: WebSocketHeader = {}) {
         super()
+        this.manager = manager
         this._url = url
         this._headers = headers
         try {
@@ -51,12 +53,12 @@ export class WebSocket extends EventEmitter {
         }
         this.client.on('open', (event) => {
             this.onopen?.(event)
-            managers.add(this)
+            manager.add(this)
         })
         this.client.on('message', (event) => this.onmessage?.(event))
         this.client.on('close', (event) => {
             this.onclose?.(event)
-            managers.del(this)
+            manager.del(this)
         })
         this.client.on('error', (event) => this.onerror?.(event))
         setTimeout(() => this.client.connect(), 20)

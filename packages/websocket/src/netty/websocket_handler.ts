@@ -1,5 +1,4 @@
-import { ServerOptions } from '../socket-io'
-import { ServerEvent } from '../socket-io/constants'
+import { JavaServerOptions, ServerEvent } from '../server'
 
 import { Keys } from './constants'
 import { HttpRequestHandler } from './httprequest'
@@ -13,8 +12,8 @@ const HttpObjectAggregator = Java.type('io.netty.handler.codec.http.HttpObjectAg
 const WebSocketServerProtocolHandler = Java.type('io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler')
 
 export class WebSocketHandler extends WebSocketHandlerAdapter {
-    private options: ServerOptions
-    constructor(options: ServerOptions) {
+    private options: JavaServerOptions
+    constructor(options: JavaServerOptions) {
         super()
         this.options = options
     }

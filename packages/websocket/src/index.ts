@@ -1,7 +1,7 @@
 /// <reference types="@ccms/nashorn" />
 /// <reference types="@javatypes/tomcat-websocket-api" />
 
-import { Server, ServerOptions } from './socket-io'
+import { Server, ServerOptions } from './socket.io'
 
 interface SocketIOStatic {
     /**
@@ -44,7 +44,7 @@ let io: SocketStatic = function (pipeline: any, options: Partial<ServerOptions>)
 }
 io.Instance = Symbol("@ccms/websocket")
 export default io
-export * from './socket-io'
+export * from './socket.io'
 export * from './client'
 export * from './server'
-export * from './transport'
+export * from './engine.io/transport'

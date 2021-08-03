@@ -1,65 +1,70 @@
-import { EventEmitter } from 'events'
-
-import { ServerOptions } from '../socket-io'
-import { ServerEvent } from '../socket-io/constants'
+import { JavaServerOptions, ServerEvent, WebSocketServer } from '../server'
+import { Request } from '../server/request'
 
 import { NettyClient } from './client'
-import { Keys } from './constants'
+import { AttributeKeys, Keys } from './constants'
 import { WebSocketDetect } from './websocket_detect'
 import { WebSocketHandler } from './websocket_handler'
 
-class NettyWebSocketServer extends EventEmitter {
-    private pipeline: any
-    private clients: Map<string, NettyClient>
+class NettyWebSocketServer extends WebSocketServer {
+    constructor(pipeline: any, options: JavaServerOptions) {
+        super(pipeline, options)
+    }
 
-    constructor(pipeline: any, options: ServerOptions) {
-        super()
-        this.clients = new Map()
-        this.pipeline = pipeline
-        let connectEvent = options.event
-        try { this.pipeline.remove(Keys.Detect) } catch (error) { }
-        this.pipeline.addFirst(Keys.Detect, new WebSocketDetect(connectEvent).getHandler())
+    protected initialize() {
+        let connectEvent = this.options.event
+        try { this.instance.remove(Keys.Detect) } catch (error) { }
+        this.instance.addFirst(Keys.Detect, new WebSocketDetect(connectEvent).getHandler())
         connectEvent.on(ServerEvent.detect, (ctx, channel) => {
-            channel.pipeline().addFirst(Keys.Handler, new WebSocketHandler(options).getHandler())
+            channel.pipeline().addFirst(Keys.Handler, new WebSocketHandler(this.options).getHandler())
             ctx.fireChannelRead(channel)
         })
         connectEvent.on(ServerEvent.connect, (ctx) => {
-            let cid = ctx?.channel().id() + ''
-            let nettyClient = new NettyClient(this, ctx.channel())
-            this.clients.set(cid, nettyClient)
-            this.emit(ServerEvent.connect, nettyClient)
+            this.onconnect(ctx)
         })
         connectEvent.on(ServerEvent.message, (ctx, msg) => {
-            let cid = ctx?.channel().id() + ''
-            if (this.clients.has(cid)) {
-                this.emit(ServerEvent.message, this.clients.get(cid), msg.text())
-            } else if (global.debug) {
-                console.error(`unknow client ${ctx} reciver message ${msg.text()}`)
-            }
+            this.onmessage(ctx, msg.text())
         })
         connectEvent.on(ServerEvent.disconnect, (ctx, cause) => {
-            let cid = ctx?.channel().id() + ''
-            if (this.clients.has(cid)) {
-                this.emit(ServerEvent.disconnect, this.clients.get(cid), cause)
-            } else if (global.debug) {
-                console.error(`unknow client ${ctx} disconnect cause ${cause}`)
-            }
+            this.ondisconnect(ctx, cause)
         })
-        connectEvent.on(ServerEvent.error, (ctx, cause) => {
-            let cid = ctx?.channel().id() + ''
-            if (this.clients.has(cid)) {
-                this.emit(ServerEvent.error, this.clients.get(cid), cause)
-            } else if (global.debug) {
-                console.error(`unknow client ${ctx} cause error ${cause}`)
-                console.ex(cause)
-            }
+        connectEvent.on(ServerEvent.error, (ctx, error) => {
+            this.onerror(ctx, error)
         })
     }
-    close() {
-        if (this.pipeline.names().contains(Keys.Detect)) {
-            this.pipeline.remove(Keys.Detect)
+
+    protected getId(ctx: any) {
+        try {
+            return ctx.channel().id() + ''
+        } catch (error) {
+            console.log(Object.toString.apply(ctx))
+            console.ex(error)
         }
-        this.clients.forEach(client => client.close())
+    }
+
+    protected getRequest(ctx) {
+        let channel = ctx.channel()
+        let req = channel.attr(AttributeKeys.Request).get()
+        let headers = {}
+        let nativeHeaders = req.headers()
+        nativeHeaders.forEach(function (header) {
+            headers[header.getKey()] = header.getValue()
+        })
+        let request = new Request(req.uri(), req.method().name(), headers)
+        request.connection = {
+            remoteAddress: channel.remoteAddress() + ''
+        }
+        return request
+    }
+
+    protected getSocket(ctx) {
+        return new NettyClient(ctx.channel())
+    }
+
+    protected doClose() {
+        if (this.instance.names().contains(Keys.Detect)) {
+            this.instance.remove(Keys.Detect)
+        }
     }
 }
 

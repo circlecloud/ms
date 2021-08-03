@@ -1,6 +1,7 @@
+import { JavaServerOptions } from '../server'
+
 import { HttpRequestHandlerAdapter } from './adapter'
 import { AttributeKeys } from './constants'
-import { ServerOptions } from 'socket-io'
 
 const DefaultHttpResponse = Java.type('io.netty.handler.codec.http.DefaultHttpResponse')
 const DefaultFullHttpResponse = Java.type('io.netty.handler.codec.http.DefaultFullHttpResponse')
@@ -18,7 +19,7 @@ const ChannelFutureListener = Java.type('io.netty.channel.ChannelFutureListener'
 export class HttpRequestHandler extends HttpRequestHandlerAdapter {
     private ws: string
     private root: string
-    constructor(options: ServerOptions) {
+    constructor(options: JavaServerOptions) {
         super()
         this.root = options.root
         this.ws = options.path
