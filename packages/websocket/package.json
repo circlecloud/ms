@@ -1,6 +1,6 @@
 {
     "name": "@ccms/websocket",
-    "version": "0.16.0",
+    "version": "0.16.2",
     "description": "MiaoScript websocket package",
     "keywords": [
         "miaoscript",
