@@ -1,11 +1,11 @@
 import { EventEmitter } from 'events'
-import { ServerOptions } from '../socket-io'
-import { ServerEvent } from '../socket-io/constants'
+import { JavaServerOptions, ServerEvent } from '../server'
+
 import { TextWebSocketFrameHandlerAdapter } from './adapter'
 
 export class TextWebSocketFrameHandler extends TextWebSocketFrameHandlerAdapter {
     private event: EventEmitter
-    constructor(options: ServerOptions) {
+    constructor(options: JavaServerOptions) {
         super()
         this.event = options.event
     }

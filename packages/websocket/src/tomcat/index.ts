@@ -1,60 +1,61 @@
-import { EventEmitter } from 'events'
+import { JavaServerOptions, WebSocketServer } from '../server'
+import { Request } from '../server/request'
 
-import { ServerOptions } from '../socket-io'
-import { ServerEvent } from '../socket-io/constants'
-import { ProxyBeanName } from './constants'
 import { TomcatClient } from './client'
+import { ProxyBeanName } from './constants'
 
 const ThreadPoolExecutor = Java.type('java.util.concurrent.ThreadPoolExecutor')
 
 type TomcatWebSocketSession = javax.websocket.Session
 
-class TomcatWebSocketServer extends EventEmitter {
-    private beanFactory: any
+class TomcatWebSocketServer extends WebSocketServer {
     private executor: any
-    private clients: Map<string, any>
 
-    constructor(beanFactory: any, options: ServerOptions) {
-        super()
-        this.clients = new Map()
-        this.beanFactory = beanFactory
+    constructor(beanFactory: any, options: JavaServerOptions) {
+        super(beanFactory, options)
+    }
+
+    protected initialize(): void {
         this.initThreadPool()
-        try { this.beanFactory.destroySingleton(ProxyBeanName) } catch (error) { }
+        try { this.instance.destroySingleton(ProxyBeanName) } catch (error) { }
         let NashornWebSocketServerProxy = Java.extend(Java.type("pw.yumc.MiaoScript.websocket.WebSocketProxy"), {
             onOpen: (session: TomcatWebSocketSession) => {
-                let cid = `${session?.getId()}`
-                let tomcatClient = new TomcatClient(this, session)
-                this.clients.set(cid, tomcatClient)
-                this.emit(ServerEvent.connect, tomcatClient)
+                this.onconnect(session)
             },
             onMessage: (session: TomcatWebSocketSession, message: string) => {
-                let cid = `${session?.getId()}`
-                if (this.clients.has(cid)) {
-                    this.executor.execute(() => this.emit(ServerEvent.message, this.clients.get(cid), message))
-                } else {
-                    console.error(`unknow client ${session} reciver message ${message}`)
-                }
+                this.onmessage(session, message)
             },
             onClose: (session: TomcatWebSocketSession, reason: any) => {
-                let cid = `${session?.getId()}`
-                if (this.clients.has(cid)) {
-                    this.emit(ServerEvent.disconnect, this.clients.get(cid), reason)
-                } else {
-                    console.error(`unknow client ${session} disconnect cause ${reason}`)
-                }
+                this.ondisconnect(session, reason)
             },
             onError: (session: TomcatWebSocketSession, error: Error) => {
-                let cid = `${session?.getId()}`
-                if (this.clients.has(cid)) {
-                    this.emit(ServerEvent.error, this.clients.get(cid), error)
-                } else {
-                    console.error(`unknow client ${session} cause error ${error}`)
-                    console.ex(error)
-                }
+                this.onerror(session, error)
             },
         })
-        this.beanFactory.registerSingleton(ProxyBeanName, new NashornWebSocketServerProxy())
+        this.instance.registerSingleton(ProxyBeanName, new NashornWebSocketServerProxy())
     }
+
+    protected getId(session) {
+        return session?.getId() + ''
+    }
+
+    protected getRequest(session) {
+        let request = new Request(session.getRequestURI(), "GET")
+        request.connection = {
+            remoteAddress: ''
+        }
+        return request
+    }
+
+    protected getSocket(session) {
+        return new TomcatClient(session)
+    }
+
+    protected doClose() {
+        this.instance.destroySingleton(ProxyBeanName)
+        this.executor.shutdown()
+    }
+
     private initThreadPool() {
         const ThreadPoolTaskExecutor = Java.type('org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor')
         this.executor = new ThreadPoolTaskExecutor()
@@ -65,11 +66,6 @@ class TomcatWebSocketServer extends EventEmitter {
         this.executor.setThreadNamePrefix("@ccms/websocket-")
         this.executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy())
         this.executor.initialize()
-    }
-    close() {
-        this.clients.forEach(client => client.close())
-        this.beanFactory.destroySingleton(ProxyBeanName)
-        this.executor.shutdown()
     }
 }
 

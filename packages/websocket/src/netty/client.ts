@@ -1,24 +1,26 @@
-import { Transport } from '../transport'
-import { AttributeKeys } from './constants'
+import { WebSocketClient } from '../server/client'
 
 const TextWebSocketFrame = Java.type('io.netty.handler.codec.http.websocketx.TextWebSocketFrame')
 
-export class NettyClient extends Transport {
+export class NettyClient extends WebSocketClient {
     private channel: any
 
-    constructor(server: any, channel: any) {
-        super(server)
-        this.remoteAddress = channel.remoteAddress() + ''
-        this.request = channel.attr(AttributeKeys.Request).get()
-
-        this._id = channel.id() + ''
+    constructor(channel: any) {
+        super()
+        this.id = channel.id() + ''
         this.channel = channel
     }
 
-    doSend(text: string) {
-        this.channel.writeAndFlush(new TextWebSocketFrame(text))
+    send(text: string, opts?: any, callback?: (err?: Error) => void) {
+        try {
+            this.channel.writeAndFlush(new TextWebSocketFrame(text))
+            callback?.()
+        } catch (error) {
+            callback?.(error)
+        }
     }
-    doClose() {
+
+    close() {
         this.channel.close()
     }
 }

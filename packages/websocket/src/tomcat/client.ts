@@ -1,22 +1,24 @@
-import { Transport } from '../transport'
+import { WebSocketClient } from '../server/client'
 
-export class TomcatClient extends Transport {
+export class TomcatClient extends WebSocketClient {
     private session: javax.websocket.Session
 
-    constructor(server: any, session: javax.websocket.Session) {
-        super(server)
-        this.remoteAddress = session + ''
-        this.request = {
-            uri: () => `${session.getRequestURI()}`,
-            headers: () => []
-        }
-        this._id = session.getId() + ''
+    constructor(session: javax.websocket.Session) {
+        super()
+        this.id = session.getId() + ''
         this.session = session
     }
-    doSend(text: string) {
-        Java.synchronized(() => this.session.getBasicRemote().sendText(text), this.session)()
+    send(text: string, opts?: any, callback?: (err?: Error) => void) {
+        Java.synchronized(() => {
+            try {
+                this.session.getBasicRemote().sendText(text)
+                callback?.()
+            } catch (error) {
+                callback?.(error)
+            }
+        }, this.session)()
     }
-    doClose() {
+    close() {
         this.session.close()
     }
 }
