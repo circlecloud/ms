@@ -3,9 +3,11 @@
 import { plugin as pluginApi, server, task, constants, command } from '@ccms/api'
 import { plugin, interfaces, cmd, tab, enable, config, disable, PluginConfig } from '@ccms/plugin'
 import { ContainerInstance, Container, Autowired } from '@ccms/container'
-import io, { Server as SocketIOServer, Socket as SocketIOSocket } from '@ccms/websocket'
+import io from '@ccms/websocket'
 import * as fs from '@ccms/common/dist/fs'
 import * as reflect from '@ccms/common/dist/reflect'
+
+import type { Namespace, Server as SocketIOServer, Socket as SocketIOSocket } from '@ccms/websocket'
 
 const suffixMap = {
     ts: 'typescript',
@@ -58,7 +60,7 @@ export class MiaoConsole extends interfaces.Plugin {
             this.token = Java.type('java.util.UUID').randomUUID().toString()
             this.logger.console(`§6已生成随机Token: §3${this.token} §c重启后或重新生成后失效!`)
         }
-        process.on('message', (msg) => {
+        process.on('message', (msg: string) => {
             this.logCache.push(msg)
             if (this.logCache.length > 100) {
                 this.logCache = this.logCache.slice(this.logCache.length - 100, this.logCache.length)
@@ -191,6 +193,7 @@ export class MiaoConsole extends interfaces.Plugin {
     disable() {
         if (this.socketIOServer) {
             this.socketIOServer.close()
+            process.removeAllListeners('websocket.create')
             process.removeAllListeners('message')
         }
         if (this.container.isBound(io.Instance)) {
@@ -230,30 +233,43 @@ export class MiaoConsole extends interfaces.Plugin {
         this.socketIOServer = io(this.instance, {
             path: '/ws',
             root: fs.concat(root, 'wwwroot')
-        })
+        } as any)
         this.container.bind(io.Instance).toConstantValue(this.socketIOServer)
         process.emit('websocket.create', this.socketIOServer)
+    }
+
+    registryWebSocketNamespace(namespace: string, initialization: (namespace: Namespace) => void) {
+        if (this.socketIOServer) {
+            initialization(this.socketIOServer.of(namespace))
+        } else {
+            process.once('websocket.create', (server) => initialization(server.of(namespace)))
+        }
+    }
+
+    checkWebSocketClient(client: SocketIOSocket) {
+        if (!this.token) {
+            this.logger.console(`§6客户端 §b${client.id} §a请求连接 §4服务器尚未设置 Token 无法连接!`)
+            client.emit('unauthorized', () => client.disconnect(true))
+            return false
+        }
+        if (this.token != client.handshake.query.token) {
+            this.logger.console(`§6客户端 §b${client.id} §c无效请求 §4请提供正确Token后再次连接!`)
+            client.emit('unauthorized', () => client.disconnect(true))
+            return false
+        }
+        return true
     }
 
     startSocketIOServer() {
         let namespace = this.socketIOServer.of('/MiaoConsole')
         process.on('message', (msg) => namespace.emit('log', msg))
         namespace.on('connection', (client: SocketIOSocket) => {
-            if (!this.token) {
-                this.logger.console(`§6客户端 §b${client.id} §a请求连接 §4服务器尚未设置 Token 无法连接!`)
-                client.emit('unauthorized', () => client.disconnect(true))
-                return
+            if (this.checkWebSocketClient(client)) {
+                this.initWebSocketClient(client)
+                this.logCache.forEach(msg => client.emit('log', msg))
+                this.logger.console(`§6客户端 §b${client.id} §a新建连接 ${this.rootLogger ? '启动日志转发' : '§4转发日志启动失败'}...`)
             }
-            if (this.token != client.handshake.query.token) {
-                this.logger.console(`§6客户端 §b${client.id} §c无效请求 §4请提供正确Token后再次连接!`)
-                client.emit('unauthorized', () => client.disconnect(true))
-                return
-            }
-            this.initWebSocketClient(client)
-            this.logCache.forEach(msg => client.emit('log', msg))
-            this.logger.console(`§6客户端 §b${client.id} §a新建连接 ${this.rootLogger ? '启动日志转发' : '§4转发日志启动失败'}...`)
         })
-        process.emit('websocket.start', this.socketIOServer)
     }
 
     private initWebSocketClient(client: SocketIOSocket) {

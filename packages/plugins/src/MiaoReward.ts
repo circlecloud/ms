@@ -68,7 +68,7 @@ const defaultConfig = {
     joinTip: true
 }
 
-@JSPlugin({ prefix: 'MRD', version: '1.5.9', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], nativeDepends: ['ProtocolLib', 'PlaceholderAPI'], source: __filename })
+@JSPlugin({ prefix: 'MRD', version: '1.6.0', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], nativeDepends: ['ProtocolLib', 'PlaceholderAPI'], source: __filename })
 export class MiaoReward extends interfaces.Plugin {
     public serverInfo: ServerInfo
     private notifyError = true
@@ -79,6 +79,7 @@ export class MiaoReward extends interfaces.Plugin {
     private playerInfoCache = new Map<string, UserInfo>()
 
     private downgrade = false
+    private subversion = 0
 
     @Autowired()
     private chat: chat.Chat
@@ -132,6 +133,7 @@ export class MiaoReward extends interfaces.Plugin {
         //@ts-ignore
         this.logger.prefix = this.config.prefix
         this.downgrade = this.Bukkit.server.class.name.split('.')[3] == "v1_7_R4"
+        this.subversion = parseInt(this.Bukkit.server.class.name.split('.')[3].split('_')[1])
         this.updateServerInfo(null, () => this.updateOnlinePlayersInfo())
     }
 
@@ -248,29 +250,50 @@ export class MiaoReward extends interfaces.Plugin {
         if (!this.ProtocolLibrary) {
             return this.logger.console(`§4服务器未安装 ProtocolLib 无法扫码功能 请安装后重试!`)
         }
-        this.adapter = this.createPacketAdapter((event) => {
+        let writer = undefined
+        if (this.downgrade) {
+            writer = (packet, bytes) => {
+                // let xbytes = new Bytes(131)
+                let origin = packet.getByteArrays().read(0)
+                // xbytes[1] = origin[1]
+                // xbytes[2] = origin[2]
+                for (let y = 0; y < 128; ++y) {
+                    origin[y + 3] = bytes[y * 128 + origin[1]]
+                }
+                packet.getByteArrays().write(0, origin)
+            }
+        } else if (this.subversion < 17) {
+            writer = (packet, bytes) => {
+                packet.getByteArrays().write(0, bytes)
+                packet.getIntegers().write(3, 128)
+                packet.getIntegers().write(4, 128)
+            }
+        } else if (this.subversion > 16) {
+            writer = (packet, bytes) => {
+                let b = packet.getModifier().read(4)
+                if (b) {
+                    let bi = Java.type(b.class.name)
+                    packet.getModifier().write(4, new bi(b.a, b.b, 128, 128, bytes))
+                }
+            }
+        }
+        if (writer) {
+            this.adapter = this.createPacketAdapter(this.getPacketAdapter(writer))
+            this.ProtocolLibrary.getProtocolManager().addPacketListener(this.adapter)
+        } else {
+            console.console('§4当前服务器不支持虚拟地图发包 将无法使用扫码功能!')
+        }
+    }
+
+    private getPacketAdapter(writer: (packet: any, bytes: number[]) => void) {
+        return (event) => {
             let integers = event.getPacket().getIntegers().getValues()
             let mapId = integers.get(0)
             let player = event.getPlayer()
             if (mapId == this.zeroMapView.getId() && this.playerImageCache.has(player.getName())) {
-                let bytes = this.playerImageCache.get(player.getName())
-                if (!this.downgrade) {
-                    event.getPacket().getByteArrays().write(0, bytes)
-                    event.getPacket().getIntegers().write(3, 128)
-                    event.getPacket().getIntegers().write(4, 128)
-                } else {
-                    // let xbytes = new Bytes(131)
-                    let origin = event.getPacket().getByteArrays().read(0)
-                    // xbytes[1] = origin[1]
-                    // xbytes[2] = origin[2]
-                    for (let y = 0; y < 128; ++y) {
-                        origin[y + 3] = bytes[y * 128 + origin[1]]
-                    }
-                    event.getPacket().getByteArrays().write(0, origin)
-                }
+                writer(event.getPacket(), this.playerImageCache.get(player.getName()))
             }
-        })
-        this.ProtocolLibrary.getProtocolManager().addPacketListener(this.adapter)
+        }
     }
 
     private sendWindowItems(player: org.bukkit.entity.Player, mapItem: any) {
