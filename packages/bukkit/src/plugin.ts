@@ -14,10 +14,10 @@ export class BukkitNativePluginManager extends server.NativePluginManager {
         return Java.from(this.bukkitPluginManager.getPlugins()).map(plugin => this.convert(plugin))
     }
     has(name: string): boolean {
-        return !!Bukkit.getPluginManager().getPlugin(name)
+        return !!this.bukkitPluginManager.getPlugin(name)
     }
     get(name: string): server.NativePlugin {
-        return this.convert(Bukkit.getPluginManager().getPlugin(name))
+        return this.convert(this.bukkitPluginManager.getPlugin(name))
     }
 
     private convert(plugin: org.bukkit.plugin.Plugin): server.NativePlugin {
