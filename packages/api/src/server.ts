@@ -16,15 +16,28 @@ export namespace server {
      * Runtime Server Instance
      */
     export const ServerInstance = Symbol("ServerInstance")
+    export interface NativePlugin {
+        name: string
+        version: string
+        authors?: string | string[]
+        enable: boolean
+        depends?: string[]
+        softDepends?: string[]
+        /**
+         * 插件本体
+         */
+        origin: any
+        [key: string]: any
+    }
     @injectable()
     export abstract class NativePluginManager {
-        list(): any[] {
+        list(): NativePlugin[] {
             throw new Error("Method not implemented.")
         }
         has(name: string): boolean {
             return true
         }
-        get(name: string): any {
+        get(name: string): NativePlugin {
             throw new Error("Method not implemented.")
         }
         load(name: string): boolean {

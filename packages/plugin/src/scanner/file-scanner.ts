@@ -19,7 +19,7 @@ export class JSFileScanner implements plugin.PluginScanner {
     load(metadata: plugin.PluginLoadMetadata): plugin.PluginLoadMetadata {
         if (metadata.type !== this.type) { return }
         this.updatePlugin(metadata.file)
-        //@ts-ignore
+        //@ts-ignore load plugin not use cache
         metadata.instance = require(metadata.file.toString(), { cache: false })
         return metadata
     }

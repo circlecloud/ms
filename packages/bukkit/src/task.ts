@@ -21,11 +21,11 @@ export class BukkitTaskManager extends task.TaskManager {
 export class BukkitTask extends task.Task {
     submit0(...args: any[]): task.Cancelable {
         let run = new BukkitRunnable({ run: () => this.run(...args) })
-        let funcName = `runTask${this.interval ? 'Timer' : 'Later'}${this.isAsync ? 'Asynchronously' : ''}`
+        let suffix = this.isAsync ? 'Asynchronously' : ''
         if (this.interval) {
-            return run[funcName](base.getInstance(), this.laterTime, this.interval)
+            return run[`runTaskTimer${suffix}`](base.getInstance(), this.laterTime, this.interval)
         } else {
-            return run[funcName](base.getInstance(), this.laterTime)
+            return run[`runTaskLater${suffix}`](base.getInstance(), this.laterTime)
         }
     }
 }

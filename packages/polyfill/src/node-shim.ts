@@ -39,17 +39,29 @@ class Process extends EventEmitter {
         return super.on(event, (...args) => {
             try {
                 listener(...args)
-            } catch (error) {
+            } catch (origin) {
                 try {
-                    super.emit('error', error)
+                    super.emit('error', origin)
                 } catch (error) {
+                    console.ex(origin)
                     console.ex(error)
                 }
             }
         })
     }
-    nextTick(func: Function) {
-        microTaskPool.execute(func)
+    nextTick(func: Function, ...args: any[]) {
+        microTaskPool.execute(() => {
+            try {
+                func(args)
+            } catch (origin) {
+                try {
+                    super.emit('error', origin)
+                } catch (error) {
+                    console.ex(origin)
+                    console.ex(error)
+                }
+            }
+        })
     }
     exit(code: number) {
         console.log(`process exit by code ${code}!`)
@@ -198,7 +210,7 @@ Object.defineProperty(process, require('core-js/es/symbol/to-string-tag'), { val
 const eventLoop = new EventLoop()
 Object.defineProperty(process, 'eventLoop', { value: eventLoop })
 eventLoop.startEventLoop()
-global.setGlobal('queueMicrotask', (func: any) => microTaskPool.execute(func), {})
+global.setGlobal('queueMicrotask', (func: any, ...args: any[]) => process.nextTick(func, args), {})
 global.setGlobal('setTimeout', eventLoop.setTimeout.bind(eventLoop), {})
 global.setGlobal('clearTimeout', eventLoop.clearTimeout.bind(eventLoop), {})
 global.setGlobal('setInterval', eventLoop.setInterval.bind(eventLoop), {})
