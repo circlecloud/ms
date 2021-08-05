@@ -61,7 +61,7 @@ export class WebSocket extends EventEmitter {
             manager.del(this)
         })
         this.client.on('error', (event) => this.onerror?.(event))
-        setTimeout(() => this.client.connect(), 20)
+        this.client.connect()
     }
     get id() {
         return this.client.id
