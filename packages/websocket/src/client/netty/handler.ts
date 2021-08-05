@@ -20,15 +20,15 @@ export class WebSocketClientHandler extends WebSocketClientHandlerAdapter {
         return true
     }
     handlerAdded(ctx: any) {
-        console.trace(`${ctx} handlerAdded`)
+        console.debug(`${ctx} handlerAdded`)
         this.handshakeFuture = ctx.newPromise()
     }
     channelActive(ctx: any) {
-        console.trace(`${ctx} channelActive`)
+        console.debug(`${ctx} channelActive`)
         this.handshaker.handshake(ctx.channel())
     }
     channelInactive(ctx: any) {
-        console.trace(`${ctx} channelInactive`)
+        console.debug(`${ctx} channelInactive`)
         this.client.onclose({ code: 0, reason: 'server connection channel inactive!' })
     }
     channelRead0(ctx: any, msg: any) {
@@ -54,7 +54,7 @@ export class WebSocketClientHandler extends WebSocketClientHandlerAdapter {
         }
     }
     exceptionCaught(ctx: any, cause: Error) {
-        console.trace(`${ctx} exceptionCaught ${cause}`)
+        console.debug(`${ctx} exceptionCaught ${cause}`)
         this.client.onerror({ error: cause })
         if (!this.handshakeFuture.isDone()) {
             this.handshakeFuture.setFailure(cause)
