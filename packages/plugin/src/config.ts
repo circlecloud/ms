@@ -103,7 +103,7 @@ export class PluginConfigManager {
                     }
                     needSave && base.save(metadata.file, configLoader.dump(configValue))
                 }
-                console.debug(`[${plugin.description.name}] Load Config ${metadata.variable} from file ${metadata.file} =>\n${JSON.stringify(configValue, undefined, 4)}`)
+                console.debug(`[${plugin.description.name}] Load Config ${metadata.variable} from file ${metadata.file} =>\n${JSON.stringify(configValue, undefined, 4).substr(0, 500)}`)
             }
             this.defienConfigProp(plugin, metadata, configValue)
         } catch (error) {
@@ -117,7 +117,7 @@ export class PluginConfigManager {
             metadata.file = fs.concat(fs.file(plugin.description.loadMetadata.file).parent, plugin.description.name, metadata.filename)
             let result = this.getConfigLoader(metadata.format).dump(plugin[metadata.variable])
             base.save(metadata.file, result)
-            console.debug(`[${plugin.description.name}] Save Config ${metadata.variable} to file ${metadata.file} =>\n${result}`)
+            console.debug(`[${plugin.description.name}] Save Config ${metadata.variable} to file ${metadata.file} =>\n${result.substr(0, 500)}`)
             return true
         } catch (error) {
             console.i18n("ms.plugin.manager.config.save.error", { plugin: plugin.description.name, name: metadata.name, format: metadata.format, error })
