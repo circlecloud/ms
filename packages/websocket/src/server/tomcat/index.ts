@@ -1,5 +1,5 @@
-import { JavaServerOptions, WebSocketServer } from '../server'
-import { Request } from '../server/request'
+import { JavaServerOptions, WebSocketServer } from '../'
+import { Request } from '../request'
 
 import { TomcatClient } from './client'
 import { ProxyBeanName } from './constants'

@@ -18,6 +18,10 @@
         "build": "yarn clean && tsc",
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
+    "dependencies": {
+        "backo2": "^1.0.2",
+        "parseuri": "^0.0.6"
+    },
     "devDependencies": {
         "@ccms/nashorn": "^0.16.0",
         "@javatypes/tomcat-websocket-api": "^0.0.3",

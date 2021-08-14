@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events'
 import { WebSocketHandlerAdapter } from "./adapter"
 
-import { ServerEvent } from '../server'
+import { ServerEvent } from '../'
 
 export class WebSocketDetect extends WebSocketHandlerAdapter {
     private event: EventEmitter

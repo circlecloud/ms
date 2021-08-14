@@ -1,7 +1,7 @@
-import { JavaServerOptions } from '../server'
-
 import { HttpRequestHandlerAdapter } from './adapter'
 import { AttributeKeys } from './constants'
+
+import type { JavaServerOptions } from '../'
 
 const DefaultHttpResponse = Java.type('io.netty.handler.codec.http.DefaultHttpResponse')
 const DefaultFullHttpResponse = Java.type('io.netty.handler.codec.http.DefaultFullHttpResponse')

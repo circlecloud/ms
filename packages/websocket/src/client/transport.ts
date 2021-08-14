@@ -32,9 +32,11 @@ export abstract class Transport extends EventEmitter {
     }
 
     connect() {
+        console.debug(`client Transport connect`)
         try {
             this.doConnect()
         } catch (error) {
+            console.ex(error)
             this.onerror({ error })
         }
     }

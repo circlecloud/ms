@@ -1,7 +1,9 @@
 import { EventEmitter } from 'events'
-import { JavaServerOptions, ServerEvent } from '../server'
+import { ServerEvent } from '../'
 
 import { TextWebSocketFrameHandlerAdapter } from './adapter'
+
+import type { JavaServerOptions } from '../'
 
 export class TextWebSocketFrameHandler extends TextWebSocketFrameHandlerAdapter {
     private event: EventEmitter

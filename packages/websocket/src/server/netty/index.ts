@@ -1,10 +1,12 @@
-import { JavaServerOptions, ServerEvent, WebSocketServer } from '../server'
-import { Request } from '../server/request'
+import { ServerEvent, WebSocketServer } from '../'
+import { Request } from '../request'
 
 import { NettyClient } from './client'
 import { AttributeKeys, Keys } from './constants'
 import { WebSocketDetect } from './websocket_detect'
 import { WebSocketHandler } from './websocket_handler'
+
+import type { JavaServerOptions } from '../'
 
 class NettyWebSocketServer extends WebSocketServer {
     constructor(pipeline: any, options: JavaServerOptions) {
