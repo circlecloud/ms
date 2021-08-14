@@ -1,4 +1,4 @@
-import { WebSocketClient } from '../server/client'
+import { WebSocketClient } from '../client'
 
 const TextWebSocketFrame = Java.type('io.netty.handler.codec.http.websocketx.TextWebSocketFrame')
 

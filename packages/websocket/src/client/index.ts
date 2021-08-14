@@ -46,22 +46,25 @@ export class WebSocket extends EventEmitter {
         try {
             let TransportImpl = require('./netty').NettyWebSocket
             this.client = new TransportImpl(url, subProtocol, headers)
+            console.debug('create websocket from ' + this.client.constructor.name)
         } catch (error) {
             console.error('create websocket impl error: ' + error)
             console.ex(error)
             return
         }
         this.client.on('open', (event) => {
+            console.debug('client WebSocket call open', this.onopen)
             this.onopen?.(event)
             manager.add(this)
         })
         this.client.on('message', (event) => this.onmessage?.(event))
         this.client.on('close', (event) => {
+            console.log('client WebSocket call close', this.onclose)
             this.onclose?.(event)
             manager.del(this)
         })
         this.client.on('error', (event) => this.onerror?.(event))
-        this.client.connect()
+        setTimeout(() => this.client.connect(), 20)
     }
     get id() {
         return this.client.id

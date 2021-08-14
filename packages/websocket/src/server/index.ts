@@ -49,9 +49,6 @@ export abstract class WebSocketServer extends EventEmitter {
         this.execute(handler, (websocket) => websocket.emit(ServerEvent.disconnect, cause))
     }
     protected onerror(handler: any, error: Error) {
-        if (global.debug) {
-            console.ex(error)
-        }
         this.execute(handler, (websocket) => websocket.emit(ServerEvent.error, error))
     }
     protected execute(handler: any, callback: (websocket: WebSocketClient) => void) {
@@ -82,9 +79,9 @@ export const attach = (instance, options) => {
     }, options)
     let WebSocketServerImpl = undefined
     if (instance.class.name.startsWith('io.netty.channel')) {
-        WebSocketServerImpl = require("../netty").NettyWebSocketServer
+        WebSocketServerImpl = require("./netty").NettyWebSocketServer
     } else {
-        WebSocketServerImpl = require("../tomcat").TomcatWebSocketServer
+        WebSocketServerImpl = require("./tomcat").TomcatWebSocketServer
     }
     return new WebSocketServerImpl(instance, options)
 }

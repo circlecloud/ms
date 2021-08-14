@@ -1,4 +1,4 @@
-import { WebSocketClient } from '../server/client'
+import { WebSocketClient } from '../client'
 
 export class TomcatClient extends WebSocketClient {
     private session: javax.websocket.Session

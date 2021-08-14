@@ -63,7 +63,7 @@ export class NettyWebSocket extends Transport {
                 this._port = 80
             }
         }
-        console.debug(`constructor NettyWebSocket url: ${url} scheme: ${this._schema} host: ${this._host} port: ${this._port}`)
+        console.debug(`constructor NettyWebSocket url: ${url} scheme: ${this._schema} host: ${this._host} port: ${this._port} header: ${JSON.stringify(headers)}`)
     }
     getId() {
         return this.channel?.id() + ''

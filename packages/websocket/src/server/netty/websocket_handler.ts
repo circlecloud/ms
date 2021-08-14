@@ -1,9 +1,11 @@
-import { JavaServerOptions, ServerEvent } from '../server'
+import { ServerEvent } from '../'
 
 import { Keys } from './constants'
 import { HttpRequestHandler } from './httprequest'
 import { WebSocketHandlerAdapter } from "./adapter"
 import { TextWebSocketFrameHandler } from './text_websocket_frame'
+
+import type { JavaServerOptions } from '../'
 
 const CharsetUtil = Java.type('io.netty.util.CharsetUtil')
 const HttpServerCodec = Java.type('io.netty.handler.codec.http.HttpServerCodec')
