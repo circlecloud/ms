@@ -16,7 +16,7 @@
     "dependencies": {
         "@ccms/i18n": "^0.16.0",
         "@ccms/nodejs": "^0.16.0",
-        "core-js": "^3.15.2"
+        "core-js": "^3.16.0"
     },
     "devDependencies": {
         "@ccms/nashorn": "^0.16.0",
