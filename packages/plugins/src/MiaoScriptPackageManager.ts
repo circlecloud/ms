@@ -233,7 +233,7 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
         this.logger.sender(sender, `§6[§3BPM§6][§a${this.serverName}§6] §6命令 §b/mspm ${args.join?.(' ')} §a发布成功!`)
     }
 
-    @Cmd({ servers: [constants.ServerType.Bungee] })
+    @Cmd({ alias: ["bmspm"], servers: [constants.ServerType.Bungee] })
     bungeemspm(sender: any, command: string, args: string[]) {
         if (!sender.hasPermission('mspm.admin')) { return this.i18n(sender, 'main.command.no.permission') }
         this.taskManager.create(() => this.main(sender, command, args)).async().submit()
@@ -437,10 +437,21 @@ export class MiaoScriptPackageManager extends interfaces.Plugin {
             this.i18n(sender, 'prun.script', { name })
             this.i18n(sender, 'run.script', { script })
             let result = this.runCode(script, sender, this.pluginManager.getPlugins().get(name))
-            this.i18n(sender, 'run.result', { result: result == undefined ? this.translate.translate('run.noresult') : typeof result == "string" ? result : JSON.stringify(result) })
+            this.i18n(sender, 'run.result', { result: result == undefined ? this.translate.translate('run.noresult') : typeof result == "string" ? result : this.stringify(result) })
         } catch (ex) {
             this.logger.sender(sender, this.logger.stack(ex))
         }
+    }
+
+    private stringify(object) {
+        let seen = []
+        return JSON.stringify(object, function (key, val) {
+            if (typeof val == "object") {
+                if (seen.indexOf(val) >= 0) return
+                seen.push(val)
+            }
+            return val
+        })
     }
 
     private runCode(code: string, sender: any, _this: any) {

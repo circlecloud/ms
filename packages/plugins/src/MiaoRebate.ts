@@ -2,7 +2,7 @@
 /// <reference types="@javatypes/bukkit-api" />
 /// <reference types="@javatypes/sponge-api" />
 
-import { plugin, server, task } from '@ccms/api'
+import { constants, plugin, server, task } from '@ccms/api'
 import { Autowired, JSClass } from '@ccms/container'
 import { Cmd, Config, interfaces, JSPlugin, Listener, PluginConfig, Tab } from '@ccms/plugin'
 
@@ -37,7 +37,7 @@ const defaultConfig = {
     }
 }
 
-@JSPlugin({ version: '1.0.1', author: 'MiaoWoo', source: __filename, depends: ['MiaoReward'], nativeDepends: ['PlaceholderAPI'] })
+@JSPlugin({ version: '1.0.1', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], depends: ['MiaoReward'], nativeDepends: ['PlaceholderAPI'], source: __filename })
 export class MiaoRebate extends interfaces.Plugin {
     @Autowired()
     private server: server.Server

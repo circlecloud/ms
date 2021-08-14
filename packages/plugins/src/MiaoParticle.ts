@@ -2,11 +2,11 @@
 /// <reference types="@javatypes/bukkit-api" />
 /// <reference types="@javatypes/sponge-api" />
 
-import { particle } from '@ccms/api'
+import { constants, particle } from '@ccms/api'
 import { Autowired } from '@ccms/container'
 import { Cmd, JSPlugin, Tab, interfaces } from '@ccms/plugin'
 
-@JSPlugin({ version: '1.0.0', author: 'MiaoWoo', source: __filename })
+@JSPlugin({ version: '1.0.0', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], source: __filename })
 export class MiaoParticle extends interfaces.Plugin {
     @Autowired()
     private particleManager: particle.ParticleManager

@@ -10,13 +10,8 @@ import type { MiaoReward } from './MiaoReward'
 import http from '@ccms/common/dist/http'
 import * as CryptoJS from "crypto-js"
 
-const Thread = java.lang.Thread
+const Thread = Java.type('java.lang.Thread')
 
-interface PlayerPointsAPI {
-    look(name: string)
-    give(name: string, amount: number)
-    take(name: string, amount: number)
-}
 interface App {
     appid: string
     appname: string
@@ -78,7 +73,7 @@ const defaultConfig = {
     }
 }
 
-@JSPlugin({ version: '1.5.0', author: 'MiaoWoo', source: __filename, servers: [constants.ServerType.Bukkit], depends: ['MiaoReward'], nativeDepends: ['PlaceholderAPI', 'ProtocolLib'] })
+@JSPlugin({ version: '1.6.1', author: 'MiaoWoo', source: __filename, servers: [constants.ServerType.Bukkit], depends: ['MiaoReward'], nativeDepends: ['PlaceholderAPI', 'ProtocolLib'] })
 export class MiaoPay extends interfaces.Plugin {
     @Autowired()
     private server: server.Server
@@ -154,6 +149,10 @@ export class MiaoPay extends interfaces.Plugin {
         } catch (error) {
             return this.logger.sender(sender, error.message || error)
         }
+        this.taskManager.create(() => this.createOrderByPlayer(sender, amount)).async().submit()
+    }
+
+    private createOrderByPlayer(sender: org.bukkit.entity.Player, amount: number = 0) {
         this.MiaoReward.sendTitle(sender, `§6充值 §a${amount} §6${this.config.coinName}`, '§c正在请求充值二维码 请稍候...')
         let sync: any = { scaned: false, start: Math.round(Date.now() / 1000) }
         let order = this.createOrder(sender, amount)
@@ -248,14 +247,14 @@ export class MiaoPay extends interfaces.Plugin {
         let point = this.safeMultiply(amount, this.config.ratio)
         let finish = this.preFinishOrder(order_id)
         if (finish.code != 200) {
-            this.sendError(sender, order_id, amount, '§4充值预标记异常!')
+            this.sendError(sender, order_id, amount, '充值预标记异常!')
             return this.logger.console(`§c充值系统异常 订单 §3${order_id} 预标记异常! §4${this.config.coinName}已停止充值 §c请手动补单!`)
         }
         this.taskManager.callSyncMethod(() => {
             let prePoint = this.getPlayerAmount(sender)
             let command = this.config.command.replace('%player_name%', sender.getName()).replace('%amount%', `${point}`).replace('%remark%', `${order_id}`)
             if (!this.server.dispatchConsoleCommand(command)) {
-                return this.sendError(sender, order_id, amount, '§4充值命令执行异常!')
+                return this.sendError(sender, order_id, amount, '充值命令执行异常!')
             }
             this.checkRecharge(sender, order_id, amount, prePoint, point)
         })
@@ -271,7 +270,7 @@ export class MiaoPay extends interfaces.Plugin {
         this.taskManager.create(() => {
             let nowPoint = this.checkNowPoint(sender, point, prePoint)
             if (nowPoint === false) {
-                return this.sendError(sender, order_id, amount, '§4充值结果检测异常!')
+                return this.sendError(sender, order_id, amount, '充值结果检测异常!')
             }
             this.logger.sender(sender, [
                 `§6充值 §a${point} §6${this.config.coinName} §a成功 §6当前账户余额: §3${nowPoint} §6${this.config.coinName}`,
@@ -280,29 +279,18 @@ export class MiaoPay extends interfaces.Plugin {
             this.rewardOrder(sender, order_id, point)
             let finish = this.finishOrder(order_id)
             if (finish.code != 200) {
-                return this.logger.console(`§c充值系统异常 订单 §3${order_id} 完成标记异常! §4${this.config.coinName}可能重复到账!`)
+                this.errorOrder(order_id, '充值完成标记异常 请到后台标记为已兑换!')
+                return this.logger.console(`§c充值系统异常 订单 §3${order_id} §c完成标记异常! §a请到后台标记为已兑换! §4否则${this.config.coinName}可能重复到账!`)
             }
         }).async().submit()
     }
 
-    private checkNowPoint(sender: org.bukkit.entity.Player, point: number, prePoint: number) {
+    private checkNowPoint(sender: org.bukkit.entity.Player, point: number, prePoint: number, times: number = 1) {
+        if (times > 3) { return false }
         let nowPoint = this.getPlayerAmount(sender)
-        if (nowPoint == prePoint + point) {
-            return nowPoint
-        }
-        Thread.sleep(100)
-        nowPoint = this.getPlayerAmount(sender)
-        if (nowPoint == prePoint + point) {
-            return nowPoint
-        }
-        Thread.sleep(200)
-        nowPoint = this.getPlayerAmount(sender)
-        if (nowPoint == prePoint + point) {
-            return nowPoint
-        }
-        Thread.sleep(300)
-        nowPoint = this.getPlayerAmount(sender)
-        return false
+        if (nowPoint == prePoint + point) { return nowPoint }
+        Thread.sleep(times * 100)
+        return this.checkNowPoint(sender, point, prePoint, times++)
     }
 
     private rewardOrder(sender, order_id, point) {
@@ -333,7 +321,7 @@ export class MiaoPay extends interfaces.Plugin {
     }
 
     sendError(sender: org.bukkit.entity.Player, order_id: string, amount: number, error: string) {
-        return this.logger.sender(sender, [
+        this.logger.sender(sender, [
             `§c========== ${this.config.prefix}§4充值异常 §c==========`,
             `§6异常订单: §3${order_id}`,
             `§6订单金额: §3${amount}`,
@@ -341,8 +329,10 @@ export class MiaoPay extends interfaces.Plugin {
             `§6异常账号: §b${sender.getName()}`,
             `§6异常时间: §a${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
             `§c如果已付款但${this.config.coinName}未到账 请截图发给腐竹!`,
+            `§c可尝试重新登录 或 执行 §3/mpay check §c手动补单!`,
             `§c========== ${this.config.prefix}§4充值异常 §c==========`,
         ])
+        this.errorOrder(order_id, error)
     }
 
     @Tab()
@@ -367,11 +357,15 @@ export class MiaoPay extends interfaces.Plugin {
     }
 
     private preFinishOrder(id: string) {
-        return this.httpPost('/preFinish', { id })
+        return this.httpPost('/preFinish', { id }, true)
+    }
+
+    private errorOrder(id: string, error: string) {
+        return this.httpPost('/error', { id, error }, true)
     }
 
     private finishOrder(id: string) {
-        return this.httpPost('/finish', { id })
+        return this.httpPost('/finish', { id }, true)
     }
 
     private createOrder(sender: org.bukkit.entity.Player, amount: number): Order {
@@ -397,21 +391,30 @@ export class MiaoPay extends interfaces.Plugin {
         return this.httpPost('/unconverted', { username, force })
     }
 
-    private httpPost(method: string, data: any) {
+    private httpPost(method: string, data: any, retry = false) {
         let startTime = Date.now()
         data.appid = this.config.id
         data.timestamp = Math.round(Date.now() / 1000)
         data.nonce = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'.replace(/x/g, () => (Math.random() * 16 | 0).toString(16))
         data.sign = this.sign(data)
         let url = `${this.apiGateWay}/api${method}`
-        let result = http.post(url, data)
-        console.debug(`
+        try {
+            let result = http.post(url, data)
+            console.debug(`
 ====== HTTP POST ======
 REQUEST URL : ${url}
 REQUEST DATA: ${JSON.stringify(data)}
 RESPONSE    : ${JSON.stringify(result)}
 CAST TIME   : ${Date.now() - startTime}`)
-        return result
+            return result
+        } catch (error) {
+            if (retry) {
+                return this.httpPost(method, data)
+            } else {
+                console.console('§4请求支付中心发生异常 请联系管理员处理此问题!')
+                console.ex(error)
+            }
+        }
     }
 
     private http_build_query(params: any) {

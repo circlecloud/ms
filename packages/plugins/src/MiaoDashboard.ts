@@ -2,9 +2,10 @@
 /// <reference types="@javatypes/bukkit-api" />
 /// <reference types="@javatypes/sponge-api" />
 
-import { plugin, server, task } from '@ccms/api'
+import { constants, plugin, server, task } from '@ccms/api'
 import { Autowired } from '@ccms/container'
-import { Config, interfaces, JSPlugin, PluginConfig } from '@ccms/plugin'
+import { Config, disable, enable, interfaces, JSPlugin, PluginConfig } from '@ccms/plugin'
+import { client } from '@ccms/websocket'
 
 import http from '@ccms/common/dist/http'
 
@@ -26,7 +27,7 @@ const defaultDataConfig = {
     server_total_entities: "%server_total_entities%",
 }
 
-@JSPlugin({ prefix: 'Dashboard', version: '1.0.0', author: 'MiaoWoo', source: __filename, depends: ['MiaoConsole'] })
+@JSPlugin({ prefix: 'Dashboard', version: '1.0.0', author: 'MiaoWoo', depends: ['MiaoConsole'], source: __filename })
 export class MiaoDashboard extends interfaces.Plugin {
     @Autowired()
     private server: server.Server
@@ -44,7 +45,8 @@ export class MiaoDashboard extends interfaces.Plugin {
     @Config()
     private dataConfig: PluginConfig & typeof defaultDataConfig = defaultDataConfig
     @Config({ autosave: true })
-    private dataCache: { [key: string]: { time: string, value: Number }[] } = {}
+    private dataCache: PluginConfig & { [key: string]: { time: string, value: Number }[] } = {}
+
     private statisticTimer: task.Task
 
     private PlaceholderAPI: { setPlaceholders: (player: any, str: string) => string }
@@ -66,6 +68,10 @@ export class MiaoDashboard extends interfaces.Plugin {
                 }
             })
         })
+    }
+
+    @enable({ servers: [constants.ServerType.Bukkit] })
+    enableBukkit() {
         this.PlaceholderAPI = base.getClass("me.clip.placeholderapi.PlaceholderAPI").static
         this.statisticTimer = this.taskManager.create(() => {
             for (const key of Object.keys(this.dataConfig)) {
@@ -79,6 +85,41 @@ export class MiaoDashboard extends interfaces.Plugin {
                 }
             }
         }, this).async().timer(20 * 10).submit()
+        this.proxys = client.io('ws://192.168.2.25:25577/MiaoConsole?access_token=325325', {
+            path: "/ws"
+        })
+        this.proxys.on('connect', () => {
+            this.logger.info('connect')
+            this.proxys.emit('type', (type) => {
+                console.log('server type is ' + type)
+            })
+        })
+        this.proxys.on('log', (msg) => {
+            console.log(msg)
+        })
+    }
+
+    private proxys
+
+    @enable({ servers: [constants.ServerType.Bungee] })
+    enbaleBungee() {
+        this.proxys = client.io('ws://192.168.2.25:25565/MiaoConsole?access_token=325325', {
+            path: "/ws"
+        })
+        this.proxys.on('connect', () => {
+            this.logger.info('connect')
+            this.proxys.emit('type', (type) => {
+                console.log('server type is ' + type)
+            })
+        })
+        this.proxys.on('log', (msg) => {
+            console.log(msg)
+        })
+    }
+
+    @disable({ servers: [constants.ServerType.Bungee] })
+    disableBungee() {
+
     }
 
     private dateFormat(fmt: string, date = new Date()) {
@@ -103,7 +144,7 @@ export class MiaoDashboard extends interfaces.Plugin {
 
     disable() {
         this.namespace?.close()
-        this.statisticTimer.cancel()
+        this.statisticTimer?.cancel()
     }
 
     private wrapper(fn, data) {

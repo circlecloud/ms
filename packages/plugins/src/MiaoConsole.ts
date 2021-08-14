@@ -67,7 +67,7 @@ export class MiaoConsole extends interfaces.Plugin {
             }
         })
         this.task.create(() => {
-            if (!this.babel) {
+            if (!this.babel && this.serverType != constants.ServerType.Bungee) {
                 try {
                     this.logger.console('§3脚本 Babel 引擎初始化中 请稍候...')
                     let startTime = Date.now()
@@ -164,7 +164,11 @@ export class MiaoConsole extends interfaces.Plugin {
         if (this.rootLogger) {
             let AbstractHandler = Java.type('java.util.logging.Handler')
             let ProxyHandler = Java.extend(AbstractHandler, {
-                publish: (record) => process.emit('message', record.getMessage()),
+                publish: (record) => {
+                    if (record.getLevel().intValue() > 500) {
+                        process.emit('message', record.getMessage())
+                    }
+                },
                 flush: () => { },
                 close: () => { }
             })
@@ -248,16 +252,19 @@ export class MiaoConsole extends interfaces.Plugin {
 
     checkWebSocketClient(client: SocketIOSocket) {
         if (!this.token) {
-            this.logger.console(`§6客户端 §b${client.id} §a请求连接 §4服务器尚未设置 Token 无法连接!`)
-            client.emit('unauthorized', () => client.disconnect(true))
-            return false
+            return this.notifyDisconnect(client, `§6客户端 §b${client.id} §a请求连接 §4服务器尚未设置 Token 无法连接!`)
         }
         if (this.token != client.handshake.query.token) {
-            this.logger.console(`§6客户端 §b${client.id} §c无效请求 §4请提供正确Token后再次连接!`)
-            client.emit('unauthorized', () => client.disconnect(true))
-            return false
+            return this.notifyDisconnect(client, `§6客户端 §b${client.id} §c无效请求 §4请提供正确Token后再次连接!`)
         }
         return true
+    }
+
+    private notifyDisconnect(client: SocketIOSocket, reason: string) {
+        this.logger.console(reason)
+        client.emit('unauthorized', () => client.disconnect(true))
+        setTimeout(() => { if (client.connected) { client.disconnect(true) } }, 5)
+        return false
     }
 
     startSocketIOServer() {
