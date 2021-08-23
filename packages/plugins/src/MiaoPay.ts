@@ -73,7 +73,7 @@ const defaultConfig = {
     }
 }
 
-@JSPlugin({ version: '1.6.1', author: 'MiaoWoo', source: __filename, servers: [constants.ServerType.Bukkit], depends: ['MiaoReward'], nativeDepends: ['PlaceholderAPI', 'ProtocolLib'] })
+@JSPlugin({ version: '1.6.3', author: 'MiaoWoo', source: __filename, servers: [constants.ServerType.Bukkit], depends: ['MiaoReward'], nativeDepends: ['PlaceholderAPI', 'ProtocolLib'] })
 export class MiaoPay extends interfaces.Plugin {
     @Autowired()
     private server: server.Server
@@ -109,6 +109,10 @@ export class MiaoPay extends interfaces.Plugin {
             this.appInfo = info.data
             this.config.ratio = this.appInfo.ratio
             this.config.coinName = this.appInfo.coin_name
+            if (this.config.name == this.appInfo.appname) {
+                this.config.name = ''
+                this.config.save()
+            }
         } else {
             this.logger.console('§4初始化支付系统失败 请检查配置是否正确!')
             this.logger.console('§c服务器返回异常: §4' + info.msg)
@@ -134,7 +138,7 @@ export class MiaoPay extends interfaces.Plugin {
         if (this.cacheMap.has(sender.getName())) {
             this.logger.sender(sender, '§c您有一笔订单尚未完成 请完成支付或等待订单超时!')
             let sync = this.cacheSyncMap.get(sender.getName())
-            if (!sync.cancelled) { return }
+            if (!sync.cancelled) { return this.cacheMap.delete(sender.getName()) }
             sync.scaned = false
             sync.left = (sync.paying ? 100 : 55) - (Math.round(Date.now() / 1000) - sync.start)
             let order = this.cacheMap.get(sender.getName())
@@ -192,27 +196,6 @@ export class MiaoPay extends interfaces.Plugin {
         this.MiaoReward.clearTitle(sender)
     }
 
-    cmdquery(sender: org.bukkit.entity.Player, id: string) {
-        if (!id) { return this.logger.sender(sender, '§c请输入订单号!') }
-        this.taskManager.create(() => {
-            let result = this.queryOrder(id, sender.getName(), sender.getUniqueId().toString())
-            if (result.code != 200) { return this.logger.sender(sender, `§c查询异常! §4ERROR: ${result.msg}`) }
-            let order = result.data
-            this.logger.sender(sender, [
-                `§6商户名称: §3${order.appname}`,
-                `§6订单号: §3${id}`,
-                `§6商品: §b${order.subject}`,
-                `§6金额: §e${order.amount}`,
-                `§6玩家: §a${order.username}`,
-                `§6状态: §c${order.status}`,
-            ])
-            if (order.status > 1 && order.status < 4) {
-                this.logger.sender(sender, `§3当前订单已支付 尚未完成充值 开始补单操作...`)
-                this.recharge(sender, order)
-            }
-        }).async().submit()
-    }
-
     cmdcheck(sender: org.bukkit.entity.Player, force = 1) {
         if (this.checkSet.has(sender.getName())) {
             return this.logger.sender(sender, '§c检查任务执行中 请稍候...')
@@ -245,12 +228,14 @@ export class MiaoPay extends interfaces.Plugin {
         let order_id = order.order_id
         let amount = order.amount
         let point = this.safeMultiply(amount, this.config.ratio)
+        if (!sender.isOnline()) { return }
         let finish = this.preFinishOrder(order_id)
         if (finish.code != 200) {
             this.sendError(sender, order_id, amount, '充值预标记异常!')
             return this.logger.console(`§c充值系统异常 订单 §3${order_id} 预标记异常! §4${this.config.coinName}已停止充值 §c请手动补单!`)
         }
         this.taskManager.callSyncMethod(() => {
+            if (!sender.isOnline()) { return this.errorOrder(order_id, "充值前玩家掉线 请重置标记!") }
             let prePoint = this.getPlayerAmount(sender)
             let command = this.config.command.replace('%player_name%', sender.getName()).replace('%amount%', `${point}`).replace('%remark%', `${order_id}`)
             if (!this.server.dispatchConsoleCommand(command)) {
@@ -268,10 +253,9 @@ export class MiaoPay extends interfaces.Plugin {
 
     private checkRecharge(sender: org.bukkit.entity.Player, order_id: string, amount: number, prePoint: number, point: number) {
         this.taskManager.create(() => {
+            if (!sender.isOnline()) { return this.errorOrder(order_id, "充值后玩家掉线 请标记已兑换!") }
             let nowPoint = this.checkNowPoint(sender, point, prePoint)
-            if (nowPoint === false) {
-                return this.sendError(sender, order_id, amount, '充值结果检测异常!')
-            }
+            if (nowPoint === false) { return this.sendError(sender, order_id, amount, '充值结果检测异常!') }
             this.logger.sender(sender, [
                 `§6充值 §a${point} §6${this.config.coinName} §a成功 §6当前账户余额: §3${nowPoint} §6${this.config.coinName}`,
                 `§c如出现未到账的情况 请联系管理员!`
@@ -369,7 +353,7 @@ export class MiaoPay extends interfaces.Plugin {
     }
 
     private createOrder(sender: org.bukkit.entity.Player, amount: number): Order {
-        let serverName = this.appInfo?.appname
+        let serverName = this.appInfo.appname
         if (this.config.name) { serverName = `${serverName}(${this.config.name})` }
         let result = this.httpPost('/create', {
             subject: `${serverName} 充值 ${amount} ${this.config.coinName}`,
