@@ -200,7 +200,7 @@ export class Client<
      * @private
      */
     private close(): void {
-        console.debug(`client ${this.id} clise - reason: forcing transport close`)
+        console.debug(`client ${this.id} close - reason: forcing transport close`)
         if ("open" === this.conn.readyState) {
             console.debug("forcing transport close")
             this.conn.close()

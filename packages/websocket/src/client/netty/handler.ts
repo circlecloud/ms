@@ -29,7 +29,7 @@ export class WebSocketClientHandler extends WebSocketClientHandlerAdapter {
     }
     channelInactive(ctx: any) {
         console.debug(`${ctx} channelInactive`)
-        this.client.onclose({ code: 0, reason: 'server connection channel inactive!' })
+        this.client.onclose({ code: 0, reason: 'client connection channel inactive!' })
     }
     channelRead0(ctx: any, msg: any) {
         console.trace(`${ctx} channelRead0 ${msg}`)
@@ -50,7 +50,7 @@ export class WebSocketClientHandler extends WebSocketClientHandlerAdapter {
         if (frame instanceof TextWebSocketFrame) {
             this.client.onmessage({ data: frame.text() })
         } else if (frame instanceof CloseWebSocketFrame) {
-            this.client.onclose({ code: 0, reason: 'server send CloseWebSocketFrame!' })
+            this.client.onclose({ code: 0, reason: 'server close connection!' })
         }
     }
     exceptionCaught(ctx: any, cause: Error) {

@@ -57,6 +57,8 @@ export abstract class Transport extends EventEmitter {
                 this.doClose(code, reason)
             } catch (error) {
                 this.onerror({ error })
+            } finally {
+                this.removeAllListeners()
             }
         } else {
             console.debug(`${this.id} call close but state is ${this.readyStatus}`)
@@ -69,7 +71,6 @@ export abstract class Transport extends EventEmitter {
     }
 
     onconnect(event: Event) {
-        console.debug(`${this.id} call onconnect`)
         if (this.readyStatus != WebSocket.OPEN) {
             this.readyStatus = WebSocket.OPEN
             this.emit('open', event)
