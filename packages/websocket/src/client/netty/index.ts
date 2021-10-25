@@ -100,9 +100,11 @@ export class NettyWebSocket extends Transport {
             handler.handshakeFuture.addListener(new ChannelFutureListener((future: any) => {
                 try {
                     future.sync()
+                    // only trigger onconnect when not have error
                     this.onconnect({})
                 } catch (error) {
-                    this.onerror({ error })
+                    // ignore error exceptionCaught from handler
+                    // this.onerror({ error })
                 }
             }))
         }))

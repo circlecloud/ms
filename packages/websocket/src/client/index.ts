@@ -53,13 +53,11 @@ export class WebSocket extends EventEmitter {
             return
         }
         this.client.on('open', (event) => {
-            console.debug('client WebSocket call open', this.onopen)
             this.onopen?.(event)
             manager.add(this)
         })
         this.client.on('message', (event) => this.onmessage?.(event))
         this.client.on('close', (event) => {
-            console.log('client WebSocket call close', this.onclose)
             this.onclose?.(event)
             manager.del(this)
         })
@@ -101,3 +99,4 @@ export class WebSocket extends EventEmitter {
         this.removeAllListeners()
     }
 }
+global.setGlobal('WebSocket', WebSocket)
