@@ -73,6 +73,12 @@ export namespace server {
         getService(service: string): any {
             throw new Error("Method not implemented.")
         }
+        broadcast(message: string, permission: string) {
+            throw new Error("Method not implemented.")
+        }
+        broadcastMessage(message: string) {
+            throw new Error("Method not implemented.")
+        }
         dispatchCommand(sender: string | any, command: string): boolean {
             throw new Error("Method not implemented.")
         }

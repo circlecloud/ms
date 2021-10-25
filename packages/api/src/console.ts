@@ -105,7 +105,7 @@ export class MiaoScriptConsole implements Console {
                         let sourceMappingURL = lastLine.split('sourceMappingURL=', 2)[1]
                         if (sourceMappingURL.startsWith('data:application/json;base64,')) {
                             sourceContent = String.fromCharCode(...Array.from(base64.toByteArray(sourceMappingURL.split(',', 2)[1])))
-                        } else if (sourceMappingURL.startsWith('http')) {
+                        } else if (sourceMappingURL.startsWith('http://') || sourceMappingURL.startsWith('https://')) {
                             // TODO
                         } else {
                             let file = Paths.get(Paths.get(fileName, '..', sourceMappingURL).toFile().getCanonicalPath()).toFile()

@@ -4,7 +4,7 @@ import { provideSingleton } from '@ccms/container'
 import * as reflect from '@ccms/common/dist/reflect'
 import chat from './enhance/chat'
 
-let Bukkit = org.bukkit.Bukkit
+let Bukkit: typeof org.bukkit.Bukkit = org.bukkit.Bukkit
 
 @provideSingleton(server.Server)
 export class BukkitServer extends server.ReflectServer {
@@ -29,6 +29,12 @@ export class BukkitServer extends server.ReflectServer {
     }
     getService(service: string) {
         return Bukkit.getServicesManager().getRegistration(base.getClass(service))?.getProvider()
+    }
+    broadcast(message: string, permission: string) {
+        return Bukkit.broadcast(message, permission)
+    }
+    broadcastMessage(message: string) {
+        return Bukkit.broadcastMessage(message)
     }
     dispatchCommand(sender: string | any, command: string): boolean {
         if (typeof sender === 'string') {

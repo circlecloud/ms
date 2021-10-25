@@ -58,6 +58,12 @@ export class BungeeServer implements server.Server {
     getService(service: string) {
         throw new Error("Method not implemented.")
     }
+    broadcast(message: string, permission: string) {
+        return Bungee.broadcast(message)
+    }
+    broadcastMessage(message: string) {
+        return Bungee.broadcast(message)
+    }
     dispatchCommand(sender: string | any, command: string): boolean {
         if (typeof sender === 'string') {
             sender = this.getPlayer(sender)
