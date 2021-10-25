@@ -27,6 +27,12 @@ export class NukkitServer implements server.Server {
     getService(service: string) {
         return Nukkit.getServiceManager().getProvider(base.getClass(service))
     }
+    broadcast(message: string, permission: string) {
+        return Nukkit.broadcast(message, permission)
+    }
+    broadcastMessage(message: string) {
+        return Nukkit.broadcastMessage(message)
+    }
     dispatchCommand(sender: string | any, command: string): boolean {
         if (typeof sender === 'string') {
             sender = this.getPlayer(sender)

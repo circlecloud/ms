@@ -17,7 +17,7 @@ export namespace task {
                 this.cacheTasks.delete(taskId)
                 let ownerName = task.getOwner()?.description.name
                 if (ownerName && this.pluginCacheTasks.has(ownerName)) {
-                    this.pluginCacheTasks.get(ownerName).delete(taskId)
+                    this.pluginCacheTasks.get(ownerName)?.delete(taskId)
                 }
             })
         }

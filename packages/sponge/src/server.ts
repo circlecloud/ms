@@ -3,7 +3,8 @@ import { provideSingleton } from '@ccms/container'
 
 import * as reflect from '@ccms/common/dist/reflect'
 
-const Sponge = org.spongepowered.api.Sponge
+const Sponge: typeof org.spongepowered.api.Sponge = org.spongepowered.api.Sponge
+const Text: typeof org.spongepowered.api.text.Text = org.spongepowered.api.text.Text
 const File = Java.type("java.io.File")
 
 @provideSingleton(server.Server)
@@ -29,6 +30,12 @@ export class SpongeServer extends server.ReflectServer {
     }
     getService(service: string) {
         return Sponge.getServiceManager().provide(base.getClass(service)).orElse(null)
+    }
+    broadcast(message: string, permission: string) {
+        return Sponge.getServer().getBroadcastChannel().permission(permission).send(Text.of(message) as any)
+    }
+    broadcastMessage(message: string) {
+        return Sponge.getServer().getBroadcastChannel().TO_ALL.send(Text.of(message) as any)
     }
     dispatchCommand(sender: string | any, command: string): boolean {
         if (typeof sender === 'string') {
