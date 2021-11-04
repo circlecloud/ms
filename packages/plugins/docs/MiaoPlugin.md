@@ -1,5 +1,6 @@
 ### Miao系列插件
 
+- [[综合|前置]MiaoLink —— 喵式映射 用于无公网环境的自动化端口映射[全版本]](https://www.mcbbs.net/thread-1121423-1-1.html)
 - [[经济]MiaoReward —— 喵式奖励 让玩家看广告为服务器提供收入吧[1.7.10+全版本]](https://www.mcbbs.net/thread-1121423-1-1.html)
 - [[编程]MiaoBlockly —— 喵式积木 用简单的积木来写插件吧[1.12.2+全版本]](https://www.mcbbs.net/thread-1129411-1-1.html)
 - [[编程]MiaoConsole —— 喵式终端 通过MC端口直接控制服务器 调试插件[1.12.2+全版本]](https://www.mcbbs.net/thread-1129227-1-1.html)

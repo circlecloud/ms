@@ -1,41 +1,152 @@
 /// <reference types="@javatypes/bungee-api" />
 /// <reference types="@javatypes/bukkit-api" />
 /// <reference types="@javatypes/sponge-api" />
-/// <reference types="typescript" />
-// @ts-ignore
-require.clear('websocket/client')
-import { server } from '@ccms/api'
-import { Autowired, Container, ContainerInstance } from '@ccms/container'
-import { Cmd, JSPlugin, Tab, interfaces, PluginConfig, Config } from '@ccms/plugin'
+
+import { EventEmitter } from 'events'
+
+import { constants, server } from '@ccms/api'
+import { Autowired, JSClass } from '@ccms/container'
+import { Cmd, JSPlugin, Tab, interfaces, PluginConfig, Config, Listener } from '@ccms/plugin'
 import { WebSocket } from '@ccms/websocket'
 
+const Thread = Java.type('java.lang.Thread')
+const ChatColor = Java.type('org.bukkit.ChatColor')
+
 const defaultConfig = {
+    version: 1,
     address: '',
-    token: ''
+    token: '',
+    group_id: '',
+    admin_id: '',
+    message: {
+        join: "玩家: %player_name% 加入了服务器!",
+        quit: "玩家: %player_name% 退出了服务器!",
+        chat: "%player_name%: ",
+        group: "&6[&c服务器群&6] &b%sender_nickname%&6(&a%sender_user_id%&6)&r: "
+    }
 }
-//https://github3.mk-proxy.ml/-----https://github.com/Mrs4s/go-cqhttp/releases/download/v0.9.34/go-cqhttp-v0.9.34-linux-amd64
-@JSPlugin({ version: '1.0.0', author: 'MiaoWoo', source: __filename })
+
+interface RobotConfig {
+    address: string,
+    token: string,
+    timeout: number
+}
+
+interface PlaceholderAPI {
+    registerPlaceholderHook: (key: string, onPlaceholderRequest: (player, s) => string) => void
+    unregisterPlaceholderHook: (key: string) => void
+    setPlaceholders: (player: any, str: string) => string
+}
+
+class Robot extends EventEmitter {
+    private config: RobotConfig
+
+    private websocket: WebSocket
+
+    private invokeCount = 1;
+    private apiResultCache = [];
+
+    constructor(config: RobotConfig) {
+        super()
+        this.config = config
+    }
+
+    sleep(ms) {
+        Thread.sleep(ms)
+    }
+
+    invoke(action, params) {
+        if (this.websocket.readyState != WebSocket.OPEN) { throw new Error('client not connect!') }
+        let startTime: number = new Date().getTime()
+        let request = { action, params, echo: this.invokeCount++ }
+        this.websocket.send(JSON.stringify(request))
+        while (startTime + this.config.timeout > new Date().getTime()) {
+            if (this.apiResultCache[request.echo]) {
+                let result = this.apiResultCache[request.echo]
+                delete this.apiResultCache[request.echo]
+                if ((result.status === "ok" && result.retcode !== 0) && (result.status === "async" && result !== 1)) {
+                    throw Error(`Invoke API Error! Response ${JSON.stringify(result)}`)
+                }
+                return result.data
+            }
+            this.sleep(50)
+        }
+        throw Error(`Invoke API Timeout! Request ${JSON.stringify(request)}`)
+    }
+
+    connect() {
+        this.websocket = new WebSocket(this.config.address, '', { Authorization: `Bearer ${this.config.token}` })
+        this.websocket.onopen = () => {
+            this.emit('connect')
+        }
+        this.websocket.onmessage = (event) => {
+            let robotEvent = JSON.parse(event.data)
+            if (robotEvent.post_type == "meta_event") { return }
+            if (robotEvent.post_type) {
+                this.emit(robotEvent.post_type, robotEvent)
+            }
+        }
+        this.websocket.onclose = (event) => {
+            this.emit('close', event)
+        }
+        this.websocket.onerror = (event) => {
+            this.emit('error', event)
+        }
+    }
+
+    disconnect(reason = '') {
+        if (this.websocket) {
+            this.websocket.close(0, reason)
+        }
+    }
+
+    sendGroupMessage(group_id, message) {
+        this.websocket.send(JSON.stringify({
+            action: "send_msg",
+            params: { group_id, message }
+        }))
+    }
+
+    sendPrivateMessage(user_id, message) {
+        this.websocket.send(JSON.stringify({
+            action: "send_msg",
+            params: { user_id, message }
+        }))
+    }
+}
+
+@JSPlugin({ version: '1.0.0', author: 'MiaoWoo', servers: [constants.ServerType.Bukkit], source: __filename, nativeDepends: ['PlaceholderAPI'] })
 export class MiaoRobot extends interfaces.Plugin {
     @Autowired()
     private server: server.Server
 
-    private client: WebSocket
+    @JSClass('me.clip.placeholderapi.PlaceholderAPI')
+    private PlaceholderAPI: PlaceholderAPI
+
+    private robot: Robot
 
     @Config()
     private config: PluginConfig & typeof defaultConfig = defaultConfig
 
     load() {
-    }
-
-    private downloadRobot() {
-        //https://api.github.com/repos/Mrs4s/go-cqhttp/releases?per_page=1&page=1
+        this.logger.prefix = ''
     }
 
     enable() {
+        if (this.config.address && this.config.token) {
+            this.cmdconnect(this.server.getConsoleSender())
+            if (!this.config.group_id) {
+                this.logger.console('§c机器人尚未配置绑定服务器群 部分功能将无法使用!')
+            }
+        } else {
+            this.logger.console('§c机器人尚未配置 请参照帖子内容配置机器人!')
+        }
     }
 
     disable() {
-        this.cmdclose(this.server.getConsoleSender())
+        if (this.robot) {
+            this.cmdclose(this.server.getConsoleSender())
+        }
     }
 
     @Cmd({ autoMain: true })
@@ -46,50 +157,64 @@ export class MiaoRobot extends interfaces.Plugin {
             return this.logger.sender(sender, '§4错误 请配置服务器地址和Token!')
         }
         this.cmdclose(sender)
-        try {
-            this.client = new WebSocket(address, '', { Authorization: `Bearer ${token}` })
-            this.initRobot(this.client)
-        } catch (error) {
-            console.ex(error)
-        }
+        this.initRobot(sender)
     }
 
-    private initRobot(client: WebSocket) {
-        client.onopen = () => {
-            this.logger.console(`§3连接到 §b${client.url} §a成功!`)
-        }
-        client.onmessage = (event) => {
-            let messageEvent = JSON.parse(event.data)
-            switch (messageEvent.post_type) {
-                case "message":
-                    this.logger.console(`§6接收到 §3群 §b${messageEvent.group_id} §2成员 §a${messageEvent.sender.nickname} §6的消息: §r${messageEvent.message}`)
-                    break
+    initRobot(sender) {
+        this.robot = new Robot({ ...this.config, timeout: 60 })
+        this.robot.on('connect', () => {
+            this.logger.sender(sender, '§a机器人链接成功!')
+        })
+        this.robot.on('message', (event) => {
+            if (event.message_type == "group" && event.group_id == this.config.group_id) {
+                let message: string = event.message
+                message = message.replace(/.*\[CQ:image\,file=(.*),url=(.*),.*]/g, '[图片]')
+                message = this.config.message.group
+                    .replace(/%sender_nickname%/g, event.sender.nickname)
+                    .replace(/%sender_card%/g, event.sender.card)
+                    .replace(/%sender_title%/g, event.sender.title)
+                    .replace(/%sender_user_id%/g, event.sender.user_id) + message
+                message = ChatColor.translateAlternateColorCodes('&', message)
+                this.server.getOnlinePlayers().forEach(p => this.logger.sender(p, message))
+                this.logger.console(message)
             }
-        }
-        client.onclose = (event) => {
-            this.logger.console(`§4连接已断开 §6Code: §3${event.code} §6原因: §c${event.reason}!`)
-        }
-        client.onerror = (event) => {
-            this.logger.console(`§4发生错误: §r${event.error}`)
-            console.ex(event.error)
-        }
+        })
+        this.robot.connect()
     }
 
     cmdclose(sender: org.bukkit.entity.Player) {
-        if (this.client && this.client.readyState != WebSocket.CLOSED) {
-            this.client.close(0, 'plugin close socket')
+        if (this.robot) {
+            this.robot.disconnect()
+            this.logger.sender(sender, '§c机器人已断开链接!')
         }
     }
 
     cmdsend(sender: org.bukkit.entity.Player, text: string) {
-        if (this.client) {
-            this.client.send(text)
-            this.logger.sender(sender, '§a发送成功!')
-        }
+        this?.robot.sendGroupMessage(this.config.group_id, text)
+        this.logger.sender(sender, '§a发送成功!')
     }
 
     @Tab()
     tabmbot(_sender: any, _command: string, _args: string[]) {
         return []
+    }
+
+    @Listener()
+    private PlayerJoinEvent(event: org.bukkit.event.player.PlayerJoinEvent) {
+        if (this.robot && this.config.group_id) {
+            this.robot.sendGroupMessage(this.config.group_id, this.PlaceholderAPI.setPlaceholders(event.getPlayer(), this.config.message.join))
+        }
+    }
+    @Listener()
+    private PlayerQuitEvent(event: org.bukkit.event.player.PlayerQuitEvent) {
+        if (this.robot && this.config.group_id) {
+            this.robot.sendGroupMessage(this.config.group_id, this.PlaceholderAPI.setPlaceholders(event.getPlayer(), this.config.message.quit))
+        }
+    }
+    @Listener()
+    private AsyncPlayerChatEvent(event: org.bukkit.event.player.AsyncPlayerChatEvent) {
+        if (this.robot && this.config.group_id) {
+            this.robot.sendGroupMessage(this.config.group_id, this.PlaceholderAPI.setPlaceholders(event.getPlayer(), this.config.message.chat) + event.getMessage())
+        }
     }
 }

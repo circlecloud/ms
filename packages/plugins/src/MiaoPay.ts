@@ -73,7 +73,7 @@ const defaultConfig = {
     }
 }
 
-@JSPlugin({ version: '1.6.3', author: 'MiaoWoo', source: __filename, servers: [constants.ServerType.Bukkit], depends: ['MiaoReward'], nativeDepends: ['PlaceholderAPI', 'ProtocolLib'] })
+@JSPlugin({ version: '1.6.6', author: 'MiaoWoo', source: __filename, servers: [constants.ServerType.Bukkit], depends: ['MiaoReward'], nativeDepends: ['PlaceholderAPI', 'ProtocolLib'] })
 export class MiaoPay extends interfaces.Plugin {
     @Autowired()
     private server: server.Server
@@ -104,7 +104,11 @@ export class MiaoPay extends interfaces.Plugin {
     enable() {
         if (!this.MiaoReward) { return this.logger.error('当前脚本插件需要 MiaoReward 作为前置脚本插件!') }
         if (!this.config.id || !this.config.secret) { return this.logger.console('§4尚未配置商户信息 将无法正常收款!') }
-        let info = this.httpPost('/apps', { id: this.config.id })
+        this.initAppInfo()
+    }
+
+    private initAppInfo() {
+        let info = this.httpPost('/apps', { id: this.config.id }, 10)
         if (info.code == 200) {
             this.appInfo = info.data
             this.config.ratio = this.appInfo.ratio
@@ -114,8 +118,8 @@ export class MiaoPay extends interfaces.Plugin {
                 this.config.save()
             }
         } else {
-            this.logger.console('§4初始化支付系统失败 请检查配置是否正确!')
-            this.logger.console('§c服务器返回异常: §4' + info.msg)
+            this.logger.console('§4初始化支付系统失败 请检查配置或网络是否正常!')
+            this.logger.console('§c返回异常: §4' + info.msg)
         }
     }
 
@@ -131,14 +135,17 @@ export class MiaoPay extends interfaces.Plugin {
 
     cmdpay(sender: org.bukkit.entity.Player, amount: number = 0) {
         if (!sender.getItemInHand) { return this.logger.sender(sender, '§4控制台无法执行此命令!') }
-        if (!this.appInfo) {
-            return this.logger.sender(sender, '§4当前服务器尚未配置 请联系管理员配置MiaoPay!')
-        }
         if (!this.config.id || !this.config.secret) { return this.logger.sender(sender, '§c当前服务器尚未配置 请联系管理员配置支付密钥!') }
+        if (!this.appInfo) {
+            this.initAppInfo()
+            return this.logger.sender(sender, '§6支付系统初始化中 请稍候重试...')
+        }
         if (this.cacheMap.has(sender.getName())) {
             this.logger.sender(sender, '§c您有一笔订单尚未完成 请完成支付或等待订单超时!')
             let sync = this.cacheSyncMap.get(sender.getName())
-            if (!sync.cancelled) { return this.cacheMap.delete(sender.getName()) }
+            if (sync.scaned) { return }
+            sync.scaned = true
+            Thread.sleep(1100)
             sync.scaned = false
             sync.left = (sync.paying ? 100 : 55) - (Math.round(Date.now() / 1000) - sync.start)
             let order = this.cacheMap.get(sender.getName())
@@ -146,7 +153,7 @@ export class MiaoPay extends interfaces.Plugin {
             return
         }
         if (amount < 1) { return this.logger.sender(sender, `§c充值异常 §4充值金额不得小于 1 ${this.config.coinName}!`) }
-        if (amount / this.config.ratio > 5000) { return this.logger.sender(sender, `§c充值异常 §4充值金额不得大于 ${this.config.ratio * 5000} ${this.config.coinName}!`) }
+        if (amount / this.config.ratio > 5000) { return this.logger.sender(sender, `§c充值异常 §4充值金额不得大于 ${this.config.ratio * 3000} ${this.config.coinName}!`) }
         if (amount != Math.round(amount)) { return this.logger.sender(sender, `§c充值异常 §4充值金额必须为整数!`) }
         try {
             this.getPlayerAmount(sender)
@@ -341,15 +348,15 @@ export class MiaoPay extends interfaces.Plugin {
     }
 
     private preFinishOrder(id: string) {
-        return this.httpPost('/preFinish', { id }, true)
+        return this.httpPost('/preFinish', { id }, 3)
     }
 
     private errorOrder(id: string, error: string) {
-        return this.httpPost('/error', { id, error }, true)
+        return this.httpPost('/error', { id, error }, 3)
     }
 
     private finishOrder(id: string) {
-        return this.httpPost('/finish', { id }, true)
+        return this.httpPost('/finish', { id }, 3)
     }
 
     private createOrder(sender: org.bukkit.entity.Player, amount: number): Order {
@@ -368,14 +375,14 @@ export class MiaoPay extends interfaces.Plugin {
     }
 
     private queryOrder(id: string, username: string, uuid: string) {
-        return this.httpPost('/query', { id, username, uuid })
+        return this.httpPost('/query', { id, username, uuid }, 2)
     }
 
     private queryUnconverted(username: string, force: number) {
-        return this.httpPost('/unconverted', { username, force })
+        return this.httpPost('/unconverted', { username, force }, 2)
     }
 
-    private httpPost(method: string, data: any, retry = false) {
+    private httpPost(method: string, data: any, retry = 0) {
         let startTime = Date.now()
         data.appid = this.config.id
         data.timestamp = Math.round(Date.now() / 1000)
@@ -393,11 +400,12 @@ CAST TIME   : ${Date.now() - startTime}`)
             return result
         } catch (error) {
             if (retry) {
-                return this.httpPost(method, data)
-            } else {
-                console.console('§4请求支付中心发生异常 请联系管理员处理此问题!')
-                console.ex(error)
+                Thread.sleep(retry * 10)
+                return this.httpPost(method, data, --retry)
             }
+            console.console('§4请求支付中心发生异常 请联系管理员处理此问题!')
+            console.ex(error)
+            return { code: 500, msg: '本地网络错误: ' + error.message, data: error }
         }
     }
 

@@ -479,7 +479,7 @@ return eval(${JSON.stringify(code)});`)
         return tfunc.apply(_this, params)
     }
 
-    cmddeploy(sender: string, name: string, changelog: string) {
+    cmddeploy(sender: string, name: string, changelog: string = '') {
         if (!process.env.AccessToken) { return this.i18n(sender, 'deploy.token.not.exists') }
         this.taskManager.create(() => {
             if (this.checkPlugin(sender, name)) {
@@ -544,9 +544,9 @@ return eval(${JSON.stringify(code)});`)
             for (const pl of result.data) { this.packageCache[pl.name] = pl }
             this.packageNameCache = Object.keys(this.packageCache)
             this.i18n(sender, 'cloud.update.finish', { length: this.packageNameCache.length })
+            let updateCount = 0
             this.pluginManager.getPlugins().forEach(p => {
                 let cloudPlugin = this.packageCache[p.description.name]
-                let updateCount = 0
                 //§6插件名称: §b{name}\n§6版本: §a{version}\n§6作者: §3{author}\§6更新时间: §9{updated_at}
                 if (cloudPlugin && cloudPlugin.version != p.description.version) {
                     this.i18n(sender, 'cloud.update.exists', {
@@ -557,10 +557,10 @@ return eval(${JSON.stringify(code)});`)
                     })
                     updateCount++
                 }
-                if (updateCount) {
-                    this.i18n(sender, 'cloud.update.tip', { count: updateCount })
-                }
             })
+            if (updateCount) {
+                this.i18n(sender, 'cloud.update.tip', { count: updateCount })
+            }
         }).async().submit()
     }
 
@@ -570,7 +570,7 @@ return eval(${JSON.stringify(code)});`)
             this.i18n(sender, 'download.start', { name, version: pluginPkg.version })
             this.i18n(sender, 'download.url', { url: pluginPkg.url })
             let pluginFile = update ? fs.concat(root, this.pluginFolder, 'update', name + '.js') : fs.concat(root, this.pluginFolder, name + '.js')
-            http.download(pluginPkg.url, pluginFile)
+            http.download(pluginPkg.url + '?t=' + Date.now(), pluginFile)
             this.i18n(sender, 'download.finish', { name, version: pluginPkg.version })
             callback?.()
         }).async().submit()

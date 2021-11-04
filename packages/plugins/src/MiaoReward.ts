@@ -663,6 +663,7 @@ export class MiaoReward extends interfaces.Plugin {
             sync.cancelled = false
             let task = this.taskManager.create(() => {
                 try {
+                    console.log(JSON.stringify(sync))
                     if (sync.scaned || !sender.isOnline() || !this.isHoldQrCodeItem(sender) || --sync.left < 0) {
                         if (sync.left < 0) {
                             this.logger.sender(sender, '§c二维码已过期 请重新获取 如已扫码请忽略!')
