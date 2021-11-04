@@ -1,4 +1,3 @@
-import { EventEmitter } from 'events'
 import { NettyWebSocket } from '.'
 import { WebSocketClientHandlerAdapter } from './adapter/handler'
 
@@ -6,6 +5,7 @@ const CharsetUtil = Java.type('io.netty.util.CharsetUtil')
 const TextWebSocketFrame = Java.type('io.netty.handler.codec.http.websocketx.TextWebSocketFrame')
 const CloseWebSocketFrame = Java.type('io.netty.handler.codec.http.websocketx.CloseWebSocketFrame')
 const FullHttpResponse = Java.type('io.netty.handler.codec.http.FullHttpResponse')
+const DefaultChannelPromise = Java.type('io.netty.channel.DefaultChannelPromise')
 
 export class WebSocketClientHandler extends WebSocketClientHandlerAdapter {
     public handshaker: any
@@ -21,7 +21,11 @@ export class WebSocketClientHandler extends WebSocketClientHandlerAdapter {
     }
     handlerAdded(ctx: any) {
         console.debug(`${ctx} handlerAdded`)
-        this.handshakeFuture = ctx.newPromise()
+        if (ctx.newPromise) {
+            this.handshakeFuture = ctx.newPromise()
+        } else {
+            this.handshakeFuture = new DefaultChannelPromise(ctx.channel(), ctx.executor())
+        }
     }
     channelActive(ctx: any) {
         console.debug(`${ctx} channelActive`)
