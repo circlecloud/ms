@@ -92,16 +92,8 @@ export class PluginConfigManager {
                 console.i18n("ms.plugin.manager.config.save.default", { plugin: plugin.description.name, name: metadata.name, format: metadata.format })
             } else {
                 configValue = configLoader.load(base.read(metadata.file)) || {}
-                if (defaultValue) {
-                    let needSave = false
-                    for (const key of Object.keys(defaultValue)) {
-                        // 当配置文件不存在当前属性时才进行赋值
-                        if (!Object.prototype.hasOwnProperty.call(configValue, key)) {
-                            configValue[key] = defaultValue[key]
-                            needSave = true
-                        }
-                    }
-                    needSave && base.save(metadata.file, configLoader.dump(configValue))
+                if (defaultValue && this.setDefaultValue(configValue, defaultValue)) {
+                    base.save(metadata.file, configLoader.dump(configValue))
                 }
                 console.debug(`[${plugin.description.name}] Load Config ${metadata.variable} from file ${metadata.file} =>\n${JSON.stringify(configValue, undefined, 4).substr(0, 500)}`)
             }
@@ -110,6 +102,21 @@ export class PluginConfigManager {
             console.i18n("ms.plugin.manager.config.load.error", { plugin: plugin.description.name, name: metadata.name, format: metadata.format, error })
             console.ex(error)
         }
+    }
+
+    private setDefaultValue(configValue, defaultValue) {
+        let needSave = false
+        for (const key of Object.keys(defaultValue)) {
+            // 当配置文件不存在当前属性时才进行赋值
+            if (!Object.prototype.hasOwnProperty.call(configValue, key)) {
+                configValue[key] = defaultValue[key]
+                needSave = true
+            } else if (Object.prototype.toString.call(configValue[key]) == "[object Object]") {
+                // 对象需要递归检测
+                needSave ||= this.setDefaultValue(configValue[key], defaultValue[key])
+            }
+        }
+        return needSave
     }
 
     private saveConfig0(plugin: plugin.Plugin, metadata: interfaces.ConfigMetadata) {
