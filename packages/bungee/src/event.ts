@@ -79,7 +79,7 @@ export class BungeeEvent extends event.Event {
             currentPriorityMap.put(listener, methods);
             this.bakeHandlers.invoke(this.eventBus, eventCls);
             return listener;
-        } catch (ex) {
+        } catch (ex: any) {
             console.ex(ex)
         } finally {
             this.lock.unlock()
@@ -108,7 +108,7 @@ export class BungeeEvent extends event.Event {
                 }
                 this.bakeHandlers.invoke(this.eventBus, eventCls);
             }
-        } catch (ex) {
+        } catch (ex: any) {
             console.ex(ex)
         } finally {
             this.lock.unlock()

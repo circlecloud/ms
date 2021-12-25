@@ -35,7 +35,7 @@ export abstract class Transport extends EventEmitter {
         console.debug(`client Transport connect`)
         try {
             this.doConnect()
-        } catch (error) {
+        } catch (error: any) {
             console.ex(error)
             this.onerror({ error })
         }
@@ -44,7 +44,7 @@ export abstract class Transport extends EventEmitter {
     send(text: string) {
         try {
             this.doSend(text)
-        } catch (error) {
+        } catch (error: any) {
             this.onerror({ error })
         }
     }
@@ -55,7 +55,7 @@ export abstract class Transport extends EventEmitter {
             try {
                 this.onclose({ code, reason })
                 this.doClose(code, reason)
-            } catch (error) {
+            } catch (error: any) {
                 this.onerror({ error })
             } finally {
                 this.removeAllListeners()

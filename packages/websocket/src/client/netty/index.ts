@@ -31,7 +31,7 @@ var SslHandler: any
 try {
     SslContextBuilder = Java.type('io.netty.handler.ssl.SslContextBuilder')
     InsecureTrustManagerFactory = Java.type('io.netty.handler.ssl.util.InsecureTrustManagerFactory')
-} catch (error) {
+} catch (error: any) {
     SSLContext = Java.type('javax.net.ssl.SSLContext')
     SslHandler = Java.type('io.netty.handler.ssl.SslHandler')
 }
@@ -45,7 +45,7 @@ try {
     const EpollSocketChannel = Java.type('io.netty.channel.epoll.EpollSocketChannel')
     group = epull ? new EpollEventLoopGroup() : new NioEventLoopGroup()
     socketChannelClass = epull ? EpollSocketChannel.class : NioSocketChannel.class
-} catch (error) {
+} catch (error: any) {
     group = new NioEventLoopGroup()
     socketChannelClass = NioSocketChannel.class
 }
@@ -130,7 +130,7 @@ export class NettyWebSocket extends Transport {
                     future.sync()
                     // only trigger onconnect when not have error
                     this.onconnect({})
-                } catch (error) {
+                } catch (error: any) {
                     // ignore error exceptionCaught from handler
                     // this.onerror({ error })
                 }

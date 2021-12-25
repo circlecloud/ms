@@ -2,6 +2,8 @@ import { server, MiaoScriptConsole, event, plugin } from "@ccms/api"
 import { injectable, inject, postConstruct } from "@ccms/container"
 import { getPluginMetadata } from "./utils"
 
+const File = Java.type('java.io.File')
+
 export namespace interfaces {
     @injectable()
     export abstract class Plugin implements plugin.Plugin {
@@ -18,6 +20,12 @@ export namespace interfaces {
         private initialize() {
             // @ts-ignore
             this.logger = new this.Console(this.description.prefix || this.description.name)
+        }
+
+        public getDataFolder() {
+            let parent = new File(this.description.source).parent
+            let dataFolder = new File(parent, this.description.name)
+            return dataFolder.getAbsolutePath()
         }
 
         public load() { }

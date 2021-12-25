@@ -92,12 +92,12 @@ export class PluginManagerImpl implements plugin.PluginManager {
                 plugins.forEach(loadMetadata => {
                     try {
                         this.loadAndRequirePlugin(loadMetadata)
-                    } catch (error) {
+                    } catch (error: any) {
                         console.error(`plugin scanner ${scanner.type} load ${loadMetadata.file} occurred error ${error}`)
                         console.ex(error)
                     }
                 })
-            } catch (error) {
+            } catch (error: any) {
                 console.error(`plugin scanner ${scanner.type} occurred error ${error}`)
                 console.ex(error)
             }
@@ -123,7 +123,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
             this.runCatch(plugin, `${this.serverType}${stage}`)
             plugin.description.loadMetadata.loader[stage]?.(plugin)
             process.emit(`plugin.after.${stage}`, plugin)
-        } catch (ex) {
+        } catch (ex: any) {
             console.i18n("ms.plugin.manager.stage.exec.error", { plugin: plugin.description.name, executor: stage, error: ex })
             if (global.debug) { console.ex(ex) }
         }
@@ -136,7 +136,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
             for (const [, loader] of this.loaderMap) {
                 if (this.loaderRequirePlugin(loadMetadata, loader)?.loaded) return loadMetadata.metadata
             }
-        } catch (error) {
+        } catch (error: any) {
             console.i18n("ms.plugin.manager.initialize.error", { name: loadMetadata.file, ex: error })
             console.ex(error)
         }
@@ -156,7 +156,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
                 metadata.loadMetadata = loadMetadata
             }
             return loadMetadata
-        } catch (error) {
+        } catch (error: any) {
             if (global.debug) {
                 console.console(`§6Loader §b${loader.type} §6load §a${loadMetadata.file} §cerror. §4Err: §c${error}`)
                 console.ex(error)
@@ -228,7 +228,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     private runCatch(pl: any, func: string) {
         try {
             if (pl[func]) pl[func].call(pl)
-        } catch (ex) {
+        } catch (ex: any) {
             console.i18n("ms.plugin.manager.stage.exec.error", { plugin: pl.description.name, executor: func, error: ex })
             console.ex(ex)
         }
@@ -279,7 +279,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
             if (!pluginInstance) { throw new Error(`§4加载器 §c${metadata.type} §4加载插件 §c${metadata.name} §4失败!`) }
             this.instanceMap.set(metadata.name, pluginInstance)
             return pluginInstance
-        } catch (error) {
+        } catch (error: any) {
             console.console(`§4无法加载插件 §b${metadata.name} §4构建插件失败!`)
             console.ex(error)
         }

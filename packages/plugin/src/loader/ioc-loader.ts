@@ -38,7 +38,7 @@ export class IocLoader implements plugin.PluginLoader {
                 console.i18n('ms.plugin.manager.build.not.extends', { source: metadata.source })
                 return
             }
-        } catch (ex) {
+        } catch (ex: any) {
             console.i18n("ms.plugin.manager.initialize.error", { name: metadata.name, ex })
             console.ex(ex)
         }
@@ -81,7 +81,7 @@ export class IocLoader implements plugin.PluginLoader {
             console.i18n("ms.plugin.manager.stage.exec", { plugin: pluginInstance.description.name, name: stage.executor, stage: stageName, servers: stage.servers })
             try {
                 pluginInstance[stage.executor].apply(pluginInstance)
-            } catch (error) {
+            } catch (error: any) {
                 console.i18n("ms.plugin.manager.stage.exec.error", { plugin: pluginInstance.description.name, executor: stage.executor, error })
                 console.ex(error)
             }

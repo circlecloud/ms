@@ -58,22 +58,22 @@ export class SpringTask extends task.Task {
         if (this.laterTime > 0) {
             try {
                 Thread.sleep(this.laterTime)
-            } catch (ex) {
+            } catch (ex: any) {
                 Thread.currentThread().interrupt()
             }
         }
         while (this.running.get()) {
             try {
                 this.func(...args)
-            } catch (t) {
-                console.error("Task exec error:", t)
-                console.ex(t)
+            } catch (ex: any) {
+                console.error("Task exec error:", ex)
+                console.ex(ex)
             }
             // If we have a interval of 0 or less, only run once
             if (this.interval <= 0) { break }
             try {
                 Thread.sleep(this.interval)
-            } catch (ex) {
+            } catch (ex: any) {
                 Thread.currentThread().interrupt()
             }
         }

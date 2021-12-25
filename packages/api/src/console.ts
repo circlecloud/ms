@@ -123,7 +123,7 @@ export class MiaoScriptConsole implements Console {
                     if (sourceMapping && lineNumber != sourceMapping.mapping.sourceLine) { lineNumber = sourceMapping.mapping.sourceLine }
                 }
             }
-        } catch (error) {
+        } catch (error: any) {
             console.debug('search source map', fileName, 'line', lineNumber, 'error:', error)
             if (global.debug) {
                 console.ex(error)

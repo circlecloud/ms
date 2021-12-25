@@ -26,7 +26,7 @@ function nmsCls(name: string) {
 function remapMethod(clazz: any, origin: string, test: string, params: any) {
     try {
         return clazz.getMethod(origin, params)
-    } catch (ex) {
+    } catch (ex: any) {
         if (RemapUtils) {
             return clazz.getMethod(RemapUtils.mapMethod(clazz, origin, params), params)
         } else {
@@ -38,7 +38,7 @@ function remapMethod(clazz: any, origin: string, test: string, params: any) {
 function remapFieldName(clazz: any, origin: string, test: string) {
     try {
         return clazz.getField(origin)
-    } catch (ex) {
+    } catch (ex: any) {
         if (RemapUtils) {
             return clazz.getField(RemapUtils.mapFieldName(clazz, origin))
         } else {
@@ -53,7 +53,7 @@ function init() {
     nmsSubVersion = nmsVersion.split("_")[1]
     try {
         RemapUtils = Java.type('catserver.server.remapper.RemapUtils')
-    } catch (ex) {
+    } catch (ex: any) {
     }
     let nmsChatSerializerClass = undefined
     if (nmsSubVersion < 8) {
@@ -119,7 +119,7 @@ function sendPacket(player: { handle: { [x: string]: { [x: string]: (arg0: any) 
 
 try {
     init()
-} catch (ex) {
+} catch (ex: any) {
     org.bukkit.Bukkit.getConsoleSender().sendMessage(`§6[§cMS§6][§bbukkit§6][§achat§6] §cNMS Inject Error §4${ex} §cDowngrade to Command Mode...`)
     downgrade = true
 }

@@ -15,7 +15,7 @@ export abstract class ChannelAwareMessageListenerAdapter<T = any> {
                     if (message.getMessageProperties().getContentType() == MessageProperties.CONTENT_TYPE_JSON) {
                         content = JSON.parse(content)
                     }
-                } catch (error) {
+                } catch (error: any) {
                     if (manual) {
                         channel.basicReject(message.getMessageProperties().getDeliveryTag(), true)
                     } else {
@@ -42,7 +42,7 @@ export abstract class ChannelAwareMessageListenerAdapter<T = any> {
             } else {
                 channel.basicNack(deliveryTag, false, true)
             }
-        } catch (error) {
+        } catch (error: any) {
             channel.basicReject(deliveryTag, this.onError(error, message, channel))
         }
     }

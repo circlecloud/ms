@@ -49,7 +49,7 @@ function checkBoxedPrimitive(value, prototypeValueOf) {
     try {
         prototypeValueOf(value);
         return true;
-    } catch (e) {
+    } catch (error: any) {
         return false;
     }
 }

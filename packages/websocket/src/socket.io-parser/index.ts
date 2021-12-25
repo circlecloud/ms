@@ -265,7 +265,7 @@ export class Decoder extends EventEmitter {
 function tryParse(str) {
     try {
         return JSON.parse(str)
-    } catch (e) {
+    } catch (error: any) {
         return false
     }
 }

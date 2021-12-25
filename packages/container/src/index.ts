@@ -37,8 +37,8 @@ export const provideSingletonNamed = (identifier: interfaces.ServiceIdentifier<a
  */
 export const JavaClass = (className: string) => {
     return function (target: object, propertyKey: string, index?: number) {
-        try { target[propertyKey] = Java.type(className).class; return } catch (error) { }
-        try { target[propertyKey] = base.getClass(className); return } catch (error) { }
+        try { target[propertyKey] = Java.type(className).class; return } catch (error: any) { }
+        try { target[propertyKey] = base.getClass(className); return } catch (error: any) { }
         console.warn('JavaClass', className, 'Inject target', target.constructor.name, 'propertyKey', propertyKey, 'failed!')
     }
 }
@@ -49,8 +49,8 @@ export const JavaClass = (className: string) => {
  */
 export const JSClass = (className: string) => {
     return function (target: object, propertyKey: string, index?: number) {
-        try { target[propertyKey] = Java.type(className); return } catch (error) { }
-        try { target[propertyKey] = base.getClass(className).static; return } catch (error) { }
+        try { target[propertyKey] = Java.type(className); return } catch (error: any) { }
+        try { target[propertyKey] = base.getClass(className).static; return } catch (error: any) { }
         console.warn('JSClass', className, 'Inject target', target.constructor.name, 'propertyKey', propertyKey, 'failed!')
     }
 }

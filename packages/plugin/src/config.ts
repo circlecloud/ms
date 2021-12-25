@@ -83,22 +83,24 @@ export class PluginConfigManager {
 
     private loadConfig0(plugin: plugin.Plugin, metadata: interfaces.ConfigMetadata) {
         try {
-            metadata.file = fs.concat(fs.file(plugin.description.loadMetadata.file).parent, plugin.description.name, metadata.filename)
-            let configLoader = this.getConfigLoader(metadata.format)
             let defaultValue = metadata.default ?? plugin[metadata.variable]
-            let configValue = defaultValue
-            if (!fs.exists(metadata.file)) {
-                base.save(metadata.file, configLoader.dump(defaultValue))
-                console.i18n("ms.plugin.manager.config.save.default", { plugin: plugin.description.name, name: metadata.name, format: metadata.format })
-            } else {
-                configValue = configLoader.load(base.read(metadata.file)) || {}
-                if (defaultValue && this.setDefaultValue(configValue, defaultValue)) {
-                    base.save(metadata.file, configLoader.dump(configValue))
+            let configValue = defaultValue || {}
+            if (defaultValue) {
+                metadata.file = fs.concat(fs.file(plugin.description.loadMetadata.file).parent, plugin.description.name, metadata.filename)
+                let configLoader = this.getConfigLoader(metadata.format)
+                if (!fs.exists(metadata.file)) {
+                    base.save(metadata.file, configLoader.dump(defaultValue))
+                    console.i18n("ms.plugin.manager.config.save.default", { plugin: plugin.description.name, name: metadata.name, format: metadata.format })
+                } else {
+                    configValue = configLoader.load(base.read(metadata.file)) || {}
+                    if (defaultValue && this.setDefaultValue(configValue, defaultValue)) {
+                        base.save(metadata.file, configLoader.dump(configValue))
+                    }
+                    console.debug(`[${plugin.description.name}] Load Config ${metadata.variable} from file ${metadata.file} =>\n${JSON.stringify(configValue, undefined, 4).substr(0, 500)}`)
                 }
-                console.debug(`[${plugin.description.name}] Load Config ${metadata.variable} from file ${metadata.file} =>\n${JSON.stringify(configValue, undefined, 4).substr(0, 500)}`)
             }
             this.defienConfigProp(plugin, metadata, configValue)
-        } catch (error) {
+        } catch (error: any) {
             console.i18n("ms.plugin.manager.config.load.error", { plugin: plugin.description.name, name: metadata.name, format: metadata.format, error })
             console.ex(error)
         }
@@ -111,8 +113,8 @@ export class PluginConfigManager {
             if (!Object.prototype.hasOwnProperty.call(configValue, key)) {
                 configValue[key] = defaultValue[key]
                 needSave = true
-            } else if (Object.prototype.toString.call(configValue[key]) == "[object Object]") {
-                // 对象需要递归检测
+            } else if (Object.prototype.toString.call(configValue[key]) == "[object Object]" && !Object.prototype.hasOwnProperty.call(defaultValue[key], '____ignore____')) {
+                // 对象需要递归检测 如果对象内存在 ____ignore____ 那就忽略设置
                 needSave ||= this.setDefaultValue(configValue[key], defaultValue[key])
             }
         }
@@ -126,7 +128,7 @@ export class PluginConfigManager {
             base.save(metadata.file, result)
             console.debug(`[${plugin.description.name}] Save Config ${metadata.variable} to file ${metadata.file} =>\n${result.substr(0, 500)}`)
             return true
-        } catch (error) {
+        } catch (error: any) {
             console.i18n("ms.plugin.manager.config.save.error", { plugin: plugin.description.name, name: metadata.name, format: metadata.format, error })
             console.ex(error)
             return false

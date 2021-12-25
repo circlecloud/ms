@@ -51,34 +51,34 @@ function detectServer(): constants.ServerType {
     try {
         Java.type("org.bukkit.Bukkit")
         return constants.ServerType.Bukkit
-    } catch (ex) {
+    } catch (ex: any) {
     }
     try {
         Java.type("org.spongepowered.api.Sponge")
         return constants.ServerType.Sponge
-    } catch (ex) {
+    } catch (ex: any) {
     }
     try {
         Java.type("cn.nukkit.Nukkit")
         return constants.ServerType.Nukkit
-    } catch (ex) {
+    } catch (ex: any) {
     }
     try {
         Java.type("net.md_5.bungee.api.ProxyServer")
         return constants.ServerType.Bungee
-    } catch (ex) {
+    } catch (ex: any) {
     }
     try {
         Java.type("org.springframework.boot.SpringApplication")
         return constants.ServerType.Spring
-    } catch (ex) {
+    } catch (ex: any) {
     }
     throw Error('Unknow Server Type...')
 }
 
 function initialize() {
     global.ScriptEngineVersion = require('../package.json').version
-    try { engineLoad({ script: http.get("http://ms.yumc.pw/api/plugin/download/name/initialize"), name: 'core/initialize.js' }) } catch (error) { console.debug(error) }
+    try { engineLoad({ script: http.get("http://ms.yumc.pw/api/plugin/download/name/initialize"), name: 'core/initialize.js' }) } catch (error: any) { console.debug(error) }
     try {
         let corePackageStartTime = new Date().getTime()
         container.bind(ContainerInstance).toConstantValue(container)
@@ -97,7 +97,7 @@ function initialize() {
         let disable = container.get<MiaoScriptCore>(MiaoScriptCore).enable()
         console.i18n("ms.core.engine.completed", { version: 'v' + global.ScriptEngineVersion, time: (Date.now() - global.ScriptEngineStartTime) / 1000 })
         return disable
-    } catch (error) {
+    } catch (error: any) {
         console.i18n("ms.core.initialize.error", { error })
         console.ex(error)
         return () => console.i18n('ms.core.engine.disable.abnormal')

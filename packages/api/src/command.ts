@@ -45,7 +45,7 @@ export namespace command {
             return (sender: any, _: any, command: string, args: string[]) => {
                 try {
                     return executor(sender, command, Java.from(args))
-                } catch (ex) {
+                } catch (ex: any) {
                     console.i18n("ms.api.command.execute.error", { player: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex })
                     console.ex(ex)
                     if (sender.name != 'CONSOLE') {
@@ -61,7 +61,7 @@ export namespace command {
                     var token = args[args.length - 1]
                     var complete = tabCompleter(sender, command, Java.from(args)) || []
                     return this.copyPartialMatches(complete, token)
-                } catch (ex) {
+                } catch (ex: any) {
                     console.i18n("ms.api.command.tab.completer.error", { player: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex })
                     console.ex(ex)
                     console.sender(sender, [i18n.translate("ms.api.command.tab.completer.error", { player: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex }), ...console.stack(ex)])

@@ -15,7 +15,7 @@ export class NettyClient extends WebSocketClient {
         try {
             this.channel.writeAndFlush(new TextWebSocketFrame(text))
             callback?.()
-        } catch (error) {
+        } catch (error: any) {
             callback?.(error)
         }
     }

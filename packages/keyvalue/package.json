@@ -30,7 +30,7 @@
         "@javatypes/spring-rabbit": "^0.0.3",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
-        "typescript": "^4.3.5"
+        "typescript": "^4.5.3"
     },
     "gitHead": "2589633069d24f646ac09261b1b2304c21d4ea75"
 }

@@ -248,8 +248,8 @@ export class Client<
         // try/catch is needed for protocol violations (GH-1880)
         try {
             this.decoder.add(data)
-        } catch (e) {
-            this.onerror(e)
+        } catch (error: any) {
+            this.onerror(error)
         }
     }
 

@@ -7,7 +7,7 @@ export enum Keys {
 }
 
 let RequestAttributeKey: any
-try { RequestAttributeKey = AttributeKey.valueOf('request') } catch (error) { }
+try { RequestAttributeKey = AttributeKey.valueOf('request') } catch (error: any) { }
 export enum AttributeKeys {
     Request = RequestAttributeKey
 }

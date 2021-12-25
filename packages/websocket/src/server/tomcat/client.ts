@@ -13,7 +13,7 @@ export class TomcatClient extends WebSocketClient {
             try {
                 this.session.getBasicRemote().sendText(text)
                 callback?.()
-            } catch (error) {
+            } catch (error: any) {
                 callback?.(error)
             }
         }, this.session)()

@@ -17,7 +17,7 @@ export class DataBaseManager {
             this.beanFactory = this.instance.getAutowireCapableBeanFactory()
             let mainDatasource = this.beanFactory.getBean(Packages.javax.sql.DataSource.class)
             this.mainDatabase = new DataBase({ url: mainDatasource })
-        } catch (error) {
+        } catch (error: any) {
             console.ex(error)
         }
     }

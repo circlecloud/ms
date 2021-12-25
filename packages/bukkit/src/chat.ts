@@ -16,7 +16,7 @@ export class BukkitChat extends chat.Chat {
     sendTitle(sender: any, title: string, subtitle: string = '', fadeIn: number = 20, time: number = 100, fadeOut: number = 20) {
         try {
             sender.sendTitle(title, subtitle, fadeIn, time, fadeOut)
-        } catch (error) {
+        } catch (error: any) {
             sender.sendTitle(title, subtitle)
         }
     }

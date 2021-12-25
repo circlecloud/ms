@@ -17,7 +17,7 @@ class TomcatWebSocketServer extends WebSocketServer {
 
     protected initialize(): void {
         this.initThreadPool()
-        try { this.instance.destroySingleton(ProxyBeanName) } catch (error) { }
+        try { this.instance.destroySingleton(ProxyBeanName) } catch (error: any) { }
         let NashornWebSocketServerProxy = Java.extend(Java.type("pw.yumc.MiaoScript.websocket.WebSocketProxy"), {
             onOpen: (session: TomcatWebSocketSession) => {
                 this.onconnect(session)

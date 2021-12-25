@@ -19,10 +19,10 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "devDependencies": {
-        "@types/js-yaml": "^4.0.2",
+        "@types/js-yaml": "^4.0.5",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
-        "typescript": "^4.3.5"
+        "typescript": "^4.5.3"
     },
     "dependencies": {
         "@ccms/api": "^0.17.0",

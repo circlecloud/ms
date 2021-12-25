@@ -32,7 +32,7 @@ export class BukkitChannel extends channel.Channel {
             onPluginMessageReceived: (/**String */ channel, /**Player */ player, /**byte[] */data) => {
                 try {
                     listener(data, { channel, player, data })
-                } catch (error) {
+                } catch (error: any) {
                     console.ex(error)
                 }
             }

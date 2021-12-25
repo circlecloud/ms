@@ -44,15 +44,16 @@ export class PluginCommandManager {
         let cmdSubCache = Object.keys(pluginInstance.constructor.prototype).filter(s => s.startsWith('cmd')).map(s => s.substring(3))
         if (cmd.autoMain) {
             cmdExecutor = (sender: any, command: string, args: string[]) => {
-                let subcommand = args[0] || 'help'
+                let subcommand = args[0]
                 let cmdKey = 'cmd' + subcommand
-                if (!pluginInstance[cmdKey]) {
-                    pluginInstance.logger.sender(sender, '§4未知的子命令: §c' + subcommand)
-                    pluginInstance['cmdhelp'] && pluginInstance.logger.sender(sender, `§6请执行 §b/${command} §ahelp §6查看帮助!`)
-                    return
+                if (pluginInstance[cmdKey]) {
+                    args.shift()
+                    return pluginInstance[cmdKey].apply(pluginInstance, [sender, ...args])
+                } else if (pluginInstance['cmdmain']) {
+                    return pluginInstance['cmdmain'].apply(pluginInstance, [sender, ...args])
                 }
-                args.shift()
-                return pluginInstance[cmdKey].apply(pluginInstance, [sender, ...args])
+                pluginInstance.logger.sender(sender, '§4未知的子命令: §c' + subcommand)
+                pluginInstance['cmdhelp'] && pluginInstance.logger.sender(sender, `§6请执行 §b/${command} §ahelp §6查看帮助!`)
             }
             let originCompleter = cmdCompleter
             cmdCompleter = (sender: any, command: string, args: string[]) => {

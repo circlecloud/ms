@@ -51,7 +51,7 @@ export class Server {
         try {
             this.beanFactory.destroySingleton(FilterProxyBeanName)
             this.beanFactory.destroySingleton(WebProxyBeanName)
-        } catch (error) {
+        } catch (error: any) {
             console.ex(error)
         }
     }
@@ -160,7 +160,7 @@ export class Server {
     }
 
     private registryFilterProxy() {
-        try { this.beanFactory.destroySingleton(FilterProxyBeanName) } catch (ex) { }
+        try { this.beanFactory.destroySingleton(FilterProxyBeanName) } catch (ex: any) { }
         var WebFilterProxyNashorn = Java.extend(this.WebFilterProxy, {
             doFilter: (servletRequest: javax.servlet.http.HttpServletRequest, servletResponse: javax.servlet.http.HttpServletResponse, filterChain: javax.servlet.FilterChain) => {
                 filterChain.doFilter(servletRequest, servletResponse)
@@ -206,7 +206,7 @@ export class Server {
     }
 
     private registryWebProxy() {
-        try { this.beanFactory.destroySingleton(WebProxyBeanName) } catch (ex) { }
+        try { this.beanFactory.destroySingleton(WebProxyBeanName) } catch (ex: any) { }
         var WebServerProxyNashorn = Java.extend(this.WebServerProxy, {
             process: (req: javax.servlet.http.HttpServletRequest, resp: javax.servlet.http.HttpServletResponse) => {
                 let ctx: Context = { request: req, response: resp, params: {}, body: {} }
@@ -226,7 +226,7 @@ export class Server {
                     if ((ctx.headers['Content-Type'] || '').includes('application/json')) {
                         try {
                             ctx.body = JSON.parse(ctx.body)
-                        } catch (error) {
+                        } catch (error: any) {
                             return {
                                 status: 500,
                                 msg: `parse json body error: ${error}`,
@@ -258,7 +258,7 @@ export class Server {
                         console.debug(`[WARN] Interceptor ${interceptor.name} preHandle cost time ${preHandleTime}ms!`)
                     }
                     if (ctx.result) { return ctx.result }
-                } catch (error) {
+                } catch (error: any) {
                     console.ex(error)
                     return {
                         status: 500,
@@ -284,7 +284,7 @@ export class Server {
                     if (preHandleTime > 20) {
                         console.debug(`[WARN] Interceptor ${interceptor.name} preHandle cost time ${preHandleTime}ms!`)
                     }
-                } catch (error) {
+                } catch (error: any) {
                     return {
                         status: 500,
                         msg: `Interceptor ${interceptor.name} postHandle error: ${error}`,
@@ -310,7 +310,7 @@ Handle   Time   : ${Date.now() - startTime}ms
         if (!ctx.handler) return this.notFound(ctx)
         try {
             return ctx.handler(ctx)
-        } catch (error) {
+        } catch (error: any) {
             return {
                 status: 500,
                 msg: '' + error,

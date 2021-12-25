@@ -47,7 +47,7 @@ export class WebSocket extends EventEmitter {
             let TransportImpl = require('./netty').NettyWebSocket
             this.client = new TransportImpl(url, subProtocol, headers)
             console.debug('create websocket from ' + this.client.constructor.name)
-        } catch (error) {
+        } catch (error: any) {
             console.error('create websocket impl error: ' + error)
             console.ex(error)
             return

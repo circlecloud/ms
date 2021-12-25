@@ -15,7 +15,7 @@ class NettyWebSocketServer extends WebSocketServer {
 
     protected initialize() {
         let connectEvent = this.options.event
-        try { this.instance.remove(Keys.Detect) } catch (error) { }
+        try { this.instance.remove(Keys.Detect) } catch (error: any) { }
         this.instance.addFirst(Keys.Detect, new WebSocketDetect(connectEvent).getHandler())
         connectEvent.on(ServerEvent.detect, (ctx, channel) => {
             channel.pipeline().addFirst(Keys.Handler, new WebSocketHandler(this.options).getHandler())
@@ -38,7 +38,7 @@ class NettyWebSocketServer extends WebSocketServer {
     protected getId(ctx: any) {
         try {
             return ctx.channel().id() + ''
-        } catch (error) {
+        } catch (error: any) {
             console.log(Object.toString.apply(ctx))
             console.ex(error)
         }

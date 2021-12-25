@@ -36,7 +36,7 @@ export class CommandMap {
         if (exists) {
             try {
                 return exists.executor(sender, '', command, Java.to(args))
-            } catch (error) {
+            } catch (error: any) {
                 console.ex(error)
             }
             return true
@@ -54,7 +54,7 @@ export class CommandMap {
             try {
                 if (args.length !== index) { args.push('') }
                 return exists.tabCompleter(sender, '', command, Java.to(args))
-            } catch (error) {
+            } catch (error: any) {
                 console.ex(error)
             }
         }

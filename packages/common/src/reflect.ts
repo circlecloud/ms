@@ -48,7 +48,7 @@ class Reflect {
             try {
                 // Try getting a public field
                 field = this.class.getField(nameOrIndex)
-            } catch (ex) {
+            } catch (ex: any) {
                 // Try again, getting a non-public field
                 field = declaredField(this.class, nameOrIndex)
             }
@@ -113,10 +113,10 @@ function declaredConstructor(clazz, param) {
     let constructor
     try {
         constructor = clazz.getDeclaredConstructor(types(param))
-    } catch (ex) {
+    } catch (ex: any) {
         try {
             constructor = clazz.getDeclaredConstructor(types(param, true))
-        } catch (ex) {
+        } catch (ex: any) {
             constructor = clazz.getDeclaredConstructors()[0]
         }
     }
@@ -132,7 +132,7 @@ function declaredField(clazz: java.lang.Class<any>, name: string | java.lang.Str
         try {
             field = target.getDeclaredField(name)
             if (field !== null) { break }
-        } catch (e) {
+        } catch (error: any) {
             if (target === undefined) { break }
             target = target.getSuperclass()
         }
@@ -151,10 +151,10 @@ function declaredMethod(clazz: java.lang.Class<any>, nameOrIndex: string | numbe
     } else {
         try {
             methodCache.set(key, clazz.getMethod(nameOrIndex, clazzs as any))
-        } catch (ex) {
+        } catch (ex: any) {
             try {
                 methodCache.set(key, clazz.getDeclaredMethod(nameOrIndex, clazzs as any))
-            } catch (ex) {
+            } catch (ex: any) {
                 for (const m of Java.from(declaredMethods(clazz))) {
                     if (m.getName() == nameOrIndex) {
                         methodCache.set(key, m)

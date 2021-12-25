@@ -142,7 +142,7 @@ export namespace task {
             try {
                 this.func(...args)
                 !this.interval && process.emit('task.finish', this)
-            } catch (ex) {
+            } catch (ex: any) {
                 console.console('§4插件执行任务时发生错误', ex)
                 console.ex(ex)
             }

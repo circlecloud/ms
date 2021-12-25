@@ -191,8 +191,8 @@ export class Socket extends Emitter {
         // Retry with the next transport if the transport is disabled (jsonp: false)
         try {
             transport = this.createTransport(transport)
-        } catch (e) {
-            debug("error while creating transport: %s", e)
+        } catch (error: any) {
+            debug("error while creating transport: %s", error)
             this.transports.shift()
             this.open()
             return

@@ -15,7 +15,7 @@ export default function SpringImpl(container: Container) {
         require('@ccms/amqp')
         require('@ccms/database')
         require('./internal/scanner/mysql-scanner')
-    } catch (error) {
+    } catch (error: any) {
         console.ex(error)
     }
     const beanFactory = base.getInstance().getAutowireCapableBeanFactory()

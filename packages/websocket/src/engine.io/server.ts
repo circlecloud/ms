@@ -326,7 +326,7 @@ export class Server extends EventEmitter {
         let id
         try {
             id = this.generateId(req)
-        } catch (e) {
+        } catch (error: any) {
             console.debug("error while generating an id")
             this.emit("connection_error", {
                 req,
@@ -334,7 +334,7 @@ export class Server extends EventEmitter {
                 message: Server.errorMessages[Server.errors.BAD_REQUEST],
                 context: {
                     name: "ID_GENERATION_ERROR",
-                    error: e
+                    error
                 }
             })
             closeConnection(Server.errors.BAD_REQUEST)
@@ -360,7 +360,7 @@ export class Server extends EventEmitter {
             } else {
                 transport.supportsBinary = true
             }
-        } catch (e) {
+        } catch (e: any) {
             console.ex(e)
             this.emit("connection_error", {
                 req,

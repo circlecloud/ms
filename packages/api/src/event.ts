@@ -57,7 +57,7 @@ export namespace event {
                             this.mapEvent[simpleName] = clazz
                             count++
                         }
-                    } catch (ex) {
+                    } catch (ex: any) {
                         //ignore already loaded class
                     }
                 }
@@ -82,9 +82,9 @@ export namespace event {
             let eventCls = this.mapEvent[event.toLowerCase()] || this.mapEvent[event.toLowerCase() + 'event']
             if (!eventCls) {
                 try {
-                    eventCls = base.getClass(eventCls)
+                    eventCls = base.getClass(event)
                     this.mapEvent[event] = eventCls
-                } catch (ex) {
+                } catch (ex: any) {
                     console.i18n("ms.api.event.not.found", { name, event })
                     return
                 }
@@ -104,7 +104,7 @@ export namespace event {
                             console.i18n("ms.api.event.execute.slow", { name, event: this.class2Name(eventCls), cost })
                         }
                     }
-                } catch (ex) {
+                } catch (ex: any) {
                     console.i18n("ms.api.event.execute.error", { name, event: this.class2Name(eventCls), ex })
                     console.ex(ex)
                 }

@@ -134,7 +134,7 @@ export namespace server {
                 let consoleServer = this.getDedicatedServer()
                 this.reflectPipeline(consoleServer)
                 this.reflectRootLogger(consoleServer)
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Error When Reflect MinecraftServer!', error)
                 console.ex(error)
             }
@@ -148,7 +148,7 @@ export namespace server {
                     if (connection.class.name.indexOf('ServerConnection') !== -1
                         || connection.class.name.indexOf('NetworkSystem') !== -1) { break }
                     connection = undefined
-                } catch (error) {
+                } catch (error: any) {
                     if (global.debug) {
                         console.ex(error)
                     }
@@ -160,7 +160,7 @@ export namespace server {
                     promise = reflect.on(connection).get(field).get().get(0)
                     if (promise.class.name.indexOf('Promise') !== -1) { break }
                     promise = undefined
-                } catch (error) {
+                } catch (error: any) {
                     if (global.debug) {
                         console.ex(error)
                     }
@@ -173,13 +173,13 @@ export namespace server {
         protected reflectRootLogger(consoleServer: any) {
             try {
                 this.rootLogger = reflect.on(consoleServer).get('LOGGER').get().parent
-            } catch (error) {
+            } catch (error: any) {
                 if (global.debug) {
                     console.ex(error)
                 }
                 try {
                     this.rootLogger = reflect.on(consoleServer).get(0).get().parent
-                } catch (error) {
+                } catch (error: any) {
                     if (global.debug) {
                         console.ex(error)
                     }

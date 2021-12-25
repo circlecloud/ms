@@ -2,11 +2,10 @@ import './scanner/file-scanner'
 import './loader/ioc-loader'
 import './loader/basic-loader'
 
+export * from './config'
 export * from './manager'
 export * from './decorators'
 export * from './interfaces'
-
-export { PluginConfig } from './config'
 
 export {
     plugin as JSPlugin,

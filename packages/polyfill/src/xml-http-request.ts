@@ -226,7 +226,7 @@ export class XMLHttpRequest {
             }
             this.setResponseHeaders(this._connection.getHeaderFields())
             this.onloadend && this.onloadend()
-        } catch (ex) {
+        } catch (ex: any) {
             if (ex instanceof SocketTimeoutException && this.ontimeout) {
                 return this.ontimeout(ex)
             } else if (this.onerror) {

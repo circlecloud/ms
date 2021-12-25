@@ -26,7 +26,7 @@ export class BungeeServer implements server.Server {
                 // @ts-ignore
                 this.pipeline = reflect.on(base.getInstance().getProxy()).get('listeners').get().toArray()[0].pipeline()
                 wait.cancel()
-            } catch (ex) {
+            } catch (ex: any) {
                 count++
                 if (count > 50) {
                     console.error('Reflect BungeeCord netty channel pipeline error time > 50times. Err: ' + ex)
@@ -38,7 +38,7 @@ export class BungeeServer implements server.Server {
         }).later(10).timer(20).submit()
         try {
             this.rootLogger = Bungee.getLogger()
-        } catch (error) {
+        } catch (error: any) {
             console.error("Can't found rootLogger!")
         }
     }

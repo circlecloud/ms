@@ -467,7 +467,7 @@ export namespace particle {
                                 console.warn(`ParticleTask ${this.taskId} particle ${this.particle.getUUID()} cancel because entity and location both undefined!`)
                                 this.task.cancel()
                             }
-                        } catch (error) {
+                        } catch (error: any) {
                             console.error(`§6插件 §a${this.owner.description.name} §c播放粒子发送异常 §4粒子播放任务已终止!`)
                             console.ex(error)
                             this.cancel()
