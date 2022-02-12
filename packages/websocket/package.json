@@ -1,6 +1,6 @@
 {
     "name": "@ccms/websocket",
-    "version": "0.17.0",
+    "version": "0.18.0",
     "description": "MiaoScript websocket package",
     "keywords": [
         "miaoscript",
@@ -23,7 +23,7 @@
         "parseuri": "^0.0.6"
     },
     "devDependencies": {
-        "@ccms/nashorn": "^0.17.0",
+        "@ccms/nashorn": "^0.18.0",
         "@javatypes/tomcat-websocket-api": "^0.0.3",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",

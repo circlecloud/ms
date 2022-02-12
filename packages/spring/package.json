@@ -1,6 +1,6 @@
 {
     "name": "@ccms/spring",
-    "version": "0.17.0",
+    "version": "0.18.0",
     "description": "MiaoScript spring package",
     "keywords": [
         "miaoscript",
@@ -24,9 +24,9 @@
         "typescript": "^4.5.5"
     },
     "dependencies": {
-        "@ccms/api": "^0.17.0",
-        "@ccms/common": "^0.17.0",
-        "@ccms/container": "^0.17.0",
-        "@ccms/database": "^0.17.0"
+        "@ccms/api": "^0.18.0",
+        "@ccms/common": "^0.18.0",
+        "@ccms/container": "^0.18.0",
+        "@ccms/database": "^0.18.0"
     }
 }
