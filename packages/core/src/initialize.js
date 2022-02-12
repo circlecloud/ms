@@ -3,7 +3,6 @@ function initialize() {
 
     var http = require('@ccms/common/dist/http').default
     var fs = require('@ccms/common/dist/fs')
-    var yaml = require('js-yaml')
 
     var pluginFolder = fs.concat(root, 'plugins')
     var updateFolder = fs.concat(pluginFolder, 'update')
@@ -29,9 +28,10 @@ function initialize() {
         }
     })
     var core = http.get('https://registry.npmmirror.com/@ccms/core')
-    if (global.ScriptEngineVersion != core['dist-tags']['latest']) {
+    if (base.VERSION && global.ScriptEngineVersion != core['dist-tags']['latest']) {
         var Paths = Java.type('java.nio.file.Paths')
         base.save(Paths.get(root, "upgrade"), core['dist-tags']['latest'])
+        console.info('@ccms/core found new version ' + core['dist-tags']['latest'] + ' will upgrade after reboot!')
     }
     console.debug('initialize finish!')
 }
