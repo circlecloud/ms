@@ -26,6 +26,7 @@
     "dependencies": {
         "axios": "^0.24.0",
         "minecraft-protocol": "^1.29.0",
+        "minecraft-protocol-forge": "^1.0.0",
         "proxy-agent": "^5.0.0"
     },
     "devDependencies": {

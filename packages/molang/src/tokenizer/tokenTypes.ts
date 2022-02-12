@@ -1,0 +1,32 @@
+export const TokenTypes: Record<string, string> = {
+	'!': 'BANG',
+	'&': 'AND',
+	'(': 'LEFT_PARENT',
+	')': 'RIGHT_PARENT',
+	'*': 'ASTERISK',
+	'+': 'PLUS',
+	',': 'COMMA',
+	'-': 'MINUS',
+	'/': 'SLASH',
+	':': 'COLON',
+	';': 'SEMICOLON',
+	'<': 'SMALLER',
+	'=': 'EQUALS',
+	'>': 'GREATER',
+	'?': 'QUESTION',
+	'[': 'ARRAY_LEFT',
+	']': 'ARRAY_RIGHT',
+	'{': 'CURLY_LEFT',
+	'|': 'OR',
+	'}': 'CURLY_RIGHT',
+}
+
+export const KeywordTokens = new Set([
+	'return',
+	'continue',
+	'break',
+	'for_each',
+	'loop',
+	'false',
+	'true',
+])

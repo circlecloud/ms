@@ -110,11 +110,12 @@ export class PluginConfigManager {
         let needSave = false
         for (const key of Object.keys(defaultValue)) {
             // 当配置文件不存在当前属性时才进行赋值
-            if (!Object.prototype.hasOwnProperty.call(configValue, key)) {
+            if (!Object.prototype.hasOwnProperty.call(configValue, key) && key != '____deep_copy____') {
                 configValue[key] = defaultValue[key]
                 needSave = true
-            } else if (Object.prototype.toString.call(configValue[key]) == "[object Object]" && !Object.prototype.hasOwnProperty.call(defaultValue[key], '____ignore____')) {
-                // 对象需要递归检测 如果对象内存在 ____ignore____ 那就忽略设置
+            } else if (Object.prototype.toString.call(configValue[key]) == "[object Object]"
+                && Object.prototype.hasOwnProperty.call(defaultValue[key], '____deep_copy____')) {
+                // 对象需要递归检测 如果对象内存在 ____deep_copy____ 那就忽略设置
                 needSave ||= this.setDefaultValue(configValue[key], defaultValue[key])
             }
         }
