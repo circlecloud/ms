@@ -1,9 +1,12 @@
 import { chat } from '@ccms/api'
 import { provideSingleton } from '@ccms/container'
-import bukkitChat from './enhance/chat'
+import bukkitChat from './internal/chat'
 
 @provideSingleton(chat.Chat)
 export class BukkitChat extends chat.Chat {
+    get handle(): any {
+        return bukkitChat
+    }
     sendJson(sender: any, json: string | object, type = 0) {
         bukkitChat.send(sender, typeof json === "string" ? json : JSON.stringify(json), type)
     }

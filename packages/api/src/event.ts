@@ -100,7 +100,7 @@ export namespace event {
                         let time = Date.now()
                         exec(event)
                         let cost = Date.now() - time
-                        if (cost > 20) {
+                        if (cost > global.ScriptSlowExecuteTime) {
                             console.i18n("ms.api.event.execute.slow", { name, event: this.class2Name(eventCls), cost })
                         }
                     }

@@ -1,4 +1,6 @@
-import './scanner/file-scanner'
+import './scanner/js-scanner'
+import './scanner/mjs-scanner'
+
 import './loader/ioc-loader'
 import './loader/basic-loader'
 
@@ -12,5 +14,6 @@ export {
     cmd as Cmd,
     tab as Tab,
     listener as Listener,
-    config as Config
+    config as Config,
+    playerdata as PlayerData
 } from './decorators'

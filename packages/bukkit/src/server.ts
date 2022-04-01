@@ -1,10 +1,9 @@
-import { server, constants } from '@ccms/api'
+import { server } from '@ccms/api'
 import { provideSingleton } from '@ccms/container'
 
 import * as reflect from '@ccms/common/dist/reflect'
-import chat from './enhance/chat'
 
-let Bukkit: typeof org.bukkit.Bukkit = org.bukkit.Bukkit
+const Bukkit: typeof org.bukkit.Bukkit = Java.type('org.bukkit.Bukkit')
 
 @provideSingleton(server.Server)
 export class BukkitServer extends server.ReflectServer {

@@ -29,6 +29,7 @@
         "@ccms/common": "^0.18.0",
         "@ccms/container": "^0.18.0",
         "@ccms/i18n": "^0.18.0",
+        "crypto-js": "^4.1.1",
         "js-yaml": "^4.1.0",
         "yaml": "^1.10.2"
     }

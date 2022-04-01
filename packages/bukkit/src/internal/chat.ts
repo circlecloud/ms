@@ -29,17 +29,16 @@ abstract class BukkitChatInvoke {
             this.ChatSerializer = Java.type(nmsChatSerializerClass.getName())
             let packetTypeClass = this.getPacketPlayOutChatClass()
             this.PacketPlayOutChat = Java.type(packetTypeClass.getName())
-            let packetTypeConstructor: { parameterTypes: any[] }
             let constructors = packetTypeClass.constructors
-            Java.from(constructors).forEach(function (c) {
-                if (c.parameterTypes.length === 2 || c.parameterTypes.length === 3) {
-                    packetTypeConstructor = c
+            for (const constructor of Java.from(constructors)) {
+                let parameterTypes = constructor.parameterTypes
+                if (parameterTypes.length === 2 || parameterTypes.length === 3) {
+                    let nmsChatMessageTypeClass = parameterTypes[1]
+                    if (nmsChatMessageTypeClass.isEnum()) {
+                        this.chatMessageTypes = nmsChatMessageTypeClass.getEnumConstants()
+                        break
+                    }
                 }
-            })
-            let parameterTypes = packetTypeConstructor.parameterTypes
-            let nmsChatMessageTypeClass = parameterTypes[1]
-            if (nmsChatMessageTypeClass.isEnum()) {
-                this.chatMessageTypes = nmsChatMessageTypeClass.getEnumConstants()
             }
             let playerConnectionField = this.getPlayerConnectionField()
             this.playerConnectionFieldName = playerConnectionField.getName()
@@ -151,8 +150,9 @@ class BukkitChatInvoke_1_17_1 extends BukkitChatInvoke_1_16_5 {
 }
 
 try {
-    //@ts-ignore
-    let nmsVersion = org.bukkit.Bukkit.server.class.name.split('.')[3]
+    let Bukkit: typeof org.bukkit.Bukkit = Java.type('org.bukkit.Bukkit')
+    // @ts-ignore
+    let nmsVersion = Bukkit.getServer().class.name.split('.')[3]
     let nmsSubVersion = nmsVersion.split("_")[1]
     if (nmsSubVersion >= 8) {
         bukkitChatInvoke = new BukkitChatInvoke_1_8(nmsVersion)
@@ -168,6 +168,7 @@ try {
 }
 
 let chat = {
+    invoke: bukkitChatInvoke,
     json: bukkitChatInvoke.json.bind(bukkitChatInvoke),
     send: bukkitChatInvoke.send.bind(bukkitChatInvoke)
 }

@@ -1,8 +1,22 @@
+var fs = require('@ccms/common/dist/fs')
+function updateJar() {
+    if (!base.version) {
+        var pluginFolder = fs.file(fs.concat(root, '..'))
+        var updateFolder = fs.concat(pluginFolder, 'update')
+    }
+}
+function upgradeModules() {
+    var core = http.get('https://registry.npmmirror.com/@ccms/core')
+    if (base.version && global.ScriptEngineVersion != core['dist-tags']['latest']) {
+        var Paths = Java.type('java.nio.file.Paths')
+        base.save(Paths.get(root, "upgrade"), core['dist-tags']['latest'])
+        console.info('@ccms/core found new version ' + core['dist-tags']['latest'] + ' will upgrade after reboot!')
+    }
+}
 function initialize() {
-    var mspmc = 'http://ms.yumc.pw/api/plugin/download/name/'
+    var mspmc = 'https://ms.yumc.pw/api/plugin/download/name/'
 
     var http = require('@ccms/common/dist/http').default
-    var fs = require('@ccms/common/dist/fs')
 
     var pluginFolder = fs.concat(root, 'plugins')
     var updateFolder = fs.concat(pluginFolder, 'update')
@@ -27,12 +41,12 @@ function initialize() {
             }
         }
     })
-    var core = http.get('https://registry.npmmirror.com/@ccms/core')
-    if (base.VERSION && global.ScriptEngineVersion != core['dist-tags']['latest']) {
-        var Paths = Java.type('java.nio.file.Paths')
-        base.save(Paths.get(root, "upgrade"), core['dist-tags']['latest'])
-        console.info('@ccms/core found new version ' + core['dist-tags']['latest'] + ' will upgrade after reboot!')
+    try {
+        Java.type("org.bukkit.Bukkit")
+        updateJar()
+    } catch (ignore) {
     }
+    upgradeModules()
     console.debug('initialize finish!')
 }
 initialize()

@@ -40,13 +40,13 @@ export namespace server {
         get(name: string): NativePlugin {
             throw new Error("Method not implemented.")
         }
-        load(name: string): boolean {
+        enable(name: string): NativePlugin {
             throw new Error("Method not implemented.")
         }
-        unload(name: string): boolean {
+        disable(name: string): NativePlugin {
             throw new Error("Method not implemented.")
         }
-        reload(name: string): boolean {
+        reload(name: string): NativePlugin {
             throw new Error("Method not implemented.")
         }
         delete(name: string): boolean {

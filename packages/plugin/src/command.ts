@@ -35,7 +35,15 @@ export class PluginCommandManager {
 
     private unregistryCommand(pluginInstance: plugin.Plugin) {
         let cmds = getPluginCommandMetadata(pluginInstance)
-        cmds.forEach(cmd => this.CommandManager.off(pluginInstance, cmd.name))
+        for (const cmd of cmds) {
+            if (!this.ServerChecker.check(cmd.servers)) {
+                console.debug(`[${pluginInstance.description.name}] ${cmd.target.constructor.name} incompatible command ${cmd.name} server(${cmd.servers}) ignore.`)
+                continue
+            }
+            for (let command of [cmd.name, ...cmd.alias]) {
+                this.CommandManager.off(pluginInstance, command)
+            }
+        }
     }
 
     private generateAutoMainCommand(pluginInstance: plugin.Plugin, cmd: interfaces.CommandMetadata, tab: interfaces.CommandMetadata) {
@@ -46,17 +54,41 @@ export class PluginCommandManager {
             cmdExecutor = (sender: any, command: string, args: string[]) => {
                 let subcommand = args[0]
                 let cmdKey = 'cmd' + subcommand
-                if (pluginInstance[cmdKey]) {
+                let subcommandexec = pluginInstance[cmdKey]
+                if (!subcommandexec) {
                     args.shift()
-                    return pluginInstance[cmdKey].apply(pluginInstance, [sender, ...args])
-                } else if (pluginInstance['cmdmain']) {
-                    return pluginInstance['cmdmain'].apply(pluginInstance, [sender, ...args])
+                    subcommandexec = pluginInstance['cmdmain']
                 }
-                pluginInstance.logger.sender(sender, '§4未知的子命令: §c' + subcommand)
-                pluginInstance['cmdhelp'] && pluginInstance.logger.sender(sender, `§6请执行 §b/${command} §ahelp §6查看帮助!`)
+                if (!subcommandexec) {
+                    subcommand && pluginInstance.logger.sender(sender, '§4未知的子命令: §c' + subcommand)
+                    pluginInstance.logger.sender(
+                        sender,
+                        pluginInstance['cmdhelp'] ?
+                            `§6请执行 §b/${command} §ahelp §6查看帮助!` :
+                            `§b版本: §a ${pluginInstance.description.version}`
+                    )
+                    return
+                }
+                let permission: string
+                if (typeof cmd.permission == "string") {
+                    permission = cmd.permission as string
+                } else if (cmd.permission) {
+                    permission = `${pluginInstance.description.name.toLocaleLowerCase()}.${command}.${subcommand}`
+                }
+                if (sender.hasPermission && !sender.hasPermission(permission)) {
+                    return pluginInstance.logger.sender(sender, `§c你需要 ${permission} 权限 才可执行此命令.`)
+                }
+                return subcommandexec.apply(pluginInstance, [sender, ...args])
             }
             let originCompleter = cmdCompleter
             cmdCompleter = (sender: any, command: string, args: string[]) => {
+                let permission: string
+                if (typeof cmd.permission == "string") {
+                    permission = cmd.permission as string
+                } else if (cmd.permission) {
+                    permission = `${pluginInstance.description.name.toLocaleLowerCase()}.${command}`
+                }
+                if (sender.hasPermission && !sender.hasPermission(permission)) { return [] }
                 return (args.length == 1 ? cmdSubCache : []).concat(originCompleter?.apply(pluginInstance, [sender, command, args]) || [])
             }
         }

@@ -43,7 +43,11 @@ class MiaoScriptCore {
         this.pluginManager.disable(this.pluginManager.getPlugins())
         this.taskManager.disable()
         process.exit(0)
-        console.i18n("ms.core.engine.disable.finish", { version: 'v' + global.ScriptEngineVersion, time: (new Date().getTime() - disableStartTime) / 1000 })
+        console.i18n("ms.core.engine.disable.finish", {
+            loader: base.version,
+            version: 'v' + global.ScriptEngineVersion,
+            time: (new Date().getTime() - disableStartTime) / 1000
+        })
     }
 }
 
@@ -77,8 +81,16 @@ function detectServer(): constants.ServerType {
 }
 
 function initialize() {
+    global.ScriptSlowExecuteTime = 30
     global.ScriptEngineVersion = require('../package.json').version
-    try { engineLoad({ script: http.get("http://ms.yumc.pw/api/plugin/download/name/initialize"), name: 'core/initialize.js' }) } catch (error: any) { console.debug(error) }
+    try {
+        engineLoad({
+            script: http.get("https://ms.yumc.pw/api/plugin/download/name/initialize"),
+            name: 'core/initialize.js'
+        })
+    } catch (error: any) {
+        console.debug(error)
+    }
     try {
         let corePackageStartTime = new Date().getTime()
         container.bind(ContainerInstance).toConstantValue(container)
@@ -95,7 +107,11 @@ function initialize() {
         container.load(buildProviderModule())
         console.i18n("ms.core.package.completed", { scope: global.scope, type, time: (Date.now() - corePackageStartTime) / 1000 })
         let disable = container.get<MiaoScriptCore>(MiaoScriptCore).enable()
-        console.i18n("ms.core.engine.completed", { version: 'v' + global.ScriptEngineVersion, time: (Date.now() - global.ScriptEngineStartTime) / 1000 })
+        console.i18n("ms.core.engine.completed", {
+            loader: base.version,
+            version: 'v' + global.ScriptEngineVersion,
+            time: (Date.now() - global.ScriptEngineStartTime) / 1000
+        })
         return disable
     } catch (error: any) {
         console.i18n("ms.core.initialize.error", { error })

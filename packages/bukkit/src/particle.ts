@@ -1,5 +1,5 @@
 import { provideSingleton } from '@ccms/container'
-import { particle, plugin } from '@ccms/api'
+import { particle } from '@ccms/api'
 
 @provideSingleton(particle.ParticleManager)
 export class BukkitParticleManager extends particle.ParticleManager {

@@ -1,7 +1,7 @@
 import { channel, plugin } from '@ccms/api'
 import { inject, provideSingleton } from '@ccms/container'
 
-const Bukkit = org.bukkit.Bukkit
+const Bukkit: typeof org.bukkit.Bukkit = Java.type('org.bukkit.Bukkit')
 const PluginMessageListener = Java.type("org.bukkit.plugin.messaging.PluginMessageListener")
 const Messenger = Bukkit.getMessenger()
 

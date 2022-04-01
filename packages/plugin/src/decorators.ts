@@ -2,7 +2,7 @@ import { plugin as pluginApi } from "@ccms/api"
 import { injectable, decorate } from "@ccms/container"
 import { interfaces } from './interfaces'
 import { METADATA_KEY } from './constants'
-import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPluginTabCompleterMetadata, getPluginConfigMetadata, getPluginStageMetadata, getPluginSources } from './utils'
+import { getPluginMetadatas, getPluginCommandMetadata, getPluginListenerMetadata, getPluginTabCompleterMetadata, getPluginConfigMetadata, getPluginStageMetadata, getPluginSources, getPluginPlayerDataMetadata } from './utils'
 
 /**
  * MiaoScript plugin
@@ -81,6 +81,21 @@ export function config(metadata: interfaces.ConfigMetadata = {}) {
         let previousMetadata = getPluginConfigMetadata(target)
         previousMetadata.set(metadata.name, metadata)
         Reflect.defineMetadata(METADATA_KEY.config, previousMetadata, target.constructor)
+    }
+}
+
+export function playerdata(metadata: interfaces.PlayerDataMetadata = {}) {
+    return function (target: any, key: string) {
+        metadata.name = metadata.name || key
+        metadata.variable = key
+        metadata.version = metadata.version ?? 1
+        metadata.format = metadata.format ?? 'yml'
+        metadata.autosave = metadata.autosave ?? false
+        metadata.filename = metadata.filename ?? "username"
+        metadata.dir = metadata.dir ?? "playerdata"
+        let previousMetadata = getPluginPlayerDataMetadata(target)
+        previousMetadata.set(metadata.name, metadata)
+        Reflect.defineMetadata(METADATA_KEY.playerdata, previousMetadata, target.constructor)
     }
 }
 

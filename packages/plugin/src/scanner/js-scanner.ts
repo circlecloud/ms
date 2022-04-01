@@ -2,7 +2,7 @@ import { plugin } from "@ccms/api"
 import * as fs from '@ccms/common/dist/fs'
 import { provideSingletonNamed } from "@ccms/container"
 
-const SCANNER_TYPE_NAME = 'file'
+const SCANNER_TYPE_NAME = 'js'
 
 @provideSingletonNamed(plugin.PluginScanner, SCANNER_TYPE_NAME)
 export class JSFileScanner implements plugin.PluginScanner {

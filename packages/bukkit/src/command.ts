@@ -1,35 +1,38 @@
 import '@ccms/nashorn'
 
 import { command, plugin } from '@ccms/api'
-import * as reflect from '@ccms/common/dist/reflect'
 import { provideSingleton, postConstruct, inject } from '@ccms/container'
+import * as reflect from '@ccms/common/dist/reflect'
 
-let Bukkit = org.bukkit.Bukkit
-let TabCompleter = Java.type('org.bukkit.command.TabCompleter')
-let PluginCommand = Java.type('org.bukkit.command.PluginCommand')
-let CommandExecutor = Java.type('org.bukkit.command.CommandExecutor')
+const Bukkit: typeof org.bukkit.Bukkit = Java.type('org.bukkit.Bukkit')
+const TabCompleter = Java.type('org.bukkit.command.TabCompleter')
+const PluginCommand = Java.type('org.bukkit.command.PluginCommand')
+const CommandExecutor = Java.type('org.bukkit.command.CommandExecutor')
 
 @provideSingleton(command.Command)
 export class BukkitCommand extends command.Command {
     @inject(plugin.PluginInstance)
     private pluginInstance: any
     private commandMap: any
+    private knownCommands: any
 
     @postConstruct()
     init() {
         this.commandMap = reflect.on(Bukkit.getPluginManager()).get('commandMap').get()
+        this.knownCommands = reflect.on(this.commandMap).get('knownCommands').get()
     }
     create(plugin: any, command: string) {
         var cmd = this.commandMap.getCommand(command)
-        if (cmd && cmd instanceof PluginCommand) { return cmd };
+        if (cmd instanceof PluginCommand) { return cmd };
         cmd = reflect.on(PluginCommand).create(command, this.pluginInstance).get()
         this.commandMap.register(plugin.description.name, cmd)
         return cmd
     }
     remove(plugin: any, command: string) {
         var cmd = this.commandMap.getCommand(command)
-        if (cmd && cmd instanceof PluginCommand) {
+        if (cmd instanceof PluginCommand) {
             cmd.unregister(this.commandMap)
+            this.knownCommands.remove(command)
         }
     }
     tabComplete(sender: any, input: string, index?: number): string[] {

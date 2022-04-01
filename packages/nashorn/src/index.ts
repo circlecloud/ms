@@ -50,6 +50,7 @@ declare global {
             debug: boolean
             level: string
             ScriptEngineVersion: string
+            ScriptSlowExecuteTime: number
             ScriptEngineStartTime: number
             setGlobal: (key: string, value: any, config?: PropertyDescriptor & ThisType<any>) => void
             noop: () => void
@@ -65,6 +66,7 @@ declare global {
     const ScriptEngineContextHolder: any
     function engineLoad(str: string | { script: string, name: string }): any
     interface Core {
+        version: string
         getClass(name: String): any
         getProxyClass(): any
         getJavaScriptTaskClass(): any

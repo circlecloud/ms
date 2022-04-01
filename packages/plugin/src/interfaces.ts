@@ -59,6 +59,10 @@ export namespace interfaces {
          * 自动化主命令
          */
         autoMain?: boolean
+        /**
+         * 子命令权限效验
+         */
+        permission?: boolean | string
     }
     export interface ListenerMetadata extends ExecMetadata {
         /**
@@ -99,5 +103,39 @@ export namespace interfaces {
          * 配置文件全路径
          */
         file?: any
+    }
+    export interface PlayerDataMetadata extends plugin.BaseMetadata {
+        /**
+         * 配置文件版本号
+         */
+        version?: number
+        /**
+         * 默认配置
+         */
+        default?: any
+        /**
+         * 实体变量名称
+         */
+        variable?: string
+        /**
+         * 配置文件格式 默认 yml
+         */
+        format?: string
+        /**
+         * 自动保存 默认为 false
+         */
+        autosave?: boolean
+        /**
+         * 配置文件名称 默认玩家名称
+         */
+        filename?: "username" | "uuid"
+        /**
+         * 配置文件目录 默认 playerdata
+         */
+        dir?: string
+        /**
+         * 配置文件子目录 默认为空
+         */
+        subdir?: string
     }
 }
