@@ -19,6 +19,22 @@ export class BukkitNativePluginManager extends server.NativePluginManager {
     get(name: string): server.NativePlugin {
         return this.convert(this.bukkitPluginManager.getPlugin(name))
     }
+    enable(name: string): server.NativePlugin {
+        let origin = this.bukkitPluginManager.getPlugin(name)
+        if (!origin) { throw new Error(`Native Plugin ${name} not found.`) }
+        if (!origin.isEnabled()) {
+            this.bukkitPluginManager.enablePlugin(origin)
+        }
+        return this.convert(origin)
+    }
+    disable(name: string): server.NativePlugin {
+        let origin = this.bukkitPluginManager.getPlugin(name)
+        if (!origin) { throw new Error(`Native Plugin ${name} not found.`) }
+        if (origin.isEnabled()) {
+            this.bukkitPluginManager.disablePlugin(origin)
+        }
+        return this.convert(origin)
+    }
 
     private convert(plugin: org.bukkit.plugin.Plugin): server.NativePlugin {
         if (!plugin) return plugin as any

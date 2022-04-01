@@ -5,6 +5,7 @@ export const METADATA_KEY = {
     tab: Symbol.for("@ccms/plugin:tab"),
     listener: Symbol.for("@ccms/plugin:listener"),
     config: Symbol.for("@ccms/plugin:config"),
+    playerdata: Symbol.for("@ccms/plugin:playerdata"),
     stage: {
         load: Symbol.for("@ccms/plugin:stage:load"),
         enable: Symbol.for("@ccms/plugin:stage:enable"),

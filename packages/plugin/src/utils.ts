@@ -67,7 +67,13 @@ function getPluginConfigMetadata(target: any) {
     ) || new Map<string, interfaces.ConfigMetadata>()
     return configMetadata
 }
-
+function getPluginPlayerDataMetadata(target: any) {
+    let playerdataMetadata: Map<string, interfaces.ConfigMetadata> = Reflect.getMetadata(
+        METADATA_KEY.playerdata,
+        target.constructor
+    ) || new Map<string, interfaces.ConfigMetadata>()
+    return playerdataMetadata
+}
 function getPluginStageMetadata(target: any, stage: string) {
     let stageMetadata: interfaces.ExecMetadata[] = Reflect.getMetadata(
         METADATA_KEY.stage[stage],
@@ -86,5 +92,6 @@ export {
     getPluginTabCompleterMetadata,
     getPluginListenerMetadata,
     getPluginConfigMetadata,
+    getPluginPlayerDataMetadata,
     getPluginStageMetadata
 }

@@ -169,6 +169,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     private loadAndRequirePlugin(loadMetadata: plugin.PluginLoadMetadata) {
         let startTime = Date.now()
         let metadata = this.loadPlugin(loadMetadata.scanner.load(loadMetadata))
+        if (!metadata) { throw new Error('load plugin metadata failed.') }
         console.i18n('ms.plugin.manager.build', {
             name: loadMetadata.metadata.name,
             version: loadMetadata.metadata.version,
@@ -184,9 +185,10 @@ export class PluginManagerImpl implements plugin.PluginManager {
      * 从文件加载插件
      * @param file java.io.File
      */
-    loadFromFile(file: string, scanner = this.sacnnerMap.get('file')): plugin.Plugin {
-        if (!file) { throw new Error('plugin file can\'t be undefiend!') }
-        if (!scanner) { throw new Error('plugin scanner can\'t be undefiend!') }
+    loadFromFile(file: string, ext: any = 'js'): plugin.Plugin {
+        if (!file) { throw new Error('plugin file can\'t be undefiend.') }
+        let scanner = this.sacnnerMap.get(ext)
+        if (!scanner) { throw new Error(`plugin scanner ${ext} can't found in sacnnerMap.`) }
         let metadata = this.loadAndRequirePlugin(scanner.read(file))
         let plugin = this.buildPlugin(metadata)
         this.load(plugin)
@@ -213,7 +215,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     reload(...args: any[]): void {
         this.checkAndGet(args[0]).forEach((pl: plugin.Plugin) => {
             this.disable(pl)
-            this.loadFromFile(pl.description.loadMetadata.file, pl.description.loadMetadata.scanner)
+            this.loadFromFile(pl.description.loadMetadata.file, pl.description.loadMetadata.scanner.type)
         })
     }
 
@@ -235,12 +237,12 @@ export class PluginManagerImpl implements plugin.PluginManager {
     }
 
     private checkAndGet(name: string | plugin.Plugin | undefined | any): Map<string, plugin.Plugin> | plugin.Plugin[] {
-        if (name === undefined) throw new Error(`checkAndGet Plugin can't be undefiend!`)
+        if (name === undefined) throw new Error(`checkAndGet Plugin can't be undefiend.`)
         if (name == this.instanceMap) { return this.instanceMap }
         if (typeof name == 'string' && this.instanceMap.has(name)) { return [this.instanceMap.get(name)] }
         if (name instanceof interfaces.Plugin) { return [name as plugin.Plugin] }
         if (name.description?.name) { return [name as plugin.Plugin] }
-        throw new Error(`Plugin ${JSON.stringify(name)} not exist!`)
+        throw new Error(`Plugin ${JSON.stringify(name)} not exist.`)
     }
 
     private buildPlugins() {

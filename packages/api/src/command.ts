@@ -44,12 +44,37 @@ export namespace command {
         protected setExecutor(plugin: plugin.Plugin, command: any, executor: Function) {
             return (sender: any, _: any, command: string, args: string[]) => {
                 try {
-                    return executor(sender, command, Java.from(args))
+                    let time = Date.now()
+                    let result = executor(sender, command, Java.from(args))
+                    let cost = Date.now() - time
+                    if (cost > global.ScriptSlowExecuteTime) {
+                        console.i18n("ms.api.command.execute.slow", {
+                            player: sender.name,
+                            plugin: plugin.description.name,
+                            command,
+                            args: Java.from(args).join(' '),
+                            cost
+                        })
+                    }
+                    return result
                 } catch (ex: any) {
-                    console.i18n("ms.api.command.execute.error", { player: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex })
+                    console.i18n("ms.api.command.execute.error", {
+                        player: sender.name,
+                        plugin: plugin.description.name,
+                        command,
+                        args: Java.from(args).join(' '),
+                        ex
+                    })
                     console.ex(ex)
                     if (sender.name != 'CONSOLE') {
-                        console.sender(sender, [i18n.translate("ms.api.command.execute.error", { player: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex }), ...console.stack(ex)])
+                        console.sender(sender, [i18n.translate("ms.api.command.execute.error", {
+                            player: sender.name,
+                            plugin: plugin.description.name,
+                            command,
+                            args: Java.from(args).join(' '),
+                            ex
+                        }),
+                        ...console.stack(ex)])
                     }
                     return true
                 }
@@ -58,13 +83,42 @@ export namespace command {
         protected setTabCompleter(plugin: plugin.Plugin, command: any, tabCompleter: Function) {
             return (sender: any, _: any, command: string, args: string[]) => {
                 try {
+                    let time = Date.now()
                     var token = args[args.length - 1]
                     var complete = tabCompleter(sender, command, Java.from(args)) || []
-                    return this.copyPartialMatches(complete, token)
+                    let result = this.copyPartialMatches(complete, token)
+                    let cost = Date.now() - time
+                    if (cost > global.ScriptSlowExecuteTime) {
+                        console.i18n("ms.api.command.tab.completer.slow", {
+                            player: sender.name,
+                            plugin: plugin.description.name,
+                            command,
+                            args: Java.from(args).join(' '),
+                            cost
+                        })
+                    }
+                    return result
                 } catch (ex: any) {
-                    console.i18n("ms.api.command.tab.completer.error", { player: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex })
+                    console.i18n("ms.api.command.tab.completer.error", {
+                        player: sender.name,
+                        plugin: plugin.description.name,
+                        command,
+                        args: Java.from(args).join(' '),
+                        ex
+                    })
                     console.ex(ex)
-                    console.sender(sender, [i18n.translate("ms.api.command.tab.completer.error", { player: sender.name, plugin: plugin.description.name, command, args: Java.from(args).join(' '), ex }), ...console.stack(ex)])
+                    if (sender.name != 'CONSOLE') {
+                        console.sender(sender, [
+                            i18n.translate("ms.api.command.tab.completer.error", {
+                                player: sender.name,
+                                plugin: plugin.description.name,
+                                command,
+                                args: Java.from(args).join(' '),
+                                ex
+                            }),
+                            ...console.stack(ex)
+                        ])
+                    }
                     return []
                 }
             }

@@ -1,13 +1,13 @@
 import { event, plugin } from '@ccms/api'
-import { inject, provideSingleton } from '@ccms/container';
+import { inject, provideSingleton } from '@ccms/container'
 import * as reflect from '@ccms/common/dist/reflect'
 
-const Bukkit = Java.type("org.bukkit.Bukkit");
-const Event = Java.type("org.bukkit.event.Event");
-const Modifier = Java.type("java.lang.reflect.Modifier");
-const Listener = Java.type("org.bukkit.event.Listener");
-const EventPriority = Java.type("org.bukkit.event.EventPriority");
-const EventExecutor = Java.type("org.bukkit.plugin.EventExecutor");
+const Bukkit = Java.type("org.bukkit.Bukkit")
+const Event = Java.type("org.bukkit.event.Event")
+const Modifier = Java.type("java.lang.reflect.Modifier")
+const Listener = Java.type("org.bukkit.event.Listener")
+const EventPriority = Java.type("org.bukkit.event.EventPriority")
+const EventExecutor = Java.type("org.bukkit.plugin.EventExecutor")
 
 @provideSingleton(event.Event)
 export class BukkitEvent extends event.Event {
@@ -15,7 +15,7 @@ export class BukkitEvent extends event.Event {
     private pluginInstance: any
 
     constructor() {
-        super('org/bukkit/event');
+        super('org/bukkit/event')
     }
 
     getJarFile(resource: string) {
@@ -27,10 +27,10 @@ export class BukkitEvent extends event.Event {
             // 访问符为Public
             Modifier.isPublic(clazz.getModifiers()) &&
             // 不是抽象类
-            !Modifier.isAbstract(clazz.getModifiers());
+            !Modifier.isAbstract(clazz.getModifiers())
     }
     register(eventCls: any, exec: Function, priority: event.EventPriority, ignoreCancel: boolean) {
-        let listener = new Listener({});
+        let listener = new Listener({})
         Bukkit.pluginManager.registerEvent(
             eventCls,
             listener,
@@ -39,10 +39,10 @@ export class BukkitEvent extends event.Event {
                 execute: exec
             }),
             this.pluginInstance,
-            ignoreCancel);
-        return listener;
+            ignoreCancel)
+        return listener
     }
     unregister(event: any, listener: any): void {
-        reflect.on(event).call('getHandlerList').get().unregister(listener);
+        reflect.on(event).call('getHandlerList').get().unregister(listener)
     }
 }
