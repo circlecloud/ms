@@ -1,6 +1,6 @@
 {
     "name": "@ccms/plugin",
-    "version": "0.19.5",
+    "version": "0.19.6",
     "description": "MiaoScript api package",
     "keywords": [
         "miaoscript",
@@ -25,7 +25,7 @@
         "typescript": "^4.5.5"
     },
     "dependencies": {
-        "@ccms/api": "^0.19.5",
+        "@ccms/api": "^0.19.6",
         "@ccms/common": "^0.19.0",
         "@ccms/container": "^0.19.0",
         "@ccms/i18n": "^0.19.0",
