@@ -5,8 +5,7 @@ function updateJar() {
         var updateFolder = fs.concat(pluginFolder, 'update')
     }
 }
-function upgradeModules() {
-    var core = http.get('https://registry.npmmirror.com/@ccms/core')
+function upgradeModules(core) {
     if (base.version && global.ScriptEngineVersion != core['dist-tags']['latest']) {
         var Paths = Java.type('java.nio.file.Paths')
         base.save(Paths.get(root, "upgrade"), core['dist-tags']['latest'])
@@ -46,7 +45,7 @@ function initialize() {
         updateJar()
     } catch (ignore) {
     }
-    upgradeModules()
+    upgradeModules(http.get('https://registry.npmmirror.com/@ccms/core'))
     console.debug('initialize finish!')
 }
 initialize()
