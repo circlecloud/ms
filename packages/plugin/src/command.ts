@@ -56,8 +56,9 @@ export class PluginCommandManager {
                 let cmdKey = 'cmd' + subcommand
                 let subcommandexec = pluginInstance[cmdKey]
                 if (!subcommandexec) {
-                    args.shift()
                     subcommandexec = pluginInstance['cmdmain']
+                } else {
+                    args.shift()
                 }
                 if (!subcommandexec) {
                     subcommand && pluginInstance.logger.sender(sender, '§4未知的子命令: §c' + subcommand)

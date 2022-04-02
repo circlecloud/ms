@@ -20,7 +20,7 @@ export namespace plugin {
     export abstract class PluginManager {
         abstract scan(folder: string): void
         abstract build(): void
-        abstract loadFromFile(file: string, scanner?: plugin.PluginScanner): Plugin
+        abstract loadFromFile(file: string, ext: any): Plugin
         abstract load(...args: any[]): void
         abstract enable(...args: any[]): void
         abstract disable(...args: any[]): void
