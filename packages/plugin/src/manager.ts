@@ -64,6 +64,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     initialize() {
         if (this.pluginInstance === undefined) { throw new Error("Can't found Plugin Instance!") }
         if (this.initialized !== true) {
+            process.emit('plugin.manager.before.initialize')
             console.i18n('ms.plugin.initialize', { plugin: this.pluginInstance, loader: Thread.currentThread().contextClassLoader })
             console.i18n('ms.plugin.event.map', { count: this.eventManager.mapEventName(), type: this.serverType })
             let pluginScanner = this.container.getAll<plugin.PluginScanner>(plugin.PluginScanner)
@@ -77,13 +78,14 @@ export class PluginManagerImpl implements plugin.PluginManager {
                 this.loaderMap.set(loader.type, loader)
             })
             this.initialized = true
-            process.emit('plugin.initialize')
+            process.emit('plugin.manager.after.initialize')
         }
     }
 
     scan(folder: string): void {
         if (!folder) { throw new Error('plugin scan folder can\'t be empty!') }
         this.initialize()
+        process.emit('plugin.manager.before.scan', folder)
         for (const [, scanner] of this.sacnnerMap) {
             try {
                 console.i18n('ms.plugin.manager.scan', { scanner: scanner.type, folder })
@@ -102,12 +104,13 @@ export class PluginManagerImpl implements plugin.PluginManager {
                 console.ex(error)
             }
         }
-        process.emit('plugin.scan', folder)
+        process.emit('plugin.manager.after.scan', folder)
     }
 
     build(): void {
+        process.emit('plugin.manager.before.build')
         this.buildPlugins()
-        process.emit('plugin.build')
+        process.emit('plugin.manager.after.build')
     }
 
     private logStage(plugin: plugin.Plugin, stage: string) {
@@ -132,6 +135,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
     private loadPlugin(loadMetadata: plugin.PluginLoadMetadata) {
         if (!loadMetadata) { throw new Error('loadMetadata can\'t be undefiend when loadPlugin!') }
         if (loadMetadata.loaded) { throw new Error(`Plugin file ${loadMetadata.file} is already loaded by ${loadMetadata.loader?.type}!`) }
+        process.emit(`plugin.before.require`, loadMetadata)
         try {
             for (const [, loader] of this.loaderMap) {
                 if (this.loaderRequirePlugin(loadMetadata, loader)?.loaded) return loadMetadata.metadata
@@ -154,6 +158,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
                 }
                 this.metadataMap.set(metadata.name, metadata)
                 metadata.loadMetadata = loadMetadata
+                process.emit(`plugin.after.require`, loadMetadata)
             }
             return loadMetadata
         } catch (error: any) {
@@ -269,6 +274,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
         return loseDepends
     }
     private buildPlugin(metadata: plugin.PluginMetadata) {
+        process.emit(`plugin.before.build`, metadata)
         try {
             if (this.instanceMap.has(metadata.name)) { throw new Error(`Plugin ${metadata.name} is already load from ${metadata.source}...`) }
             if (!this.loaderMap.has(metadata.type)) { throw new Error(`§4无法加载插件 §b${metadata.name} §4请检查 §c${metadata.type} §4加载器是否正常启用!`) }
@@ -280,6 +286,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
             let pluginInstance = this.loaderMap.get(metadata.type).build(metadata)
             if (!pluginInstance) { throw new Error(`§4加载器 §c${metadata.type} §4加载插件 §c${metadata.name} §4失败!`) }
             this.instanceMap.set(metadata.name, pluginInstance)
+            process.emit(`plugin.after.build`, metadata, pluginInstance)
             return pluginInstance
         } catch (error: any) {
             console.console(`§4无法加载插件 §b${metadata.name} §4构建插件失败!`)
