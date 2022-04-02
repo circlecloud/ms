@@ -17,14 +17,18 @@ class MiaoScriptCore {
     private pluginManager: plugin.PluginManager
 
     enable() {
+        process.emit('core.before.enable')
         this.loadServerConsole()
         this.loadPlugins()
+        process.emit('core.after.enable')
         return () => this.disable()
     }
 
     loadServerConsole() {
+        process.emit('core.before.load.console')
         //@ts-ignore
         global.setGlobal('console', new this.Console(), { writable: false, configurable: false })
+        process.emit('core.after.load.console')
     }
 
     loadPlugins() {
@@ -81,6 +85,7 @@ function detectServer(): constants.ServerType {
 }
 
 function initialize() {
+    process.emit('core.before.initialize')
     global.ScriptSlowExecuteTime = 30
     global.ScriptEngineVersion = require('../package.json').version
     try {
@@ -97,21 +102,29 @@ function initialize() {
         container.bind(plugin.PluginInstance).toConstantValue(base.getInstance())
         container.bind(plugin.PluginFolder).toConstantValue('plugins')
         let type = detectServer()
+
+        process.emit('core.before.initialize.detect')
         console.i18n("ms.core.initialize.detect", { scope: global.scope, type })
         container.bind(server.ServerType).toConstantValue(type)
         container.bind(server.ServerChecker).toSelf().inSingletonScope()
         container.bind(server.NativePluginManager).toSelf().inSingletonScope()
+        process.emit('core.after.initialize.detect')
+
+        process.emit('core.before.package.initialize')
         console.i18n("ms.core.package.initialize", { scope: global.scope, type })
         require(`${global.scope}/${type}`).default(container)
         require(`${global.scope}/plugin`)
         container.load(buildProviderModule())
         console.i18n("ms.core.package.completed", { scope: global.scope, type, time: (Date.now() - corePackageStartTime) / 1000 })
+        process.emit('core.after.package.initialize')
+
         let disable = container.get<MiaoScriptCore>(MiaoScriptCore).enable()
         console.i18n("ms.core.engine.completed", {
             loader: base.version,
             version: 'v' + global.ScriptEngineVersion,
             time: (Date.now() - global.ScriptEngineStartTime) / 1000
         })
+        process.emit('core.after.initialize')
         return disable
     } catch (error: any) {
         console.i18n("ms.core.initialize.error", { error })
