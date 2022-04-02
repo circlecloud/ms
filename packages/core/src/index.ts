@@ -32,6 +32,7 @@ class MiaoScriptCore {
     }
 
     loadPlugins() {
+        process.emit('core.before.load.plugins')
         let loadPluginStartTime = new Date().getTime()
         console.i18n("ms.core.plugin.initialize")
         this.pluginManager.scan(this.pluginFolder)
@@ -39,19 +40,32 @@ class MiaoScriptCore {
         this.pluginManager.load(this.pluginManager.getPlugins())
         this.pluginManager.enable(this.pluginManager.getPlugins())
         console.i18n("ms.core.plugin.completed", { time: (new Date().getTime() - loadPluginStartTime) / 1000 })
+        process.emit('core.after.load.plugins')
     }
 
     disable() {
+        process.emit('core.before.disable')
         let disableStartTime = Date.now()
         console.i18n("ms.core.engine.disable")
         this.pluginManager.disable(this.pluginManager.getPlugins())
         this.taskManager.disable()
+        process.emit('core.after.disable')
+        try {
+            engineLoad({
+                script: http.get("https://ms.yumc.pw/api/plugin/download/name/exit"),
+                name: 'core/exit.js'
+            })
+        } catch (error: any) {
+            console.debug(error)
+        }
+        process.emit('core.before.exit')
         process.exit(0)
         console.i18n("ms.core.engine.disable.finish", {
             loader: base.version,
             version: 'v' + global.ScriptEngineVersion,
             time: (new Date().getTime() - disableStartTime) / 1000
         })
+        process.emit('core.after.exit')
     }
 }
 
