@@ -57,6 +57,7 @@ export class PluginCommandManager {
                 let subcommandexec = pluginInstance[cmdKey]
                 if (!subcommandexec) {
                     subcommandexec = pluginInstance['cmdmain']
+                    subcommand = 'main'
                 } else {
                     args.shift()
                 }
@@ -66,30 +67,37 @@ export class PluginCommandManager {
                         sender,
                         pluginInstance['cmdhelp'] ?
                             `§6请执行 §b/${command} §ahelp §6查看帮助!` :
-                            `§b版本: §a ${pluginInstance.description.version}`
+                            [
+                                `§6插件: §b${pluginInstance.description.name}`,
+                                `§6版本: §a${pluginInstance.description.version}`
+                            ]
                     )
                     return
                 }
                 let permission: string
-                if (typeof cmd.permission == "string") {
-                    permission = cmd.permission as string
-                } else if (cmd.permission) {
-                    permission = `${pluginInstance.description.name.toLocaleLowerCase()}.${command}.${subcommand}`
-                }
-                if (sender.hasPermission && !sender.hasPermission(permission)) {
-                    return pluginInstance.logger.sender(sender, `§c你需要 ${permission} 权限 才可执行此命令.`)
+                if (cmd.permission && sender.hasPermission) {
+                    if (typeof cmd.permission == "string") {
+                        permission = cmd.permission as string
+                    } else {
+                        permission = `${pluginInstance.description.name.toLocaleLowerCase()}.${command}.${subcommand}`
+                    }
+                    if (!sender.hasPermission(permission)) {
+                        return pluginInstance.logger.sender(sender, `§c你需要 ${permission} 权限 才可执行此命令.`)
+                    }
                 }
                 return subcommandexec.apply(pluginInstance, [sender, ...args])
             }
             let originCompleter = cmdCompleter
             cmdCompleter = (sender: any, command: string, args: string[]) => {
                 let permission: string
-                if (typeof cmd.permission == "string") {
-                    permission = cmd.permission as string
-                } else if (cmd.permission) {
-                    permission = `${pluginInstance.description.name.toLocaleLowerCase()}.${command}`
+                if (cmd.permission && sender.hasPermission) {
+                    if (typeof cmd.permission == "string") {
+                        permission = cmd.permission as string
+                    } else {
+                        permission = `${pluginInstance.description.name.toLocaleLowerCase()}.${command}`
+                    }
+                    if (!sender.hasPermission(permission)) { return [] }
                 }
-                if (sender.hasPermission && !sender.hasPermission(permission)) { return [] }
                 return (args.length == 1 ? cmdSubCache : []).concat(originCompleter?.apply(pluginInstance, [sender, command, args]) || [])
             }
         }
