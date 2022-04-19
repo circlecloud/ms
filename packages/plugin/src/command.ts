@@ -54,37 +54,34 @@ export class PluginCommandManager {
             cmdExecutor = (sender: any, command: string, args: string[]) => {
                 let subcommand = args[0]
                 let cmdKey = 'cmd' + subcommand
-                let subcommandexec = pluginInstance[cmdKey]
-                if (!subcommandexec) {
-                    subcommandexec = pluginInstance['cmdmain']
-                    subcommand = 'main'
-                } else {
-                    args.shift()
-                }
-                if (!subcommandexec) {
-                    subcommand && pluginInstance.logger.sender(sender, '§4未知的子命令: §c' + subcommand)
-                    pluginInstance.logger.sender(
-                        sender,
-                        pluginInstance['cmdhelp'] ?
-                            `§6请执行 §b/${command} §ahelp §6查看帮助!` :
-                            [
-                                `§6插件: §b${pluginInstance.description.name}`,
-                                `§6版本: §a${pluginInstance.description.version}`
-                            ]
-                    )
+                if (!cmdSubCache.includes(subcommand)) {
+                    if (!pluginInstance[cmd.executor].apply(pluginInstance, [sender, command, args])) {
+                        subcommand && pluginInstance.logger.sender(sender, '§4未知的子命令: §c' + subcommand)
+                        pluginInstance.logger.sender(
+                            sender,
+                            pluginInstance['cmdhelp'] ?
+                                `§6请执行 §b/${command} §ahelp §6查看帮助!` :
+                                [
+                                    `§6插件: §b${pluginInstance.description.name}`,
+                                    `§6版本: §a${pluginInstance.description.version}`
+                                ]
+                        )
+                    }
                     return
                 }
+                let subcommandexec = pluginInstance[cmdKey]
                 let permission: string
                 if (cmd.permission && sender.hasPermission) {
                     if (typeof cmd.permission == "string") {
                         permission = cmd.permission as string
                     } else {
-                        permission = `${pluginInstance.description.name.toLocaleLowerCase()}.${command}.${subcommand}`
+                        permission = `${pluginInstance.description.name.toLocaleLowerCase()}.${command}.${subcommand || 'main'}`
                     }
                     if (!sender.hasPermission(permission)) {
                         return pluginInstance.logger.sender(sender, `§c你需要 ${permission} 权限 才可执行此命令.`)
                     }
                 }
+                args.shift()
                 return subcommandexec.apply(pluginInstance, [sender, ...args])
             }
             let originCompleter = cmdCompleter

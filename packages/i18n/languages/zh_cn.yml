@@ -22,8 +22,9 @@ ms.api.event.not.found: "§6插件 §b{name} §6注册事件 §c{event} §6失�
 ms.api.event.execute.slow: "§c注意! §6插件 §b{name} §6处理 §d{event} §6事件 §c耗时 §4{cost}ms !"
 ms.api.event.execute.error: "§6插件 §b{name} §6处理 §d{event} §6事件时发生异常 §4{ex}"
 ms.api.event.listen.plugin.name.empty: "插件名称为空 请检查传入参数!"
-ms.api.event.register: "[{name}] 注册事件 {event} => 执行器 {exec}"
+ms.api.event.register: "[{name}] 注册事件 {event} => 执行器 {exec} 优先级 {priority} 忽略取消 {ignore}"
 ms.api.event.unregister: "[{name}] 注销事件 {event} => 执行器 {exec}"
+
 ms.api.command.register.input.error: "CommandExec 必须为一个函数... 输入: {exec}"
 ms.api.command.register: "[{plugin}] 注册命令 {name}({cmd})..."
 ms.api.command.unregister: "[{plugin}] 注销命令 {name}..."
@@ -34,6 +35,7 @@ ms.api.command.tab.completer.error: "§6玩家 §a{player} §6执行 §b{plugin}
 
 ms.plugin.initialize: "初始化 MiaoScript 插件系统: 实例: {plugin} 加载器: {loader}..."
 ms.plugin.event.map: "总计 {count} 个 {type} 事件 映射完成..."
+ms.plugin.event.map.error: "映射 {type} 事件 异常 将无法使用事件简称. Error: {error}"
 ms.plugin.manager.scan: "扫描器 {scanner} 扫描 {folder} 中的插件..."
 ms.plugin.manager.scan.finish: "扫描器 {scanner} 在 {folder} 中 发现 {size} 个插件 开始构建..."
 ms.plugin.manager.initialize.error: "§6插件 §b{name} §6初始化错误 §4{ex}"

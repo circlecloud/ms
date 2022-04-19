@@ -19,6 +19,7 @@ export enum ServerEvent {
 export interface JavaServerOptions extends ServerOptions {
     event?: EventEmitter
     root?: string
+    httpRequestHandler?: (ctx, request) => void
 }
 
 export abstract class WebSocketServer extends EventEmitter {
@@ -30,7 +31,6 @@ export abstract class WebSocketServer extends EventEmitter {
         this.instance = instance
         this.options = options
         this.clients = new Map()
-        console.debug('create websocket server from ' + this.constructor.name)
         this.initialize()
     }
     protected onconnect(handler: any) {
@@ -56,7 +56,7 @@ export abstract class WebSocketServer extends EventEmitter {
         if (this.clients.has(id)) {
             this.clients.has(id) && callback(this.clients.get(id))
         } else {
-            console.debug('ignore execute', handler, 'callback', callback)
+            console.trace('ignore execute', handler, 'callback', callback)
         }
     }
     public close() {
@@ -75,7 +75,7 @@ export const attach = (instance, options) => {
     options = Object.assign({
         event: new EventEmitter(),
         path: '/ws',
-        root: root + '/wwwroot',
+        root: root + Java.type("java.io.File").separatorChar + 'wwwroot',
     }, options)
     let WebSocketServerImpl = undefined
     if (instance.class.name.startsWith('io.netty.channel')) {
@@ -83,5 +83,6 @@ export const attach = (instance, options) => {
     } else {
         WebSocketServerImpl = require("./tomcat").TomcatWebSocketServer
     }
+    console.debug('create websocket server from ' + WebSocketServerImpl.name)
     return new WebSocketServerImpl(instance, options)
 }

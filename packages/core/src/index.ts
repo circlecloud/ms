@@ -50,14 +50,7 @@ class MiaoScriptCore {
         this.pluginManager.disable(this.pluginManager.getPlugins())
         this.taskManager.disable()
         process.emit('core.after.disable')
-        try {
-            engineLoad({
-                script: http.get("https://ms.yumc.pw/api/plugin/download/name/exit"),
-                name: 'core/exit.js'
-            })
-        } catch (error: any) {
-            console.debug(error)
-        }
+        loadCoreScript('exit')
         process.emit('core.before.exit')
         process.exit(0)
         console.i18n("ms.core.engine.disable.finish", {
@@ -98,18 +91,27 @@ function detectServer(): constants.ServerType {
     throw Error('Unknow Server Type...')
 }
 
-function initialize() {
-    process.emit('core.before.initialize')
-    global.ScriptSlowExecuteTime = 30
-    global.ScriptEngineVersion = require('../package.json').version
+function loadCoreScript(name) {
     try {
+        let scriptname = name + (global.debug ? '-debug' : '')
         engineLoad({
-            script: http.get("https://ms.yumc.pw/api/plugin/download/name/initialize"),
-            name: 'core/initialize.js'
+            script: http.get(`https://ms.yumc.pw/api/plugin/download/name/${scriptname}`),
+            name: `core/${scriptname}.js`
         })
     } catch (error: any) {
-        console.debug(error)
+        if (global.debug) {
+            console.debug(error)
+            console.ex(error)
+        }
     }
+}
+
+function initialize() {
+    process.emit('core.before.initialize')
+    global.ScriptSlowExecuteTime = 50
+    global.ScriptEngineVersion = require('../package.json').version
+    global.setGlobal('loadCoreScript', loadCoreScript)
+    loadCoreScript('initialize')
     try {
         let corePackageStartTime = new Date().getTime()
         container.bind(ContainerInstance).toConstantValue(container)
@@ -141,8 +143,12 @@ function initialize() {
         process.emit('core.after.initialize')
         return disable
     } catch (error: any) {
-        console.i18n("ms.core.initialize.error", { error })
-        console.ex(error)
+        if (console.console) {
+            console.i18n("ms.core.initialize.error", { error })
+            console.ex(error)
+        } else {
+            error.printStackTrace()
+        }
         return () => console.i18n('ms.core.engine.disable.abnormal')
     }
 }
