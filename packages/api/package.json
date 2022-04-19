@@ -1,6 +1,6 @@
 {
     "name": "@ccms/api",
-    "version": "0.19.6",
+    "version": "0.20.0-alpha.0",
     "description": "MiaoScript api package",
     "keywords": [
         "miaoscript",
@@ -21,7 +21,7 @@
     "dependencies": {
         "@ccms/common": "^0.19.0",
         "@ccms/container": "^0.19.0",
-        "@ccms/polyfill": "^0.19.0",
+        "@ccms/polyfill": "^0.20.0-alpha.0",
         "base64-js": "^1.5.1",
         "source-map-builder": "^0.0.7"
     },
