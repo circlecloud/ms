@@ -1,6 +1,6 @@
 {
     "name": "@ccms/polyfill",
-    "version": "0.19.0",
+    "version": "0.20.0-alpha.0",
     "description": "MiaoScript polyfill package",
     "author": "MiaoWoo <admin@yumc.pw>",
     "homepage": "https://github.com/circlecloud/ms.git",
@@ -14,7 +14,7 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
-        "@ccms/i18n": "^0.19.0",
+        "@ccms/i18n": "^0.20.0-alpha.0",
         "@ccms/nodejs": "^0.19.0",
         "core-js": "^3.21.0"
     },
