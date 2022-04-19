@@ -1,57 +1,34 @@
-import * as yaml from 'js-yaml'
-import * as fs from '@ccms/common/dist/fs'
 import { plugin } from '@ccms/api'
-import { provideSingleton } from '@ccms/container'
+import { Autowired, Container, ContainerInstance, postConstruct, provideSingleton } from '@ccms/container'
+
+import * as fs from '@ccms/common/dist/fs'
 
 import { interfaces } from './interfaces'
 import { getPluginConfigMetadata } from './utils'
 
-export interface PluginConfigLoader {
-    load(content: string): any
-    dump(variable: any): string
-}
-
-export class YamlPluginConfig implements PluginConfigLoader {
-    load(content: string) {
-        return yaml.load(content)
-    }
-    dump(variable: any): string {
-        return yaml.dump(variable, { skipInvalid: true, lineWidth: 120 })
-    }
-}
-
-export class JsonPluginConfig implements PluginConfigLoader {
-    load(content: string) {
-        return JSON.parse(content)
-    }
-    dump(variable: any): string {
-        return JSON.stringify(variable, undefined, 4)
-    }
-}
-
-export interface PluginConfig {
-    /**
-     * Save Config to File
-     */
-    readonly save?: () => void
-    /**
-     * Reload Config from File
-     */
-    readonly reload?: () => void
-    [key: string]: any
-}
+import { PluginConfigLoader } from './config/interfaces'
+import './config/loader/json-loader'
+import './config/loader/yaml-loader'
 
 @provideSingleton(PluginConfigManager)
 export class PluginConfigManager {
+    @Autowired(ContainerInstance)
+    private container: Container
+
     private configLoaderMap = new Map<string, PluginConfigLoader>()
 
     constructor() {
-        this.configLoaderMap.set("json", new JsonPluginConfig())
-        let yaml = new YamlPluginConfig()
-        this.configLoaderMap.set("yml", yaml)
-        this.configLoaderMap.set("yaml", yaml)
         process.on('plugin.before.load', this.loadConfig.bind(this))
         process.on('plugin.after.disable', this.saveConfig.bind(this))
+    }
+
+    @postConstruct()
+    initialize() {
+        let configLoader = this.container.getAll<PluginConfigLoader>(PluginConfigLoader)
+        configLoader.forEach((scanner) => {
+            console.debug(`loading config loader ${scanner.type}...`)
+            this.configLoaderMap.set(scanner.type, scanner)
+        })
     }
 
     getConfigLoader(format: string) {
@@ -73,13 +50,17 @@ export class PluginConfigManager {
         }
     }
 
-    private defienConfigProp(plugin: plugin.Plugin, metadata: interfaces.ConfigMetadata, value: any) {
+    createConfig(plugin: plugin.Plugin, metadata: interfaces.ConfigMetadata, value: any) {
         Object.defineProperties(value, {
             'save': { value: () => this.saveConfig0(plugin, metadata) },
             'reload': { value: () => this.loadConfig0(plugin, metadata) }
         })
+        return value
+    }
+
+    private defienConfigProp(plugin: plugin.Plugin, metadata: interfaces.ConfigMetadata, value: any) {
         Object.defineProperty(plugin, metadata.variable, {
-            value,
+            value: this.createConfig(plugin, metadata, value),
             configurable: true
         })
     }

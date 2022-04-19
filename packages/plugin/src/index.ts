@@ -1,5 +1,5 @@
+import './scanner/ms-scanner'
 import './scanner/js-scanner'
-import './scanner/mjs-scanner'
 
 import './loader/ioc-loader'
 import './loader/basic-loader'

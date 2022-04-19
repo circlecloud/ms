@@ -133,7 +133,12 @@ export namespace event {
             // @ts-ignore
             let executor = exec.name || exec.executor || '[anonymous]'
             // noinspection JSUnusedGlobalSymbols
-            var listener = this.register(eventCls, this.execute(name, exec, eventCls), priority, ignoreCancel)
+            var listener = this.register(
+                eventCls,
+                this.execute(name, exec, eventCls),
+                priority,
+                ignoreCancel
+            )
             var listenerMap = this.listenerMap
             // add to cache Be used for close plugin to close event
             if (!listenerMap[name]) listenerMap[name] = []
@@ -141,11 +146,21 @@ export namespace event {
                 if (off['offed']) return
                 off['offed'] = true
                 this.unregister(eventCls, listener)
-                console.debug(i18n.translate("ms.api.event.unregister", { name, event: this.class2Name(eventCls), exec: executor }))
+                console.debug(i18n.translate("ms.api.event.unregister", {
+                    name,
+                    event: this.class2Name(eventCls),
+                    exec: executor
+                }))
             }
             listenerMap[name].push(off)
             // noinspection JSUnresolvedVariable
-            console.debug(i18n.translate("ms.api.event.register", { name, event: this.class2Name(eventCls), exec: executor }))
+            console.debug(i18n.translate("ms.api.event.register", {
+                name,
+                event: this.class2Name(eventCls),
+                exec: executor,
+                priority,
+                ignore: ignoreCancel
+            }))
             return off
         }
 

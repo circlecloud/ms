@@ -2,7 +2,6 @@
  * Module dependencies.
  */
 
-import * as server from "../server"
 // const http = require("http")
 // const Server = require("./server")
 import { Server } from './server'
@@ -18,7 +17,7 @@ import { Server } from './server'
 
 function attach(srv, options) {
     const engine = new Server(options)
-    engine.attach(server.attach(srv, options), options)
+    engine.attach(srv, options)
     return engine
 }
 
