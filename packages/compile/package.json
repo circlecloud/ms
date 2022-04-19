@@ -1,6 +1,6 @@
 {
     "name": "@ccms/compile",
-    "version": "0.19.0",
+    "version": "0.20.0",
     "description": "MiaoScript compile package",
     "keywords": [
         "miaoscript",
