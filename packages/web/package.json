@@ -26,7 +26,7 @@
         "@javatypes/tomcat": "^0.0.3",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
-        "typescript": "^4.5.5"
+        "typescript": "^4.6.3"
     },
     "dependencies": {
         "@ccms/api": "^0.20.0",
