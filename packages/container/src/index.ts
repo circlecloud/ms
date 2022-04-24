@@ -5,6 +5,7 @@ import { initContainer, getContainer } from './decorators'
 import { interfaces, Container, inject, named } from 'inversify'
 import { fluentProvide } from 'inversify-binding-decorators'
 import { ioc } from "./constants"
+import { _proxyGetter } from "./utils"
 
 /**
  * 注册一个命名对象
@@ -49,9 +50,11 @@ export const JavaClass = (className: string) => {
  */
 export const JSClass = (className: string) => {
     return function (target: object, propertyKey: string, index?: number) {
-        try { target[propertyKey] = Java.type(className); return } catch (error: any) { }
-        try { target[propertyKey] = base.getClass(className).static; return } catch (error: any) { }
-        console.warn('JSClass', className, 'Inject target', target.constructor.name, 'propertyKey', propertyKey, 'failed!')
+        _proxyGetter(target, propertyKey, () => {
+            try { return Java.type(className) } catch (error: any) { }
+            try { return base.getClass(className).static } catch (error: any) { }
+            console.warn('JSClass', className, 'Inject target', target.constructor.name, 'propertyKey', propertyKey, 'failed!')
+        }, true)
     }
 }
 
@@ -85,6 +88,59 @@ export const Autowired = (className?: any) => {
 export const Resource = (resourceName?: string | any) => {
     return function (target: any, propertyKey: string, index?: number) {
         target[propertyKey] = getContainer().getNamed(ioc.Resource, resourceName || propertyKey)
+    }
+}
+
+const DocumentBuilderFactory = Java.type('javax.xml.parsers.DocumentBuilderFactory')
+
+export const MavenDepend = (groupId: string, artifactId: string, version: string, recursion = false) => {
+    return function (target: any) {
+        loadMavenDepend(groupId, artifactId, version, recursion)
+    }
+}
+
+const loadedMavenDepend = new Set<string>()
+
+export function loadMavenDepend(groupId: string, artifactId: string, version: string, recursion = false) {
+    try {
+        const key = `${groupId}:${artifactId}:${version}`
+        if (loadedMavenDepend.has(key)) { return }
+        console.info('loading maven dependency', key)
+        let [pom, _] = base.loadMavenDepend(groupId, artifactId, version)
+        loadedMavenDepend.add(key)
+        if (recursion) {
+            let doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(pom)
+            let dependencies = doc.getElementsByTagName("dependency")
+            let size = dependencies.length
+            if (!size) { return }
+            console.info(key, 'found', size, 'dependencies loading...')
+            for (let i = 0; i < size; i++) {
+                const dependency = dependencies.item(i)
+                const gav = dependency.getChildNodes()
+                const length = gav.length
+                const dependencyVersion = { groupId: '', artifactId: '', version: '' }
+                for (let j = 0; j < length; j++) {
+                    const prop = gav.item(j)
+                    switch (prop.getNodeName()) {
+                        case "groupId":
+                            dependencyVersion.groupId = prop.getTextContent()
+                            break
+                        case "artifactId":
+                            dependencyVersion.artifactId = prop.getTextContent()
+                            break
+                        case "version":
+                            dependencyVersion.version = prop.getTextContent()
+                            break
+                    }
+                }
+                loadMavenDepend(dependencyVersion.groupId, dependencyVersion.artifactId, dependencyVersion.version, recursion)
+            }
+        }
+    } catch (error: any) {
+        console.warn('attachMavenDepend failed. Error: ' + error)
+        if (global.debug) {
+            console.ex(error)
+        }
     }
 }
 

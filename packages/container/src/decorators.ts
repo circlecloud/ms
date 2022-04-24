@@ -1,38 +1,9 @@
 import { interfaces, Container } from "inversify"
+import { _proxyGetter } from "./utils"
 
 let _container: Container
 
 const ContainerInstance = Symbol.for("@ccms/ioc:Container")
-const INJECTION = Symbol.for("INJECTION")
-
-function _proxyGetter(
-    proto: any,
-    key: string,
-    resolve: () => any,
-    doCache: boolean
-) {
-    function getter(this: object) {
-        if (doCache && !Reflect.hasMetadata(INJECTION, this, key)) {
-            Reflect.defineMetadata(INJECTION, resolve(), this, key)
-        }
-        if (Reflect.hasMetadata(INJECTION, this, key)) {
-            return Reflect.getMetadata(INJECTION, this, key)
-        } else {
-            return resolve()
-        }
-    }
-
-    function setter(this: object, newVal: any) {
-        Reflect.defineMetadata(INJECTION, newVal, this, key)
-    }
-
-    Object.defineProperty(proto, key, {
-        configurable: true,
-        enumerable: true,
-        get: getter,
-        set: setter
-    })
-}
 
 function initContainer(container: Container) {
     Reflect.defineMetadata(ContainerInstance, container, Reflect)

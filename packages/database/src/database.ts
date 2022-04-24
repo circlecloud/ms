@@ -1,8 +1,5 @@
+import { JSClass } from '@ccms/container'
 import { Model } from './model'
-
-const HikariDataSource = Java.type('com.zaxxer.hikari.HikariDataSource')
-const HikariConfig = Java.type('com.zaxxer.hikari.HikariConfig')
-const JdbcTemplate = Java.type('org.springframework.jdbc.core.JdbcTemplate')
 
 /**
  * 数据库配置
@@ -33,6 +30,13 @@ export class DataBase {
     private dataSource: javax.sql.DataSource
     private jdbcTemplate: org.springframework.jdbc.core.JdbcTemplate
 
+    @JSClass('com.zaxxer.hikari.HikariDataSource')
+    private HikariDataSource: any
+    @JSClass('com.zaxxer.hikari.HikariConfig')
+    private HikariConfig: any
+    @JSClass('org.springframework.jdbc.core.JdbcTemplate')
+    private JdbcTemplate: typeof org.springframework.jdbc.core.JdbcTemplate
+
     constructor(dbConfig: DataBaseConfig) {
         if (!dbConfig.url) { throw new Error('DataBase url can\'t be null!') }
         this.createDataSource(dbConfig)
@@ -41,24 +45,25 @@ export class DataBase {
 
     private createDataSource(dbConfig: DataBaseConfig) {
         if (typeof dbConfig.url === "string") {
-            if (!dbConfig.username || !dbConfig.password) {
-                throw new Error('DataBase username or password can\'t be null!')
-            }
-            let config = new HikariConfig()
+            let config = new this.HikariConfig()
             if (dbConfig.driverClassName) {
                 config.setDriverClassName(dbConfig.driverClassName)
             }
-            config.setUsername(dbConfig.username)
-            config.setPassword(dbConfig.password)
+            if (dbConfig.username) {
+                config.setUsername(dbConfig.username)
+            }
+            if (dbConfig.password) {
+                config.setPassword(dbConfig.password)
+            }
             config.setJdbcUrl(dbConfig.url)
-            this.dataSource = new HikariDataSource(config)
+            this.dataSource = new this.HikariDataSource(config)
         } else {
             this.dataSource = dbConfig.url
         }
     }
 
     private initialize() {
-        this.jdbcTemplate = new JdbcTemplate(this.dataSource)
+        this.jdbcTemplate = new this.JdbcTemplate(this.dataSource)
     }
 
     /**

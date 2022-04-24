@@ -3,7 +3,11 @@ console.i18n("ms.core.ioc.initialize", { scope: global.scope })
 import { plugin, server, task, constants } from '@ccms/api'
 import { DefaultContainer as container, provideSingleton, ContainerInstance, buildProviderModule, Autowired } from '@ccms/container'
 console.i18n("ms.core.ioc.completed", { scope: global.scope, time: (Date.now() - containerStartTime) / 1000 })
+import * as yaml from 'js-yaml'
 import http from '@ccms/common/dist/http'
+import * as fs from '@ccms/common/dist/fs'
+
+const UUID = Java.type('java.util.UUID')
 
 @provideSingleton(MiaoScriptCore)
 class MiaoScriptCore {
@@ -106,9 +110,24 @@ function loadCoreScript(name) {
     }
 }
 
+function loadMiaoScriptConfig() {
+    let configFile = fs.concat(root, 'config.yml')
+    if (!fs.exists(configFile)) {
+        global.ScriptEngineConfig = base.save(configFile, yaml.dump({
+            uuid: UUID.randomUUID().toString(),
+            channel: 'latest',
+            slow_execute: 50
+        }))
+    } else {
+        global.ScriptEngineConfig = yaml.load(base.read(configFile))
+    }
+    global.ScriptEngineChannel = global.ScriptEngineConfig.channel || 'latest'
+    global.ScriptSlowExecuteTime = global.ScriptEngineConfig.slow_execute || 50
+}
+
 function initialize() {
     process.emit('core.before.initialize')
-    global.ScriptSlowExecuteTime = 50
+    loadMiaoScriptConfig()
     global.ScriptEngineVersion = require('../package.json').version
     global.setGlobal('loadCoreScript', loadCoreScript)
     loadCoreScript('initialize')

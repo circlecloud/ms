@@ -17,3 +17,5 @@ export {
     config as Config,
     playerdata as PlayerData
 } from './decorators'
+
+import '@ccms/database'

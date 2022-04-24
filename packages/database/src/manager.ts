@@ -1,25 +1,18 @@
-import { plugin, database } from '@ccms/api'
-import { provideSingleton, inject, postConstruct } from '@ccms/container'
+import { database } from '@ccms/api'
+import { provideSingleton } from '@ccms/container'
 import { DataBase, DataBaseConfig } from './database'
 
 @provideSingleton(database.DataBaseManager)
 export class DataBaseManager {
-    @inject(plugin.PluginInstance)
-    private instance: any
-
-    private beanFactory: any
     private mainDatabase: DataBase
-    private databases: { [key: string]: DataBase } = {}
+    private databases = new Map<string, DataBase>()
 
-    @postConstruct()
-    initialize() {
-        try {
-            this.beanFactory = this.instance.getAutowireCapableBeanFactory()
-            let mainDatasource = this.beanFactory.getBean(Packages.javax.sql.DataSource.class)
-            this.mainDatabase = new DataBase({ url: mainDatasource })
-        } catch (error: any) {
-            console.ex(error)
-        }
+    /**
+     * 设置主数据库
+     * @param mainDatabase 主数据库
+     */
+    setMainDatabase(mainDatabase: DataBase) {
+        this.mainDatabase = mainDatabase
     }
 
     /**
@@ -38,16 +31,19 @@ export class DataBaseManager {
      */
     createDatabase(name: string, config: DataBaseConfig) {
         Java.synchronized(() => {
-            if (this.databases[name]) return this.databases[name]
-            return this.databases[name] = new DataBase(config)
+            if (!this.databases.has(name)) {
+                this.databases.set(name, new DataBase(config))
+            }
+            return this.databases.get(name)
         }, this.databases)()
     }
 
     getDatabase(name: string) {
-        return this.databases[name]
+        return this.databases.get(name)
     }
 
     disable() {
-        Object.values(this.databases).forEach((ds) => ds?.close())
+        this.databases.forEach((db) => db.close())
+        this.databases.clear()
     }
 }

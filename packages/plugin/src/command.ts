@@ -56,7 +56,7 @@ export class PluginCommandManager {
                 let cmdKey = 'cmd' + subcommand
                 if (!cmdSubCache.includes(subcommand)) {
                     if (!pluginInstance[cmd.executor].apply(pluginInstance, [sender, command, args])) {
-                        subcommand && pluginInstance.logger.sender(sender, '§4未知的子命令: §c' + subcommand)
+                        subcommand && pluginInstance.logger.sender(sender, `§4未知的命令: §b/${command} §c${subcommand}`)
                         pluginInstance.logger.sender(
                             sender,
                             pluginInstance['cmdhelp'] ?

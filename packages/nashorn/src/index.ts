@@ -49,7 +49,18 @@ declare global {
             logger: any
             debug: boolean
             level: string
+            /**
+             * 引擎配置
+             */
+            ScriptEngineConfig: any
+            /**
+             * 引擎版本
+             */
             ScriptEngineVersion: string
+            /**
+             * 引擎渠道
+             */
+            ScriptEngineChannel: string
             ScriptSlowExecuteTime: number
             ScriptEngineStartTime: number
             setGlobal: (key: string, value: any, config?: PropertyDescriptor & ThisType<any>) => void
@@ -71,6 +82,7 @@ declare global {
         getProxyClass(): any
         getJavaScriptTaskClass(): any
         getInstance(): any
+        loadMavenDepend(groupId: string, artifactId: string, version: string): [any, any]
         read(path: string): string
         save(path: string, content: string): void
         delete(path: string): void
