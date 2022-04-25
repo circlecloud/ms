@@ -18,12 +18,5 @@
         "build": "yarn clean && tsc",
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
-    "devDependencies": {
-        "@ccms/nashorn": "^0.20.0",
-        "reflect-metadata": "^0.1.13",
-        "rimraf": "^3.0.2",
-        "tslib": "^2.3.1",
-        "typescript": "^4.6.3"
-    },
     "gitHead": "781524f83e52cad26d7c480513e3c525df867121"
 }
