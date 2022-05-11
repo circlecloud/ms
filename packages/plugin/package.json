@@ -23,6 +23,7 @@
         "@ccms/common": "file:../common",
         "@ccms/container": "file:../container",
         "@ccms/i18n": "file:../i18n",
+        "@ccms/verify": "file:../verify",
         "crypto-js": "^4.1.1",
         "js-yaml": "^4.1.0"
     }

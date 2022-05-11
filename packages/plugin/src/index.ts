@@ -1,10 +1,11 @@
-import './scanner/ms-scanner'
+import '@ccms/verify'
 import './scanner/js-scanner'
 
 import './loader/ioc-loader'
 import './loader/basic-loader'
 
 export * from './config'
+export * from './config/config'
 export * from './manager'
 export * from './decorators'
 export * from './interfaces'

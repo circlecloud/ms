@@ -63,13 +63,13 @@ export class IocLoader implements plugin.PluginLoader {
     }
 
     private bindPlugin(metadata: plugin.PluginMetadata) {
-        try {
+        if (this.container.isBoundNamed(plugin.Plugin, metadata.name)) {
             let pluginInstance = this.container.getNamed<plugin.Plugin>(plugin.Plugin, metadata.name)
             if (pluginInstance.description.source + '' !== metadata.source + '') {
                 console.i18n('ms.plugin.manager.build.duplicate', { exists: pluginInstance.description.source, source: metadata.source })
             }
             this.container.rebind(plugin.Plugin).to(metadata.target).inSingletonScope().whenTargetNamed(metadata.name)
-        } catch {
+        } else {
             this.container.bind(plugin.Plugin).to(metadata.target).inSingletonScope().whenTargetNamed(metadata.name)
         }
     }

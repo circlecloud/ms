@@ -20,7 +20,6 @@
         "packages/*"
     ],
     "devDependencies": {
-        "@ccms/nashorn": "file:../nashorn",
         "@javatypes/amqp-client": "^0.0.3",
         "@javatypes/bungee-api": "^0.0.3",
         "@javatypes/jdk": "^0.0.3",
