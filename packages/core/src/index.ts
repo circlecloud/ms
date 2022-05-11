@@ -115,13 +115,11 @@ function loadMiaoScriptConfig() {
     if (!fs.exists(configFile)) {
         global.ScriptEngineConfig = base.save(configFile, yaml.dump({
             uuid: UUID.randomUUID().toString(),
-            channel: 'latest',
             slow_execute: 50
         }))
     } else {
         global.ScriptEngineConfig = yaml.load(base.read(configFile))
     }
-    global.ScriptEngineChannel = global.ScriptEngineConfig.channel || 'latest'
     global.ScriptSlowExecuteTime = global.ScriptEngineConfig.slow_execute || 50
 }
 

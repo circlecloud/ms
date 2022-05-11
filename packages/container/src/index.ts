@@ -113,7 +113,7 @@ export function loadMavenDepend(groupId: string, artifactId: string, version: st
             let dependencies = doc.getElementsByTagName("dependency")
             let size = dependencies.length
             if (!size) { return }
-            console.info(key, 'found', size, 'dependencies loading...')
+            console.debug(key, 'found', size, 'dependencies loading...')
             for (let i = 0; i < size; i++) {
                 const dependency = dependencies.item(i)
                 const gav = dependency.getChildNodes()
