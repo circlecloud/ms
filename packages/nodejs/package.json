@@ -18,5 +18,8 @@
         "build": "yarn clean && tsc",
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
+    "devDependencies": {
+        "@ccms/nashorn": "file:../nashorn"
+    },
     "gitHead": "781524f83e52cad26d7c480513e3c525df867121"
 }

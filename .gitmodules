@@ -1,0 +1,3 @@
+[submodule "packages/verify"]
+	path = packages/verify
+	url = https://github.com/circlecloud/ccms-verify.git
