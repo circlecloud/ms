@@ -30,6 +30,7 @@
         "@ccms/common": "^0.20.0",
         "@ccms/container": "^0.20.0",
         "@ccms/i18n": "^0.20.0",
+        "@ccms/verify": "^0.21.1",
         "crypto-js": "^4.1.1",
         "js-yaml": "^4.1.0"
     }

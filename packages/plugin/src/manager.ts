@@ -283,7 +283,6 @@ export class PluginManagerImpl implements plugin.PluginManager {
         try {
             return this.buildPlugin(metadata)
         } catch (error: any) {
-            console.console(`§4无法加载插件 §b${metadata.name} §4构建插件失败!`)
             console.ex(error)
         }
     }
