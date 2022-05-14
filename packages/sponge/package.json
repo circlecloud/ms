@@ -1,7 +1,7 @@
 {
     "name": "@ccms/sponge",
     "version": "0.21.0",
-    "description": "MiaoScript api package",
+    "description": "MiaoScript sponge package",
     "keywords": [
         "miaoscript",
         "minecraft",

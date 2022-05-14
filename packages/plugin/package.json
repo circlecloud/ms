@@ -1,7 +1,7 @@
 {
     "name": "@ccms/plugin",
     "version": "0.21.0",
-    "description": "MiaoScript api package",
+    "description": "MiaoScript plugin package",
     "keywords": [
         "miaoscript",
         "minecraft",
