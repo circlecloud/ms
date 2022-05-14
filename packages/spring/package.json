@@ -18,10 +18,15 @@
         "build": "yarn clean && tsc",
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
+    "devDependencies": {
+        "reflect-metadata": "^0.1.13",
+        "rimraf": "^3.0.2",
+        "typescript": "^4.6.3"
+    },
     "dependencies": {
-        "@ccms/api": "file:../api",
-        "@ccms/common": "file:../common",
-        "@ccms/container": "file:../container",
-        "@ccms/database": "file:../database"
+        "@ccms/api": "^0.20.0",
+        "@ccms/common": "^0.20.0",
+        "@ccms/container": "^0.20.0",
+        "@ccms/database": "^0.20.0"
     }
 }
