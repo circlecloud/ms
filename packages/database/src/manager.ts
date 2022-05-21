@@ -1,5 +1,5 @@
 import { database } from '@ccms/api'
-import { provideSingleton } from '@ccms/container'
+import { JSClass, provideSingleton } from '@ccms/container'
 import { DataBase } from './database'
 
 @provideSingleton(database.DataBaseManager)
@@ -7,11 +7,32 @@ export class DataBaseManager extends database.DataBaseManager {
     private mainDatabase: DataBase
     private databases = new Map<string, DataBase>()
 
+    @JSClass('org.h2.tools.Server')
+    private Server: any
+
+    private webManager: any
+
     constructor() {
         super()
-        process.on('exit', () => this.disable())
+        process.on('exit', () => this.shutdown())
     }
 
+    startWebManager(...args: string[]) {
+        this.webManager = this.Server.createWebServer(args)
+        this.webManager.start()
+    }
+
+    stopWebManager() {
+        if (this.webManager) {
+            this.webManager.stop()
+            this.webManager.shutdown()
+        }
+    }
+
+    shutdown() {
+        this.stopWebManager()
+        this.disable()
+    }
     /**
      * 设置主数据库
      * @param mainDatabase 主数据库

@@ -1,6 +1,7 @@
 import { database } from '@ccms/api'
 import { JSClass, postConstruct } from '@ccms/container'
 
+const JavaString = Java.type('java.lang.String')
 const Properties = Java.type('java.util.Properties')
 
 /**
@@ -47,11 +48,11 @@ export class DataBase extends database.DataBase {
         } else {
             this.dataSource = dbConfig.url
         }
+        this.jdbcTemplate = new this.JdbcTemplate(this.dataSource)
     }
 
-    @postConstruct()
-    private initialize() {
-        this.jdbcTemplate = new this.JdbcTemplate(this.dataSource)
+    getDataSource() {
+        return this.dataSource
     }
 
     /**
@@ -62,7 +63,7 @@ export class DataBase extends database.DataBase {
     query<T>(sql: string, ...args: any[]): Array<T> {
         let startTime = Date.now()
         let result = Java.from<any>(this.jdbcTemplate.queryForList(sql, args))
-        console.debug(java.lang.String.format(`\n[DB] query \nSQL  : ${sql.replace(/\?/ig, '%s')} \nCOST : ${Date.now() - startTime}ms`, args))
+        console.debug(JavaString.format(`\n[DB] query \nSQL  : ${sql.replace(/\?/ig, '%s')} \nCOST : ${Date.now() - startTime}ms`, args))
         return result
     }
 
@@ -74,7 +75,7 @@ export class DataBase extends database.DataBase {
     update(sql: string, ...args: any[]): number {
         let startTime = Date.now()
         let result = this.jdbcTemplate.update(sql, args)
-        console.debug(java.lang.String.format(`\n[DB] update \nSQL  : ${sql.replace(/\?/ig, '%s')} \nCOST : ${Date.now() - startTime}ms`, args))
+        console.debug(JavaString.format(`\n[DB] update \nSQL  : ${sql.replace(/\?/ig, '%s')} \nCOST : ${Date.now() - startTime}ms`, args))
         return result
     }
 
@@ -85,7 +86,7 @@ export class DataBase extends database.DataBase {
     execute(sql: string): void {
         let startTime = Date.now()
         this.jdbcTemplate.execute(sql)
-        console.debug(java.lang.String.format(`\n[DB] execute \nSQL  : sql} \nCOST : ${Date.now() - startTime}ms`))
+        console.debug(`\n[DB] execute \nSQL  : ${sql} \nCOST : ${Date.now() - startTime}ms`)
     }
 
     close() {

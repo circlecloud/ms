@@ -35,6 +35,9 @@ export namespace database {
         abstract createDatabase(name: string, config: DataBaseConfig): DataBase
         abstract removeDatabase(name: string): boolean
         abstract getDatabase(name: string): DataBase
+        abstract startWebManager(...args: string[])
+        abstract stopWebManager()
+        abstract shutdown()
     }
     @injectable()
     export abstract class DataBase {
