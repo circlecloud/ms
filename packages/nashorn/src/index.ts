@@ -48,7 +48,10 @@ declare global {
             scope: string
             logger: any
             debug: boolean
-            level: string
+            /**
+             * 引擎日志等级
+             */
+            ScriptEngineLoggerLevel: string
             /**
              * 引擎配置
              */

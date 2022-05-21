@@ -6,6 +6,7 @@ console.i18n("ms.core.ioc.completed", { scope: global.scope, time: (Date.now() -
 import * as yaml from 'js-yaml'
 import http from '@ccms/common/dist/http'
 import * as fs from '@ccms/common/dist/fs'
+import { VersionUtils } from '@ccms/common/dist/version'
 
 const UUID = Java.type('java.util.UUID')
 
@@ -25,6 +26,11 @@ class MiaoScriptCore {
         this.loadServerConsole()
         this.loadPlugins()
         process.emit('core.after.enable')
+        console.i18n("ms.core.engine.completed", {
+            loader: base.version,
+            version: 'v' + global.ScriptEngineVersion,
+            time: (Date.now() - global.ScriptEngineStartTime) / 1000
+        })
         return () => this.disable()
     }
 
@@ -123,6 +129,30 @@ function loadMiaoScriptConfig() {
     global.ScriptSlowExecuteTime = global.ScriptEngineConfig.slow_execute || 50
 }
 
+function createCore() {
+    let corePackageStartTime = new Date().getTime()
+    container.bind(ContainerInstance).toConstantValue(container)
+    container.bind(plugin.PluginInstance).toConstantValue(base.getInstance())
+    container.bind(plugin.PluginFolder).toConstantValue('plugins')
+    let type = detectServer()
+
+    process.emit('core.before.initialize.detect')
+    console.i18n("ms.core.initialize.detect", { scope: global.scope, type })
+    container.bind(server.ServerType).toConstantValue(type)
+    container.bind(server.ServerChecker).toSelf().inSingletonScope()
+    container.bind(server.NativePluginManager).toSelf().inSingletonScope()
+    process.emit('core.after.initialize.detect')
+
+    process.emit('core.before.package.initialize')
+    console.i18n("ms.core.package.initialize", { scope: global.scope, type })
+    require(`${global.scope}/${type}`).default(container)
+    require(`${global.scope}/plugin`)
+    container.load(buildProviderModule())
+    console.i18n("ms.core.package.completed", { scope: global.scope, type, time: (Date.now() - corePackageStartTime) / 1000 })
+    process.emit('core.after.package.initialize')
+    return container.get<MiaoScriptCore>(MiaoScriptCore)
+}
+
 function initialize() {
     process.emit('core.before.initialize')
     loadMiaoScriptConfig()
@@ -130,43 +160,22 @@ function initialize() {
     global.setGlobal('loadCoreScript', loadCoreScript)
     loadCoreScript('initialize')
     try {
-        let corePackageStartTime = new Date().getTime()
-        container.bind(ContainerInstance).toConstantValue(container)
-        container.bind(plugin.PluginInstance).toConstantValue(base.getInstance())
-        container.bind(plugin.PluginFolder).toConstantValue('plugins')
-        let type = detectServer()
-
-        process.emit('core.before.initialize.detect')
-        console.i18n("ms.core.initialize.detect", { scope: global.scope, type })
-        container.bind(server.ServerType).toConstantValue(type)
-        container.bind(server.ServerChecker).toSelf().inSingletonScope()
-        container.bind(server.NativePluginManager).toSelf().inSingletonScope()
-        process.emit('core.after.initialize.detect')
-
-        process.emit('core.before.package.initialize')
-        console.i18n("ms.core.package.initialize", { scope: global.scope, type })
-        require(`${global.scope}/${type}`).default(container)
-        require(`${global.scope}/plugin`)
-        container.load(buildProviderModule())
-        console.i18n("ms.core.package.completed", { scope: global.scope, type, time: (Date.now() - corePackageStartTime) / 1000 })
-        process.emit('core.after.package.initialize')
-
-        let disable = container.get<MiaoScriptCore>(MiaoScriptCore).enable()
-        console.i18n("ms.core.engine.completed", {
-            loader: base.version,
-            version: 'v' + global.ScriptEngineVersion,
-            time: (Date.now() - global.ScriptEngineStartTime) / 1000
-        })
-        process.emit('core.after.initialize')
-        return disable
+        let core = createCore()
+        if (VersionUtils.isGreaterOrEqual(base.version, '0.22.0')) { return core }
+        return core.enable()
     } catch (error: any) {
         if (console.console) {
-            console.i18n("ms.core.initialize.error", { error })
+            console.i18n("core.initialize.error", { error })
             console.ex(error)
         } else {
             error.printStackTrace()
         }
-        return () => console.i18n('ms.core.engine.disable.abnormal')
+        process.emit('core.initialize.error')
+        return {
+            enable: () => console.i18n('ms.core.engine.disable.abnormal')
+        }
+    } finally {
+        process.emit('core.after.initialize')
     }
 }
 

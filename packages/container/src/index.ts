@@ -102,8 +102,8 @@ export const MavenDepend = (groupId: string, artifactId: string, version: string
 const loadedMavenDepend = new Set<string>()
 
 export function loadMavenDepend(groupId: string, artifactId: string, version: string, recursion = false) {
+    const key = `${groupId}:${artifactId}:${version}`
     try {
-        const key = `${groupId}:${artifactId}:${version}`
         if (loadedMavenDepend.has(key)) { return }
         console.info('loading maven dependency', key)
         let [pom, _] = base.loadMavenDepend(groupId, artifactId, version)
@@ -137,7 +137,7 @@ export function loadMavenDepend(groupId: string, artifactId: string, version: st
             }
         }
     } catch (error: any) {
-        console.warn('attachMavenDepend failed. Error: ' + error)
+        console.warn('load maven dependency', key, 'failed. Error:', error)
         if (global.debug) {
             console.ex(error)
         }

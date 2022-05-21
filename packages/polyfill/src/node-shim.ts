@@ -15,7 +15,7 @@ const DelayQueue = Java.type('java.util.concurrent.DelayQueue')
 const JavaScriptTask = Java.type(base.getJavaScriptTaskClass().name)
 
 const threadCount = new AtomicInteger(0)
-const threadGroup = new ThreadGroup("@ccms/ployfill-micro-task")
+const threadGroup = new ThreadGroup("@ccms/micro-task")
 const microTaskPool = new ThreadPoolExecutor(
     100, 200, 60, TimeUnit.SECONDS,
     new LinkedBlockingQueue(300),
@@ -76,16 +76,16 @@ class Process extends EventEmitter {
 class EventLoop {
     private eventLoopMainThread = undefined
     private eventLoopTaskQueue = new DelayQueue()
-    private taskExecTimeout = 3
+    private taskExecuteTimeout = 3000
     private fixedThreadPool = undefined
 
     constructor() {
-        this.taskExecTimeout = parseInt(process.env.MS_NODE_EVENT_LOOP_TIMEOUT) || 3
+        this.taskExecuteTimeout = parseInt(process.env.MS_TASK_EXECUTE_TIMEOUT) || 3000
         this.fixedThreadPool = new ThreadPoolExecutor(
             1, 1, 0, TimeUnit.SECONDS,
-            new LinkedBlockingQueue(300),
+            new LinkedBlockingQueue(500),
             new ThreadFactory((run: any) => {
-                let thread = new Thread(run, "@ccms/node-shim/event-loop-exec")
+                let thread = new Thread(run, "@ccms/event-loop")
                 thread.setDaemon(true)
                 return thread
             }))
@@ -115,7 +115,7 @@ class EventLoop {
                 this.intervalTasks = undefined
                 this.eventLoopMainThread = undefined
             }
-        }, "@ccms/node-shim/event-loop")
+        }, "@ccms/event-loop")
         this.eventLoopMainThread.setDaemon(true)
         process.on('exit', () => {
             this.eventLoopMainThread.interrupt()
@@ -137,7 +137,9 @@ class EventLoop {
         if (!callback) {
             throw new Error(`task ${name} callback function can't be null!`)
         }
-        if (this.fixedThreadPool.isShutdown()) { return console.warn(`FixedThreadPool isTerminated! ignore Task ${name}!`) }
+        if (this.fixedThreadPool.isShutdown()) {
+            return console.warn(`FixedThreadPool isTerminated! ignore Task ${name}!`)
+        }
         try {
             this.fixedThreadPool.submit(new Callable({
                 call: () => {
@@ -153,13 +155,13 @@ class EventLoop {
                         }
                     }
                 }
-            })).get(this.taskExecTimeout, TimeUnit.SECONDS)
+            })).get(this.taskExecuteTimeout, TimeUnit.MILLISECONDS)
         } catch (error: any) {
             if (error instanceof InterruptedException) {
                 return console.warn(`FixedThreadPool isInterrupted exit! Task ${name} exec exit!`)
             }
             if (error instanceof TimeoutException) {
-                return console.warn(`Task ${name} => ${callback} exec time greater than ${this.taskExecTimeout}s!`)
+                return console.warn(`Task ${name} => ${callback} exec time greater than ${this.taskExecuteTimeout}s!`)
             }
             throw error.getCause && error.getCause() || error
         }

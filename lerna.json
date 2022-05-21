@@ -8,10 +8,6 @@
     "command": {
         "run": {
             "stream": true
-        },
-        "publish": {
-            "access": "public",
-            "registry": "https://repo.yumc.pw/repository/npm-hosted/"
         }
     }
 }
