@@ -92,6 +92,10 @@ export namespace interfaces {
          */
         format?: string
         /**
+         * 是否合并默认配置
+         */
+        migrate?: boolean
+        /**
          * 自动保存 默认为 false
          */
         autosave?: boolean

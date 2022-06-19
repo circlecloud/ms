@@ -83,7 +83,7 @@ export class PluginConfigManager {
                         name: metadata.name,
                         format: metadata.format
                     })
-                } else {
+                } else if (metadata.migrate) {
                     configValue = configLoader.load(base.read(metadata.file)) || {}
                     if (defaultValue && this.setDefaultValue(configValue, defaultValue, !!metadata.default)) {
                         base.save(metadata.file, configLoader.dump(configValue))

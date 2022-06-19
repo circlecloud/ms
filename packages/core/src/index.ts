@@ -1,6 +1,6 @@
 let containerStartTime = Date.now()
 console.i18n("ms.core.ioc.initialize", { scope: global.scope })
-import { plugin, server, task, constants } from '@ccms/api'
+import { plugin, server, task, constants, console as jsconsole } from '@ccms/api'
 import { DefaultContainer as container, provideSingleton, ContainerInstance, buildProviderModule, Autowired } from '@ccms/container'
 console.i18n("ms.core.ioc.completed", { scope: global.scope, time: (Date.now() - containerStartTime) / 1000 })
 import * as yaml from 'js-yaml'
@@ -161,19 +161,13 @@ function initialize() {
     loadCoreScript('initialize')
     try {
         let core = createCore()
-        if (VersionUtils.isGreaterOrEqual(base.version, '0.22.0')) { return core }
-        return core.enable()
+        return VersionUtils.isGreaterOrEqual(base.version, '0.22.0') ? core : core.enable()
     } catch (error: any) {
-        if (console.console) {
-            console.i18n("core.initialize.error", { error })
-            console.ex(error)
-        } else {
-            error.printStackTrace()
-        }
+        let core = { enable: () => () => console.i18n('ms.core.engine.disable.abnormal') }
+        console.i18n("core.initialize.error", { error })
+        jsconsole.getStackTrace(error, false).forEach(line => console.log(line))
         process.emit('core.initialize.error')
-        return {
-            enable: () => console.i18n('ms.core.engine.disable.abnormal')
-        }
+        return VersionUtils.isGreaterOrEqual(base.version, '0.22.0') ? core : core.enable()
     } finally {
         process.emit('core.after.initialize')
     }

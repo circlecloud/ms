@@ -2,6 +2,7 @@ import { EventEmitter } from 'events'
 
 const System = Java.type('java.lang.System')
 const Thread = Java.type('java.lang.Thread')
+const ManagementFactory = Java.type('java.lang.management.ManagementFactory')
 const InterruptedException = Java.type('java.lang.InterruptedException')
 const ThreadGroup = Java.type("java.lang.ThreadGroup")
 const AtomicInteger = Java.type("java.util.concurrent.atomic.AtomicInteger")
@@ -18,16 +19,32 @@ const threadCount = new AtomicInteger(0)
 const threadGroup = new ThreadGroup("@ccms/micro-task")
 const microTaskPool = new ThreadPoolExecutor(
     100, 200, 60, TimeUnit.SECONDS,
-    new LinkedBlockingQueue(300),
+    new LinkedBlockingQueue(1024),
     new ThreadFactory((run: any) => new Thread(threadGroup, run, "@ccms/micro-task-" + threadCount.incrementAndGet()))
 )
 class Process extends EventEmitter {
+    readonly version = base.version
+    readonly versions = []
+    readonly config = {}
+    readonly pid: number = parseInt(ManagementFactory.getRuntimeMXBean().getName().split('@')[0])
+    readonly ppid: number
+    title: string
+    readonly arch: string = System.getProperty("os.arch")
+    readonly platform = System.getProperty("os.name")
+
     env = {
         __noSuchProperty__: (prop) => {
             return System.getenv(prop)
         }
     }
-    platform = System.getProperty("os.name")
+
+    stdout = System.out
+    stderr = System.err
+    stdin = System.in
+
+    execArgv = ''
+    execPath = ''
+
     constructor() {
         super()
         this.on('exit', () => {
@@ -49,10 +66,10 @@ class Process extends EventEmitter {
             }
         })
     }
-    nextTick(func: Function, ...args: any[]) {
+    nextTick(callback: Function, ...args: any[]): void {
         microTaskPool.execute(() => {
             try {
-                func(args)
+                callback(args)
             } catch (origin: any) {
                 try {
                     super.emit('error', origin)
@@ -65,9 +82,44 @@ class Process extends EventEmitter {
     }
     exit(code: number) {
         console.log(`process exit by code ${code}!`)
-        this.emit('exit', code)
+        this.emit('exit', this.exitCode = code)
     }
-
+    exitCode = 0
+    openStdin() {
+        throw new Error('MiaoScript unsupport openStdin.')
+    }
+    chdir(directory: string): void {
+        console.error('MiaoScript unsupport chdir. lock at ' + root)
+    }
+    cwd() {
+        return root
+    }
+    getgid(): number {
+        throw new Error('MiaoScript unsupport getgid.')
+    }
+    setgid(id: number | string) {
+        throw new Error('MiaoScript unsupport setgid.')
+    }
+    getuid(): number {
+        throw new Error('MiaoScript unsupport getuid.')
+    }
+    setuid(id: number | string) {
+        throw new Error('MiaoScript unsupport setuid.')
+    }
+    setUncaughtExceptionCaptureCallback(cb: ((err: Error) => void) | null) {
+        if (cb == null) {
+            this.removeAllListeners('error')
+        } else {
+            this.on('error', cb)
+        }
+    }
+    hasUncaughtExceptionCaptureCallback() {
+        return this.listenerCount('error') > 0
+    }
+    kill(pid: number, signal?: string | number): true {
+        throw new Error('MiaoScript unsupport kill.')
+        return true
+    }
     toString() {
         return "[object process]"
     }
@@ -83,7 +135,7 @@ class EventLoop {
         this.taskExecuteTimeout = parseInt(process.env.MS_TASK_EXECUTE_TIMEOUT) || 3000
         this.fixedThreadPool = new ThreadPoolExecutor(
             1, 1, 0, TimeUnit.SECONDS,
-            new LinkedBlockingQueue(500),
+            new LinkedBlockingQueue(1024),
             new ThreadFactory((run: any) => {
                 let thread = new Thread(run, "@ccms/event-loop")
                 thread.setDaemon(true)

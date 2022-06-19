@@ -1,6 +1,7 @@
 import { database } from '@ccms/api'
-import { JSClass, postConstruct } from '@ccms/container'
+import { JSClass } from '@ccms/container'
 
+const Thread = Java.type('java.lang.Thread')
 const JavaString = Java.type('java.lang.String')
 const Properties = Java.type('java.util.Properties')
 
@@ -26,9 +27,21 @@ export class DataBase extends database.DataBase {
 
     private createDataSource(dbConfig: database.DataBaseConfig) {
         if (typeof dbConfig.url === "string") {
+            let originClassLoader = Thread.currentThread().getContextClassLoader()
+            Thread.currentThread().setContextClassLoader(base.getInstance().class.classLoader)
             let config = new this.HikariConfig()
             if (dbConfig.driverClassName) {
                 config.setDriverClassName(dbConfig.driverClassName)
+            } else {
+                switch (dbConfig.type) {
+                    case "h2":
+                        config.setDriverClassName("org.h2.Driver")
+                        break
+                    case "sqlite":
+                        config.setDriverClassName("org.sqlite.JDBC")
+                        break
+                    default:
+                }
             }
             if (dbConfig.username) {
                 config.setUsername(dbConfig.username)
@@ -44,7 +57,9 @@ export class DataBase extends database.DataBase {
                 }
                 config.setDataSourceProperties(properties)
             }
+            console.debug('createDataSource from config ' + JSON.stringify(dbConfig))
             this.dataSource = new this.HikariDataSource(config)
+            Thread.currentThread().setContextClassLoader(originClassLoader)
         } else {
             this.dataSource = dbConfig.url
         }

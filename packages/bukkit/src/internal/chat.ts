@@ -6,12 +6,14 @@ let bukkitChatInvoke: BukkitChatInvoke
 abstract class BukkitChatInvoke {
     private downgrade: boolean = false
     protected RemapUtils: any
+    protected ComponentSerializer:any
 
     protected ChatSerializer: any
     protected nmsChatSerializerMethodName: string
     protected PacketPlayOutChat: any
     protected chatMessageTypes: any
     protected playerConnectionFieldName: string
+    protected playerFieldName: string
     protected sendPacketMethodName: string
 
     constructor(private nmsVersion) {
@@ -20,12 +22,12 @@ abstract class BukkitChatInvoke {
     init() {
         try {
             try {
+                this.ComponentSerializer = Java.type('net.md_5.bungee.chat.ComponentSerializer')
                 this.RemapUtils = Java.type('catserver.server.remapper.RemapUtils')
             } catch (ex: any) {
             }
             let nmsChatSerializerClass = this.getNmsChatSerializerClass()
-            let nmsChatSerializerMethod = this.remapMethod(nmsChatSerializerClass, 'a', 'func_150699_a', base.getClass('java.lang.String'))
-            this.nmsChatSerializerMethodName = nmsChatSerializerMethod.getName()
+            this.nmsChatSerializerMethodName = this.getNmsChatSerializerMethodName(nmsChatSerializerClass)
             this.ChatSerializer = Java.type(nmsChatSerializerClass.getName())
             let packetTypeClass = this.getPacketPlayOutChatClass()
             this.PacketPlayOutChat = Java.type(packetTypeClass.getName())
@@ -42,7 +44,7 @@ abstract class BukkitChatInvoke {
             }
             let playerConnectionField = this.getPlayerConnectionField()
             this.playerConnectionFieldName = playerConnectionField.getName()
-            this.sendPacketMethodName = this.remapMethod(playerConnectionField.getType(), 'sendPacket', 'func_179290_a', this.getPacketClass()).getName()
+            this.sendPacketMethodName = this.getSendPacketMethodName(playerConnectionField.getType())
         } catch (ex: any) {
             org.bukkit.Bukkit.getConsoleSender().sendMessage(`§6[§cMS§6][§bbukkit§6][§achat§6] §cNMS Inject Error §4${ex} §cDowngrade to Command Mode...`)
             this.downgrade = true
@@ -50,10 +52,12 @@ abstract class BukkitChatInvoke {
     }
 
     abstract getNmsChatSerializerClass()
+    abstract getNmsChatSerializerMethodName(nmsChatSerializerClass: any)
     abstract getPacketPlayOutChatClass()
     abstract getPacketPlayOutChat(sender: any, json: any, type: number)
     abstract getPlayerConnectionField()
     abstract getPacketClass()
+    abstract getSendPacketMethodName(playerConnectionClass: any)
 
     nmsCls(name: string) {
         return base.getClass(['net.minecraft.server', this.nmsVersion, name].join('.'))
@@ -83,9 +87,9 @@ abstract class BukkitChatInvoke {
         }
     }
 
-    json(sender: { name: string }, json: string) {
+    json(sender: any, json: string) {
         if (this.downgrade) {
-            return '/tellraw ' + sender.name + ' ' + json
+            return sender.spigot().sendMessage(this.ComponentSerializer.parse(json))
         } else {
             this.send(sender, json, 0)
             return false
@@ -100,6 +104,13 @@ abstract class BukkitChatInvoke {
 }
 
 class BukkitChatInvokeBase extends BukkitChatInvoke {
+    getSendPacketMethodName(playerConnectionClass: any) {
+        return this.remapMethod(playerConnectionClass, 'sendPacket', 'func_179290_a', this.getPacketClass()).getName()
+    }
+    getNmsChatSerializerMethodName(nmsChatSerializerClass: any) {
+        let nmsChatSerializerMethod = this.remapMethod(nmsChatSerializerClass, 'a', 'func_150699_a', base.getClass('java.lang.String'))
+        return nmsChatSerializerMethod.getName()
+    }
     getPacketPlayOutChat(sender: any, json: any, type: number) {
         return new this.PacketPlayOutChat(this.ChatSerializer[this.nmsChatSerializerMethodName](json), type)
     }
@@ -149,17 +160,31 @@ class BukkitChatInvoke_1_17_1 extends BukkitChatInvoke_1_16_5 {
     }
 }
 
+class BukkitChatInvoke_1_19 extends BukkitChatInvoke_1_17_1 {
+    getSendPacketMethodName(playerConnectionClass: any) {
+        return playerConnectionClass.getMethod('a', this.getPacketClass()).getName()
+    }
+    getPacketPlayOutChatClass() {
+        return base.getClass('net.minecraft.network.protocol.game.ClientboundSystemChatPacket')
+    }
+    getPacketPlayOutChat(sender: any, json: any, type: number) {
+        return new this.PacketPlayOutChat(this.ChatSerializer[this.nmsChatSerializerMethodName](json), type == 0 ? 1 : type)
+    }
+}
+
 try {
     let Bukkit: typeof org.bukkit.Bukkit = Java.type('org.bukkit.Bukkit')
     // @ts-ignore
     let nmsVersion = Bukkit.getServer().class.name.split('.')[3]
     let nmsSubVersion = nmsVersion.split("_")[1]
-    if (nmsSubVersion >= 8) {
-        bukkitChatInvoke = new BukkitChatInvoke_1_8(nmsVersion)
-    } else if (nmsSubVersion >= 16) {
-        bukkitChatInvoke = new BukkitChatInvoke_1_16_5(nmsVersion)
+    if (nmsSubVersion >= 19) {
+        bukkitChatInvoke = new BukkitChatInvoke_1_19(nmsVersion)
     } else if (nmsSubVersion >= 17) {
         bukkitChatInvoke = new BukkitChatInvoke_1_17_1(nmsVersion)
+    } else if (nmsSubVersion >= 16) {
+        bukkitChatInvoke = new BukkitChatInvoke_1_16_5(nmsVersion)
+    } else if (nmsSubVersion >= 8) {
+        bukkitChatInvoke = new BukkitChatInvoke_1_8(nmsVersion)
     } else {
         bukkitChatInvoke = new BukkitChatInvoke_1_7_10(nmsVersion)
     }

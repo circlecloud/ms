@@ -4,6 +4,7 @@ import { server } from '@ccms/api'
 import { Container } from '@ccms/container'
 
 import { BukkitConsole } from './console'
+import './item'
 import './chat'
 import './task'
 import './event'

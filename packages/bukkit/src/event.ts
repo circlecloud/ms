@@ -2,6 +2,7 @@ import { event, plugin } from '@ccms/api'
 import { inject, provideSingleton } from '@ccms/container'
 import * as reflect from '@ccms/common/dist/reflect'
 
+const URL = Java.type('java.net.URL')
 const Bukkit = Java.type("org.bukkit.Bukkit")
 const Event = Java.type("org.bukkit.event.Event")
 const Modifier = Java.type("java.lang.reflect.Modifier")
@@ -19,7 +20,15 @@ export class BukkitEvent extends event.Event {
     }
 
     getJarFile(resource: string) {
-        return super.getJarFile('org/bukkit/Bukkit.class', Bukkit.class.classLoader)
+        try {
+            return super.getJarFile('org/bukkit/Bukkit.class', Bukkit.class.classLoader)
+        } catch (error) {
+            // 兼容 LoliServer 的 Bukkit 包无法获取的问题
+            let ModList = Java.type('net.minecraftforge.fml.ModList').get()
+            let forgeFile = ModList.getModFileById("forge").getFile().getFilePath()
+            let jarPath = `jar:file:${forgeFile}!/org/bukkit/Bukkit.class`
+            return new URL(jarPath).openConnection().jarFile
+        }
     }
     isValidEvent(clazz: any): boolean {
         // 继承于 org.bukkit.event.Event

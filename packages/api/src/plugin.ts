@@ -149,7 +149,15 @@ export namespace plugin {
         /**
          * 插件名称 不填默认为类名
          */
-        name?: string
+        name: string
+        /**
+         * 插件中文名称
+         */
+        cname?: string
+        /**
+         * 插件等级 付费插件自动注入
+         */
+        level?: number
         /**
          * 前缀
          */

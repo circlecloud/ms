@@ -69,7 +69,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
             try {
                 console.i18n('ms.plugin.event.map', { count: this.eventManager.mapEventName(), type: this.serverType })
             } catch (error) {
-                console.i18n('ms.plugin.event.map.error', { error })
+                console.i18n('ms.plugin.event.map.error', { type: this.serverType, error })
             }
             let pluginScanner = this.container.getAll<plugin.PluginScanner>(plugin.PluginScanner)
             pluginScanner.forEach((scanner) => {

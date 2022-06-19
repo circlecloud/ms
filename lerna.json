@@ -9,5 +9,8 @@
         "run": {
             "stream": true
         }
+    },
+    "publishConfig": {
+        "access": "public"
     }
 }

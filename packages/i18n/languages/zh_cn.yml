@@ -34,7 +34,7 @@ ms.api.command.tab.completer.slow: "§c注意! §6玩家 §a{player} §6执行 �
 ms.api.command.tab.completer.error: "§6玩家 §a{player} §6执行 §b{plugin} §6插件 §d{command} {args} §6补全时发生异常 §4{ex}"
 
 ms.plugin.initialize: "初始化 MiaoScript 插件系统: 实例: {plugin} 加载器: {loader}..."
-ms.plugin.event.map: "总计 {count} 个 {type} 事件 映射完成..."
+ms.plugin.event.map: "映射 {type} 事件 成功 总计 {count} 个 {type} 事件..."
 ms.plugin.event.map.error: "映射 {type} 事件 异常 将无法使用事件简称. Error: {error}"
 ms.plugin.manager.scan: "扫描器 {scanner} 扫描 {folder} 中的插件..."
 ms.plugin.manager.scan.finish: "扫描器 {scanner} 在 {folder} 中 发现 {size} 个插件 开始编译..."

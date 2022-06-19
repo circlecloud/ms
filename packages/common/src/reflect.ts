@@ -129,12 +129,14 @@ function declaredField(clazz: java.lang.Class<any>, name: string | java.lang.Str
     let field = null
     // noinspection JSUnresolvedVariable
     while (target !== JavaObject.class) {
+        console.debug(`reflect field ${name} from ${target.getName()}`)
         try {
             field = target.getDeclaredField(name)
             if (field !== null) { break }
         } catch (error: any) {
             if (target === undefined) { break }
             target = target.getSuperclass()
+            console.debug(`切换到超类: ${target.getName()}`)
         }
     }
     if (field === null) {
@@ -146,21 +148,32 @@ function declaredField(clazz: java.lang.Class<any>, name: string | java.lang.Str
 function declaredMethod(clazz: java.lang.Class<any>, nameOrIndex: string | number, ...clazzs: java.lang.Class<any>[]): java.lang.reflect.Method {
     let key = clazz.getName() + '.' + nameOrIndex + ':' + (clazzs || []).map(c => c.getName()).join(':')
     if (methodCache.has(key)) { return methodCache.get(key) }
+    let target = clazz
     if (typeof nameOrIndex === "number") {
         methodCache.set(key, declaredMethods(clazz)[nameOrIndex])
     } else {
-        try {
-            methodCache.set(key, clazz.getMethod(nameOrIndex, clazzs as any))
-        } catch (ex: any) {
+        while (target !== JavaObject.class && !methodCache.has(key)) {
             try {
-                methodCache.set(key, clazz.getDeclaredMethod(nameOrIndex, clazzs as any))
-            } catch (ex: any) {
-                for (const m of Java.from(declaredMethods(clazz))) {
-                    if (m.getName() == nameOrIndex) {
-                        methodCache.set(key, m)
-                        break
+                console.debug(`reflect method ${typeof nameOrIndex == "number" ? 'index' : 'name'} ${nameOrIndex} from ${target.getName()}`)
+                try {
+                    methodCache.set(key, target.getMethod(nameOrIndex, clazzs as any))
+                } catch (ex: any) {
+                    try {
+                        methodCache.set(key, target.getDeclaredMethod(nameOrIndex, clazzs as any))
+                    } catch (ex: any) {
+                        for (const m of Java.from(declaredMethods(target))) {
+                            if (m.getName() == nameOrIndex) {
+                                methodCache.set(key, m)
+                                break
+                            }
+                        }
+                        throw new Error(`method ${typeof nameOrIndex == "number" ? 'index' : 'name'} ${nameOrIndex} not found.`)
                     }
                 }
+            } catch (error) {
+                if (target === undefined) { break }
+                target = target.getSuperclass()
+                console.debug(`切换到超类: ${target.getName()}`)
             }
         }
     }

@@ -7,6 +7,10 @@ export namespace database {
      */
     export interface DataBaseConfig {
         /**
+         * 数据库类型
+         */
+        type: 'h2' | 'mysql' | 'mongodb' | 'sqlite' | 'postgres' | 'redis'
+        /**
          * 数据库连接串
          */
         url: string | javax.sql.DataSource

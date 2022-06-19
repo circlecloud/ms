@@ -14,7 +14,7 @@
         "np": "./script/push.sh",
         "lsp": "npm login --registry=https://registry.npmjs.org --scope=@ccms",
         "lp": "lerna publish --registry https://registry.npmjs.org",
-        "lpb": "lerna publish --registry https://registry.npmjs.org --canary --pre-dist-tag beta"
+        "lpb": "lerna publish --registry https://registry.npmjs.org --canary --preid beta --pre-dist-tag beta"
     },
     "workspaces": [
         "packages/*"
