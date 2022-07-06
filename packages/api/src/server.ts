@@ -172,13 +172,13 @@ export namespace server {
         }
         protected reflectRootLogger(consoleServer: any) {
             try {
-                this.rootLogger = reflect.on(consoleServer).get('LOGGER').get().parent
+                this.rootLogger = reflect.on(consoleServer).get('LOGGER').get()
             } catch (error: any) {
                 if (global.debug) {
                     console.ex(error)
                 }
                 try {
-                    this.rootLogger = reflect.on(consoleServer).get(0).get().parent
+                    this.rootLogger = reflect.on(consoleServer).get(0).get()
                 } catch (error: any) {
                     if (global.debug) {
                         console.ex(error)

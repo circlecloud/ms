@@ -155,7 +155,11 @@ export namespace plugin {
          */
         cname?: string
         /**
-         * 插件等级 付费插件自动注入
+         * 付费插件ID
+         */
+        pid?: number
+        /**
+         * 付费插件等级 付费插件自动注入
          */
         level?: number
         /**

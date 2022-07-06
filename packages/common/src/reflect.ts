@@ -54,6 +54,7 @@ class Reflect {
             }
         }
         if (!field) throw new Error(`can't reflect field ${typeof nameOrIndex == "number" ? 'index' : 'name'} ${nameOrIndex} from ${this.class.getName()}!`)
+        fieldCache.set(key, field)
         return accessible(field)
     }
 

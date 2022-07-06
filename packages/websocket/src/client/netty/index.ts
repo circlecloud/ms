@@ -58,7 +58,7 @@ export class NettyWebSocket extends Transport {
     private _host: string
     private _port: number
     private channel: any
-    private b = new Bootstrap();
+    private b: any
 
     constructor(url: string, subProtocol: string = '', headers: WebSocketHeader = {}) {
         super(url, subProtocol, headers)
@@ -102,6 +102,7 @@ export class NettyWebSocket extends Transport {
         // HttpResponseDecoder to WebSocketHttpResponseDecoder in the pipeline.
         let handler = new WebSocketClientHandler(WebSocketClientHandshakerFactory
             .newHandshaker(uri, WebSocketVersion.V13, null, false, headers), this)
+        this.b = new Bootstrap()
         this.b.group(group)
             .channel(socketChannelClass)
             .handler(new ChannelInitializer({
@@ -123,18 +124,22 @@ export class NettyWebSocket extends Transport {
                 }
             }))
         this.b.connect(this._host, this._port).addListener(new ChannelFutureListener((future: any) => {
-            this.channel = future.sync().channel()
-            this.onconnection({})
-            handler.handshakeFuture.addListener(new ChannelFutureListener((future: any) => {
-                try {
-                    future.sync()
-                    // only trigger onconnect when not have error
-                    this.onconnect({})
-                } catch (error: any) {
-                    // ignore error exceptionCaught from handler
-                    // this.onerror({ error })
-                }
-            }))
+            try {
+                this.channel = future.sync().channel()
+                this.onconnection({})
+                handler.handshakeFuture.addListener(new ChannelFutureListener((future: any) => {
+                    try {
+                        future.sync()
+                        // only trigger onconnect when not have error
+                        this.onconnect({})
+                    } catch (error: any) {
+                        // ignore error exceptionCaught from handler
+                        // this.onerror({ error })
+                    }
+                }))
+            } catch (error: any) {
+                this.onerror({ error })
+            }
         }))
     }
     doSend(text: string) {

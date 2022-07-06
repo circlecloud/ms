@@ -6,7 +6,7 @@ let bukkitChatInvoke: BukkitChatInvoke
 abstract class BukkitChatInvoke {
     private downgrade: boolean = false
     protected RemapUtils: any
-    protected ComponentSerializer:any
+    protected ComponentSerializer: any
 
     protected ChatSerializer: any
     protected nmsChatSerializerMethodName: string
@@ -38,6 +38,8 @@ abstract class BukkitChatInvoke {
                     let nmsChatMessageTypeClass = parameterTypes[1]
                     if (nmsChatMessageTypeClass.isEnum()) {
                         this.chatMessageTypes = nmsChatMessageTypeClass.getEnumConstants()
+                        break
+                    } else if (nmsChatMessageTypeClass.getName() == 'int') {
                         break
                     }
                 }
