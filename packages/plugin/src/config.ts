@@ -68,30 +68,25 @@ export class PluginConfigManager {
     private loadConfig0(plugin: plugin.Plugin, metadata: interfaces.ConfigMetadata) {
         try {
             let defaultValue = metadata.default ?? plugin[metadata.variable]
-            let configValue = defaultValue || {}
-            if (defaultValue) {
-                metadata.file = fs.concat(
-                    fs.file(plugin.description.loadMetadata.file).parent,
-                    plugin.description.name,
-                    metadata.filename
-                )
-                let configLoader = this.getConfigLoader(metadata.format)
-                if (!fs.exists(metadata.file)) {
-                    base.save(metadata.file, configLoader.dump(defaultValue))
-                    console.i18n("ms.plugin.manager.config.save.default", {
-                        plugin: plugin.description.name,
-                        name: metadata.name,
-                        format: metadata.format
-                    })
-                } else if (metadata.migrate) {
-                    configValue = configLoader.load(base.read(metadata.file)) || {}
-                    if (defaultValue && this.setDefaultValue(configValue, defaultValue, !!metadata.default)) {
-                        base.save(metadata.file, configLoader.dump(configValue))
-                    }
-                    console.debug(`[${plugin.description.name}] Load Config ${metadata.variable} from file ${metadata.file} =>
-${JSON.stringify(configValue, undefined, 4).substring(0, 500)}`)
-                }
+            metadata.file = fs.concat(
+                fs.file(plugin.description.loadMetadata.file).parent,
+                plugin.description.name,
+                metadata.filename
+            )
+            let configLoader = this.getConfigLoader(metadata.format)
+            if (!fs.exists(metadata.file) && defaultValue) {
+                base.save(metadata.file, configLoader.dump(defaultValue))
+                console.i18n("ms.plugin.manager.config.save.default", {
+                    plugin: plugin.description.name,
+                    name: metadata.name,
+                    format: metadata.format
+                })
             }
+            let configValue = configLoader.load(base.read(metadata.file)) || {}
+            if (metadata.migrate && defaultValue && this.setDefaultValue(configValue, defaultValue, !!metadata.default)) {
+                base.save(metadata.file, configLoader.dump(configValue))
+            }
+            console.debug(`[${plugin.description.name}] Load Config ${metadata.variable} from file ${metadata.file}`)
             this.defienConfigProp(plugin, metadata, configValue)
         } catch (error: any) {
             console.i18n("ms.plugin.manager.config.load.error", {
