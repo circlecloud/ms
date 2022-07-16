@@ -5,7 +5,7 @@ export namespace item {
     export abstract class Item {
         abstract builder(): ItemBuilder
         abstract toJson(item: any): string
-        abstract fromJSON(json: string): any
+        abstract fromJson(json: string): any
     }
     export interface ItemBuilder {
         from(item: any): ItemBuilder

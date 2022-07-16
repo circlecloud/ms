@@ -44,13 +44,13 @@ export namespace jsconsole {
                             let file = Paths.get(Paths.get(fileName, '..', sourceMappingURL).toFile().getCanonicalPath()).toFile()
                             if (file.exists()) {
                                 sourceContent = base.read(file)
+                                sourceFileMaps[fileName] = file.getCanonicalPath()
                             } else if (global.debug) {
                                 console.debug('readSourceMap can\'t found', fileName, 'source map file', sourceMappingURL)
                             }
                         }
                         if (sourceContent) {
                             sourceMaps[fileName] = new SourceMapBuilder(JSON.parse(sourceContent))
-                            sourceFileMaps[fileName] = Paths.get(fileName, '..', sourceMaps[fileName].sources[0]).toFile().getCanonicalPath()
                         }
                     }
                 }
@@ -88,9 +88,9 @@ export namespace jsconsole {
                 let { fileName, lineNumber } = readSourceMap(trace.fileName, trace.lineNumber)
                 if (fileName.startsWith(root)) { fileName = fileName.split(root)[1] }
                 if (color) {
-                    cache.push(`    §e->§c ${fileName}:${lineNumber} => §4${trace.methodName}`)
+                    cache.push(`    §e->§c ${fileName}:${lineNumber}(${trace.lineNumber}) => §4${trace.methodName}`)
                 } else {
-                    cache.push(`    -> ${fileName}:${lineNumber} => ${trace.methodName}`)
+                    cache.push(`    -> ${fileName}:${lineNumber}(${trace.lineNumber}) => ${trace.methodName}`)
                 }
             } else {
                 let className = trace.className

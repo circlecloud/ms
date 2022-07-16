@@ -12,6 +12,7 @@ export class BukkitItem extends item.Item {
     private NBTTagCompound: any
     private nmsSaveNBTMethodName: any
     private MojangsonParser: any
+    private nmsItemStack: any
     private mpParseMethodName: any
     private nmsVersion: any
     constructor() {
@@ -25,8 +26,8 @@ export class BukkitItem extends item.Item {
         let nbt = new this.NBTTagCompound()
         return this.CraftItemStack.asNMSCopy(item)[this.nmsSaveNBTMethodName](nbt).toString()
     }
-    fromJSON(json: string) {
-        return this.CraftItemStack.asBukkitCopy(this.MojangsonParser[this.mpParseMethodName](json))
+    fromJson(json: string) {
+        return this.CraftItemStack.asBukkitCopy(new this.nmsItemStack(this.MojangsonParser[this.mpParseMethodName](json)))
     }
     private obcCls(name: string) {
         return base.getClass(['org.bukkit.craftbukkit', this.nmsVersion, name].join('.'))
@@ -44,6 +45,7 @@ export class BukkitItem extends item.Item {
             // @ts-ignore
             let asNMSCopyMethod = CraftItemStackClass.getMethod('asNMSCopy', ItemStack.class)
             let nmsItemStackClass = asNMSCopyMethod.getReturnType()
+            this.nmsItemStack = Java.type(nmsItemStackClass.getName())
             let nmsNBTTagCompoundClass = undefined
             for (let method of Java.from(nmsItemStackClass.getMethods())) {
                 let rt = method.getReturnType()
@@ -61,7 +63,7 @@ export class BukkitItem extends item.Item {
                 }
             }
             try {
-                this.MojangsonParser = this.nmsCls('MojangsonParser')
+                this.MojangsonParser = this.nmsCls('MojangsonParser').static
             } catch (error) {
                 this.MojangsonParser = Java.type('net.minecraft.nbt.MojangsonParser')
             }
