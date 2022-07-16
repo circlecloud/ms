@@ -1,6 +1,6 @@
 {
     "name": "@ccms/api",
-    "version": "0.24.1",
+    "version": "0.24.2",
     "description": "MiaoScript api package",
     "keywords": [
         "miaoscript",
@@ -19,9 +19,9 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
-        "@ccms/common": "^0.24.1",
-        "@ccms/container": "^0.24.1",
-        "@ccms/polyfill": "^0.24.1",
+        "@ccms/common": "^0.24.2",
+        "@ccms/container": "^0.24.2",
+        "@ccms/polyfill": "^0.24.2",
         "base64-js": "^1.5.1",
         "source-map-builder": "^0.0.7"
     },
