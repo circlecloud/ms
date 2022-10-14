@@ -1,6 +1,6 @@
 {
     "name": "@ccms/keyvalue",
-    "version": "0.24.2",
+    "version": "0.24.3",
     "description": "MiaoScript keyvalue package",
     "keywords": [
         "miaoscript",
@@ -19,8 +19,8 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
-        "@ccms/api": "^0.24.2",
-        "@ccms/common": "^0.24.2",
+        "@ccms/api": "^0.24.3",
+        "@ccms/common": "^0.24.3",
         "@ccms/container": "^0.24.2"
     },
     "devDependencies": {
