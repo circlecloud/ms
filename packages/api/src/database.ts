@@ -30,6 +30,10 @@ export namespace database {
          * 链接属性
          */
         properties?: { [key: string]: any }
+        /**
+         * 调试模式
+         */
+        debug?: boolean
     }
 
     @injectable()

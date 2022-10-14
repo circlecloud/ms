@@ -2,12 +2,11 @@ import i18n from '@ccms/i18n'
 import { plugin, server } from '@ccms/api'
 import { provideSingleton, Container, ContainerInstance, Autowired } from '@ccms/container'
 
-import './config'
 import { interfaces } from './interfaces'
 import { PluginTaskManager } from './task'
 import { PluginEventManager } from './event'
-import { PluginCommandManager } from './command'
 import { PluginConfigManager } from './config'
+import { PluginCommandManager } from './command'
 
 const Thread = Java.type('java.lang.Thread')
 
@@ -93,18 +92,16 @@ export class PluginManagerImpl implements plugin.PluginManager {
         for (const [, scanner] of this.sacnnerMap) {
             try {
                 console.i18n('ms.plugin.manager.scan', { scanner: scanner.type, folder })
-                let plugins = scanner.scan(folder)
-                console.i18n('ms.plugin.manager.scan.finish', { scanner: scanner.type, folder, size: plugins.length })
-                plugins.forEach(loadMetadata => {
+                let loadMetadatas = scanner.scan(folder)
+                console.i18n('ms.plugin.manager.scan.finish', { scanner: scanner.type, folder, size: loadMetadatas.length })
+                for (const loadMetadata of loadMetadatas) {
                     try {
                         this.loadAndRequirePlugin(loadMetadata)
                     } catch (error: any) {
-                        console.error(`plugin scanner ${scanner.type} load ${loadMetadata.file} occurred error ${error}`)
                         console.ex(error)
                     }
-                })
+                }
             } catch (error: any) {
-                console.error(`plugin scanner ${scanner.type} occurred error ${error}`)
                 console.ex(error)
             }
         }

@@ -161,11 +161,12 @@ class BukkitChatInvoke_1_17_1 extends BukkitChatInvoke_1_16_5 {
         return base.getClass('net.minecraft.network.protocol.Packet')
     }
 }
-
-class BukkitChatInvoke_1_19 extends BukkitChatInvoke_1_17_1 {
+class BukkitChatInvoke_1_18_2 extends BukkitChatInvoke_1_17_1 {
     getSendPacketMethodName(playerConnectionClass: any) {
         return playerConnectionClass.getMethod('a', this.getPacketClass()).getName()
     }
+}
+class BukkitChatInvoke_1_19 extends BukkitChatInvoke_1_18_2 {
     getPacketPlayOutChatClass() {
         return base.getClass('net.minecraft.network.protocol.game.ClientboundSystemChatPacket')
     }
@@ -181,6 +182,8 @@ try {
     let nmsSubVersion = nmsVersion.split("_")[1]
     if (nmsSubVersion >= 19) {
         bukkitChatInvoke = new BukkitChatInvoke_1_19(nmsVersion)
+    } else if (nmsSubVersion >= 18) {
+        bukkitChatInvoke = new BukkitChatInvoke_1_18_2(nmsVersion)
     } else if (nmsSubVersion >= 17) {
         bukkitChatInvoke = new BukkitChatInvoke_1_17_1(nmsVersion)
     } else if (nmsSubVersion >= 16) {

@@ -9,6 +9,7 @@ import * as fs from '@ccms/common/dist/fs'
 import { VersionUtils } from '@ccms/common/dist/version'
 
 const UUID = Java.type('java.util.UUID')
+const MiaoScriptAPI = Java.type('pw.yumc.MiaoScript.api.MiaoScriptAPI')
 
 @provideSingleton(MiaoScriptCore)
 class MiaoScriptCore {
@@ -24,6 +25,10 @@ class MiaoScriptCore {
     enable() {
         process.emit('core.before.enable')
         this.loadServerConsole()
+        try {
+            MiaoScriptAPI.setPluginManager(this.pluginManager)
+        } catch (error) {
+        }
         this.loadPlugins()
         process.emit('core.after.enable')
         console.i18n("ms.core.engine.completed", {

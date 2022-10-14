@@ -74,7 +74,8 @@ type HttpHeader = { [key: string]: string }
 const executor = Executors.newCachedThreadPool()
 
 export class XMLHttpRequest {
-    private _timeout: number = 120000;
+    private _connectTimeout: number = 5000;
+    private _readTimeout: number = 120000;
     private _responseType: ResponseType = 'text';
     private _withCredentials: boolean
 
@@ -96,10 +97,22 @@ export class XMLHttpRequest {
     private _connection = null;
 
     get timeout() {
-        return this._timeout
+        return this._readTimeout
     }
     set timeout(timeout: number) {
-        this._timeout = timeout
+        this._readTimeout = timeout
+    }
+    get connectTimeout() {
+        return this._connectTimeout
+    }
+    set connectTimeout(timeout: number) {
+        this._connectTimeout = timeout
+    }
+    get readTimeout() {
+        return this._readTimeout
+    }
+    set readTimeout(timeout: number) {
+        this._readTimeout = timeout
     }
     get readyState() {
         return this._readyState
@@ -169,8 +182,8 @@ export class XMLHttpRequest {
         this._connection.setRequestMethod(this._method)
         this._connection.setDoOutput(true)
         this._connection.setDoInput(true)
-        this._connection.setConnectTimeout(this._timeout)
-        this._connection.setReadTimeout(this._timeout)
+        this._connection.setConnectTimeout(this._connectTimeout)
+        this._connection.setReadTimeout(this._readTimeout)
 
         this.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
         this.setReadyState(ReadyState.OPENED)
@@ -181,7 +194,7 @@ export class XMLHttpRequest {
         }
         if (this._readyState !== ReadyState.OPENED) { throw new Error(`Error Status ${this._readyState}!`) }
         let future = executor.submit(new Callable({ call: () => this._send(body) }))
-        if (!this._async) { future.get(this._timeout, TimeUnit.MILLISECONDS) }
+        if (!this._async) { future.get(this._connectTimeout + this._readTimeout + 100, TimeUnit.MILLISECONDS) }
         return future
     }
     get() {

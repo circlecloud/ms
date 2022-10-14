@@ -19,12 +19,20 @@ interface RequestConfig {
     method?: Method
     headers?: { [key: string]: string }
     params?: { [key: string]: string }
-    data?: any
+    data?: any,
+    connectTimeout?: number,
+    readTimeout?: number,
 }
 
 function request(config: RequestConfig) {
     // @ts-ignore XMLHttpRequest class only exist nashorn polyfill
     let xhr = new XMLHttpRequest()
+    if (config.connectTimeout) {
+        xhr.connectTimeout = config.connectTimeout
+    }
+    if (config.readTimeout) {
+        xhr.readTimeout = config.readTimeout
+    }
     xhr.open(config.method, config.url, false)
     for (const header in config.headers) {
         xhr.setRequestHeader(header, config.headers[header])
