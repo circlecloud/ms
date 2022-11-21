@@ -22,7 +22,7 @@
         "@ccms/nashorn": "^0.24.2",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
-        "typescript": "^4.6.3"
+        "typescript": "^4.9.3"
     },
     "dependencies": {
         "inversify": "^6.0.1",

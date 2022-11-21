@@ -24,14 +24,16 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
-        "axios": "^0.27.2",
-        "minecraft-protocol": "^1.34.0",
+        "axios": "^1.1.3",
+        "https-proxy-agent": "^5.0.1",
+        "minecraft-protocol": "^1.36.1",
         "minecraft-protocol-forge": "^1.0.0",
         "proxy-agent": "^5.0.0"
     },
     "devDependencies": {
-        "@types/node": "^17.0.25",
+        "@types/node": "^18.11.9",
+        "lerna": "^6.0.3",
         "rimraf": "^3.0.2",
-        "typescript": "^4.6.3"
+        "typescript": "^4.9.3"
     }
 }
