@@ -1,6 +1,13 @@
-import { EventEmitter } from 'events'
-import parser_v4 from "../engine.io-parser"
-import type { WebSocketClient } from '../server/client'
+import { EventEmitter } from "events"
+import * as parser_v4 from "../engine.io-parser"
+import * as parser_v3 from "./parser-v3"
+// import debugModule from "debug"
+import { IncomingMessage } from "http"
+import { Packet } from "../engine.io-parser"
+
+// const debug = debugModule("engine:transport")
+const debug = require('../debug')("engine:transport")
+
 /**
  * Noop function.
  *
@@ -11,15 +18,28 @@ function noop() { }
 
 export abstract class Transport extends EventEmitter {
     public sid: string
-    public req /**http.IncomingMessage */
-    public socket: WebSocketClient
     public writable: boolean
-    public readyState: string
-    public discarded: boolean
-    public protocol: Number
-    public parser: any
-    public perMessageDeflate: any
-    public supportsBinary: boolean = false
+    public protocol: number
+
+    protected _readyState: string
+    protected discarded: boolean
+    protected parser: any
+    protected req: IncomingMessage & { cleanup: Function }
+    protected supportsBinary: boolean
+
+    get readyState() {
+        return this._readyState
+    }
+
+    set readyState(state) {
+        debug(
+            "readyState updated from %s to %s (%s)",
+            this._readyState,
+            state,
+            this.name
+        )
+        this._readyState = state
+    }
 
     /**
      * Transport constructor.
@@ -32,7 +52,7 @@ export abstract class Transport extends EventEmitter {
         this.readyState = "open"
         this.discarded = false
         this.protocol = req._query.EIO === "4" ? 4 : 3 // 3rd revision by default
-        this.parser = parser_v4//= this.protocol === 4 ? parser_v4 : parser_v3
+        this.parser = this.protocol === 4 ? parser_v4 : parser_v3
     }
 
     /**
@@ -48,10 +68,10 @@ export abstract class Transport extends EventEmitter {
      * Called with an incoming HTTP request.
      *
      * @param {http.IncomingMessage} request
-     * @api private
+     * @api protected
      */
-    onRequest(req) {
-        console.debug(`engine.io transport ${this.socket.id} setting request`, JSON.stringify(req))
+    protected onRequest(req) {
+        debug("setting request")
         this.req = req
     }
 
@@ -72,16 +92,18 @@ export abstract class Transport extends EventEmitter {
      *
      * @param {String} message error
      * @param {Object} error description
-     * @api private
+     * @api protected
      */
-    onError(msg: string, desc?: string) {
+    protected onError(msg: string, desc?) {
         if (this.listeners("error").length) {
-            const err: any = new Error(msg)
+            const err = new Error(msg)
+            // @ts-ignore
             err.type = "TransportError"
+            // @ts-ignore
             err.description = desc
             this.emit("error", err)
         } else {
-            console.debug(`ignored transport error ${msg} (${desc})`)
+            debug("ignored transport error %s (%s)", msg, desc)
         }
     }
 
@@ -89,9 +111,9 @@ export abstract class Transport extends EventEmitter {
      * Called with parsed out a packets from the data stream.
      *
      * @param {Object} packet
-     * @api private
+     * @api protected
      */
-    onPacket(packet) {
+    protected onPacket(packet: Packet) {
         this.emit("packet", packet)
     }
 
@@ -99,23 +121,24 @@ export abstract class Transport extends EventEmitter {
      * Called with the encoded packet data.
      *
      * @param {String} data
-     * @api private
+     * @api protected
      */
-    onData(data) {
+    protected onData(data) {
         this.onPacket(this.parser.decodePacket(data))
     }
 
     /**
      * Called upon transport close.
      *
-     * @api private
+     * @api protected
      */
-    onClose() {
+    protected onClose() {
         this.readyState = "closed"
         this.emit("close")
     }
+
     abstract get supportsFraming()
     abstract get name()
-    abstract send(...args: any[])
-    abstract doClose(d: Function)
+    abstract send(packets)
+    abstract doClose(fn?)
 }

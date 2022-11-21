@@ -1,8 +1,11 @@
-import { Transport } from '../transport'
-// const debug = require("debug")("engine:ws")
+import { Transport } from "../transport"
+// import debugModule from "debug";
+
+const debug = require('../../debug')("engine:ws")
 
 export class WebSocket extends Transport {
-    public perMessageDeflate: any
+    protected perMessageDeflate: any
+    private socket: any
 
     /**
      * WebSocket transport
@@ -13,7 +16,11 @@ export class WebSocket extends Transport {
     constructor(req) {
         super(req)
         this.socket = req.websocket
-        this.socket.on("message", this.onData.bind(this))
+        this.socket.on("message", (data, isBinary) => {
+            const message = isBinary ? data : data.toString()
+            debug('received "%s"', message)
+            super.onData(message)
+        })
         this.socket.once("close", this.onClose.bind(this))
         this.socket.on("error", this.onError.bind(this))
         this.writable = true
@@ -21,10 +28,10 @@ export class WebSocket extends Transport {
     }
 
     /**
-     * Transport name
-     *
-     * @api public
-     */
+    * Transport name
+    *
+    * @api public
+    */
     get name() {
         return "websocket"
     }
@@ -48,24 +55,12 @@ export class WebSocket extends Transport {
     }
 
     /**
-     * Processes the incoming data.
-     *
-     * @param {String} encoded packet
-     * @api private
-     */
-    onData(data) {
-        // debug('received "%s"', data)
-        super.onData(data)
-    }
-
-    /**
      * Writes a packet payload.
      *
      * @param {Array} packets
      * @api private
      */
     send(packets) {
-        // console.log('WebSocket send packets', JSON.stringify(packets))
         const packet = packets.shift()
         if (typeof packet === "undefined") {
             this.writable = true
@@ -74,7 +69,7 @@ export class WebSocket extends Transport {
         }
 
         // always creates a new object since ws modifies it
-        const opts: any = {}
+        const opts: { compress?: boolean } = {}
         if (packet.options) {
             opts.compress = packet.options.compress
         }
@@ -87,7 +82,7 @@ export class WebSocket extends Transport {
                     opts.compress = false
                 }
             }
-            console.trace('writing', data)
+            debug('writing "%s"', data)
             this.writable = false
 
             this.socket.send(data, opts, err => {
@@ -109,7 +104,7 @@ export class WebSocket extends Transport {
      * @api private
      */
     doClose(fn) {
-        // debug("closing")
+        debug("closing")
         this.socket.close()
         fn && fn()
     }

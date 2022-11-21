@@ -12,10 +12,28 @@ Object.keys(PACKET_TYPES).forEach(key => {
     PACKET_TYPES_REVERSE[PACKET_TYPES[key]] = key
 })
 
-const ERROR_PACKET = { type: "error", data: "parser error" }
+const ERROR_PACKET: Packet = { type: "error", data: "parser error" }
 
-export = {
-    PACKET_TYPES,
-    PACKET_TYPES_REVERSE,
-    ERROR_PACKET
+export { PACKET_TYPES, PACKET_TYPES_REVERSE, ERROR_PACKET }
+
+export type PacketType =
+    | "open"
+    | "close"
+    | "ping"
+    | "pong"
+    | "message"
+    | "upgrade"
+    | "noop"
+    | "error"
+
+// RawData should be "string | Buffer | ArrayBuffer | ArrayBufferView | Blob", but Blob does not exist in Node.js and
+// requires to add the dom lib in tsconfig.json
+export type RawData = any
+
+export interface Packet {
+    type: PacketType
+    options?: { compress: boolean }
+    data?: RawData
 }
+
+export type BinaryType = "nodebuffer" | "arraybuffer" | "blob"

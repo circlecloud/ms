@@ -1,6 +1,15 @@
-const { PACKET_TYPES_REVERSE, ERROR_PACKET } = require("./commons")
+import {
+    ERROR_PACKET,
+    PACKET_TYPES_REVERSE,
+    Packet,
+    BinaryType,
+    RawData
+} from "./commons.js"
 
-export const decodePacket = (encodedPacket, binaryType) => {
+const decodePacket = (
+    encodedPacket: RawData,
+    binaryType?: BinaryType
+): Packet => {
     if (typeof encodedPacket !== "string") {
         return {
             type: "message",
@@ -28,17 +37,18 @@ export const decodePacket = (encodedPacket, binaryType) => {
         }
 }
 
-const mapBinary = (data, binaryType) => {
+const mapBinary = (data: RawData, binaryType?: BinaryType) => {
+    const isBuffer = Buffer.isBuffer(data)
     switch (binaryType) {
         case "arraybuffer":
-            return Buffer.isBuffer(data) ? toArrayBuffer(data) : data
+            return isBuffer ? toArrayBuffer(data) : data
         case "nodebuffer":
         default:
             return data // assuming the data is already a Buffer
     }
 }
 
-const toArrayBuffer = buffer => {
+const toArrayBuffer = (buffer: Buffer): ArrayBuffer => {
     const arrayBuffer = new ArrayBuffer(buffer.length)
     const view = new Uint8Array(arrayBuffer)
     for (let i = 0; i < buffer.length; i++) {
@@ -46,3 +56,5 @@ const toArrayBuffer = buffer => {
     }
     return arrayBuffer
 }
+
+export default decodePacket

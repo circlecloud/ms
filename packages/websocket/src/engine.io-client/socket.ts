@@ -1,21 +1,278 @@
-import transports from "./transports"
-// const transports = require("./transports/index")
-const Emitter = require("component-emitter")
-const debug = (...args: any) => console.debug('engine.io-client:socket', ...args)//require("debug")("engine.io-client:socket")
-import parser from "../engine.io-parser"
-const parseuri = require("parseuri")
-const parseqs = require("parseqs")
-import { installTimerFunctions } from "./util"
+// import { transports } from "./transports/index.js";
+import { transports } from "./transports"
+import { installTimerFunctions, byteLength } from "./util"
+import { decode } from "./contrib/parseqs"
+import { parse } from "./contrib/parseuri"
+// import debugModule from "debug"; // debug()
+import { Emitter } from "@socket.io/component-emitter"
+// import { protocol } from "engine.io-parser";
+import { protocol } from "../engine.io-parser"
+import { CloseDetails } from "./transport"
 
-export class Socket extends Emitter {
+// const debug = debugModule("engine.io-client:socket"); // debug()
+const debug = require('../debug')('engine.io-client:socket')
+
+export interface SocketOptions {
+    /**
+     * The host that we're connecting to. Set from the URI passed when connecting
+     */
+    host: string
+
+    /**
+     * The hostname for our connection. Set from the URI passed when connecting
+     */
+    hostname: string
+
+    /**
+     * If this is a secure connection. Set from the URI passed when connecting
+     */
+    secure: boolean
+
+    /**
+     * The port for our connection. Set from the URI passed when connecting
+     */
+    port: string | number
+
+    /**
+     * Any query parameters in our uri. Set from the URI passed when connecting
+     */
+    query: { [key: string]: any }
+
+    /**
+     * `http.Agent` to use, defaults to `false` (NodeJS only)
+     */
+    agent: string | boolean
+
+    /**
+     * Whether the client should try to upgrade the transport from
+     * long-polling to something better.
+     * @default true
+     */
+    upgrade: boolean
+
+    /**
+     * Forces base 64 encoding for polling transport even when XHR2
+     * responseType is available and WebSocket even if the used standard
+     * supports binary.
+     */
+    forceBase64: boolean
+
+    /**
+     * The param name to use as our timestamp key
+     * @default 't'
+     */
+    timestampParam: string
+
+    /**
+     * Whether to add the timestamp with each transport request. Note: this
+     * is ignored if the browser is IE or Android, in which case requests
+     * are always stamped
+     * @default false
+     */
+    timestampRequests: boolean
+
+    /**
+     * A list of transports to try (in order). Engine.io always attempts to
+     * connect directly with the first one, provided the feature detection test
+     * for it passes.
+     * @default ['polling','websocket']
+     */
+    transports: string[]
+
+    /**
+     * The port the policy server listens on
+     * @default 843
+     */
+    policyPost: number
+
+    /**
+     * If true and if the previous websocket connection to the server succeeded,
+     * the connection attempt will bypass the normal upgrade process and will
+     * initially try websocket. A connection attempt following a transport error
+     * will use the normal upgrade process. It is recommended you turn this on
+     * only when using SSL/TLS connections, or if you know that your network does
+     * not block websockets.
+     * @default false
+     */
+    rememberUpgrade: boolean
+
+    /**
+     * Are we only interested in transports that support binary?
+     */
+    onlyBinaryUpgrades: boolean
+
+    /**
+     * Timeout for xhr-polling requests in milliseconds (0) (only for polling transport)
+     */
+    requestTimeout: number
+
+    /**
+     * Transport options for Node.js client (headers etc)
+     */
+    transportOptions: Object
+
+    /**
+     * (SSL) Certificate, Private key and CA certificates to use for SSL.
+     * Can be used in Node.js client environment to manually specify
+     * certificate information.
+     */
+    pfx: string
+
+    /**
+     * (SSL) Private key to use for SSL. Can be used in Node.js client
+     * environment to manually specify certificate information.
+     */
+    key: string
+
+    /**
+     * (SSL) A string or passphrase for the private key or pfx. Can be
+     * used in Node.js client environment to manually specify certificate
+     * information.
+     */
+    passphrase: string
+
+    /**
+     * (SSL) Public x509 certificate to use. Can be used in Node.js client
+     * environment to manually specify certificate information.
+     */
+    cert: string
+
+    /**
+     * (SSL) An authority certificate or array of authority certificates to
+     * check the remote host against.. Can be used in Node.js client
+     * environment to manually specify certificate information.
+     */
+    ca: string | string[]
+
+    /**
+     * (SSL) A string describing the ciphers to use or exclude. Consult the
+     * [cipher format list]
+     * (http://www.openssl.org/docs/apps/ciphers.html#CIPHER_LIST_FORMAT) for
+     * details on the format.. Can be used in Node.js client environment to
+     * manually specify certificate information.
+     */
+    ciphers: string
+
+    /**
+     * (SSL) If true, the server certificate is verified against the list of
+     * supplied CAs. An 'error' event is emitted if verification fails.
+     * Verification happens at the connection level, before the HTTP request
+     * is sent. Can be used in Node.js client environment to manually specify
+     * certificate information.
+     */
+    rejectUnauthorized: boolean
+
+    /**
+     * Headers that will be passed for each request to the server (via xhr-polling and via websockets).
+     * These values then can be used during handshake or for special proxies.
+     */
+    extraHeaders?: { [header: string]: string }
+
+    /**
+     * Whether to include credentials (cookies, authorization headers, TLS
+     * client certificates, etc.) with cross-origin XHR polling requests
+     * @default false
+     */
+    withCredentials: boolean
+
+    /**
+     * Whether to automatically close the connection whenever the beforeunload event is received.
+     * @default true
+     */
+    closeOnBeforeunload: boolean
+
+    /**
+     * Whether to always use the native timeouts. This allows the client to
+     * reconnect when the native timeout functions are overridden, such as when
+     * mock clocks are installed.
+     * @default false
+     */
+    useNativeTimers: boolean
+
+    /**
+     * weather we should unref the reconnect timer when it is
+     * create automatically
+     * @default false
+     */
+    autoUnref: boolean
+
+    /**
+     * parameters of the WebSocket permessage-deflate extension (see ws module api docs). Set to false to disable.
+     * @default false
+     */
+    perMessageDeflate: { threshold: number }
+
+    /**
+     * The path to get our client file from, in the case of the server
+     * serving it
+     * @default '/engine.io'
+     */
+    path: string
+
+    /**
+     * Either a single protocol string or an array of protocol strings. These strings are used to indicate sub-protocols,
+     * so that a single server can implement multiple WebSocket sub-protocols (for example, you might want one server to
+     * be able to handle different types of interactions depending on the specified protocol)
+     * @default []
+     */
+    protocols: string | string[]
+}
+
+interface SocketReservedEvents {
+    open: () => void
+    handshake: (data) => void
+    packet: (packet) => void
+    packetCreate: (packet) => void
+    data: (data) => void
+    message: (data) => void
+    drain: () => void
+    flush: () => void
+    heartbeat: () => void
+    ping: () => void
+    pong: () => void
+    error: (err: string | Error) => void
+    upgrading: (transport) => void
+    upgrade: (transport) => void
+    upgradeError: (err: Error) => void
+    close: (reason: string, description?: CloseDetails | Error) => void
+}
+
+export class Socket extends Emitter<{}, {}, SocketReservedEvents> {
+    public id: string
+    public transport: any
+    public binaryType: string
+
+    private readyState: string
+    private writeBuffer
+    private prevBufferLen: number
+    private upgrades
+    private pingInterval: number
+    private pingTimeout: number
+    private pingTimeoutTimer: NodeJS.Timer
+    private setTimeoutFn: typeof setTimeout
+    private clearTimeoutFn: typeof clearTimeout
+    private readonly beforeunloadEventListener: () => void
+    private readonly offlineEventListener: () => void
+    private upgrading: boolean
+    private maxPayload?: number
+
+    private readonly opts: Partial<SocketOptions>
+    private readonly secure: boolean
+    private readonly hostname: string
+    private readonly port: string | number
+    private readonly transports: string[]
+
+    static priorWebsocketSuccess: boolean
+    static protocol = protocol;
+
     /**
      * Socket constructor.
      *
      * @param {String|Object} uri or options
-     * @param {Object} options
+     * @param {Object} opts - options
      * @api public
      */
-    constructor(uri, opts: any = {}) {
+    constructor(uri, opts: Partial<SocketOptions> = {}) {
         super()
 
         if (uri && "object" === typeof uri) {
@@ -24,13 +281,13 @@ export class Socket extends Emitter {
         }
 
         if (uri) {
-            uri = parseuri(uri)
+            uri = parse(uri)
             opts.hostname = uri.host
             opts.secure = uri.protocol === "https" || uri.protocol === "wss"
             opts.port = uri.port
             if (uri.query) opts.query = uri.query
         } else if (opts.host) {
-            opts.hostname = parseuri(opts.host).host
+            opts.hostname = parse(opts.host).host
         }
 
         installTimerFunctions(this, opts)
@@ -53,10 +310,10 @@ export class Socket extends Emitter {
             (typeof location !== "undefined" && location.port
                 ? location.port
                 : this.secure
-                    ? 443
-                    : 80)
+                    ? "443"
+                    : "80")
 
-        this.transports = ["websocket"]
+        this.transports = opts.transports || ["polling", "websocket"]
         this.readyState = ""
         this.writeBuffer = []
         this.prevBufferLen = 0
@@ -67,7 +324,6 @@ export class Socket extends Emitter {
                 agent: false,
                 withCredentials: false,
                 upgrade: true,
-                jsonp: true,
                 timestampParam: "t",
                 rememberUpgrade: false,
                 rejectUnauthorized: true,
@@ -83,7 +339,7 @@ export class Socket extends Emitter {
         this.opts.path = this.opts.path.replace(/\/$/, "") + "/"
 
         if (typeof this.opts.query === "string") {
-            this.opts.query = parseqs.decode(this.opts.query)
+            this.opts.query = decode(this.opts.query)
         }
 
         // set on handshake
@@ -100,21 +356,20 @@ export class Socket extends Emitter {
                 // Firefox closes the connection when the "beforeunload" event is emitted but not Chrome. This event listener
                 // ensures every browser behaves the same (no "disconnect" event at the Socket.IO level when the page is
                 // closed/reloaded)
-                addEventListener(
-                    "beforeunload",
-                    () => {
-                        if (this.transport) {
-                            // silently close the transport
-                            this.transport.removeAllListeners()
-                            this.transport.close()
-                        }
-                    },
-                    false
-                )
+                this.beforeunloadEventListener = () => {
+                    if (this.transport) {
+                        // silently close the transport
+                        this.transport.removeAllListeners()
+                        this.transport.close()
+                    }
+                }
+                addEventListener("beforeunload", this.beforeunloadEventListener, false)
             }
             if (this.hostname !== "localhost") {
                 this.offlineEventListener = () => {
-                    this.onClose("transport close")
+                    this.onClose("transport close", {
+                        description: "network connection lost"
+                    })
                 }
                 addEventListener("offline", this.offlineEventListener, false)
             }
@@ -130,15 +385,12 @@ export class Socket extends Emitter {
      * @return {Transport}
      * @api private
      */
-    createTransport(name, opt?) {
-        if (name != 'websocket') {
-            throw new Error('Only Support WebSocket in MiaoScript!')
-        }
+    private createTransport(name) {
         debug('creating transport "%s"', name)
-        const query: any = clone(this.opts.query)
+        const query: any = Object.assign({}, this.opts.query)
 
         // append engine.io protocol identifier
-        query.EIO = parser.protocol
+        query.EIO = protocol
 
         // transport name
         query.transport = name
@@ -159,8 +411,8 @@ export class Socket extends Emitter {
             }
         )
 
-        debug("options: %j", JSON.stringify(opts))
-        debug("new func", transports[name])
+        debug("options: %j", opts)
+
         return new transports[name](opts)
     }
 
@@ -169,7 +421,7 @@ export class Socket extends Emitter {
      *
      * @api private
      */
-    open() {
+    private open() {
         let transport
         if (
             this.opts.rememberUpgrade &&
@@ -180,7 +432,7 @@ export class Socket extends Emitter {
         } else if (0 === this.transports.length) {
             // Emit error on next tick so it can be listened to
             this.setTimeoutFn(() => {
-                this.emit("error", "No transports available")
+                this.emitReserved("error", "No transports available")
             }, 0)
             return
         } else {
@@ -191,8 +443,8 @@ export class Socket extends Emitter {
         // Retry with the next transport if the transport is disabled (jsonp: false)
         try {
             transport = this.createTransport(transport)
-        } catch (error: any) {
-            debug("error while creating transport: %s", error)
+        } catch (e) {
+            debug("error while creating transport: %s", e)
             this.transports.shift()
             this.open()
             return
@@ -207,7 +459,7 @@ export class Socket extends Emitter {
      *
      * @api private
      */
-    setTransport(transport) {
+    private setTransport(transport) {
         debug("setting transport %s", transport.name)
 
         if (this.transport) {
@@ -223,9 +475,7 @@ export class Socket extends Emitter {
             .on("drain", this.onDrain.bind(this))
             .on("packet", this.onPacket.bind(this))
             .on("error", this.onError.bind(this))
-            .on("close", () => {
-                this.onClose("transport close")
-            })
+            .on("close", reason => this.onClose("transport close", reason))
     }
 
     /**
@@ -234,9 +484,9 @@ export class Socket extends Emitter {
      * @param {String} transport name
      * @api private
      */
-    probe(name) {
+    private probe(name) {
         debug('probing transport "%s"', name)
-        let transport = this.createTransport(name, { probe: 1 })
+        let transport = this.createTransport(name)
         let failed = false
 
         Socket.priorWebsocketSuccess = false
@@ -251,7 +501,7 @@ export class Socket extends Emitter {
                 if ("pong" === msg.type && "probe" === msg.data) {
                     debug('probe transport "%s" pong', name)
                     this.upgrading = true
-                    this.emit("upgrading", transport)
+                    this.emitReserved("upgrading", transport)
                     if (!transport) return
                     Socket.priorWebsocketSuccess = "websocket" === transport.name
 
@@ -265,16 +515,17 @@ export class Socket extends Emitter {
 
                         this.setTransport(transport)
                         transport.send([{ type: "upgrade" }])
-                        this.emit("upgrade", transport)
+                        this.emitReserved("upgrade", transport)
                         transport = null
                         this.upgrading = false
                         this.flush()
                     })
                 } else {
                     debug('probe transport "%s" failed', name)
-                    const err: any = new Error("probe error")
+                    const err = new Error("probe error")
+                    // @ts-ignore
                     err.transport = transport.name
-                    this.emit("upgradeError", err)
+                    this.emitReserved("upgradeError", err)
                 }
             })
         }
@@ -293,14 +544,15 @@ export class Socket extends Emitter {
 
         // Handle any error that happens while probing
         const onerror = err => {
-            const error: any = new Error("probe error: " + err)
+            const error = new Error("probe error: " + err)
+            // @ts-ignore
             error.transport = transport.name
 
             freezeTransport()
 
             debug('probe transport "%s" failed because of error: %s', name, err)
 
-            this.emit("upgradeError", error)
+            this.emitReserved("upgradeError", error)
         }
 
         function onTransportClose() {
@@ -325,8 +577,8 @@ export class Socket extends Emitter {
             transport.removeListener("open", onTransportOpen)
             transport.removeListener("error", onerror)
             transport.removeListener("close", onTransportClose)
-            this.removeListener("close", onclose)
-            this.removeListener("upgrading", onupgrade)
+            this.off("close", onclose)
+            this.off("upgrading", onupgrade)
         }
 
         transport.once("open", onTransportOpen)
@@ -342,13 +594,13 @@ export class Socket extends Emitter {
     /**
      * Called when connection is deemed open.
      *
-     * @api public
+     * @api private
      */
-    onOpen() {
+    private onOpen() {
         debug("socket open")
         this.readyState = "open"
         Socket.priorWebsocketSuccess = "websocket" === this.transport.name
-        this.emit("open")
+        this.emitReserved("open")
         this.flush()
 
         // we check for `readyState` in case an `open`
@@ -372,7 +624,7 @@ export class Socket extends Emitter {
      *
      * @api private
      */
-    onPacket(packet) {
+    private onPacket(packet) {
         if (
             "opening" === this.readyState ||
             "open" === this.readyState ||
@@ -380,10 +632,10 @@ export class Socket extends Emitter {
         ) {
             debug('socket receive: type "%s", data "%s"', packet.type, packet.data)
 
-            this.emit("packet", packet)
+            this.emitReserved("packet", packet)
 
             // Socket is live - any packet counts
-            this.emit("heartbeat")
+            this.emitReserved("heartbeat")
 
             switch (packet.type) {
                 case "open":
@@ -393,19 +645,20 @@ export class Socket extends Emitter {
                 case "ping":
                     this.resetPingTimeout()
                     this.sendPacket("pong")
-                    this.emit("ping")
-                    this.emit("pong")
+                    this.emitReserved("ping")
+                    this.emitReserved("pong")
                     break
 
                 case "error":
-                    const err: any = new Error("server error")
+                    const err = new Error("server error")
+                    // @ts-ignore
                     err.code = packet.data
                     this.onError(err)
                     break
 
                 case "message":
-                    this.emit("data", packet.data)
-                    this.emit("message", packet.data)
+                    this.emitReserved("data", packet.data)
+                    this.emitReserved("message", packet.data)
                     break
             }
         } else {
@@ -416,16 +669,17 @@ export class Socket extends Emitter {
     /**
      * Called upon handshake completion.
      *
-     * @param {Object} handshake obj
+     * @param {Object} data - handshake obj
      * @api private
      */
-    onHandshake(data) {
-        this.emit("handshake", data)
+    private onHandshake(data) {
+        this.emitReserved("handshake", data)
         this.id = data.sid
         this.transport.query.sid = data.sid
         this.upgrades = this.filterUpgrades(data.upgrades)
         this.pingInterval = data.pingInterval
         this.pingTimeout = data.pingTimeout
+        this.maxPayload = data.maxPayload
         this.onOpen()
         // In case open handler closes socket
         if ("closed" === this.readyState) return
@@ -437,7 +691,7 @@ export class Socket extends Emitter {
      *
      * @api private
      */
-    resetPingTimeout() {
+    private resetPingTimeout() {
         this.clearTimeoutFn(this.pingTimeoutTimer)
         this.pingTimeoutTimer = this.setTimeoutFn(() => {
             this.onClose("ping timeout")
@@ -452,7 +706,7 @@ export class Socket extends Emitter {
      *
      * @api private
      */
-    onDrain() {
+    private onDrain() {
         this.writeBuffer.splice(0, this.prevBufferLen)
 
         // setting prevBufferLen = 0 is very important
@@ -461,7 +715,7 @@ export class Socket extends Emitter {
         this.prevBufferLen = 0
 
         if (0 === this.writeBuffer.length) {
-            this.emit("drain")
+            this.emitReserved("drain")
         } else {
             this.flush()
         }
@@ -472,20 +726,51 @@ export class Socket extends Emitter {
      *
      * @api private
      */
-    flush() {
+    private flush() {
         if (
             "closed" !== this.readyState &&
             this.transport.writable &&
             !this.upgrading &&
             this.writeBuffer.length
         ) {
-            debug("flushing %d packets in socket", this.writeBuffer.length)
-            this.transport.send(this.writeBuffer)
+            const packets = this.getWritablePackets()
+            debug("flushing %d packets in socket", packets.length)
+            this.transport.send(packets)
             // keep track of current length of writeBuffer
             // splice writeBuffer and callbackBuffer on `drain`
-            this.prevBufferLen = this.writeBuffer.length
-            this.emit("flush")
+            this.prevBufferLen = packets.length
+            this.emitReserved("flush")
         }
+    }
+
+    /**
+     * Ensure the encoded size of the writeBuffer is below the maxPayload value sent by the server (only for HTTP
+     * long-polling)
+     *
+     * @private
+     */
+    private getWritablePackets() {
+        const shouldCheckPayloadSize =
+            this.maxPayload &&
+            this.transport.name === "polling" &&
+            this.writeBuffer.length > 1
+        if (!shouldCheckPayloadSize) {
+            return this.writeBuffer
+        }
+        let payloadSize = 1 // first packet type
+        for (let i = 0; i < this.writeBuffer.length; i++) {
+            const data = this.writeBuffer[i].data
+            if (data) {
+                payloadSize += byteLength(data)
+            }
+            if (i > 0 && payloadSize > this.maxPayload) {
+                debug("only send %d out of %d packets", i, this.writeBuffer.length)
+                return this.writeBuffer.slice(0, i)
+            }
+            payloadSize += 2 // separator + packet type
+        }
+        debug("payload size is %d (max: %d)", payloadSize, this.maxPayload)
+        return this.writeBuffer
     }
 
     /**
@@ -497,12 +782,12 @@ export class Socket extends Emitter {
      * @return {Socket} for chaining.
      * @api public
      */
-    write(msg, options, fn) {
+    public write(msg, options, fn?) {
         this.sendPacket("message", msg, options, fn)
         return this
     }
 
-    send(msg, options, fn) {
+    public send(msg, options, fn?) {
         this.sendPacket("message", msg, options, fn)
         return this
     }
@@ -516,7 +801,7 @@ export class Socket extends Emitter {
      * @param {Function} callback function.
      * @api private
      */
-    sendPacket(type, data?, options?, fn?) {
+    private sendPacket(type, data?, options?, fn?) {
         if ("function" === typeof data) {
             fn = data
             data = undefined
@@ -539,7 +824,7 @@ export class Socket extends Emitter {
             data: data,
             options: options
         }
-        this.emit("packetCreate", packet)
+        this.emitReserved("packetCreate", packet)
         this.writeBuffer.push(packet)
         if (fn) this.once("flush", fn)
         this.flush()
@@ -548,9 +833,9 @@ export class Socket extends Emitter {
     /**
      * Closes the connection.
      *
-     * @api private
+     * @api public
      */
-    close() {
+    public close() {
         const close = () => {
             this.onClose("forced close")
             debug("socket closing - telling transport to close")
@@ -558,8 +843,8 @@ export class Socket extends Emitter {
         }
 
         const cleanupAndClose = () => {
-            this.removeListener("upgrade", cleanupAndClose)
-            this.removeListener("upgradeError", cleanupAndClose)
+            this.off("upgrade", cleanupAndClose)
+            this.off("upgradeError", cleanupAndClose)
             close()
         }
 
@@ -595,10 +880,10 @@ export class Socket extends Emitter {
      *
      * @api private
      */
-    onError(err) {
+    private onError(err) {
         debug("socket error %j", err)
         Socket.priorWebsocketSuccess = false
-        this.emit("error", err)
+        this.emitReserved("error", err)
         this.onClose("transport error", err)
     }
 
@@ -607,7 +892,7 @@ export class Socket extends Emitter {
      *
      * @api private
      */
-    onClose(reason, desc?) {
+    private onClose(reason: string, description?: CloseDetails | Error) {
         if (
             "opening" === this.readyState ||
             "open" === this.readyState ||
@@ -616,7 +901,6 @@ export class Socket extends Emitter {
             debug('socket close with reason: "%s"', reason)
 
             // clear timers
-            this.clearTimeoutFn(this.pingIntervalTimer)
             this.clearTimeoutFn(this.pingTimeoutTimer)
 
             // stop event from firing again for transport
@@ -629,6 +913,11 @@ export class Socket extends Emitter {
             this.transport.removeAllListeners()
 
             if (typeof removeEventListener === "function") {
+                removeEventListener(
+                    "beforeunload",
+                    this.beforeunloadEventListener,
+                    false
+                )
                 removeEventListener("offline", this.offlineEventListener, false)
             }
 
@@ -639,7 +928,7 @@ export class Socket extends Emitter {
             this.id = null
 
             // emit close event
-            this.emit("close", reason, desc)
+            this.emitReserved("close", reason, description)
 
             // clean buffers after, so users can still
             // grab the buffers on `close` event
@@ -655,7 +944,7 @@ export class Socket extends Emitter {
      * @api private
      *
      */
-    filterUpgrades(upgrades) {
+    private filterUpgrades(upgrades) {
         const filteredUpgrades = []
         let i = 0
         const j = upgrades.length
@@ -665,24 +954,4 @@ export class Socket extends Emitter {
         }
         return filteredUpgrades
     }
-}
-
-Socket.priorWebsocketSuccess = false
-
-/**
- * Protocol version.
- *
- * @api public
- */
-
-Socket.protocol = parser.protocol // this is an int
-
-function clone(obj) {
-    const o = {}
-    for (let i in obj) {
-        if (obj.hasOwnProperty(i)) {
-            o[i] = obj[i]
-        }
-    }
-    return o
 }

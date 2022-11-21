@@ -1,4 +1,5 @@
-import { WS } from "./websocket"
-export default {
-    'websocket': WS
+import { WS } from "./websocket.js"
+
+export const transports = {
+    websocket: WS,
 }

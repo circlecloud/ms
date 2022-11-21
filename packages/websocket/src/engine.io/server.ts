@@ -1,52 +1,141 @@
-const qs = require("querystring")
-const parse = require("url").parse
+import * as qs from "querystring"
+import { parse } from "url"
 // const base64id = require("base64id")
-import transports from './transports'
-import { EventEmitter } from 'events'
-// const EventEmitter = require("events").EventEmitter
-import { Socket } from './socket'
-// const debug = require("debug")("engine")
-const debug = function (...args) { }
-// const cookieMod = require("cookie")
+import transports from "./transports"
+import { EventEmitter } from "events"
+import { Socket } from "./socket"
+// import debugModule from "debug"
+// import { serialize } from "cookie"
+// import { Server as DEFAULT_WS_ENGINE } from "ws"
+import { WebSocketServer as DEFAULT_WS_ENGINE } from "../server"
+// import { IncomingMessage, Server as HttpServer } from "http"
+// import { CookieSerializeOptions } from "cookie"
+// import { CorsOptions, CorsOptionsDelegate } from "cors"
 
-// const DEFAULT_WS_ENGINE = require("ws").Server;
-import { WebSocketServer } from '../server'
-import { Transport } from './transport'
-const DEFAULT_WS_ENGINE = WebSocketServer
-
+// const debug = debugModule("engine");
+const debug = require("../debug")("engine")
 import { Request } from '../server/request'
 import { WebSocketClient } from '../server/client'
 
-export class Server extends EventEmitter {
-    public static errors = {
-        UNKNOWN_TRANSPORT: 0,
-        UNKNOWN_SID: 1,
-        BAD_HANDSHAKE_METHOD: 2,
-        BAD_REQUEST: 3,
-        FORBIDDEN: 4,
-        UNSUPPORTED_PROTOCOL_VERSION: 5
-    }
+type Transport = "polling" | "websocket"
 
-    public static errorMessages = {
-        0: "Transport unknown",
-        1: "Session ID unknown",
-        2: "Bad handshake method",
-        3: "Bad request",
-        4: "Forbidden",
-        5: "Unsupported protocol version"
-    }
+export interface AttachOptions {
+    /**
+     * name of the path to capture
+     * @default "/engine.io"
+     */
+    path?: string
+    /**
+     * destroy unhandled upgrade requests
+     * @default true
+     */
+    destroyUpgrade?: boolean
+    /**
+     * milliseconds after which unhandled requests are ended
+     * @default 1000
+     */
+    destroyUpgradeTimeout?: number
+}
 
-    private clients = {}
-    private clientsCount = 0
-    public opts: any
+export interface ServerOptions {
+    /**
+     * how many ms without a pong packet to consider the connection closed
+     * @default 20000
+     */
+    pingTimeout?: number
+    /**
+     * how many ms before sending a new ping packet
+     * @default 25000
+     */
+    pingInterval?: number
+    /**
+     * how many ms before an uncompleted transport upgrade is cancelled
+     * @default 10000
+     */
+    upgradeTimeout?: number
+    /**
+     * how many bytes or characters a message can be, before closing the session (to avoid DoS).
+     * @default 1e5 (100 KB)
+     */
+    maxHttpBufferSize?: number
+    /**
+     * A function that receives a given handshake or upgrade request as its first parameter,
+     * and can decide whether to continue or not. The second argument is a function that needs
+     * to be called with the decided information: fn(err, success), where success is a boolean
+     * value where false means that the request is rejected, and err is an error code.
+     */
+    // allowRequest?: (
+    //     req: IncomingMessage,
+    //     fn: (err: string | null | undefined, success: boolean) => void
+    // ) => void
+    /**
+     * the low-level transports that are enabled
+     * @default ["polling", "websocket"]
+     */
+    transports?: Transport[]
+    /**
+     * whether to allow transport upgrades
+     * @default true
+     */
+    allowUpgrades?: boolean
+    /**
+     * parameters of the WebSocket permessage-deflate extension (see ws module api docs). Set to false to disable.
+     * @default false
+     */
+    perMessageDeflate?: boolean | object
+    /**
+     * parameters of the http compression for the polling transports (see zlib api docs). Set to false to disable.
+     * @default true
+     */
+    httpCompression?: boolean | object
+    /**
+     * what WebSocket server implementation to use. Specified module must
+     * conform to the ws interface (see ws module api docs).
+     * An alternative c++ addon is also available by installing eiows module.
+     *
+     * @default `require("ws").Server`
+     */
+    wsEngine?: any
+    /**
+     * an optional packet which will be concatenated to the handshake packet emitted by Engine.IO.
+     */
+    initialPacket?: any
+    /**
+     * configuration of the cookie that contains the client sid to send as part of handshake response headers. This cookie
+     * might be used for sticky-session. Defaults to not sending any cookie.
+     * @default false
+     */
+    cookie?: (/*CookieSerializeOptions & */{ name: string }) | boolean
+    /**
+     * the options that will be forwarded to the cors module
+     */
+    // cors?: CorsOptions | CorsOptionsDelegate
+    /**
+     * whether to enable compatibility with Socket.IO v2 clients
+     * @default false
+     */
+    allowEIO3?: boolean
+}
 
-    private corsMiddleware: any
+export abstract class BaseServer extends EventEmitter {
+    public opts: ServerOptions
 
-    private ws: any
-    private perMessageDeflate: any
+    protected clients: any
+    private clientsCount: number
+    protected corsMiddleware: Function
 
-    constructor(opts: any = {}) {
+    /**
+     * Server constructor.
+     *
+     * @param {Object} opts - options
+     * @api public
+     */
+    constructor(opts: ServerOptions = {}) {
         super()
+
+        this.clients = {}
+        this.clientsCount = 0
+
         this.opts = Object.assign(
             {
                 wsEngine: DEFAULT_WS_ENGINE,
@@ -70,6 +159,7 @@ export class Server extends EventEmitter {
         //         {
         //             name: "io",
         //             path: "/",
+        //             // @ts-ignore
         //             httpOnly: opts.cookie.path !== false,
         //             sameSite: "lax"
         //         },
@@ -93,42 +183,7 @@ export class Server extends EventEmitter {
         // this.init()
     }
 
-    // /**
-    //  * Initialize websocket server
-    //  *
-    //  * @api private
-    //  */
-    // init() {
-    //     if (!~this.opts.transports.indexOf("websocket")) return
-
-    //     if (this.ws) this.ws.close()
-
-    //     this.ws = new this.opts.wsEngine({
-    //         noServer: true,
-    //         clientTracking: false,
-    //         perMessageDeflate: this.opts.perMessageDeflate,
-    //         maxPayload: this.opts.maxHttpBufferSize
-    //     })
-
-    //     if (typeof this.ws.on === "function") {
-    //         this.ws.on("headers", (headersArray, req) => {
-    //             // note: 'ws' uses an array of headers, while Engine.IO uses an object (response.writeHead() accepts both formats)
-    //             // we could also try to parse the array and then sync the values, but that will be error-prone
-    //             const additionalHeaders = {}
-
-    //             const isInitialRequest = !req._query.sid
-    //             if (isInitialRequest) {
-    //                 this.emit("initial_headers", additionalHeaders, req)
-    //             }
-
-    //             this.emit("headers", additionalHeaders, req)
-
-    //             Object.keys(additionalHeaders).forEach(key => {
-    //                 headersArray.push(`${key}: ${additionalHeaders[key]}`)
-    //             })
-    //         })
-    //     }
-    // }
+    protected abstract init()
 
     /**
      * Returns a list of available transports for upgrade given a certain transport.
@@ -136,7 +191,7 @@ export class Server extends EventEmitter {
      * @return {Array}
      * @api public
      */
-    upgrades(transport): Array<any> {
+    public upgrades(transport) {
         if (!this.opts.allowUpgrades) return []
         return transports[transport].upgradesTo || []
     }
@@ -148,7 +203,7 @@ export class Server extends EventEmitter {
     //  * @return {Boolean} whether the request is valid
     //  * @api private
     //  */
-    // verify(req, upgrade, fn) {
+    // protected verify(req, upgrade, fn) {
     //     // transport check
     //     const transport = req._query.transport
     //     if (!~this.opts.transports.indexOf(transport)) {
@@ -194,6 +249,13 @@ export class Server extends EventEmitter {
     //             })
     //         }
 
+    //         if (transport === "websocket" && !upgrade) {
+    //             debug("invalid transport upgrade")
+    //             return fn(Server.errors.BAD_REQUEST, {
+    //                 name: "TRANSPORT_HANDSHAKE_ERROR"
+    //             })
+    //         }
+
     //         if (!this.opts.allowRequest) return fn()
 
     //         return this.opts.allowRequest(req, (message, success) => {
@@ -210,35 +272,233 @@ export class Server extends EventEmitter {
     // }
 
     /**
-     * Prepares a request by processing the query string.
-     *
-     * @api private
-     */
-    prepare(req) {
-        // try to leverage pre-existing `req._query` (e.g: from connect)
-        if (!req._query) {
-            req._query = ~req.url.indexOf("?") ? qs.parse(parse(req.url).query) : {}
-        }
-    }
-
-    /**
      * Closes all clients.
      *
      * @api public
      */
-    close() {
+    public close() {
         debug("closing all open clients")
         for (let i in this.clients) {
             if (this.clients.hasOwnProperty(i)) {
                 this.clients[i].close(true)
             }
         }
+        this.cleanup()
+        return this
+    }
+
+    protected abstract cleanup()
+
+    /**
+     * generate a socket id.
+     * Overwrite this method to generate your custom socket id
+     *
+     * @param {Object} request object
+     * @api public
+     */
+    public generateId(req) {
+        // return base64id.generateId()
+        return req.id
+    }
+
+    /**
+     * Handshakes a new client.
+     *
+     * @param {String} transport name
+     * @param {Object} request object
+     * @param {Function} closeConnection
+     *
+     * @api protected
+     */
+    // protected async handshake(transportName, req, closeConnection) {
+    // @java-patch sync handshake
+    protected handshake(transportName, req, closeConnection) {
+        const protocol = req._query.EIO === "4" ? 4 : 3 // 3rd revision by default
+        if (protocol === 3 && !this.opts.allowEIO3) {
+            debug("unsupported protocol version")
+            this.emit("connection_error", {
+                req,
+                code: Server.errors.UNSUPPORTED_PROTOCOL_VERSION,
+                message:
+                    Server.errorMessages[Server.errors.UNSUPPORTED_PROTOCOL_VERSION],
+                context: {
+                    protocol
+                }
+            })
+            closeConnection(Server.errors.UNSUPPORTED_PROTOCOL_VERSION)
+            return
+        }
+
+        let id
+        try {
+            id = this.generateId(req)
+        } catch (e) {
+            debug("error while generating an id")
+            this.emit("connection_error", {
+                req,
+                code: Server.errors.BAD_REQUEST,
+                message: Server.errorMessages[Server.errors.BAD_REQUEST],
+                context: {
+                    name: "ID_GENERATION_ERROR",
+                    error: e
+                }
+            })
+            closeConnection(Server.errors.BAD_REQUEST)
+            return
+        }
+
+        debug('handshaking client "%s"', id)
+
+        try {
+            var transport = this.createTransport(transportName, req)
+            if ("websocket" !== transportName) {
+                throw new Error('Unsupport polling at MiaoScript!')
+            }
+            // if ("polling" === transportName) {
+            //     transport.maxHttpBufferSize = this.opts.maxHttpBufferSize
+            //     transport.httpCompression = this.opts.httpCompression
+            // } else if ("websocket" === transportName) {
+            transport.perMessageDeflate = this.opts.perMessageDeflate
+            // }
+
+            if (req._query && req._query.b64) {
+                transport.supportsBinary = false
+            } else {
+                transport.supportsBinary = true
+            }
+        } catch (e) {
+            debug('error handshaking to transport "%s"', transportName)
+            this.emit("connection_error", {
+                req,
+                code: Server.errors.BAD_REQUEST,
+                message: Server.errorMessages[Server.errors.BAD_REQUEST],
+                context: {
+                    name: "TRANSPORT_HANDSHAKE_ERROR",
+                    error: e
+                }
+            })
+            closeConnection(Server.errors.BAD_REQUEST)
+            return
+        }
+        const socket = new Socket(id, this, transport, req, protocol)
+
+        transport.on("headers", (headers, req) => {
+            const isInitialRequest = !req._query.sid
+
+            if (isInitialRequest) {
+                if (this.opts.cookie) {
+                    headers["Set-Cookie"] = [
+                        // serialize(this.opts.cookie.name, id, this.opts.cookie)
+                    ]
+                }
+                this.emit("initial_headers", headers, req)
+            }
+            this.emit("headers", headers, req)
+        })
+
+        transport.onRequest(req)
+
+        this.clients[id] = socket
+        this.clientsCount++
+
+        socket.once("close", () => {
+            delete this.clients[id]
+            this.clientsCount--
+        })
+
+        this.emit("connection", socket)
+
+        return transport
+    }
+
+    protected abstract createTransport(transportName, req)
+
+    /**
+     * Protocol errors mappings.
+     */
+
+    static errors = {
+        UNKNOWN_TRANSPORT: 0,
+        UNKNOWN_SID: 1,
+        BAD_HANDSHAKE_METHOD: 2,
+        BAD_REQUEST: 3,
+        FORBIDDEN: 4,
+        UNSUPPORTED_PROTOCOL_VERSION: 5
+    };
+
+    static errorMessages = {
+        0: "Transport unknown",
+        1: "Session ID unknown",
+        2: "Bad handshake method",
+        3: "Bad request",
+        4: "Forbidden",
+        5: "Unsupported protocol version"
+    };
+}
+
+export class Server extends BaseServer {
+    // public httpServer?: HttpServer
+    private ws: any
+
+    /**
+     * Initialize websocket server
+     *
+     * @api protected
+     */
+    protected init() {
+        if (!~this.opts.transports.indexOf("websocket")) return
+
+        if (this.ws) this.ws.close()
+
+        this.ws = new this.opts.wsEngine({
+            noServer: true,
+            clientTracking: false,
+            perMessageDeflate: this.opts.perMessageDeflate,
+            maxPayload: this.opts.maxHttpBufferSize
+        })
+
+        if (typeof this.ws.on === "function") {
+            this.ws.on("headers", (headersArray, req) => {
+                // note: 'ws' uses an array of headers, while Engine.IO uses an object (response.writeHead() accepts both formats)
+                // we could also try to parse the array and then sync the values, but that will be error-prone
+                const additionalHeaders = {}
+
+                const isInitialRequest = !req._query.sid
+                if (isInitialRequest) {
+                    this.emit("initial_headers", additionalHeaders, req)
+                }
+
+                this.emit("headers", additionalHeaders, req)
+
+                Object.keys(additionalHeaders).forEach(key => {
+                    headersArray.push(`${key}: ${additionalHeaders[key]}`)
+                })
+            })
+        }
+    }
+
+    protected cleanup() {
         if (this.ws) {
             debug("closing webSocketServer")
             this.ws.close()
             // don't delete this.ws because it can be used again if the http server starts listening again
         }
-        return this
+    }
+
+    /**
+     * Prepares a request by processing the query string.
+     *
+     * @api private
+     */
+    private prepare(req) {
+        // try to leverage pre-existing `req._query` (e.g: from connect)
+        if (!req._query) {
+            req._query = ~req.url.indexOf("?") ? qs.parse(parse(req.url).query) : {}
+        }
+    }
+
+    protected createTransport(transportName, req) {
+        return new transports[transportName](req)
     }
 
     // /**
@@ -248,7 +508,7 @@ export class Server extends EventEmitter {
     //  * @param {http.ServerResponse|http.OutgoingMessage} response
     //  * @api public
     //  */
-    // handleRequest(req, res) {
+    // public handleRequest(req, res) {
     //     debug('handling "%s" http request "%s"', req.method, req.url)
     //     this.prepare(req)
     //     req.res = res
@@ -284,131 +544,12 @@ export class Server extends EventEmitter {
     //     }
     // }
 
-    /**
-     * generate a socket id.
-     * Overwrite this method to generate your custom socket id
-     *
-     * @param {Object} request object
-     * @api public
-     */
-    generateId(req) {
-        return req.id
-    }
-
-    /**
-     * Handshakes a new client.
-     *
-     * @param {String} transport name
-     * @param {Object} request object
-     * @param {Function} closeConnection
-     *
-     * @api private
-     */
-    // @java-patch sync handshake
-    handshake(transportName, req, closeConnection: (code: number) => void) {
-        console.debug('engine.io server handshake transport', transportName, 'from', req.url)
-        const protocol = req._query.EIO === "4" ? 4 : 3 // 3rd revision by default
-        if (protocol === 3 && !this.opts.allowEIO3) {
-            debug("unsupported protocol version")
-            this.emit("connection_error", {
-                req,
-                code: Server.errors.UNSUPPORTED_PROTOCOL_VERSION,
-                message:
-                    Server.errorMessages[Server.errors.UNSUPPORTED_PROTOCOL_VERSION],
-                context: {
-                    protocol
-                }
-            })
-            closeConnection(Server.errors.UNSUPPORTED_PROTOCOL_VERSION)
-            return
-        }
-
-        let id
-        try {
-            id = this.generateId(req)
-        } catch (error: any) {
-            console.debug("error while generating an id")
-            this.emit("connection_error", {
-                req,
-                code: Server.errors.BAD_REQUEST,
-                message: Server.errorMessages[Server.errors.BAD_REQUEST],
-                context: {
-                    name: "ID_GENERATION_ERROR",
-                    error
-                }
-            })
-            closeConnection(Server.errors.BAD_REQUEST)
-            return
-        }
-
-        console.debug('engine.io server handshaking client "' + id + '"')
-
-        try {
-            var transport: Transport = new transports[transportName](req)
-            if ("websocket" !== transportName) {
-                throw new Error('Unsupport polling at MiaoScript!')
-            }
-            // if ("polling" === transportName) {
-            //     transport.maxHttpBufferSize = this.opts.maxHttpBufferSize
-            //     transport.httpCompression = this.opts.httpCompression
-            // } else if ("websocket" === transportName) {
-            transport.perMessageDeflate = this.opts.perMessageDeflate
-            // }
-
-            if (req._query && req._query.b64) {
-                transport.supportsBinary = false
-            } else {
-                transport.supportsBinary = true
-            }
-        } catch (e: any) {
-            console.ex(e)
-            this.emit("connection_error", {
-                req,
-                code: Server.errors.BAD_REQUEST,
-                message: Server.errorMessages[Server.errors.BAD_REQUEST],
-                context: {
-                    name: "TRANSPORT_HANDSHAKE_ERROR",
-                    error: e
-                }
-            })
-            closeConnection(Server.errors.BAD_REQUEST)
-            return
-        }
-        console.debug(`engine.io server create socket ${id} from transport ${transport.name} protocol ${protocol}`)
-        const socket = new Socket(id, this, transport, req, protocol)
-
-        transport.on("headers", (headers, req) => {
-            const isInitialRequest = !req._query.sid
-
-            if (isInitialRequest) {
-                if (this.opts.cookie) {
-                    headers["Set-Cookie"] = [
-                        // cookieMod.serialize(this.opts.cookie.name, id, this.opts.cookie)
-                    ]
-                }
-                this.emit("initial_headers", headers, req)
-            }
-            this.emit("headers", headers, req)
-        })
-
-        transport.onRequest(req)
-
-        this.clients[id] = socket
-        this.clientsCount++
-
-        socket.once("close", () => {
-            delete this.clients[id]
-            this.clientsCount--
-        })
-        this.emit("connection", socket)
-    }
-
     // /**
     //  * Handles an Engine.IO HTTP Upgrade.
     //  *
     //  * @api public
     //  */
-    // handleUpgrade(req, socket, upgradeHead) {
+    // public handleUpgrade(req, socket, upgradeHead) {
     //     this.prepare(req)
 
     //     this.verify(req, true, (errorCode, errorContext) => {
@@ -423,7 +564,7 @@ export class Server extends EventEmitter {
     //             return
     //         }
 
-    //         const head = Buffer.from(upgradeHead) // eslint-disable-line node/no-deprecated-api
+    //         const head = Buffer.from(upgradeHead)
     //         upgradeHead = null
 
     //         // delegate to ws
@@ -439,14 +580,14 @@ export class Server extends EventEmitter {
      * @param {ws.Socket} websocket
      * @api private
      */
-    onWebSocket(req: Request, socket, websocket: WebSocketClient) {
+    private onWebSocket(req: Request, socket, websocket: WebSocketClient) {
         websocket.on("error", onUpgradeError)
 
         if (
             transports[req._query.transport] !== undefined &&
             !transports[req._query.transport].prototype.handlesUpgrades
         ) {
-            console.debug("transport doesnt handle upgraded requests")
+            debug("transport doesnt handle upgraded requests")
             websocket.close()
             return
         }
@@ -460,40 +601,37 @@ export class Server extends EventEmitter {
         if (id) {
             const client = this.clients[id]
             if (!client) {
-                console.debug("upgrade attempt for closed client")
+                debug("upgrade attempt for closed client")
                 websocket.close()
             } else if (client.upgrading) {
-                console.debug("transport has already been trying to upgrade")
+                debug("transport has already been trying to upgrade")
                 websocket.close()
             } else if (client.upgraded) {
-                console.debug("transport had already been upgraded")
+                debug("transport had already been upgraded")
                 websocket.close()
             } else {
-                console.debug("upgrading existing transport")
+                debug("upgrading existing transport")
 
                 // transport error handling takes over
                 websocket.removeListener("error", onUpgradeError)
 
-                const transport = new transports[req._query.transport](req)
+                const transport = this.createTransport(req._query.transport, req)
                 if (req._query && req._query.b64) {
                     transport.supportsBinary = false
                 } else {
                     transport.supportsBinary = true
                 }
-                transport.perMessageDeflate = this.perMessageDeflate
+                transport.perMessageDeflate = this.opts.perMessageDeflate
                 client.maybeUpgrade(transport)
             }
         } else {
-            // transport error handling takes over
-            websocket.removeListener("error", onUpgradeError)
-
             // const closeConnection = (errorCode, errorContext) =>
             //     abortUpgrade(socket, errorCode, errorContext)
             this.handshake(req._query.transport, req, () => { })
         }
 
-        function onUpgradeError() {
-            console.debug("websocket error before upgrade")
+        function onUpgradeError(...args) {
+            debug("websocket error before upgrade %s", ...args)
             // websocket.close() not needed
         }
     }
@@ -505,7 +643,9 @@ export class Server extends EventEmitter {
      * @param {Object} options
      * @api public
      */
-    attach(server, options: any = {}) {
+    // public attach(server: HttpServer, options: AttachOptions = {}) {
+    // @java-patch
+    public attach(server, options: AttachOptions = {}) {
         // let path = (options.path || "/engine.io").replace(/\/$/, "")
 
         // const destroyUpgradeTimeout = options.destroyUpgradeTimeout || 1000
@@ -514,7 +654,7 @@ export class Server extends EventEmitter {
         // path += "/"
 
         // function check(req) {
-        //     return path === req.url.substr(0, path.length)
+        //     return path === req.url.slice(0, path.length)
         // }
 
         // cache and clean up listeners
@@ -555,7 +695,11 @@ export class Server extends EventEmitter {
         //             // and if no eio thing handles the upgrade
         //             // then the socket needs to die!
         //             setTimeout(function () {
+        //                 // @ts-ignore
         //                 if (socket.writable && socket.bytesWritten <= 0) {
+        //                     socket.on("error", e => {
+        //                         debug("error while destroying upgrade: %s", e.message)
+        //                     })
         //                     return socket.end()
         //                 }
         //             }, destroyUpgradeTimeout)
@@ -601,7 +745,11 @@ export class Server extends EventEmitter {
 //  * @api private
 //  */
 
-// function abortUpgrade(socket, errorCode, errorContext: any = {}) {
+// function abortUpgrade(
+//     socket,
+//     errorCode,
+//     errorContext: { message?: string } = {}
+// ) {
 //     socket.on("error", () => {
 //         debug("ignoring error from closed connection")
 //     })
@@ -621,8 +769,6 @@ export class Server extends EventEmitter {
 //     }
 //     socket.destroy()
 // }
-
-// module.exports = Server
 
 /* eslint-disable */
 

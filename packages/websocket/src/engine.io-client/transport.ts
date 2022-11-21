@@ -1,15 +1,59 @@
-import parser from "../engine.io-parser"
-const Emitter = require("component-emitter")
+// import { decodePacket, Packet, RawData } from "engine.io-parser"
+import { decodePacket, Packet, RawData } from "../engine.io-parser"
+import { Emitter } from "@socket.io/component-emitter"
 import { installTimerFunctions } from "./util"
-const debug = (...args: any) => console.debug('engine.io-client:transport', ...args)//require("debug")("engine.io-client:transport")
+// import debugModule from "debug"; // debug()
+import { SocketOptions } from "./socket"
 
-export class Transport extends Emitter {
+// const debug = debugModule("engine.io-client:transport"); // debug()
+const debug = require('../debug')("engine.io-client:transport") // debug()
+
+class TransportError extends Error {
+    public readonly type = "TransportError";
+
+    constructor(
+        reason: string,
+        readonly description: any,
+        readonly context: any
+    ) {
+        super(reason)
+    }
+}
+
+export interface CloseDetails {
+    description: string
+    context?: CloseEvent | XMLHttpRequest
+}
+
+interface TransportReservedEvents {
+    open: () => void
+    error: (err: TransportError) => void
+    packet: (packet: Packet) => void
+    close: (details?: CloseDetails) => void
+    poll: () => void
+    pollComplete: () => void
+    drain: () => void
+}
+
+export abstract class Transport extends Emitter<
+    {},
+    {},
+    TransportReservedEvents
+> {
+    protected opts: SocketOptions
+    protected supportsBinary: boolean
+    protected query: object
+    protected readyState: string
+    protected writable: boolean = false;
+    protected socket: any
+    protected setTimeoutFn: typeof setTimeout
+
     /**
-     * Transport abstract constructor.
-     *
-     * @param {Object} options.
-     * @api private
-     */
+    * Transport abstract constructor.
+    *
+    * @param {Object} options.
+    * @api private
+    */
     constructor(opts) {
         super()
         installTimerFunctions(this, opts)
@@ -23,15 +67,17 @@ export class Transport extends Emitter {
     /**
      * Emits an error.
      *
-     * @param {String} str
+     * @param {String} reason
+     * @param description
+     * @param context - the error context
      * @return {Transport} for chaining
-     * @api public
+     * @api protected
      */
-    onError(msg, desc) {
-        const err: any = new Error(msg)
-        err.type = "TransportError"
-        err.description = desc
-        this.emit("error", err)
+    protected onError(reason: string, description: any, context?: any) {
+        super.emitReserved(
+            "error",
+            new TransportError(reason, description, context)
+        )
         return this
     }
 
@@ -40,7 +86,7 @@ export class Transport extends Emitter {
      *
      * @api public
      */
-    open() {
+    private open() {
         if ("closed" === this.readyState || "" === this.readyState) {
             this.readyState = "opening"
             this.doOpen()
@@ -52,9 +98,9 @@ export class Transport extends Emitter {
     /**
      * Closes the transport.
      *
-     * @api private
+     * @api public
      */
-    close() {
+    public close() {
         if ("opening" === this.readyState || "open" === this.readyState) {
             this.doClose()
             this.onClose()
@@ -64,12 +110,12 @@ export class Transport extends Emitter {
     }
 
     /**
-     * Sends multiple packets.
-     *
-     * @param {Array} packets
-     * @api private
-     */
-    send(packets) {
+   * Sends multiple packets.
+   *
+   * @param {Array} packets
+   * @api public
+   */
+    public send(packets) {
         if ("open" === this.readyState) {
             this.write(packets)
         } else {
@@ -81,39 +127,45 @@ export class Transport extends Emitter {
     /**
      * Called upon open
      *
-     * @api private
+     * @api protected
      */
-    onOpen() {
+    protected onOpen() {
         this.readyState = "open"
         this.writable = true
-        this.emit("open")
+        super.emitReserved("open")
     }
 
     /**
      * Called with data.
      *
      * @param {String} data
-     * @api private
+     * @api protected
      */
-    onData(data) {
-        const packet = parser.decodePacket(data, this.socket.binaryType)
+    protected onData(data: RawData) {
+        const packet = decodePacket(data, this.socket.binaryType)
         this.onPacket(packet)
     }
 
     /**
      * Called with a decoded packet.
+     *
+     * @api protected
      */
-    onPacket(packet) {
-        this.emit("packet", packet)
+    protected onPacket(packet: Packet) {
+        super.emitReserved("packet", packet)
     }
 
     /**
      * Called upon close.
      *
-     * @api private
+     * @api protected
      */
-    onClose() {
+    protected onClose(details?: CloseDetails) {
         this.readyState = "closed"
-        this.emit("close")
+        super.emitReserved("close", details)
     }
+
+    protected abstract doOpen()
+    protected abstract doClose()
+    protected abstract write(packets)
 }

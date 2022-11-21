@@ -38,7 +38,7 @@ export class WebSocket extends EventEmitter {
 
     private client: Transport
 
-    constructor(url: string, subProtocol: string = '', headers: WebSocketHeader = {}) {
+    constructor(url: string, subProtocol: string | string[] = '', headers: WebSocketHeader = {}) {
         super()
         this.manager = manager
         this._url = url

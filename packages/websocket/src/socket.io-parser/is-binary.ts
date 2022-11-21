@@ -7,14 +7,14 @@ const isView = (obj: any) => {
 }
 
 const toString = Object.prototype.toString
-const withNativeBlob = false
-// typeof Blob === "function" ||
-// (typeof Blob !== "undefined" &&
-//     toString.call(Blob) === "[object BlobConstructor]")
-const withNativeFile = false
-// typeof File === "function" ||
-// (typeof File !== "undefined" &&
-//     toString.call(File) === "[object FileConstructor]")
+const withNativeBlob =
+    typeof Blob === "function" ||
+    (typeof Blob !== "undefined" &&
+        toString.call(Blob) === "[object BlobConstructor]")
+const withNativeFile =
+    typeof File === "function" ||
+    (typeof File !== "undefined" &&
+        toString.call(File) === "[object FileConstructor]")
 
 /**
  * Returns true if obj is a Buffer, an ArrayBuffer, a Blob or a File.
@@ -24,8 +24,9 @@ const withNativeFile = false
 
 export function isBinary(obj: any) {
     return (
-        (withNativeArrayBuffer && (obj instanceof ArrayBuffer || isView(obj)))
-        // || (withNativeBlob && obj instanceof Blob) || (withNativeFile && obj instanceof File)
+        (withNativeArrayBuffer && (obj instanceof ArrayBuffer || isView(obj))) ||
+        (withNativeBlob && obj instanceof Blob) ||
+        (withNativeFile && obj instanceof File)
     )
 }
 

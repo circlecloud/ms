@@ -1,8 +1,10 @@
-import EventEmitter = require("events")
-import { deconstructPacket, reconstructPacket } from "./binary"
-import { isBinary, hasBinary } from "./is-binary"
+import { Emitter } from "@socket.io/component-emitter"
+import { deconstructPacket, reconstructPacket } from "./binary.js"
+import { isBinary, hasBinary } from "./is-binary.js"
+// import debugModule from "debug" // debug()
 
-// const debug = require("debug")("socket.io-parser")
+// const debug = debugModule("socket.io-parser") // debug()
+const debug = require("../debug")("socket.io-client")
 
 /**
  * Protocol version.
@@ -36,13 +38,19 @@ export interface Packet {
 
 export class Encoder {
     /**
+     * Encoder constructor
+     *
+     * @param {function} replacer - custom replacer to pass down to JSON.parse
+     */
+    constructor(private replacer?: (this: any, key: string, value: any) => any) { }
+    /**
      * Encode a packet as a single string if non-binary, or as a
      * buffer sequence, depending on packet type.
      *
      * @param {Object} obj - packet object
      */
     public encode(obj: Packet) {
-        console.trace("encoding packet", JSON.stringify(obj))
+        debug("encoding packet %j", obj)
 
         if (obj.type === PacketType.EVENT || obj.type === PacketType.ACK) {
             if (hasBinary(obj)) {
@@ -85,10 +93,10 @@ export class Encoder {
 
         // json data
         if (null != obj.data) {
-            str += JSON.stringify(obj.data)
+            str += JSON.stringify(obj.data, this.replacer)
         }
 
-        console.trace("encoded", JSON.stringify(obj), "as", str)
+        debug("encoded %j as %s", obj, str)
         return str
     }
 
@@ -108,15 +116,24 @@ export class Encoder {
     }
 }
 
+interface DecoderReservedEvents {
+    decoded: (packet: Packet) => void
+}
+
 /**
  * A socket.io Decoder instance
  *
  * @return {Object} decoder
  */
-export class Decoder extends EventEmitter {
+export class Decoder extends Emitter<{}, {}, DecoderReservedEvents> {
     private reconstructor: BinaryReconstructor
 
-    constructor() {
+    /**
+     * Decoder constructor
+     *
+     * @param {function} reviver - custom reviver to pass down to JSON.stringify
+     */
+    constructor(private reviver?: (this: any, key: string, value: any) => any) {
         super()
     }
 
@@ -129,6 +146,9 @@ export class Decoder extends EventEmitter {
     public add(obj: any) {
         let packet
         if (typeof obj === "string") {
+            if (this.reconstructor) {
+                throw new Error("got plaintext data when reconstructing a packet")
+            }
             packet = this.decodeString(obj)
             if (
                 packet.type === PacketType.BINARY_EVENT ||
@@ -139,11 +159,11 @@ export class Decoder extends EventEmitter {
 
                 // no attachments, labeled binary but no binary data to follow
                 if (packet.attachments === 0) {
-                    super.emit("decoded", packet)
+                    super.emitReserved("decoded", packet)
                 }
             } else {
                 // non-binary full packet
-                super.emit("decoded", packet)
+                super.emitReserved("decoded", packet)
             }
         } else if (isBinary(obj) || obj.base64) {
             // raw binary data
@@ -154,7 +174,7 @@ export class Decoder extends EventEmitter {
                 if (packet) {
                     // received final buffer
                     this.reconstructor = null
-                    super.emit("decoded", packet)
+                    super.emitReserved("decoded", packet)
                 }
             }
         } else {
@@ -223,7 +243,7 @@ export class Decoder extends EventEmitter {
 
         // look up json data
         if (str.charAt(++i)) {
-            const payload = tryParse(str.substr(i))
+            const payload = this.tryParse(str.substr(i))
             if (Decoder.isPayloadValid(p.type, payload)) {
                 p.data = payload
             } else {
@@ -231,8 +251,16 @@ export class Decoder extends EventEmitter {
             }
         }
 
-        console.trace("decoded", str, "as", p)
+        debug("decoded %s as %j", str, p)
         return p
+    }
+
+    private tryParse(str) {
+        try {
+            return JSON.parse(str, this.reviver)
+        } catch (e) {
+            return false
+        }
     }
 
     private static isPayloadValid(type: PacketType, payload: any): boolean {
@@ -259,14 +287,6 @@ export class Decoder extends EventEmitter {
         if (this.reconstructor) {
             this.reconstructor.finishedReconstruction()
         }
-    }
-}
-
-function tryParse(str) {
-    try {
-        return JSON.parse(str)
-    } catch (error: any) {
-        return false
     }
 }
 

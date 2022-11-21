@@ -1,21 +1,18 @@
-import { Transport } from '../transport'
-// const Transport = require("../transport")
-import parser from '../../engine.io-parser'
-// const parser = require("../engine.io-parser")
-const parseqs = require("parseqs")
-const yeast = require("yeast")
-import { pick } from '../util'
-// const { pick } = require("../util")
-import { WebSocket } from '../../client'
-const usingBrowserWebSocket = true
-// const {
-//     WebSocket,
-//     usingBrowserWebSocket,
-//     defaultBinaryType,
-//     nextTick
-// } = require("./websocket-constructor")
+import { Transport } from "../transport"
+import { encode } from "../contrib/parseqs"
+import { yeast } from "../contrib/yeast"
+import { pick } from "../util"
+import {
+    defaultBinaryType,
+    nextTick,
+    usingBrowserWebSocket,
+    WebSocket
+} from "./websocket-constructor"
+// import debugModule from "debug" // debug()
+import { encodePacket } from "../../engine.io-parser"
 
-const debug = (...args: any) => console.debug('engine.io-client:websocket', ...args)//require("debug")("engine.io-client:websocket")
+// const debug = debugModule("engine.io-client:websocket") // debug()
+const debug = (...args: any) => console.debug('engine.io-client:websocket', ...args)
 
 // detect ReactNative environment
 const isReactNative =
@@ -24,6 +21,8 @@ const isReactNative =
     navigator.product.toLowerCase() === "reactnative"
 
 export class WS extends Transport {
+    private ws: any
+
     /**
      * WebSocket transport constructor.
      *
@@ -86,17 +85,17 @@ export class WS extends Transport {
         }
 
         try {
-            this.ws = new WebSocket(uri, protocols)
-            // usingBrowserWebSocket && !isReactNative
-            //     ? protocols
-            //         ? new WebSocket(uri, protocols)
-            //         : new WebSocket(uri)
-            //     : new WebSocket(uri, protocols, opts)
-        } catch (err) {
-            return this.emit("error", err)
+            this.ws =
+                usingBrowserWebSocket && !isReactNative
+                    ? protocols
+                        ? new WebSocket(uri, protocols)
+                        : new WebSocket(uri)
+                    : new WebSocket(uri, protocols, opts)
+        } catch (err: any) {
+            return this.emitReserved("error", err)
         }
 
-        this.ws.binaryType = this.socket.binaryType || 'arraybuffer'
+        this.ws.binaryType = this.socket.binaryType || defaultBinaryType
 
         this.addEventListeners()
     }
@@ -113,7 +112,11 @@ export class WS extends Transport {
             }
             this.onOpen()
         }
-        this.ws.onclose = this.onClose.bind(this)
+        this.ws.onclose = closeEvent =>
+            this.onClose({
+                description: "websocket connection closed",
+                context: closeEvent
+            })
         this.ws.onmessage = ev => this.onData(ev.data)
         this.ws.onerror = e => this.onError("websocket error", e)
     }
@@ -133,9 +136,9 @@ export class WS extends Transport {
             const packet = packets[i]
             const lastPacket = i === packets.length - 1
 
-            parser.encodePacket(packet, this.supportsBinary, data => {
+            encodePacket(packet, this.supportsBinary, data => {
                 // always create a new object (GH-437)
-                const opts: any = {}
+                const opts: { compress?: boolean } = {}
                 if (!usingBrowserWebSocket) {
                     if (packet.options) {
                         opts.compress = packet.options.compress
@@ -143,6 +146,7 @@ export class WS extends Transport {
 
                     if (this.opts.perMessageDeflate) {
                         const len =
+                            // @ts-ignore
                             "string" === typeof data ? Buffer.byteLength(data) : data.length
                         if (len < this.opts.perMessageDeflate.threshold) {
                             opts.compress = false
@@ -160,29 +164,20 @@ export class WS extends Transport {
                     } else {
                         this.ws.send(data, opts)
                     }
-                } catch (error: any) {
+                } catch (e) {
                     debug("websocket closed before onclose event")
                 }
 
                 if (lastPacket) {
                     // fake drain
                     // defer to next tick to allow Socket to clear writeBuffer
-                    process.nextTick(() => {
+                    nextTick(() => {
                         this.writable = true
-                        this.emit("drain")
+                        this.emitReserved("drain")
                     }, this.setTimeoutFn)
                 }
             })
         }
-    }
-
-    /**
-     * Called upon close
-     *
-     * @api private
-     */
-    onClose() {
-        Transport.prototype.onClose.call(this)
     }
 
     /**
@@ -203,7 +198,7 @@ export class WS extends Transport {
      * @api private
      */
     uri() {
-        let query = this.query || {}
+        let query: { b64?: number } = this.query || {}
         const schema = this.opts.secure ? "wss" : "ws"
         let port = ""
 
@@ -226,21 +221,16 @@ export class WS extends Transport {
             query.b64 = 1
         }
 
-        query = parseqs.encode(query)
-
-        // prepend ? to query
-        if (query.length) {
-            query = "?" + query
-        }
-
+        const encodedQuery = encode(query)
         const ipv6 = this.opts.hostname.indexOf(":") !== -1
+
         return (
             schema +
             "://" +
             (ipv6 ? "[" + this.opts.hostname + "]" : this.opts.hostname) +
             port +
             this.opts.path +
-            query
+            (encodedQuery.length ? "?" + encodedQuery : "")
         )
     }
 
@@ -251,9 +241,6 @@ export class WS extends Transport {
      * @api public
      */
     check() {
-        return (
-            !!WebSocket &&
-            !("__initialize" in WebSocket && this.name === WS.prototype.name)
-        )
+        return !!WebSocket
     }
 }

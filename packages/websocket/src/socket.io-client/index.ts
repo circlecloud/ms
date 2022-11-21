@@ -5,15 +5,9 @@ import { Socket, SocketOptions } from "./socket"
 const debug = require("../debug")("socket.io-client")
 
 /**
- * Module exports.
- */
-
-module.exports = exports = lookup
-
-/**
  * Managers cache.
  */
-const cache: Record<string, Manager> = (exports.managers = {})
+const cache: Record<string, Manager> = {}
 
 /**
  * Looks up an existing `Manager` for multiplexing.
@@ -76,6 +70,15 @@ function lookup(
     return io.socket(parsed.path, opts)
 }
 
+// so that "lookup" can be used both as a function (e.g. `io(...)`) and as a
+// namespace (e.g. `io.connect(...)`), for backward compatibility
+Object.assign(lookup, {
+    Manager,
+    Socket,
+    io: lookup,
+    connect: lookup,
+})
+
 /**
  * Protocol version.
  *
@@ -85,21 +88,17 @@ function lookup(
 export { protocol } from "../socket.io-parser"
 
 /**
- * `connect`.
- *
- * @param {String} uri
- * @public
- */
-
-exports.connect = lookup
-
-/**
  * Expose constructors for standalone build.
  *
  * @public
  */
 
-export { Manager, ManagerOptions } from "./manager"
-export { Socket } from "./socket"
-export { lookup as io, SocketOptions }
-export default lookup
+export {
+    Manager,
+    ManagerOptions,
+    Socket,
+    SocketOptions,
+    lookup as io,
+    lookup as connect,
+    lookup as default,
+}

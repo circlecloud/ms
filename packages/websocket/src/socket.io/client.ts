@@ -9,9 +9,10 @@ import type { EventsMap } from "./typed-events"
 import type { Socket } from "./socket"
 // import type { SocketId } from "socket.io-adapter"
 import type { SocketId } from "../socket.io-adapter"
-import type { Socket as EngineIOSocket } from '../engine.io/socket'
+import type { Socket as RawSocket } from '../engine.io/socket'
 
 // const debug = debugModule("socket.io:client");
+const debug = require('../debug')("socket.io:client")
 
 interface WriteOptions {
     compress?: boolean
@@ -20,28 +21,39 @@ interface WriteOptions {
     wsPreEncoded?: string
 }
 
+type CloseReason =
+    | "transport error"
+    | "transport close"
+    | "forced close"
+    | "ping timeout"
+    | "parse error"
+
 export class Client<
     ListenEvents extends EventsMap,
     EmitEvents extends EventsMap,
-    ServerSideEvents extends EventsMap
-    > {
-    public readonly conn: EngineIOSocket
-    /**
-     * @private
-     */
-    readonly id: string
-    private readonly server: Server<ListenEvents, EmitEvents, ServerSideEvents>
+    ServerSideEvents extends EventsMap,
+    SocketData = any
+> {
+    public readonly conn: RawSocket
+
+    private readonly id: string
+    private readonly server: Server<
+        ListenEvents,
+        EmitEvents,
+        ServerSideEvents,
+        SocketData
+    >
     private readonly encoder: Encoder
-    private readonly decoder: any
+    private readonly decoder: Decoder
     private sockets: Map<
         SocketId,
-        Socket<ListenEvents, EmitEvents, ServerSideEvents>
-    > = new Map()
+        Socket<ListenEvents, EmitEvents, ServerSideEvents, SocketData>
+    > = new Map();
     private nsps: Map<
         string,
-        Socket<ListenEvents, EmitEvents, ServerSideEvents>
-    > = new Map()
-    private connectTimeout: NodeJS.Timeout
+        Socket<ListenEvents, EmitEvents, ServerSideEvents, SocketData>
+    > = new Map();
+    private connectTimeout?: NodeJS.Timeout
 
     /**
      * Client constructor.
@@ -51,8 +63,8 @@ export class Client<
      * @package
      */
     constructor(
-        server: Server<ListenEvents, EmitEvents, ServerSideEvents>,
-        conn: EngineIOSocket
+        server: Server<ListenEvents, EmitEvents, ServerSideEvents, SocketData>,
+        conn: any
     ) {
         this.server = server
         this.conn = conn
@@ -67,7 +79,8 @@ export class Client<
      *
      * @public
      */
-    public get request(): any/** IncomingMessage */ {
+    // public get request(): IncomingMessage {
+    public get request(): any {
         return this.conn.request
     }
 
@@ -77,7 +90,6 @@ export class Client<
      * @private
      */
     private setup() {
-        console.debug(`socket.io client setup conn ${this.conn.id}`)
         this.onclose = this.onclose.bind(this)
         this.ondata = this.ondata.bind(this)
         this.onerror = this.onerror.bind(this)
@@ -91,10 +103,10 @@ export class Client<
 
         this.connectTimeout = setTimeout(() => {
             if (this.nsps.size === 0) {
-                console.debug(`no namespace joined yet, close the client ${this.id}`)
+                debug("no namespace joined yet, close the client")
                 this.close()
             } else {
-                console.debug(`the client ${this.id} has already joined a namespace, nothing to do`)
+                debug("the client has already joined a namespace, nothing to do")
             }
         }, this.server._connectTimeout)
     }
@@ -108,7 +120,7 @@ export class Client<
      */
     private connect(name: string, auth: object = {}): void {
         if (this.server._nsps.has(name)) {
-            console.debug(`socket.io client ${this.id} connecting to namespace ${name}`)
+            debug("connecting to namespace %s", name)
             return this.doConnect(name, auth)
         }
 
@@ -117,14 +129,13 @@ export class Client<
             auth,
             (
                 dynamicNspName:
-                    | Namespace<ListenEvents, EmitEvents, ServerSideEvents>
+                    | Namespace<ListenEvents, EmitEvents, ServerSideEvents, SocketData>
                     | false
             ) => {
                 if (dynamicNspName) {
-                    console.debug(`dynamic namespace ${dynamicNspName} was created`)
                     this.doConnect(name, auth)
                 } else {
-                    console.debug(`creation of namespace ${name} was denied`)
+                    debug("creation of namespace %s was denied", name)
                     this._packet({
                         type: PacketType.CONNECT_ERROR,
                         nsp: name,
@@ -178,20 +189,16 @@ export class Client<
      *
      * @private
      */
-    _remove(socket: Socket<ListenEvents, EmitEvents, ServerSideEvents>): void {
+    _remove(
+        socket: Socket<ListenEvents, EmitEvents, ServerSideEvents, SocketData>
+    ): void {
         if (this.sockets.has(socket.id)) {
             const nsp = this.sockets.get(socket.id)!.nsp.name
             this.sockets.delete(socket.id)
             this.nsps.delete(nsp)
         } else {
-            console.debug("ignoring remove for", socket.id)
+            debug("ignoring remove for %s", socket.id)
         }
-        // @java-patch  disconnect client when no live socket
-        process.nextTick(() => {
-            if (this.sockets.size == 0) {
-                this.onclose('no live socket')
-            }
-        })
     }
 
     /**
@@ -200,43 +207,47 @@ export class Client<
      * @private
      */
     private close(): void {
-        console.debug(`client ${this.id} close - reason: forcing transport close`)
         if ("open" === this.conn.readyState) {
-            console.debug("forcing transport close")
+            debug("forcing transport close")
             this.conn.close()
             this.onclose("forced server close")
         }
     }
 
     /**
-   * Writes a packet to the transport.
-   *
-   * @param {Object} packet object
-   * @param {Object} opts
-   * @private
-   */
+     * Writes a packet to the transport.
+     *
+     * @param {Object} packet object
+     * @param {Object} opts
+     * @private
+     */
     _packet(packet: Packet | any[], opts: WriteOptions = {}): void {
         if (this.conn.readyState !== "open") {
-            console.debug(`client ${this.id} ignoring packet write ${JSON.stringify(packet)}`)
+            debug("ignoring packet write %j", packet)
             return
         }
         const encodedPackets = opts.preEncoded
             ? (packet as any[]) // previous versions of the adapter incorrectly used socket.packet() instead of writeToEngine()
             : this.encoder.encode(packet as Packet)
-        for (const encodedPacket of encodedPackets) {
-            this.writeToEngine(encodedPacket, opts)
-        }
+        this.writeToEngine(encodedPackets, opts)
     }
 
     private writeToEngine(
-        encodedPacket: String | Buffer,
+        encodedPackets: Array<String | Buffer>,
         opts: WriteOptions
     ): void {
         if (opts.volatile && !this.conn.transport.writable) {
-            console.debug(`client ${this.id} volatile packet is discarded since the transport is not currently writable`)
+            debug(
+                "volatile packet is discarded since the transport is not currently writable"
+            )
             return
         }
-        this.conn.write(encodedPacket, opts)
+        const packets = Array.isArray(encodedPackets)
+            ? encodedPackets
+            : [encodedPackets]
+        for (const encodedPacket of packets) {
+            this.conn.write(encodedPacket, opts)
+        }
     }
 
     /**
@@ -248,8 +259,9 @@ export class Client<
         // try/catch is needed for protocol violations (GH-1880)
         try {
             this.decoder.add(data)
-        } catch (error: any) {
-            this.onerror(error)
+        } catch (e) {
+            debug("invalid packet format")
+            this.onerror(e)
         }
     }
 
@@ -259,22 +271,31 @@ export class Client<
      * @private
      */
     private ondecoded(packet: Packet): void {
-        if (PacketType.CONNECT === packet.type) {
-            if (this.conn.protocol === 3) {
-                const parsed = url.parse(packet.nsp, true)
-                this.connect(parsed.pathname!, parsed.query)
-            } else {
-                this.connect(packet.nsp, packet.data)
-            }
+        let namespace: string
+        let authPayload
+        if (this.conn.protocol === 3) {
+            const parsed = url.parse(packet.nsp, true)
+            namespace = parsed.pathname!
+            authPayload = parsed.query
         } else {
-            const socket = this.nsps.get(packet.nsp)
-            if (socket) {
-                process.nextTick(function () {
-                    socket._onpacket(packet)
-                })
-            } else {
-                console.debug(`client ${this.id} no socket for namespace ${packet.nsp}.`)
-            }
+            namespace = packet.nsp
+            authPayload = packet.data
+        }
+        const socket = this.nsps.get(namespace)
+
+        if (!socket && packet.type === PacketType.CONNECT) {
+            this.connect(namespace, authPayload)
+        } else if (
+            socket &&
+            packet.type !== PacketType.CONNECT &&
+            packet.type !== PacketType.CONNECT_ERROR
+        ) {
+            process.nextTick(function () {
+                socket._onpacket(packet)
+            })
+        } else {
+            debug("invalid state (packet type: %s)", packet.type)
+            this.close()
         }
     }
 
@@ -297,8 +318,8 @@ export class Client<
      * @param reason
      * @private
      */
-    private onclose(reason: string): void {
-        console.debug(`client ${this.id} close with reason ${reason}`)
+    private onclose(reason: CloseReason | "forced server close"): void {
+        debug("client close with reason %s", reason)
 
         // ignore a potential subsequent `close` event
         this.destroy()

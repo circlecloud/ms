@@ -1,5 +1,5 @@
 import { Namespace } from "./namespace"
-import type { Server } from "./index"
+import type { Server, RemoteSocket } from "./index"
 import type {
     EventParams,
     EventNames,
@@ -12,16 +12,24 @@ import type { BroadcastOptions } from "../socket.io-adapter"
 export class ParentNamespace<
     ListenEvents extends EventsMap = DefaultEventsMap,
     EmitEvents extends EventsMap = ListenEvents,
-    ServerSideEvents extends EventsMap = DefaultEventsMap
-    > extends Namespace<ListenEvents, EmitEvents, ServerSideEvents> {
+    ServerSideEvents extends EventsMap = DefaultEventsMap,
+    SocketData = any
+> extends Namespace<ListenEvents, EmitEvents, ServerSideEvents, SocketData> {
     private static count: number = 0;
-    private children: Set<Namespace<ListenEvents, EmitEvents, ServerSideEvents>> = new Set();
+    private children: Set<
+        Namespace<ListenEvents, EmitEvents, ServerSideEvents, SocketData>
+    > = new Set();
 
-    constructor(server: Server<ListenEvents, EmitEvents, ServerSideEvents>) {
+    constructor(
+        server: Server<ListenEvents, EmitEvents, ServerSideEvents, SocketData>
+    ) {
         super(server, "/_" + ParentNamespace.count++)
     }
 
-    _initAdapter() {
+    /**
+     * @private
+     */
+    _initAdapter(): void {
         const broadcast = (packet: any, opts: BroadcastOptions) => {
             this.children.forEach((nsp) => {
                 nsp.adapter.broadcast(packet, opts)
@@ -42,21 +50,9 @@ export class ParentNamespace<
         return true
     }
 
-    // public emit(...args: any[]): boolean {
-    //     this.children.forEach(nsp => {
-    //         nsp._rooms = this._rooms
-    //         nsp._flags = this._flags
-    //         nsp.emit.apply(nsp, args as any)
-    //     })
-    //     this._rooms.clear()
-    //     this._flags = {}
-
-    //     return true
-    // }
-
     createChild(
         name: string
-    ): Namespace<ListenEvents, EmitEvents, ServerSideEvents> {
+    ): Namespace<ListenEvents, EmitEvents, ServerSideEvents, SocketData> {
         const namespace = new Namespace(this.server, name)
         namespace._fns = this._fns.slice(0)
         this.listeners("connect").forEach((listener) =>
@@ -68,5 +64,14 @@ export class ParentNamespace<
         this.children.add(namespace)
         this.server._nsps.set(name, namespace)
         return namespace
+    }
+
+    fetchSockets(): Promise<RemoteSocket<EmitEvents, SocketData>[]> {
+        // note: we could make the fetchSockets() method work for dynamic namespaces created with a regex (by sending the
+        // regex to the other Socket.IO servers, and returning the sockets of each matching namespace for example), but
+        // the behavior for namespaces created with a function is less clear
+        // note²: we cannot loop over each children namespace, because with multiple Socket.IO servers, a given namespace
+        // may exist on one node but not exist on another (since it is created upon client connection)
+        throw new Error("fetchSockets() is not supported on parent namespaces")
     }
 }

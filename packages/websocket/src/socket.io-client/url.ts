@@ -1,5 +1,8 @@
-import * as parseuri from "parseuri"
+// import { parse } from "engine.io-client"
+import { parse } from "../engine.io-client"
+// import debugModule from "debug" // debug()
 
+// const debug = debugModule("socket.io-client:url"); // debug()
 const debug = require("../debug")("socket.io-client")
 
 type ParsedUrl = {
@@ -67,7 +70,7 @@ export function url(
 
         // parse
         debug("parse %s", uri)
-        obj = parseuri(uri) as ParsedUrl
+        obj = parse(uri) as ParsedUrl
     }
 
     // make sure we treat `localhost:80` and `localhost` equally

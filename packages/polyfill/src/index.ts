@@ -12,6 +12,7 @@ import 'core-js'
 process.on('exit', () => require.disable())
 global.setGlobal('Proxy', require('./proxy').Proxy)
 global.setGlobal('XMLHttpRequest', require('./xml-http-request').XMLHttpRequest)
+global.setGlobal('Buffer', require('./buffer').Buffer)
 global.setGlobal('Blob', require('blob-polyfill').Blob)
 console.i18n("ms.polyfill.completed", { time: (new Date().getTime() - polyfillStartTime) / 1000 })
 export default true
