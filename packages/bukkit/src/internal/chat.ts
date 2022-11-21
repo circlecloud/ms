@@ -171,7 +171,7 @@ class BukkitChatInvoke_1_19 extends BukkitChatInvoke_1_18_2 {
         return base.getClass('net.minecraft.network.protocol.game.ClientboundSystemChatPacket')
     }
     getPacketPlayOutChat(sender: any, json: any, type: number) {
-        return new this.PacketPlayOutChat(this.ChatSerializer[this.nmsChatSerializerMethodName](json), type == 0 ? 1 : type)
+        return new this.PacketPlayOutChat(this.ChatSerializer[this.nmsChatSerializerMethodName](json), type)
     }
 }
 

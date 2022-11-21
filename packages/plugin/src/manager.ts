@@ -226,8 +226,16 @@ export class PluginManagerImpl implements plugin.PluginManager {
         })
     }
 
+    has(name: string) {
+        return this.instanceMap.has(name)
+    }
+
+    get(name: string) {
+        return this.instanceMap.get(name) || null
+    }
+
     getPlugin(name: string) {
-        return this.instanceMap.get(name)
+        return this.instanceMap.get(name) || null
     }
 
     getPlugins() {

@@ -110,7 +110,7 @@ function loadCoreScript(name) {
     try {
         let scriptname = name + (global.debug ? '-debug' : '')
         engineLoad({
-            script: http.get(`https://ms.yumc.pw/api/plugin/download/name/${scriptname}`),
+            script: http.get(`https://mscript.yumc.pw/api/plugin/download/name/${scriptname}`),
             name: `core/${scriptname}.js`
         })
     } catch (error: any) {
