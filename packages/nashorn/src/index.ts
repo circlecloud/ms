@@ -64,8 +64,18 @@ declare global {
              * 引擎渠道
              */
             ScriptEngineChannel: string
+            /**
+             * 慢执行检测时间
+             */
             ScriptSlowExecuteTime: number
             ScriptEngineStartTime: number
+            /**
+             * 设置全局对象
+             * @param key 对象名称
+             * @param value 对象值
+             * @param config 对象属性
+             * @returns
+             */
             setGlobal: (key: string, value: any, config?: PropertyDescriptor & ThisType<any>) => void
             noop: () => void
             console: Console
