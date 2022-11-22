@@ -13,9 +13,9 @@
         "ug": "yarn upgrade-interactive --latest",
         "np": "./script/push.sh",
         "lsp": "npm login -scope=@ccms",
-        "lp": "lerna publish",
-        "lpb": "lerna publish --dist-tag beta",
-        "lpc": "lerna publish --canary --preid beta --pre-dist-tag beta",
+        "lp": "lerna publish --verify-access",
+        "lpb": "lerna publish --preid beta --dist-tag beta --verify-access",
+        "lpc": "lerna publish --canary --preid beta --pre-dist-tag beta --verify-access",
         "lpf": "lerna publish from-package --yes"
     },
     "workspaces": [
