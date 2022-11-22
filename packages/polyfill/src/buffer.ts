@@ -178,7 +178,7 @@ BufferPolyfill.from = function (value, encodingOrOffset, length) {
 // Note: Change prototype *after* BufferPolyfill.from is defined to workaround Chrome bug:
 // https://github.com/feross/buffer/pull/148
 Object.setPrototypeOf(BufferPolyfill.prototype, Uint8Array.prototype)
-Object.setPrototypeOf(Buffer, Uint8Array)
+Object.setPrototypeOf(BufferPolyfill, Uint8Array)
 
 function assertSize(size) {
     if (typeof size !== 'number') {
