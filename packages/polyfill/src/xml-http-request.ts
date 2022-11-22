@@ -212,13 +212,13 @@ export class XMLHttpRequest {
     }
     abort() {
         this._connection.disconnect()
-        this.onabort && this.onabort()
+        this.onabort?.()
     }
 
     private _send(body?: string | object) {
         try {
             this._connection.connect()
-            this.onloadstart && this.onloadstart()
+            this.onloadstart?.()
             if (body) {
                 let bodyType = Object.prototype.toString.call(body)
                 if (typeof body !== "string") { throw new Error(`body(${bodyType}) must be string!`) }
@@ -228,6 +228,7 @@ export class XMLHttpRequest {
                 out.close()
             }
             this.setReadyState(ReadyState.LOADING)
+            this.onload?.()
             this._status = this._connection.getResponseCode()
             this._statusText = this._connection.getResponseMessage()
             if (this._status >= 0 && this._status < 300) {
@@ -238,7 +239,7 @@ export class XMLHttpRequest {
                 this._responseText = this.readOutput(this._connection.getErrorStream())
             }
             this.setResponseHeaders(this._connection.getHeaderFields())
-            this.onloadend && this.onloadend()
+            this.onloadend?.()
         } catch (ex: any) {
             if (ex instanceof SocketTimeoutException && this.ontimeout) {
                 return this.ontimeout(ex)
@@ -260,7 +261,7 @@ export class XMLHttpRequest {
 
     private setReadyState(state: ReadyState) {
         this._readyState = state
-        this.onreadystatechange && this.onreadystatechange()
+        this.onreadystatechange?.()
     }
 
     private readOutput(input: any) {
