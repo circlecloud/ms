@@ -1,6 +1,6 @@
 {
     "name": "@ccms/molang",
-    "version": "0.25.1-beta.0",
+    "version": "2.25.1-beta.1",
     "description": "A fast parser for Minecraft's MoLang",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",

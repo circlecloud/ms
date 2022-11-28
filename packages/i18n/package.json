@@ -1,6 +1,6 @@
 {
     "name": "@ccms/i18n",
-    "version": "0.25.1-beta.0",
+    "version": "2.25.1-beta.1",
     "description": "MiaoScript i18n package",
     "keywords": [
         "miaoscript",
@@ -19,7 +19,7 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "devDependencies": {
-        "@ccms/nashorn": "^0.25.1-beta.0",
+        "@ccms/nashorn": "^2.25.1-beta.1",
         "@types/js-yaml": "^4.0.5",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
