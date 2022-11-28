@@ -98,6 +98,7 @@ export class PluginManagerImpl implements plugin.PluginManager {
                     try {
                         this.loadAndRequirePlugin(loadMetadata)
                     } catch (error: any) {
+                        console.console(`§c扫描器 §4${scanner.type} §c文件 §4${loadMetadata.file.toString().replace(root, '')} §c编译失败 请提供下列错误给开发者`)
                         console.ex(error)
                     }
                 }

@@ -26,6 +26,7 @@ export namespace event {
 
         private mapEvent = [];
         private listenerMap = [];
+        private cacheSlowEventKey = {};
 
         protected baseEventDir = '';
 
@@ -92,17 +93,23 @@ export namespace event {
             return eventCls
         }
 
-        execute(name, exec, eventCls) {
+        /**
+         * 创建命令执行器
+         * @param name 插件名称
+         * @param exec
+         * @param eventCls
+         * @returns
+         */
+        createExecute(name, exec, eventCls) {
             return (...args: any[]) => {
+                let event = args[args.length - 1]
                 try {
-                    let event = args[args.length - 1]
-                    if (eventCls.isAssignableFrom(event.getClass())) {
-                        let time = Date.now()
-                        exec(event)
-                        let cost = Date.now() - time
-                        if (cost > global.ScriptSlowExecuteTime) {
-                            console.i18n("ms.api.event.execute.slow", { name, event: this.class2Name(eventCls), cost })
-                        }
+                    if (!eventCls.isAssignableFrom(event.getClass())) { return }
+                    let time = Date.now(); exec(event); let cost = Date.now() - time
+                    if (cost > global.ScriptSlowExecuteTime) {
+                        let eventKey = `${name}-${this.class2Name(eventCls)}`
+                        if (!this.cacheSlowEventKey[eventKey]) { return this.cacheSlowEventKey[eventKey] = cost }
+                        console.i18n("ms.api.event.execute.slow", { name, event: this.class2Name(eventCls), cost })
                     }
                 } catch (ex: any) {
                     console.i18n("ms.api.event.execute.error", { name, event: this.class2Name(eventCls), ex })
@@ -135,7 +142,7 @@ export namespace event {
             // noinspection JSUnusedGlobalSymbols
             var listener = this.register(
                 eventCls,
-                this.execute(name, exec, eventCls),
+                this.createExecute(name, exec, eventCls),
                 priority,
                 ignoreCancel
             )

@@ -7,8 +7,7 @@ import { interfaces } from './interfaces'
 import { getPluginConfigMetadata } from './utils'
 
 import { PluginConfigLoader } from './config/interfaces'
-import './config/loader/json-loader'
-import './config/loader/yaml-loader'
+import './config/loader'
 
 @provideSingleton(PluginConfigManager)
 export class PluginConfigManager {

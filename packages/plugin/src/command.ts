@@ -78,7 +78,7 @@ export class PluginCommandManager {
                         permission = `${pluginInstance.description.name.toLocaleLowerCase()}.${command}.${subcommand || 'main'}`
                     }
                     if (!sender.hasPermission(permission)) {
-                        return pluginInstance.logger.sender(sender, `§c你需要 ${permission} 权限 才可执行此命令.`)
+                        return pluginInstance.logger.sender(sender, `§c你需要 §4${permission} §c权限 才可执行此命令.`)
                     }
                 }
                 args.shift()
@@ -98,7 +98,7 @@ export class PluginCommandManager {
                 return (args.length == 1 ? cmdSubCache : []).concat(originCompleter?.apply(pluginInstance, [sender, command, args]) || [])
             }
         }
-        if (!cmdCompleter) { console.warn(`[${pluginInstance.description.name}] command ${cmd.name} is not registry tabCompleter`) }
+        if (!cmdCompleter) { console.debug(`[${pluginInstance.description.name}] command ${cmd.name} is not registry tabCompleter`) }
         return [cmdExecutor, cmdCompleter]
     }
 }

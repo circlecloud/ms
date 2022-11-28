@@ -185,15 +185,25 @@ export namespace server {
                     }
                 }
             }
+            if (this.rootLogger.class.name.indexOf('slf4j') !== -1) {
+                try {
+                    let LogManager = Java.type('org.apache.logging.log4j.LogManager')
+                    this.rootLogger = LogManager.getLogger('ROOT')
+                } catch (error: any) {
+                    if (global.debug) {
+                        console.ex(error)
+                    }
+                }
+            }
             if (this.rootLogger && this.rootLogger.class.name.indexOf('Logger') === -1) {
                 console.error('Error Logger Class: ' + this.rootLogger.class.name)
                 this.rootLogger = undefined
             }
+            if (!this.rootLogger) { console.error("Can't found rootLogger!") }
             // get root logger
             for (let index = 0; index < 5 && this.rootLogger.parent; index++) {
                 this.rootLogger = this.rootLogger.parent
             }
-            if (!this.rootLogger) { console.error("Can't found rootLogger!") }
             this.container.bind(constants.ServiceIdentifier.RootLogger).toConstantValue(this.rootLogger)
         }
     }
