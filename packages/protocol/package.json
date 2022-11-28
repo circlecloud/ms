@@ -1,6 +1,6 @@
 {
     "name": "@ccms/protocol",
-    "version": "2.25.1-beta.1",
+    "version": "2.25.1",
     "description": "MiaoScript protocol package",
     "keywords": [
         "miaoscript",

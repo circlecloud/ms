@@ -1,6 +1,6 @@
 {
     "name": "@ccms/bukkit",
-    "version": "2.25.1-beta.1",
+    "version": "2.25.1",
     "description": "MiaoScript bukkit package",
     "keywords": [
         "miaoscript",
@@ -25,8 +25,8 @@
         "typescript": "^4.9.3"
     },
     "dependencies": {
-        "@ccms/api": "^2.25.1-beta.1",
-        "@ccms/common": "^2.25.1-beta.1",
-        "@ccms/container": "^2.25.1-beta.1"
+        "@ccms/api": "^2.25.1",
+        "@ccms/common": "^2.25.1",
+        "@ccms/container": "^2.25.1"
     }
 }
