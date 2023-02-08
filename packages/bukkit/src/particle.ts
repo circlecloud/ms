@@ -3,20 +3,11 @@ import { particle } from '@ccms/api'
 
 @provideSingleton(particle.ParticleManager)
 export class BukkitParticleManager extends particle.ParticleManager {
-    private globalSpawner = new BukkitParticleSpawner()
-    constructor() {
-        super()
-        particle.ParticleManager.globalSpawner = this.globalSpawner
-    }
-    protected getGlobalSpawner() {
-        return this.globalSpawner
-    }
 }
+
+@provideSingleton(particle.ParticleSpawner)
 export class BukkitParticleSpawner extends particle.ParticleSpawner {
-    spawnParticle(location: any, particle: any, count: number = 1) {
-        location.getWorld().spawnParticle(particle, location, count)
-    }
-    spawn(location: any, particle: particle.Particle) {
+    spawn(location: org.bukkit.Location, particle: particle.Particle) {
         location.getWorld().spawnParticle(
             particle.getParticle(),
             location,
@@ -27,5 +18,16 @@ export class BukkitParticleSpawner extends particle.ParticleSpawner {
             particle.getExtra(),
             particle.getData()
         )
+    }
+    spawnToPlayer(player: org.bukkit.entity.Player, location: org.bukkit.Location, particle: particle.Particle) {
+        player.spawnParticle(
+            particle.getParticle(),
+            location,
+            particle.getCount(),
+            particle.getOffsetX(),
+            particle.getOffsetY(),
+            particle.getOffsetZ(),
+            particle.getExtra(),
+            particle.getData())
     }
 }

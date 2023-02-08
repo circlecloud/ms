@@ -23,6 +23,11 @@ export namespace particle {
         private extra: number = 0;
         private data: Object = null;
 
+        /**
+         * Only Show To Player
+         */
+        private player: any
+
         constructor() {
             this.uuid = UUID.randomUUID().toString()
         }
@@ -105,6 +110,15 @@ export namespace particle {
             return this
         }
 
+        getPlayer() {
+            return this.player
+        }
+
+        setPlayer(player) {
+            this.player = player
+            return this
+        }
+
         /**
          * 通过给定一个坐标就可以使用已经指定的参数来播放粒子
          *
@@ -112,9 +126,14 @@ export namespace particle {
          */
         spawn(location: any) {
             if (!this.spawner) throw new Error(`particle ${this.uuid} not set spawner can't spawn!`)
-            this.spawner.spawn(location, this)
+            if (this.player) {
+                this.spawner.spawnToPlayer(this.player, location, this)
+            } else {
+                this.spawner.spawn(location, this)
+            }
         }
     }
+
     /**
      * 表示一条线
      *
@@ -158,8 +177,7 @@ export namespace particle {
 
         show() {
             for (let i = 0; i < this.length; i += this.step) {
-                let vectorTemp = this.vector.clone().multiply(i)
-                this.spawn(this.start.clone().add(vectorTemp))
+                this.spawn(this.start.clone().add(this.vector.clone().multiply(i)))
             }
         }
 
@@ -233,15 +251,6 @@ export namespace particle {
             this.vector = this.end.clone().subtract(this.start).toVector()
             this.length = this.vector.length()
             this.vector.normalize()
-        }
-
-        public static buildLine(locA: any, locB: any, step: number, particle: any) {
-            let vectorAB = locB.clone().subtract(locA).toVector()
-            let vectorLength = vectorAB.length()
-            vectorAB.normalize()
-            for (let i = 0; i < vectorLength; i += step) {
-                ParticleManager.globalSpawner.spawn(locA.clone().add(vectorAB.clone().multiply(i)), particle)
-            }
         }
     }
     /**
@@ -331,9 +340,10 @@ export namespace particle {
 
     @injectable()
     export abstract class ParticleManager {
-        public static globalSpawner: ParticleSpawner = undefined
         @Autowired()
         private taskManager: task.TaskManager
+        @Autowired()
+        private particleSpawner: particle.ParticleSpawner
 
         protected taskId: java.util.concurrent.atomic.AtomicInteger
         protected cacheTasks = new Map<string, ParticleTask>()
@@ -352,6 +362,10 @@ export namespace particle {
 
         public getTaskManager() {
             return this.taskManager
+        }
+
+        public getParticleSpawner() {
+            return this.particleSpawner
         }
 
         public create(particle: Particle, plugin?: plugin.Plugin) {
@@ -389,14 +403,12 @@ export namespace particle {
             }
         }
         protected create0(owner: plugin.Plugin, particle: Particle): ParticleTask {
-            particle.setSpawner(this.getGlobalSpawner())
+            particle.setSpawner(this.getParticleSpawner())
             return new ParticleTask(owner, particle, this)
         }
-        protected abstract getGlobalSpawner(): ParticleSpawner
     }
 
     export class ParticleTask {
-
         private particle: Particle
         private isAsync: boolean = false
         private interval: number = 0
@@ -487,8 +499,9 @@ export namespace particle {
         }
     }
 
+    @injectable()
     export abstract class ParticleSpawner {
-        abstract spawnParticle(location: any, particle: any, count: number)
         abstract spawn(location: any, particle: Particle)
+        abstract spawnToPlayer(player: any, location: any, particle: Particle)
     }
 }
