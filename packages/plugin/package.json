@@ -22,15 +22,15 @@
         "@types/crypto-js": "^4.1.1",
         "@types/js-yaml": "^4.0.5",
         "reflect-metadata": "^0.1.13",
-        "rimraf": "^3.0.2",
-        "typescript": "^4.9.3"
+        "rimraf": "^4.1.2",
+        "typescript": "^4.9.5"
     },
     "dependencies": {
         "@ccms/api": "^0.26.0",
         "@ccms/common": "^0.26.0",
         "@ccms/container": "^0.26.0",
         "@ccms/i18n": "^0.26.0",
-        "@ccms/verify": "^0.24.5",
+        "@ccms/verify": "^0.25.1",
         "crypto-js": "^4.1.1",
         "js-yaml": "^4.1.0"
     }

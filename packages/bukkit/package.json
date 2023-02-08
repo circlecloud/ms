@@ -21,8 +21,8 @@
     "devDependencies": {
         "@javatypes/spigot-api": "^0.0.3",
         "reflect-metadata": "^0.1.13",
-        "rimraf": "^3.0.2",
-        "typescript": "^4.9.3"
+        "rimraf": "^4.1.2",
+        "typescript": "^4.9.5"
     },
     "dependencies": {
         "@ccms/api": "^0.26.0",

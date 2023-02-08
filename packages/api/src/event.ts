@@ -96,8 +96,8 @@ export namespace event {
         /**
          * 创建命令执行器
          * @param name 插件名称
-         * @param exec
-         * @param eventCls
+         * @param exec 执行方法
+         * @param eventCls 事件类
          * @returns
          */
         createExecute(name, exec, eventCls) {
@@ -106,7 +106,7 @@ export namespace event {
                 try {
                     if (!eventCls.isAssignableFrom(event.getClass())) { return }
                     let time = Date.now(); exec(event); let cost = Date.now() - time
-                    if (cost > global.ScriptSlowExecuteTime) {
+                    if (cost > global.ScriptSlowExecuteTime && !event.async) {
                         let eventKey = `${name}-${this.class2Name(eventCls)}`
                         if (!this.cacheSlowEventKey[eventKey]) { return this.cacheSlowEventKey[eventKey] = cost }
                         console.i18n("ms.api.event.execute.slow", { name, event: this.class2Name(eventCls), cost })
@@ -120,11 +120,11 @@ export namespace event {
 
         /**
         * 添加事件监听
-        * @param plugin {any}
-        * @param event {string}
-        * @param exec {function}
-        * @param priority {string} [LOWEST,LOW,NORMAL,HIGH,HIGHEST,MONITOR]
-        * @param ignoreCancel
+        * @param plugin {any} 插件
+        * @param event {string} 事件名称
+        * @param exec {function} 事件执行器
+        * @param priority {string} [LOWEST,LOW,NORMAL,HIGH,HIGHEST,MONITOR] 优先级
+        * @param ignoreCancel 是否忽略已取消事件
         */
         listen(plugin: any, event: string, exec: (event: any) => void, priority: EventPriority = EventPriority.NORMAL, ignoreCancel = false) {
             if (!plugin || !plugin.description || !plugin.description.name) throw new TypeError(i18n.translate("ms.api.event.listen.plugin.name.empty"))
@@ -178,7 +178,7 @@ export namespace event {
         disable(plugin: any) {
             var eventCache = this.listenerMap[plugin.description.name]
             if (eventCache) {
-                eventCache.forEach(off => off())
+                eventCache.forEach((off: () => any) => off())
                 delete this.listenerMap[plugin.description.name]
             }
         }

@@ -19,7 +19,7 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
-        "@socket.io/component-emitter": "^3.1.0",
+        "@socket.io/component-emitter": "^4.0.0",
         "backo2": "^1.0.2",
         "parseuri": "^0.0.6"
     },
@@ -27,7 +27,7 @@
         "@ccms/nashorn": "^0.26.0",
         "@javatypes/tomcat-websocket-api": "^0.0.3",
         "reflect-metadata": "^0.1.13",
-        "rimraf": "^3.0.2",
-        "typescript": "^4.9.3"
+        "rimraf": "^4.1.2",
+        "typescript": "^4.9.5"
     }
 }

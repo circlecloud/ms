@@ -68,8 +68,8 @@ type EventType =
     | 'timeout'
     | 'loadend'
     | 'loadstart'
-type HttpHeader = { [key: string]: string }
-
+type RequestHttpHeader = { [key: string]: string }
+type HttpHeader = { [key: string]: string[] }
 
 const executor = Executors.newCachedThreadPool()
 
@@ -85,7 +85,7 @@ export class XMLHttpRequest {
     private _url: string
     private _async: boolean
     private _mimeType: string
-    private _requestHeaders: HttpHeader = {};
+    private _requestHeaders: RequestHttpHeader = {};
 
     private _status: number = 0;
     private _statusText: string = null;
@@ -156,7 +156,7 @@ export class XMLHttpRequest {
         this._requestHeaders[key] = val
     }
     getResponseHeader(key: string): string {
-        return this._responseHeaders[key]
+        return this._responseHeaders[key]?.[0]
     }
     getAllResponseHeaders(): any {
         return this._responseHeaders
@@ -221,7 +221,7 @@ export class XMLHttpRequest {
             this.onloadstart?.()
             if (body) {
                 let bodyType = Object.prototype.toString.call(body)
-                if (typeof body !== "string") { throw new Error(`body(${bodyType}) must be string!`) }
+                if (typeof body !== "string") { throw new Error(`body(${bodyType}) must be string.`) }
                 var out = this._connection.getOutputStream()
                 out.write(new JavaString(body).getBytes(UTF_8))
                 out.flush()
@@ -238,7 +238,7 @@ export class XMLHttpRequest {
             } else {
                 this._responseText = this.readOutput(this._connection.getErrorStream())
             }
-            this.setResponseHeaders(this._connection.getHeaderFields())
+            this.setResponseHeaders()
             this.onloadend?.()
         } catch (ex: any) {
             if (ex instanceof SocketTimeoutException && this.ontimeout) {
@@ -253,9 +253,9 @@ export class XMLHttpRequest {
         }
     }
 
-    private setResponseHeaders(header: any) {
-        header.forEach((key: string | number, value: string | any[]) => {
-            this._responseHeaders[key + ''] = value[value.length - 1] + ''
+    private setResponseHeaders() {
+        this._connection.getHeaderFields().forEach((key: string | number, value: any[]) => {
+            this._responseHeaders[key + ''] = Java.from(value)
         })
     }
 
