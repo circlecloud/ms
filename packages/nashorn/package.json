@@ -1,6 +1,6 @@
 {
     "name": "@ccms/nashorn",
-    "version": "2.25.1",
+    "version": "0.26.0",
     "description": "MiaoScript nashorn package",
     "keywords": [
         "miaoscript",
