@@ -7,7 +7,8 @@ import { parse } from "./contrib/parseuri"
 import { Emitter } from "@socket.io/component-emitter"
 // import { protocol } from "engine.io-parser";
 import { protocol } from "../engine.io-parser"
-import { CloseDetails } from "./transport"
+import type { Packet, BinaryType, PacketType, RawData } from "../engine.io-parser"
+import { CloseDetails, Transport } from "./transport"
 
 // const debug = debugModule("engine.io-client:socket"); // debug()
 const debug = require('../debug')('engine.io-client:socket')
@@ -210,6 +211,12 @@ export interface SocketOptions {
     path: string
 
     /**
+     * Whether we should add a trailing slash to the request path.
+     * @default true
+     */
+    addTrailingSlash: boolean
+
+    /**
      * Either a single protocol string or an array of protocol strings. These strings are used to indicate sub-protocols,
      * so that a single server can implement multiple WebSocket sub-protocols (for example, you might want one server to
      * be able to handle different types of interactions depending on the specified protocol)
@@ -218,11 +225,19 @@ export interface SocketOptions {
     protocols: string | string[]
 }
 
+interface HandshakeData {
+    sid: string
+    upgrades: string[]
+    pingInterval: number
+    pingTimeout: number
+    maxPayload: number
+}
+
 interface SocketReservedEvents {
     open: () => void
-    handshake: (data) => void
-    packet: (packet) => void
-    packetCreate: (packet) => void
+    handshake: (data: HandshakeData) => void
+    packet: (packet: Packet) => void
+    packetCreate: (packet: Packet) => void
     data: (data) => void
     message: (data) => void
     drain: () => void
@@ -237,13 +252,15 @@ interface SocketReservedEvents {
     close: (reason: string, description?: CloseDetails | Error) => void
 }
 
+type SocketState = "opening" | "open" | "closing" | "closed"
+
 export class Socket extends Emitter<{}, {}, SocketReservedEvents> {
     public id: string
-    public transport: any
-    public binaryType: string
+    public transport: Transport
+    public binaryType: BinaryType
+    public readyState: SocketState
+    public writeBuffer: Packet[] = [];
 
-    private readyState: string
-    private writeBuffer
     private prevBufferLen: number
     private upgrades
     private pingInterval: number
@@ -314,7 +331,6 @@ export class Socket extends Emitter<{}, {}, SocketReservedEvents> {
                     : "80")
 
         this.transports = opts.transports || ["polling", "websocket"]
-        this.readyState = ""
         this.writeBuffer = []
         this.prevBufferLen = 0
 
@@ -326,6 +342,7 @@ export class Socket extends Emitter<{}, {}, SocketReservedEvents> {
                 upgrade: true,
                 timestampParam: "t",
                 rememberUpgrade: false,
+                addTrailingSlash: true,
                 rejectUnauthorized: true,
                 perMessageDeflate: {
                     threshold: 1024
@@ -336,7 +353,9 @@ export class Socket extends Emitter<{}, {}, SocketReservedEvents> {
             opts
         )
 
-        this.opts.path = this.opts.path.replace(/\/$/, "") + "/"
+        this.opts.path =
+            this.opts.path.replace(/\/$/, "") +
+            (this.opts.addTrailingSlash ? "/" : "")
 
         if (typeof this.opts.query === "string") {
             this.opts.query = decode(this.opts.query)
@@ -368,7 +387,7 @@ export class Socket extends Emitter<{}, {}, SocketReservedEvents> {
             if (this.hostname !== "localhost") {
                 this.offlineEventListener = () => {
                     this.onClose("transport close", {
-                        description: "network connection lost"
+                        description: "network connection lost",
                     })
                 }
                 addEventListener("offline", this.offlineEventListener, false)
@@ -381,9 +400,9 @@ export class Socket extends Emitter<{}, {}, SocketReservedEvents> {
     /**
      * Creates transport of the given type.
      *
-     * @param {String} transport name
+     * @param {String} name - transport name
      * @return {Transport}
-     * @api private
+     * @private
      */
     private createTransport(name) {
         debug('creating transport "%s"', name)
@@ -407,7 +426,7 @@ export class Socket extends Emitter<{}, {}, SocketReservedEvents> {
                 socket: this,
                 hostname: this.hostname,
                 secure: this.secure,
-                port: this.port
+                port: this.port,
             }
         )
 
@@ -417,10 +436,10 @@ export class Socket extends Emitter<{}, {}, SocketReservedEvents> {
     }
 
     /**
-     * Initializes transport to use and starts probe.
-     *
-     * @api private
-     */
+    * Initializes transport to use and starts probe.
+    *
+    * @private
+    */
     private open() {
         let transport
         if (
@@ -457,7 +476,7 @@ export class Socket extends Emitter<{}, {}, SocketReservedEvents> {
     /**
      * Sets the current transport. Disables the existing one (if any).
      *
-     * @api private
+     * @private
      */
     private setTransport(transport) {
         debug("setting transport %s", transport.name)
@@ -475,7 +494,7 @@ export class Socket extends Emitter<{}, {}, SocketReservedEvents> {
             .on("drain", this.onDrain.bind(this))
             .on("packet", this.onPacket.bind(this))
             .on("error", this.onError.bind(this))
-            .on("close", reason => this.onClose("transport close", reason))
+            .on("close", (reason) => this.onClose("transport close", reason))
     }
 
     /**

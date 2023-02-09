@@ -1,11 +1,11 @@
 // import { Polling as XHR } from "./polling"
 // import { JSONP } from "./polling-jsonp"
-import { WebSocket } from "./websocket"
+import { WebSocket } from "./websocket";
 
 export default {
-    // polling: polling,
-    websocket: WebSocket
-}
+  // polling: polling,
+  websocket: WebSocket,
+};
 
 // /**
 //  * Polling polymorphic constructor.

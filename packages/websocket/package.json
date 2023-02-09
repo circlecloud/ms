@@ -19,7 +19,7 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
-        "@socket.io/component-emitter": "^4.0.0",
+        "@socket.io/component-emitter": "3.1.0",
         "backo2": "^1.0.2",
         "parseuri": "^0.0.6"
     },

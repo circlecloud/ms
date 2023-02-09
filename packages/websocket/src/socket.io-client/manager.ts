@@ -10,7 +10,7 @@ import * as parser from "../socket.io-parser"
 // import { Decoder, Encoder, Packet } from "socket.io-parser"
 import { Decoder, Encoder, Packet } from "../socket.io-parser"
 import { on } from "./on.js"
-import { Backoff } from "./contrib/backo2"
+import { Backoff } from "./contrib/backo2.js"
 import {
     DefaultEventsMap,
     EventsMap,
@@ -468,6 +468,10 @@ export class Manager<
         if (!socket) {
             socket = new Socket(this, nsp, opts)
             this.nsps[nsp] = socket
+        }
+
+        if (this._autoConnect) {
+            socket.connect()
         }
 
         return socket
