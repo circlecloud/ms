@@ -73,6 +73,10 @@ export namespace interfaces {
          * 是否忽略已取消的事件
          */
         ignoreCancel?: boolean
+        /**
+         * 依赖插件 没有就不加载
+         */
+        plugins?: string[]
     }
     export interface ConfigMetadata extends plugin.BaseMetadata {
         /**

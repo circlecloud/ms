@@ -29,6 +29,7 @@ export namespace server {
         origin: any
         [key: string]: any
     }
+
     @injectable()
     export abstract class NativePluginManager {
         list(): NativePlugin[] {
@@ -53,6 +54,7 @@ export namespace server {
             throw new Error("Method not implemented.")
         }
     }
+
     /**
      * MiaoScript Server
      */
@@ -98,6 +100,7 @@ export namespace server {
             throw new Error("Method not implemented.")
         }
     }
+
     @injectable()
     export class ServerChecker {
         @Autowired(ServerType)
@@ -116,6 +119,22 @@ export namespace server {
             }
         }
     }
+
+    @injectable()
+    export class NativePluginChecker {
+        @Autowired(NativePluginManager)
+        private nativePluginManager: NativePluginManager
+
+        check(plugins: string[]) {
+            // Not set plugins -> allow
+            if (!plugins || !plugins.length) return true
+            for (const plugin of plugins) {
+                if (!this.nativePluginManager.has(plugin)) { return false }
+            }
+            return true
+        }
+    }
+
     @injectable()
     export abstract class ReflectServer extends server.Server {
         @Autowired(ContainerInstance)

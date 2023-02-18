@@ -146,6 +146,7 @@ function createCore() {
     container.bind(server.ServerType).toConstantValue(type)
     container.bind(server.ServerChecker).toSelf().inSingletonScope()
     container.bind(server.NativePluginManager).toSelf().inSingletonScope()
+    container.bind(server.NativePluginChecker).toSelf().inSingletonScope()
     process.emit('core.after.initialize.detect')
 
     process.emit('core.before.package.initialize')

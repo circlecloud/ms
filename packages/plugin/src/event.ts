@@ -5,9 +5,11 @@ import { getPluginListenerMetadata } from './utils'
 @provideSingleton(PluginEventManager)
 export class PluginEventManager {
     @Autowired()
-    private EventManager: event.Event
+    private eventManager: event.Event
     @Autowired()
-    private ServerChecker: server.ServerChecker
+    private serverChecker: server.ServerChecker
+    @Autowired()
+    private nativePluginChecker: server.NativePluginChecker
 
     constructor() {
         process.on('plugin.before.enable', this.registryListener.bind(this))
@@ -15,26 +17,31 @@ export class PluginEventManager {
     }
 
     mapEventName() {
-        return this.EventManager.mapEventName().toFixed(0)
+        return this.eventManager.mapEventName().toFixed(0)
     }
 
     private registryListener(pluginInstance: plugin.Plugin) {
         let events = getPluginListenerMetadata(pluginInstance)
         for (const event of events) {
             // ignore space listener
-            if (!this.ServerChecker.check(event.servers)) {
-                console.debug(`[${pluginInstance.description.name}] ${event.target.constructor.name} incompatible event ${event.name} server(${event.servers}) ignore.`)
+            if (!this.serverChecker.check(event.servers)) {
+                console.debug(`[${pluginInstance.description.name}] ${event.target.constructor.name} incompatible server(${event.servers}) ignore event ${event.name}.`)
+                continue
+            }
+            // ignore space listener
+            if (!this.nativePluginChecker.check(event.plugins)) {
+                console.debug(`[${pluginInstance.description.name}] ${event.target.constructor.name} require native plugins(${event.plugins}) ignore event ${event.name}.`)
                 continue
             }
             // here must bind this to pluginInstance
             let exec = event.target[event.executor]
             let execBinded = exec.bind(pluginInstance)
             execBinded.executor = event.executor
-            exec.off = this.EventManager.listen(pluginInstance, event.name, execBinded, event.priority, event.ignoreCancel)
+            exec.off = this.eventManager.listen(pluginInstance, event.name, execBinded, event.priority, event.ignoreCancel)
         }
     }
 
     private unregistryListener(pluginInstance: plugin.Plugin) {
-        this.EventManager.disable(pluginInstance)
+        this.eventManager.disable(pluginInstance)
     }
 }
