@@ -6,6 +6,11 @@ const UUID = Java.type('java.util.UUID')
 const Math = Java.type('java.lang.Math')
 
 export namespace particle {
+    @injectable()
+    export abstract class ParticleSpawner {
+        abstract spawn(location: any, particle: Particle)
+        abstract spawnToPlayer(player: any, location: any, particle: Particle)
+    }
     /**
      * 表示一个特效对象
      *
@@ -497,11 +502,5 @@ export namespace particle {
                 this.task.cancel()
             }
         }
-    }
-
-    @injectable()
-    export abstract class ParticleSpawner {
-        abstract spawn(location: any, particle: Particle)
-        abstract spawnToPlayer(player: any, location: any, particle: Particle)
     }
 }
