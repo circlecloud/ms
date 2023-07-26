@@ -1,6 +1,6 @@
 {
     "name": "@ccms/qrcode",
-    "version": "0.27.6",
+    "version": "0.28.0-beta.0",
     "description": "MiaoScript qrcode package",
     "keywords": [
         "miaoscript",
