@@ -11,6 +11,7 @@ export namespace particle {
         abstract spawn(location: any, particle: Particle)
         abstract spawnToPlayer(player: any, location: any, particle: Particle)
     }
+
     /**
      * 表示一个特效对象
      *

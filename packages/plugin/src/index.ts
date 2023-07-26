@@ -10,6 +10,9 @@ export * from './manager'
 export * from './decorators'
 export * from './interfaces'
 
+export * from './event'
+export * from './command'
+
 export {
     plugin as JSPlugin,
     cmd as Cmd,

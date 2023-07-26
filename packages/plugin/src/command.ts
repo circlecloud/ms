@@ -15,51 +15,51 @@ export class PluginCommandManager {
         process.on('plugin.after.disable', this.unregistryCommand.bind(this))
     }
 
-    private registryCommand(pluginInstance: plugin.Plugin) {
-        let cmds = getPluginCommandMetadata(pluginInstance)
-        let tabs = getPluginTabCompleterMetadata(pluginInstance)
+    public registryCommand(pluginInstance: plugin.Plugin, executor: any = pluginInstance) {
+        let cmds = getPluginCommandMetadata(executor)
+        let tabs = getPluginTabCompleterMetadata(executor)
         for (const cmd of cmds) {
             if (!this.ServerChecker.check(cmd.servers)) {
                 console.debug(`[${pluginInstance.description.name}] ${cmd.target.constructor.name} incompatible command ${cmd.name} server(${cmd.servers}) ignore.`)
                 continue
             }
             for (let command of [cmd.name, ...cmd.alias]) {
-                let [cmdExecutor, cmdCompleter] = this.generateAutoMainCommand(pluginInstance, cmd, tabs.get(command))
+                let [cmdExecutor, cmdCompleter] = this.generateAutoMainCommand(pluginInstance, executor, cmd, tabs.get(command))
                 this.CommandManager.on(pluginInstance, command, {
-                    cmd: cmdExecutor.bind(pluginInstance),
-                    tab: cmdCompleter?.bind(pluginInstance)
+                    cmd: cmdExecutor.bind(executor),
+                    tab: cmdCompleter?.bind(executor)
                 })
             }
         }
     }
 
-    private unregistryCommand(pluginInstance: plugin.Plugin) {
-        let cmds = getPluginCommandMetadata(pluginInstance)
+    public unregistryCommand(pluginInstance: plugin.Plugin, executor: any = pluginInstance) {
+        let cmds = getPluginCommandMetadata(executor)
         for (const cmd of cmds) {
             if (!this.ServerChecker.check(cmd.servers)) {
                 console.debug(`[${pluginInstance.description.name}] ${cmd.target.constructor.name} incompatible command ${cmd.name} server(${cmd.servers}) ignore.`)
                 continue
             }
             for (let command of [cmd.name, ...cmd.alias]) {
-                this.CommandManager.off(pluginInstance, command)
+                this.CommandManager.off(executor, command)
             }
         }
     }
 
-    private generateAutoMainCommand(pluginInstance: plugin.Plugin, cmd: interfaces.CommandMetadata, tab: interfaces.CommandMetadata) {
-        let cmdExecutor = pluginInstance[cmd.executor]
-        let cmdCompleter = tab ? pluginInstance[tab.executor] : undefined
-        let cmdSubCache = Object.keys(pluginInstance.constructor.prototype).filter(s => s.startsWith('cmd')).map(s => s.substring(3))
+    private generateAutoMainCommand(pluginInstance: plugin.Plugin, executor: any, cmd: interfaces.CommandMetadata, tab: interfaces.CommandMetadata) {
+        let cmdExecutor = executor[cmd.executor]
+        let cmdCompleter = tab ? executor[tab.executor] : undefined
+        let cmdSubCache = Object.keys(executor.constructor.prototype).filter(s => s.startsWith('cmd')).map(s => s.substring(3))
         if (cmd.autoMain) {
             cmdExecutor = (sender: any, command: string, args: string[]) => {
                 let subcommand = args[0]
                 let cmdKey = 'cmd' + subcommand
                 if (!cmdSubCache.includes(subcommand)) {
-                    if (!pluginInstance[cmd.executor].apply(pluginInstance, [sender, command, args])) {
+                    if (!executor[cmd.executor].apply(executor, [sender, command, args])) {
                         subcommand && pluginInstance.logger.sender(sender, `§4未知的命令: §b/${command} §c${subcommand}`)
                         pluginInstance.logger.sender(
                             sender,
-                            pluginInstance['cmdhelp'] ?
+                            executor['cmdhelp'] ?
                                 `§6请执行 §b/${command} §ahelp §6查看帮助!` :
                                 [
                                     `§6插件: §b${pluginInstance.description.name}`,
@@ -69,7 +69,7 @@ export class PluginCommandManager {
                     }
                     return
                 }
-                let subcommandexec = pluginInstance[cmdKey]
+                let subcommandexec = executor[cmdKey]
                 let permission: string
                 if (cmd.permission && sender.hasPermission) {
                     if (typeof cmd.permission == "string") {
@@ -82,7 +82,7 @@ export class PluginCommandManager {
                     }
                 }
                 args.shift()
-                return subcommandexec.apply(pluginInstance, [sender, ...args])
+                return subcommandexec.apply(executor, [sender, ...args])
             }
             let originCompleter = cmdCompleter
             cmdCompleter = (sender: any, command: string, args: string[]) => {
@@ -95,7 +95,7 @@ export class PluginCommandManager {
                     }
                     if (!sender.hasPermission(permission)) { return [] }
                 }
-                return (args.length == 1 ? cmdSubCache : []).concat(originCompleter?.apply(pluginInstance, [sender, command, args]) || [])
+                return (args.length == 1 ? cmdSubCache : []).concat(originCompleter?.apply(executor, [sender, command, args]) || [])
             }
         }
         if (!cmdCompleter) { console.debug(`[${pluginInstance.description.name}] command ${cmd.name} is not registry tabCompleter`) }

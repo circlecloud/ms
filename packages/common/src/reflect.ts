@@ -137,7 +137,7 @@ function declaredField(clazz: java.lang.Class<any>, name: string | java.lang.Str
         } catch (error: any) {
             if (target === undefined) { break }
             target = target.getSuperclass()
-            console.debug(`切换到超类: ${target.getName()}`)
+            console.debug(`switch to super class: ${target.getName()}`)
         }
     }
     if (field === null) {
@@ -174,7 +174,7 @@ function declaredMethod(clazz: java.lang.Class<any>, nameOrIndex: string | numbe
             } catch (error) {
                 if (target === undefined) { break }
                 target = target.getSuperclass()
-                console.debug(`切换到超类: ${target.getName()}`)
+                console.debug(`switch to super class: ${target.getName()}`)
             }
         }
     }
@@ -187,7 +187,7 @@ function declaredMethods(clazz: java.lang.Class<any>) {
 }
 
 function mapToObject(javaObj) {
-    if (!Java.isJavaObject(javaObj)) { throw new TypeError(`参数 ${javaObj} 不是一个Java对象!`) }
+    if (!Java.isJavaObject(javaObj)) { throw new TypeError(`argument ${javaObj} is not a java object.`) }
     let target = Proxy.newProxy(javaObj, {
         apply: (target, name, args) => { return args ? javaObj[name](args) : javaObj[name]() }
     })

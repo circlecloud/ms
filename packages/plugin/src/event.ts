@@ -11,6 +11,8 @@ export class PluginEventManager {
     @Autowired()
     private nativePluginChecker: server.NativePluginChecker
 
+    private listenerMap = [];
+
     constructor() {
         process.on('plugin.before.enable', this.registryListener.bind(this))
         process.on('plugin.after.disable', this.unregistryListener.bind(this))
@@ -20,8 +22,9 @@ export class PluginEventManager {
         return this.eventManager.mapEventName().toFixed(0)
     }
 
-    private registryListener(pluginInstance: plugin.Plugin) {
-        let events = getPluginListenerMetadata(pluginInstance)
+    public registryListener(pluginInstance: plugin.Plugin, listener: any = pluginInstance) {
+        let events = getPluginListenerMetadata(listener)
+        let execes = []
         for (const event of events) {
             // ignore space listener
             if (!this.serverChecker.check(event.servers)) {
@@ -35,13 +38,25 @@ export class PluginEventManager {
             }
             // here must bind this to pluginInstance
             let exec = event.target[event.executor]
-            let execBinded = exec.bind(pluginInstance)
+            let execBinded = exec.bind(listener)
             execBinded.executor = event.executor
             exec.off = this.eventManager.listen(pluginInstance, event.name, execBinded, event.priority, event.ignoreCancel)
+            execes.push(exec)
         }
+        let off = () => {
+            if (off['offed']) return
+            off['offed'] = true
+            execes.forEach((exec: { off: () => void }) => exec.off())
+        }
+        listener.off = off
     }
 
-    private unregistryListener(pluginInstance: plugin.Plugin) {
-        this.eventManager.disable(pluginInstance)
+    private unregistryListener(pluginInstance: plugin.Plugin, listener: any = pluginInstance) {
+        if (listener && listener.off) {
+            listener.off()
+        }
+        if (pluginInstance) {
+            this.eventManager.disable(pluginInstance)
+        }
     }
 }

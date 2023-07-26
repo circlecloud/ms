@@ -1,5 +1,7 @@
-import { plugin } from './index'
+import { EventEmitter } from 'events'
 import { injectable } from '@ccms/container'
+
+import { plugin } from './index'
 
 const AtomicInteger = Java.type("java.util.concurrent.atomic.AtomicInteger")
 
@@ -79,7 +81,7 @@ export namespace task {
     /**
      * 任务抽象
      */
-    export abstract class Task implements Cancelable {
+    export abstract class Task extends EventEmitter implements Cancelable {
         protected func: Function
         protected isAsync: boolean = false;
         protected laterTime: number = 0;
@@ -88,7 +90,10 @@ export namespace task {
         protected taskId: number
         protected innerTask: any
 
+        private cancelled: boolean = false
+
         constructor(owner: plugin.Plugin, func: Function, id: number) {
+            super()
             this.owner = owner
             this.func = func
             this.taskId = id
@@ -134,18 +139,33 @@ export namespace task {
          */
         cancel(): boolean {
             let result = this.cancel0()
-            process.emit('task.finish', this)
+            this.finish()
+            this.cancelled = true
             return result
         }
 
         protected run(...args: any[]): void {
             try {
+                this.emit('before', this)
+                if (this.cancelled) { return }
                 this.func(...args)
-                !this.interval && process.emit('task.finish', this)
-            } catch (ex: any) {
-                console.console('§4插件执行任务时发生错误', ex)
-                console.ex(ex)
+                this.emit('after', this)
+            } catch (error: any) {
+                this.emit('error', error)
+                if (!error.processed) {
+                    console.console('§4插件执行任务时发生错误', error)
+                    console.ex(error)
+                    this.cancel()
+                }
+            } finally {
+                this.emit('finally', this)
+                if (!this.interval && !this.cancelled) { this.finish() }
             }
+        }
+
+        protected finish() {
+            process.emit('task.finish', this)
+            this.emit('finish', this)
         }
 
         /**

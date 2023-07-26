@@ -8,7 +8,7 @@ export namespace interfaces {
     @injectable()
     export abstract class Plugin implements plugin.Plugin {
         public description: plugin.PluginMetadata
-        public logger: Console
+        public logger: MiaoScriptConsole
         @inject(server.Console)
         private Console: MiaoScriptConsole
 
@@ -27,6 +27,11 @@ export namespace interfaces {
             let dataFolder = new File(parent, this.description.name)
             return dataFolder.getAbsolutePath()
         }
+
+        public registryCommand(executor: any) { }
+        public unregistryCommand(executor: any) { }
+        public registryListener(listener: any) { }
+        public unregistryListener(listener: any) { }
 
         public load() { }
         public enable() { }

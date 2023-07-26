@@ -154,8 +154,10 @@ export const reduceMetadata = (ctx: interfaces.Context): any => {
 function initAutowired(container: Container) {
     container.bind(ioc.Autowired).toDynamicValue((ctx) => {
         var metadata: any = reduceMetadata(ctx)
-        let key = Object.toString.call(metadata.named)
+        let key = Object.prototype.toString.call(metadata.named)
         if (key === "[object Function]" || key === "[object Symbol]") { return container.get(metadata.named) }
+        console.warn('container Autowired', metadata.named, 'failed. Error: illegal serviceIdentifier type', key)
+        console.debug(metadata.named, 'metadata', JSON.stringify(metadata))
         return undefined
     })
 }

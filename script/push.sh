@@ -1,3 +1,4 @@
+#!/bin/bash
 for package in `ls packages`; do
     echo $package
     pushd packages/$package

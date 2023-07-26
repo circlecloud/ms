@@ -25,7 +25,7 @@ export namespace event {
         public EventPriority = EventPriority;
 
         private mapEvent = [];
-        private listenerMap = [];
+        private pluginEventMap = [];
         private cacheSlowEventKey = {};
 
         protected baseEventDir = '';
@@ -130,7 +130,7 @@ export namespace event {
             if (!plugin || !plugin.description || !plugin.description.name) throw new TypeError(i18n.translate("ms.api.event.listen.plugin.name.empty"))
             var name = plugin.description.name
             var eventCls = this.name2Class(name, event)
-            if (!eventCls) { return }
+            if (!eventCls) { return () => { console.warn('event ' + event + ' not found ignore off listener.') } }
             if (typeof priority === 'boolean') {
                 ignoreCancel = priority
                 priority = EventPriority.NORMAL
@@ -140,16 +140,15 @@ export namespace event {
             // @ts-ignore
             let executor = exec.name || exec.executor || '[anonymous]'
             // noinspection JSUnusedGlobalSymbols
-            var listener = this.register(
+            let listener = this.register(
                 eventCls,
                 this.createExecute(name, exec, eventCls),
                 priority,
                 ignoreCancel
             )
-            var listenerMap = this.listenerMap
             // add to cache Be used for close plugin to close event
-            if (!listenerMap[name]) listenerMap[name] = []
-            var off = () => {
+            if (!this.pluginEventMap[name]) this.pluginEventMap[name] = []
+            let off = () => {
                 if (off['offed']) return
                 off['offed'] = true
                 this.unregister(eventCls, listener)
@@ -159,7 +158,7 @@ export namespace event {
                     exec: executor
                 }))
             }
-            listenerMap[name].push(off)
+            this.pluginEventMap[name].push(off)
             // noinspection JSUnresolvedVariable
             console.debug(i18n.translate("ms.api.event.register", {
                 name,
@@ -176,10 +175,10 @@ export namespace event {
          * @param plugin 插件
          */
         disable(plugin: any) {
-            var eventCache = this.listenerMap[plugin.description.name]
+            var eventCache = this.pluginEventMap[plugin.description.name]
             if (eventCache) {
                 eventCache.forEach((off: () => any) => off())
-                delete this.listenerMap[plugin.description.name]
+                delete this.pluginEventMap[plugin.description.name]
             }
         }
 

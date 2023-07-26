@@ -10,18 +10,19 @@
         "clean": "lerna run clean",
         "watch": "lerna run watch --parallel",
         "build": "lerna run build",
-        "ug": "yarn upgrade-interactive --latest",
+        "ug": "yarn upgrade-interactive",
         "np": "./script/push.sh",
         "lsp": "npm login -scope=@ccms",
         "lp": "lerna publish --verify-access --force-publish",
         "lpb": "lerna publish --preid beta --dist-tag beta --verify-access --force-publish",
         "lpc": "lerna publish --canary --preid beta --pre-dist-tag beta --verify-access --force-publish",
-        "lpf": "lerna publish from-package --yes"
+        "lpf": "lerna publish from-package --yes",
+        "sync": "./script/sync.sh"
     },
     "workspaces": [
         "packages/*"
     ],
     "devDependencies": {
-        "lerna": "^6.4.1"
+        "lerna": "^7.1.4"
     }
 }
