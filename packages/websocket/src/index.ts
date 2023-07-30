@@ -1,7 +1,7 @@
 /// <reference types="@ccms/nashorn" />
 /// <reference types="@javatypes/tomcat-websocket-api" />
 
-import * as server from './server'
+import { WebSocketServer } from './server'
 import { Server, ServerOptions } from './socket.io'
 
 interface SocketIOStatic {
@@ -45,7 +45,7 @@ let singletonServer: Server
 let io: SocketStatic = function io(pipeline: any, options: Partial<JavaServerOptions>, singleton = true) {
     if (singleton) {
         if (!singletonServer) {
-            singletonServer = new Server(server.attach(pipeline, options), options)
+            singletonServer = new Server(WebSocketServer.attach(pipeline, options), options)
             process.emit('websocket.create', singletonServer)
             process.on('exit', () => {
                 singletonServer.close()
@@ -53,7 +53,7 @@ let io: SocketStatic = function io(pipeline: any, options: Partial<JavaServerOpt
         }
         return singletonServer
     }
-    return new Server(server.attach(pipeline, options), options)
+    return new Server(WebSocketServer.attach(pipeline, options), options)
 }
 io.Instance = Symbol("@ccms/websocket")
 export default io

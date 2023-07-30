@@ -4,10 +4,18 @@ export interface WebSocketHeader {
 }
 
 export type EventType =
-    | 'close'
-    | 'error'
-    | 'message'
-    | 'open'
+    | ClientEvent.open
+    | ClientEvent.message
+    | ClientEvent.close
+    | ClientEvent.error
+
+export enum ClientEvent {
+    open = 'open',
+    message = 'message',
+    close = 'close',
+    error = 'error',
+}
+
 export interface Event {
 
 }

@@ -1,7 +1,7 @@
 
 import { EventEmitter } from 'events'
 import { Transport } from './transport'
-import { CloseEvent, ErrorEvent, Event, EventType, MessageEvent, WebSocketHeader } from './interface'
+import { ClientEvent, CloseEvent, ErrorEvent, Event, EventType, MessageEvent, WebSocketHeader } from './interface'
 
 export class WebSocketManager {
     private clients = new Map<string, WebSocket>()
@@ -18,7 +18,9 @@ export class WebSocketManager {
     add(client: WebSocket) {
         this.clients.set(client.id, client)
     }
+
     del(client: WebSocket) {
+        client.removeAllListeners()
         this.clients.delete(client.id)
     }
 }
@@ -52,16 +54,7 @@ export class WebSocket extends EventEmitter {
             console.ex(error)
             return
         }
-        this.client.on('open', (event) => {
-            this.onopen?.(event)
-            manager.add(this)
-        })
-        this.client.on('message', (event) => this.onmessage?.(event))
-        this.client.on('close', (event) => {
-            this.onclose?.(event)
-            manager.del(this)
-        })
-        this.client.on('error', (event) => this.onerror?.(event))
+        manager.add(this)
         setTimeout(() => this.client.connect(), 20)
     }
     get id() {
@@ -82,21 +75,25 @@ export class WebSocket extends EventEmitter {
     get url() {
         return this._url
     }
-    public onopen: (event: Event) => void
-    public onmessage: (event: MessageEvent) => void
-    public onclose: (event: CloseEvent) => void
-    public onerror: (event: ErrorEvent) => void
-
-    addEventListener(event: EventType, callback: () => void) {
-        this[`on${event.toLowerCase()}`] = callback
-        this.client.on(event, callback)
+    set onopen(func: (event: Event) => void) {
+        this.client.on(ClientEvent.open, func)
+    }
+    set onmessage(func: (event: MessageEvent) => void) {
+        this.client.on(ClientEvent.message, func)
+    }
+    set onclose(func: (event: CloseEvent) => void) {
+        this.client.on(ClientEvent.close, func)
+        manager.del(this)
+    }
+    set onerror(func: (event: ErrorEvent) => void) {
+        this.client.on(ClientEvent.error, func)
     }
     public send(data: any) {
         this.client.send(data)
     }
     public close(code?: number, reason?: string) {
         this.client.close(code, reason)
-        this.removeAllListeners()
+        manager.del(this)
     }
 }
 global.setGlobal('WebSocket', WebSocket)

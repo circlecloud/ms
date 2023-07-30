@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
 import { WebSocket } from './index'
-import { CloseEvent, ErrorEvent, Event, MessageEvent, WebSocketHeader } from './interface'
+import { ClientEvent, CloseEvent, ErrorEvent, Event, MessageEvent, WebSocketHeader } from './interface'
 
 export abstract class Transport extends EventEmitter {
     protected _url: string
@@ -32,7 +32,6 @@ export abstract class Transport extends EventEmitter {
     }
 
     connect() {
-        console.debug(`client Transport connect`)
         try {
             this.doConnect()
         } catch (error: any) {
@@ -49,19 +48,16 @@ export abstract class Transport extends EventEmitter {
         }
     }
 
-    close(code: number = 0, reason: string = '') {
-        if (this.readyStatus != WebSocket.CLOSING && this.readyStatus != WebSocket.CLOSED) {
+    close(code: number = 1000, reason: string = '') {
+        if (this.readyStatus < WebSocket.CLOSING) {
             this.readyStatus = WebSocket.CLOSING
             try {
-                this.onclose({ code, reason })
                 this.doClose(code, reason)
             } catch (error: any) {
                 this.onerror({ error })
-            } finally {
-                this.removeAllListeners()
             }
         } else {
-            console.debug(`${this.id} call close but state is ${this.readyStatus}`)
+            console.debug(`WebSocket Transport ${this.id} call close code ${code} reason ${reason} but state is ${this.readyStatus}`)
         }
     }
 
@@ -73,31 +69,31 @@ export abstract class Transport extends EventEmitter {
     onconnect(event: Event) {
         if (this.readyStatus != WebSocket.OPEN) {
             this.readyStatus = WebSocket.OPEN
-            this.emit('open', event)
+            this.emit(ClientEvent.open, event)
         } else {
-            console.debug(`${this.id} call onconnect but state is ${this.readyStatus}`)
+            console.debug(`WebSocket Transport ${this.id} call onconnect but state is ${this.readyStatus}`)
         }
     }
 
     onmessage(event: MessageEvent) {
-        this.emit('message', event)
+        this.emit(ClientEvent.message, event)
     }
 
     onerror(event: ErrorEvent) {
-        this.emit('error', event)
+        this.emit(ClientEvent.error, event)
     }
 
     onclose(event: CloseEvent) {
         if (this.readyStatus != WebSocket.CLOSED) {
             this.readyStatus = WebSocket.CLOSED
-            this.emit('close', event)
-            this.removeAllListeners()
+            this.emit(ClientEvent.close, event)
         } else {
-            console.debug(`${this.id} call onclose but state is ${this.readyStatus} CloseEvent[code: ${event.code}, reason: ${event.reason}]`)
+            console.debug(`WebSocket Transport ${this.id} call onclose but state is ${this.readyStatus} CloseEvent[code: ${event.code}, reason: ${event.reason}]`)
         }
     }
-    abstract getId()
-    abstract doConnect()
-    abstract doSend(text: string)
-    abstract doClose(code: number, reason: string)
+
+    abstract getId(): string
+    abstract doConnect(): void
+    abstract doSend(text: string): void
+    abstract doClose(code: number, reason: string): void
 }

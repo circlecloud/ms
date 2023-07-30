@@ -20,7 +20,6 @@ export class WebSocketClientHandler extends WebSocketClientHandlerAdapter {
         return true
     }
     handlerAdded(ctx: any) {
-        console.debug(`${ctx} handlerAdded`)
         if (ctx.newPromise) {
             this.handshakeFuture = ctx.newPromise()
         } else {
@@ -28,15 +27,14 @@ export class WebSocketClientHandler extends WebSocketClientHandlerAdapter {
         }
     }
     channelActive(ctx: any) {
-        console.debug(`${ctx} channelActive`)
         this.handshaker.handshake(ctx.channel())
     }
     channelInactive(ctx: any) {
-        console.debug(`${ctx} channelInactive`)
-        this.client.onclose({ code: 0, reason: 'client connection channel inactive!' })
+        if (this.client.readyStatus != WebSocket.CLOSED) {
+            this.client.onclose({ code: 1006, reason: 'client connection channel inactive.' })
+        }
     }
     channelRead0(ctx: any, msg: any) {
-        console.trace(`${ctx} channelRead0 ${msg}`)
         let ch = ctx.channel()
         if (!this.handshaker.isHandshakeComplete()) {
             // web socket client connected
@@ -54,7 +52,7 @@ export class WebSocketClientHandler extends WebSocketClientHandlerAdapter {
         if (frame instanceof TextWebSocketFrame) {
             this.client.onmessage({ data: frame.text() })
         } else if (frame instanceof CloseWebSocketFrame) {
-            this.client.onclose({ code: 0, reason: 'server close connection!' })
+            this.client.close(1000, 'server close connection.')
         }
     }
     exceptionCaught(ctx: any, cause: Error) {

@@ -85,10 +85,7 @@ export class NettyWebSocket extends Transport {
         console.debug(`constructor NettyWebSocket url: ${url} scheme: ${this._schema} host: ${this._host} port: ${this._port} header: ${JSON.stringify(headers)}`)
     }
     getId() {
-        if (this.channel?.id) {
-            return this.channel?.id() + ''
-        }
-        return 'NettyWebSocket#' + channelCount.incrementAndGet()
+        return `${this.channel?.id()}` || `NettyWebSocket#${channelCount.incrementAndGet()}`
     }
     doConnect() {
         console.debug('client NettyWebSocket doConnect', this._url)
@@ -147,8 +144,9 @@ export class NettyWebSocket extends Transport {
     }
     doClose(code: number, reason: string) {
         this.channel.writeAndFlush(new CloseWebSocketFrame())
-        this.channel.close()
-        this.channel.closeFuture().addListener(new ChannelFutureListener(() => console.debug(`NettyWebSocket close code: ${code} reason: ${reason}`)))
+        this.channel.closeFuture().addListener(new ChannelFutureListener(() => {
+            this.onclose({ code, reason })
+        }))
     }
     getChannel() {
         return this.channel

@@ -26,6 +26,24 @@ export abstract class WebSocketServer extends EventEmitter {
     protected instance: any
     protected options: JavaServerOptions
     private clients: Map<string, WebSocketClient>
+
+    public static attach(instance, options) {
+        if (!instance) { throw new Error('instance can\'t be undefiend!') }
+        options = Object.assign({
+            event: new EventEmitter(),
+            path: '/ws',
+            root: root + Java.type("java.io.File").separatorChar + 'wwwroot',
+        }, options)
+        let WebSocketServerImpl = undefined
+        if (instance.class.name.startsWith('io.netty.channel')) {
+            WebSocketServerImpl = require("./netty").NettyWebSocketServer
+        } else {
+            WebSocketServerImpl = require("./tomcat").TomcatWebSocketServer
+        }
+        console.debug('create websocket server from ' + WebSocketServerImpl.name)
+        return new WebSocketServerImpl(instance, options)
+    }
+
     constructor(instance: any, options: JavaServerOptions) {
         super()
         this.instance = instance
@@ -68,21 +86,4 @@ export abstract class WebSocketServer extends EventEmitter {
     protected abstract getRequest(handler: any): Request
     protected abstract getSocket(handler: any): WebSocketClient
     protected abstract doClose(): void
-}
-
-export const attach = (instance, options) => {
-    if (!instance) { throw new Error('instance can\'t be undefiend!') }
-    options = Object.assign({
-        event: new EventEmitter(),
-        path: '/ws',
-        root: root + Java.type("java.io.File").separatorChar + 'wwwroot',
-    }, options)
-    let WebSocketServerImpl = undefined
-    if (instance.class.name.startsWith('io.netty.channel')) {
-        WebSocketServerImpl = require("./netty").NettyWebSocketServer
-    } else {
-        WebSocketServerImpl = require("./tomcat").TomcatWebSocketServer
-    }
-    console.debug('create websocket server from ' + WebSocketServerImpl.name)
-    return new WebSocketServerImpl(instance, options)
 }
