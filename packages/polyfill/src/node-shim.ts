@@ -126,6 +126,7 @@ class Process extends EventEmitter {
 }
 
 class EventLoop {
+    private threadCount = new AtomicInteger(0)
     private eventLoopMainThread = undefined
     private eventLoopTaskQueue = new DelayQueue()
     private taskExecuteTimeout = 3000
@@ -134,10 +135,10 @@ class EventLoop {
     constructor() {
         this.taskExecuteTimeout = parseInt(process.env.MS_TASK_EXECUTE_TIMEOUT) || 3000
         this.fixedThreadPool = new ThreadPoolExecutor(
-            1, 1, 0, TimeUnit.SECONDS,
+            8, 16, 0, TimeUnit.SECONDS,
             new LinkedBlockingQueue(1024),
             new ThreadFactory((run: any) => {
-                let thread = new Thread(run, "@ccms/event-loop")
+                let thread = new Thread(run, "@ccms/event-loop-" + this.threadCount.incrementAndGet())
                 thread.setDaemon(true)
                 return thread
             }))
@@ -198,7 +199,7 @@ class EventLoop {
                     try {
                         callback.apply(undefined, args)
                     } catch (cause: any) {
-                        cause = cause.getCause && cause.getCause() || cause
+                        cause = cause.getCause ? cause.getCause() : cause
                         try {
                             process.emit('error', cause)
                         } catch (error: any) {
@@ -213,7 +214,7 @@ class EventLoop {
                 return console.warn(`FixedThreadPool isInterrupted exit! Task ${name} exec exit!`)
             }
             if (error instanceof TimeoutException) {
-                return console.warn(`Task ${name} => ${callback} exec time greater than ${this.taskExecuteTimeout}s!`)
+                return console.warn(`Task ${name} => ${callback} exec time greater than ${this.taskExecuteTimeout}ms!`)
             }
             throw error.getCause && error.getCause() || error
         }

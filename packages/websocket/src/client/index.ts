@@ -28,12 +28,14 @@ export class WebSocketManager {
 export const manager = new WebSocketManager()
 
 export class WebSocket extends EventEmitter {
+    public static manager: WebSocketManager = manager
+
     public static CONNECTING = 0
     public static OPEN = 1
     public static CLOSING = 2
     public static CLOSED = 3
+
     public binaryType: 'blob' | 'arraybuffer'
-    protected manager: WebSocketManager
 
     protected _url: string
     protected _headers: WebSocketHeader = {}
@@ -42,7 +44,6 @@ export class WebSocket extends EventEmitter {
 
     constructor(url: string, subProtocol: string | string[] = '', headers: WebSocketHeader = {}) {
         super()
-        this.manager = manager
         this._url = url
         this._headers = headers
         try {
@@ -54,7 +55,14 @@ export class WebSocket extends EventEmitter {
             console.ex(error)
             return
         }
+        // mamanger connected client
         manager.add(this)
+        this.client.on(ClientEvent.close, (_) => manager.del(this))
+        // add event forward
+        this.client.on(ClientEvent.open, (event) => this.onopen?.(event))
+        this.client.on(ClientEvent.message, (event) => this.onmessage?.(event))
+        this.client.on(ClientEvent.close, (event) => this.onclose?.(event))
+        this.client.on(ClientEvent.error, (event) => this.onerror?.(event))
         setTimeout(() => this.client.connect(), 20)
     }
     get id() {
@@ -70,30 +78,31 @@ export class WebSocket extends EventEmitter {
         return this.client.protocol
     }
     get readyState() {
-        return this.client.readyStatus
+        return this.client.readyState
     }
     get url() {
         return this._url
     }
-    set onopen(func: (event: Event) => void) {
-        this.client.on(ClientEvent.open, func)
+
+    public onopen: (event: Event) => void
+    public onmessage: (event: MessageEvent) => void
+    public onclose: (event: CloseEvent) => void
+    public onerror: (event: ErrorEvent) => void
+
+    public on(eventName: string | symbol, listener: (...args: any[]) => void): this {
+        this.client.on(eventName, listener)
+        return this
     }
-    set onmessage(func: (event: MessageEvent) => void) {
-        this.client.on(ClientEvent.message, func)
+    public emit(eventName: string | symbol, ...args: any[]): boolean {
+        return this.client.emit(eventName, ...args)
     }
-    set onclose(func: (event: CloseEvent) => void) {
-        this.client.on(ClientEvent.close, func)
-        manager.del(this)
-    }
-    set onerror(func: (event: ErrorEvent) => void) {
-        this.client.on(ClientEvent.error, func)
-    }
+
     public send(data: any) {
-        this.client.send(data)
+        return this.client.send(data)
     }
+
     public close(code?: number, reason?: string) {
-        this.client.close(code, reason)
-        manager.del(this)
+        return this.client.close(code, reason)
     }
 }
 global.setGlobal('WebSocket', WebSocket)

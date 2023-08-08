@@ -6,6 +6,13 @@ export namespace command {
     @injectable()
     export abstract class Command {
         /**
+         * first time script engine need optimize jit code
+         * so ignore first slow exec notify
+         */
+        private cacheSlowCommandKey = {};
+        private cacheSlowCompleteKey = {};
+
+        /**
          * 注册插件命令
          * @param plugin 插件
          * @param name 命令
@@ -48,6 +55,8 @@ export namespace command {
                     let result = executor(sender, command, Java.from(args))
                     let cost = Date.now() - time
                     if (cost > global.ScriptSlowExecuteTime) {
+                        let commandKey = `${plugin.description.name}-${command}-${sender.name}`
+                        if (!this.cacheSlowCommandKey[commandKey]) { return this.cacheSlowCommandKey[commandKey] = cost }
                         console.i18n("ms.api.command.execute.slow", {
                             player: sender.name,
                             plugin: plugin.description.name,
@@ -58,23 +67,17 @@ export namespace command {
                     }
                     return result
                 } catch (ex: any) {
-                    console.i18n("ms.api.command.execute.error", {
+                    let message = i18n.translate("ms.api.command.execute.error", {
                         player: sender.name,
                         plugin: plugin.description.name,
                         command,
                         args: Java.from(args).join(' '),
                         ex
                     })
+                    console.console(message)
                     console.ex(ex)
                     if (sender.name != 'CONSOLE') {
-                        console.sender(sender, [i18n.translate("ms.api.command.execute.error", {
-                            player: sender.name,
-                            plugin: plugin.description.name,
-                            command,
-                            args: Java.from(args).join(' '),
-                            ex
-                        }),
-                        ...console.stack(ex)])
+                        console.sender(sender, [message, ...console.stack(ex)])
                     }
                     return true
                 }
@@ -89,6 +92,8 @@ export namespace command {
                     let result = this.copyPartialMatches(complete, token)
                     let cost = Date.now() - time
                     if (cost > global.ScriptSlowExecuteTime) {
+                        let completerKey = `${plugin.description.name}-${command}-${sender.name}`
+                        if (!this.cacheSlowCompleteKey[completerKey]) { return this.cacheSlowCompleteKey[completerKey] = cost }
                         console.i18n("ms.api.command.tab.completer.slow", {
                             player: sender.name,
                             plugin: plugin.description.name,
@@ -99,25 +104,17 @@ export namespace command {
                     }
                     return result
                 } catch (ex: any) {
-                    console.i18n("ms.api.command.tab.completer.error", {
+                    let message = i18n.translate("ms.api.command.tab.completer.error", {
                         player: sender.name,
                         plugin: plugin.description.name,
                         command,
                         args: Java.from(args).join(' '),
                         ex
                     })
+                    console.console(message)
                     console.ex(ex)
                     if (sender.name != 'CONSOLE') {
-                        console.sender(sender, [
-                            i18n.translate("ms.api.command.tab.completer.error", {
-                                player: sender.name,
-                                plugin: plugin.description.name,
-                                command,
-                                args: Java.from(args).join(' '),
-                                ex
-                            }),
-                            ...console.stack(ex)
-                        ])
+                        console.sender(sender, [message, ...console.stack(ex)])
                     }
                     return []
                 }

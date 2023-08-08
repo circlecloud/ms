@@ -1,6 +1,9 @@
 import { NettyWebSocket } from '.'
 import { WebSocketClientHandlerAdapter } from './adapter/handler'
 
+const Throwable = Java.type('java.lang.Throwable')
+const RuntimeException = Java.type('java.lang.RuntimeException')
+
 const CharsetUtil = Java.type('io.netty.util.CharsetUtil')
 const TextWebSocketFrame = Java.type('io.netty.handler.codec.http.websocketx.TextWebSocketFrame')
 const CloseWebSocketFrame = Java.type('io.netty.handler.codec.http.websocketx.CloseWebSocketFrame')
@@ -20,6 +23,7 @@ export class WebSocketClientHandler extends WebSocketClientHandlerAdapter {
         return true
     }
     handlerAdded(ctx: any) {
+        this.client.onconnection({})
         if (ctx.newPromise) {
             this.handshakeFuture = ctx.newPromise()
         } else {
@@ -28,18 +32,21 @@ export class WebSocketClientHandler extends WebSocketClientHandlerAdapter {
     }
     channelActive(ctx: any) {
         this.handshaker.handshake(ctx.channel())
+        setTimeout(() => {
+            this.abortHandshake(new Error('handshake timed out.'))
+        }, 10000)
     }
     channelInactive(ctx: any) {
-        if (this.client.readyStatus != WebSocket.CLOSED) {
-            this.client.onclose({ code: 1006, reason: 'client connection channel inactive.' })
-        }
+        this.client.close(1006, 'connection was closed abnormally.', true)
     }
     channelRead0(ctx: any, msg: any) {
         let ch = ctx.channel()
         if (!this.handshaker.isHandshakeComplete()) {
-            // web socket client connected
+            console.debug(`Netty Handler channelRead0 websocket client connected`)
+            // websocket client connected
             this.handshaker.finishHandshake(ch, msg)
             this.handshakeFuture.setSuccess()
+            this.client.onconnect({})
             return
         }
 
@@ -52,14 +59,19 @@ export class WebSocketClientHandler extends WebSocketClientHandlerAdapter {
         if (frame instanceof TextWebSocketFrame) {
             this.client.onmessage({ data: frame.text() })
         } else if (frame instanceof CloseWebSocketFrame) {
-            this.client.close(1000, 'server close connection.')
+            this.client.receiverClose(frame.statusCode(), frame.reasonText())
         }
+    }
+    abortHandshake(reason: Error) {
+        if (this.handshakeFuture.isDone()) { return }
+        if (!(reason instanceof Throwable)) {
+            reason = new RuntimeException(reason)
+        }
+        this.handshakeFuture.setFailure(reason)
     }
     exceptionCaught(ctx: any, cause: Error) {
         console.debug(`${ctx} exceptionCaught ${cause}`)
+        this.client.abortHandshake(cause)
         this.client.onerror({ error: cause })
-        if (!this.handshakeFuture.isDone()) {
-            this.handshakeFuture.setFailure(cause)
-        }
     }
 }

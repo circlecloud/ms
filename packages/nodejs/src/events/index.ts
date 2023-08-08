@@ -20,6 +20,7 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 'use strict';
+var Throwable = Java.type('java.lang.Throwable')
 var R = typeof Reflect === 'object' ? Reflect : null
 var ReflectApply = R && typeof R.apply === 'function'
     ? R.apply
@@ -136,13 +137,19 @@ EventEmitter.prototype.emit = function emit(type) {
         var er;
         if (args.length > 0)
             er = args[0];
-        if (er instanceof Error) {
+        if (er instanceof Error || er instanceof Throwable) {
             // Note: The comments on the `throw` lines are intentional, they show
             // up in Node's output if this results in an unhandled exception.
             throw er; // Unhandled 'error' event
         }
+        if (er.error instanceof Error || er.error instanceof Throwable) {
+            throw er.error; // Unhandled 'error' event
+        }
+        if (er.cause instanceof Error || er.error instanceof Throwable) {
+            throw er.error; // Unhandled 'error' event
+        }
         // At least give some kind of context to the user
-        var err = new Error('Unhandled error.' + (er ? ' (' + er.message + ')' : ''));
+        var err = new Error('Unhandled error.' + (er ? ' (' + (er.message || er.error || er.cause || er) + ')' : ''));
         // @ts-ignore
         err.context = er;
         throw err; // Unhandled 'error' event

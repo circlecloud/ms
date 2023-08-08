@@ -5,6 +5,7 @@ const Path = Java.type("java.nio.file.Path");
 const JavaString = Java.type("java.lang.String");
 const File = Java.type("java.io.File");
 const Files = Java.type("java.nio.file.Files");
+const Paths = Java.type("java.nio.file.Paths");
 const Collector = Java.type("java.util.stream.Collector")
 const separatorChar = File.separatorChar;
 const StandardCopyOption = Java.type("java.nio.file.StandardCopyOption");
@@ -37,7 +38,7 @@ function javaFile(...opts: any[]) {
 }
 
 export function renameSync(oldPath: PathLike, newPath: PathLike): void {
-
+    Files.move(Paths.get(oldPath), Paths.get(oldPath), StandardCopyOption['ATOMIC_MOVE'])
 }
 export function truncateSync() {
 

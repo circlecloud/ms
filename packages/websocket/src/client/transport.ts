@@ -8,6 +8,9 @@ export abstract class Transport extends EventEmitter {
     protected _protocol: string
     protected _headers: WebSocketHeader = {}
 
+    protected _closeFrameReceived = false;
+    protected _closeFrameSent = false;
+
     constructor(uri: string, subProtocol: string = '', headers: WebSocketHeader = {}) {
         super()
         this._url = uri
@@ -23,24 +26,22 @@ export abstract class Transport extends EventEmitter {
         return this._protocol
     }
 
-    get readyStatus() {
+    get readyState() {
         return this._state
     }
 
-    set readyStatus(state: number) {
+    set readyState(state: number) {
         this._state = state
     }
 
     connect() {
-        try {
-            this.doConnect()
-        } catch (error: any) {
-            console.ex(error)
-            this.onerror({ error })
-        }
+        this.doConnect()
     }
 
     send(text: string) {
+        if (this.readyState === WebSocket.CONNECTING) {
+            throw new Error('WebSocket is not open: readyState 0 (CONNECTING)');
+        }
         try {
             this.doSend(text)
         } catch (error: any) {
@@ -48,16 +49,24 @@ export abstract class Transport extends EventEmitter {
         }
     }
 
-    close(code: number = 1000, reason: string = '') {
-        if (this.readyStatus < WebSocket.CLOSING) {
-            this.readyStatus = WebSocket.CLOSING
-            try {
-                this.doClose(code, reason)
-            } catch (error: any) {
-                this.onerror({ error })
+    close(code: number = 1000, reason: string = '', wasClean: boolean = false) {
+        if (this.readyState === WebSocket.CLOSED) return;
+        if (this.readyState === WebSocket.CONNECTING) {
+            const msg = 'WebSocket was closed before the connection was established';
+            this.abortHandshake(new Error(msg));
+            return;
+        }
+        if (this.readyState === WebSocket.CLOSING) {
+            if (this._closeFrameSent && this._closeFrameReceived) {
+                this.onclose({ code, reason });
             }
-        } else {
-            console.debug(`WebSocket Transport ${this.id} call close code ${code} reason ${reason} but state is ${this.readyStatus}`)
+            return;
+        }
+        this.readyState = WebSocket.CLOSING
+        try {
+            this.doClose(code, reason, wasClean)
+        } catch (error: any) {
+            this.onerror({ error })
         }
     }
 
@@ -67,11 +76,11 @@ export abstract class Transport extends EventEmitter {
     }
 
     onconnect(event: Event) {
-        if (this.readyStatus != WebSocket.OPEN) {
-            this.readyStatus = WebSocket.OPEN
+        if (this.readyState != WebSocket.OPEN) {
+            this.readyState = WebSocket.OPEN
             this.emit(ClientEvent.open, event)
         } else {
-            console.debug(`WebSocket Transport ${this.id} call onconnect but state is ${this.readyStatus}`)
+            console.debug(`WebSocket Transport ${this.id} call onconnect but state is ${this.readyState}`)
         }
     }
 
@@ -84,16 +93,24 @@ export abstract class Transport extends EventEmitter {
     }
 
     onclose(event: CloseEvent) {
-        if (this.readyStatus != WebSocket.CLOSED) {
-            this.readyStatus = WebSocket.CLOSED
+        console.debug(`WebSocket Transport ${this.id} call onclose CloseEvent[code: ${event.code}, reason: ${event.reason}]`)
+        if (this.readyState != WebSocket.CLOSED) {
+            this.readyState = WebSocket.CLOSED
             this.emit(ClientEvent.close, event)
         } else {
-            console.debug(`WebSocket Transport ${this.id} call onclose but state is ${this.readyStatus} CloseEvent[code: ${event.code}, reason: ${event.reason}]`)
+            console.debug(`WebSocket Transport ${this.id} call onclose but state is ${this.readyState} CloseEvent[code: ${event.code}, reason: ${event.reason}]`)
         }
+    }
+
+    receiverClose(code: number, reason: string) {
+        console.debug(`Netty Handler receeve close code: ${code} reason: ${reason}`)
+        this._closeFrameReceived = true;
+        this.close(code, reason)
     }
 
     abstract getId(): string
     abstract doConnect(): void
     abstract doSend(text: string): void
-    abstract doClose(code: number, reason: string): void
+    abstract doClose(code: number, reason: string, wasClean?: boolean): void
+    abstract abortHandshake(reason: Error): void
 }
