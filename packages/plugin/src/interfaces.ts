@@ -1,6 +1,8 @@
-import { server, MiaoScriptConsole, event, plugin } from "@ccms/api"
-import { injectable, inject, postConstruct } from "@ccms/container"
+import { server, MiaoScriptConsole, event, plugin, task, command } from "@ccms/api"
+import { injectable, inject, postConstruct, Autowired } from "@ccms/container"
 import { getPluginMetadata } from "./utils"
+import { PluginEventManager } from "./event"
+import { PluginCommandManager } from "./command"
 
 const File = Java.type('java.io.File')
 
@@ -11,6 +13,12 @@ export namespace interfaces {
         public logger: MiaoScriptConsole
         @inject(server.Console)
         private Console: MiaoScriptConsole
+        @Autowired()
+        private taskManager: task.TaskManager
+        @Autowired()
+        private eventManager: PluginEventManager
+        @Autowired()
+        private commandManager: PluginCommandManager
 
         constructor() {
             this.description = getPluginMetadata(this)
@@ -28,10 +36,42 @@ export namespace interfaces {
             return dataFolder.getAbsolutePath()
         }
 
-        public registryCommand(executor: any) { }
-        public unregistryCommand(executor: any) { }
-        public registryListener(listener: any) { }
-        public unregistryListener(listener: any) { }
+        /**
+         * 注册命令
+         * @param executor 命令执行器
+         */
+        public registryCommand(executor: any) {
+            this.commandManager.registryCommand(this, executor)
+        }
+        /**
+         * 注销命令
+         * @param executor 命令执行器
+         */
+        public unregistryCommand(executor: any) {
+            this.commandManager.unregistryCommand(this, executor)
+        }
+        /**
+         * 注册事件
+         * @param listener 事件监听器
+         */
+        public registryListener(listener: any) {
+            this.eventManager.registryListener(this, listener)
+        }
+        /**
+         * 注销事件
+         * @param listener 事件监听器
+         */
+        public unregistryListener(listener: any) {
+            this.eventManager.unregistryListener(this, listener)
+        }
+        /**
+         * 创建任务
+         * @param func 任务内容
+         * @returns 任务
+         */
+        public createTask(func: Function) {
+            return this.taskManager.create(func, this)
+        }
 
         public load() { }
         public enable() { }

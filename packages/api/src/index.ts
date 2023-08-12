@@ -1,7 +1,5 @@
 import "@ccms/nashorn"
 
-export * from './web'
-export * from './amqp'
 export * from './chat'
 export * from './task'
 export * from './item'

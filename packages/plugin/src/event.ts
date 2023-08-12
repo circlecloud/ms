@@ -51,7 +51,7 @@ export class PluginEventManager {
         listener.off = off
     }
 
-    private unregistryListener(pluginInstance: plugin.Plugin, listener: any = pluginInstance) {
+    public unregistryListener(pluginInstance: plugin.Plugin, listener: any = pluginInstance) {
         if (listener && listener.off) {
             listener.off()
         }

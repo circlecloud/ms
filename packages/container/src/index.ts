@@ -32,16 +32,26 @@ export const provideSingletonNamed = (identifier: interfaces.ServiceIdentifier<a
     return fluentProvide(identifier).inSingletonScope().whenTargetNamed(name).done()
 }
 
+export function getJavaClass(className: string) {
+    try { return Java.type(className).class; return } catch (error: any) { }
+    try { return base.getClass(className); return } catch (error: any) { }
+}
+
 /**
  * 获得一个 java.lang.Class
  * @param className Java全类名
  */
 export const JavaClass = (className: string) => {
     return function (target: object, propertyKey: string, index?: number) {
-        try { target[propertyKey] = Java.type(className).class; return } catch (error: any) { }
-        try { target[propertyKey] = base.getClass(className); return } catch (error: any) { }
-        console.warn('JavaClass', className, 'Inject target', target.constructor.name, 'propertyKey', propertyKey, 'failed!')
+        _proxyGetter(target, propertyKey, () => {
+            return getJavaClass(className) || console.warn('JavaClass', className, 'Inject target', target.constructor.name, 'propertyKey', propertyKey, 'failed!')
+        }, true)
     }
+}
+
+export function getJSClass(className: string) {
+    try { return Java.type(className) } catch (error: any) { }
+    try { return base.getClass(className).static } catch (error: any) { }
 }
 
 /**
@@ -51,9 +61,7 @@ export const JavaClass = (className: string) => {
 export const JSClass = (className: string) => {
     return function (target: object, propertyKey: string, index?: number) {
         _proxyGetter(target, propertyKey, () => {
-            try { return Java.type(className) } catch (error: any) { }
-            try { return base.getClass(className).static } catch (error: any) { }
-            console.warn('JSClass', className, 'Inject target', target.constructor.name, 'propertyKey', propertyKey, 'failed!')
+            return getJSClass(className) || console.warn('JSClass', className, 'Inject target', target.constructor.name, 'propertyKey', propertyKey, 'failed!')
         }, true)
     }
 }
