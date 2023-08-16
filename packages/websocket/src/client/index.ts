@@ -89,11 +89,11 @@ export class WebSocket extends EventEmitter {
     public onclose: (event: CloseEvent) => void
     public onerror: (event: ErrorEvent) => void
 
-    public on(eventName: string | symbol, listener: (...args: any[]) => void): this {
+    public on(eventName: EventType, listener: (...args: any[]) => void): this {
         this.client.on(eventName, listener)
         return this
     }
-    public emit(eventName: string | symbol, ...args: any[]): boolean {
+    public emit(eventName: EventType, ...args: any[]): boolean {
         return this.client.emit(eventName, ...args)
     }
 

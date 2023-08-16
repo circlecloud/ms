@@ -56,11 +56,8 @@ export abstract class Transport extends EventEmitter {
             this.abortHandshake(new Error(msg));
             return;
         }
-        if (this.readyState === WebSocket.CLOSING) {
-            if (this._closeFrameSent && this._closeFrameReceived) {
-                this.onclose({ code, reason });
-            }
-            return;
+        if (code != 1000 && (code < 3000 || code > 4999)) {
+            throw new Error(`The code must be either 1000, or between 3000 and 4999. ${code} is neither.`)
         }
         this.readyState = WebSocket.CLOSING
         try {
@@ -104,8 +101,11 @@ export abstract class Transport extends EventEmitter {
 
     receiverClose(code: number, reason: string) {
         console.debug(`Netty Handler receeve close code: ${code} reason: ${reason}`)
+        // if not set code then set code to 1000
+        if (code === -1) { code = this._closeFrameSent ? 1005 : 1001 }
+        this.readyState = WebSocket.CLOSING
         this._closeFrameReceived = true;
-        this.close(code, reason)
+        this.doClose(code, reason)
     }
 
     abstract getId(): string

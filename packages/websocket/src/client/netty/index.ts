@@ -136,7 +136,7 @@ export class NettyWebSocket extends Transport {
         console.debug(`Netty Client doClose code: ${code} reason: ${reason}`)
         if (this.readyState == WebSocket.CLOSING) {
             if (!this._closeFrameSent) {
-                console.debug(`Netty Client doClose send close frame`)
+                console.debug(`Netty Client doClose send close frame code: ${code} reason: ${reason}`)
                 this.channel?.writeAndFlush(new CloseWebSocketFrame(code, reason))
                 this._closeFrameSent = true
             }
