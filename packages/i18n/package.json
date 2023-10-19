@@ -12,6 +12,10 @@
     "homepage": "https://github.com/circlecloud/ms.git",
     "license": "ISC",
     "main": "dist/index.js",
+    "files": [
+        "dist",
+        "languages"
+    ],
     "scripts": {
         "clean": "rimraf dist",
         "watch": "tsc --watch",
