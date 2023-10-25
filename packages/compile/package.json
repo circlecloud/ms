@@ -1,6 +1,6 @@
 {
     "name": "@ccms/compile",
-    "version": "0.28.0-beta.7",
+    "version": "0.28.0-beta.8",
     "description": "MiaoScript compile package",
     "keywords": [
         "miaoscript",
@@ -24,23 +24,23 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "devDependencies": {
-        "@ccms/api": "^0.28.0-beta.7",
-        "@ccms/bukkit": "^0.28.0-beta.7",
-        "@ccms/bungee": "^0.28.0-beta.7",
-        "@ccms/common": "^0.28.0-beta.7",
-        "@ccms/container": "^0.28.0-beta.7",
-        "@ccms/core": "^0.28.0-beta.7",
-        "@ccms/database": "^0.28.0-beta.7",
-        "@ccms/i18n": "^0.28.0-beta.7",
-        "@ccms/molang": "^0.28.0-beta.7",
-        "@ccms/nashorn": "^0.28.0-beta.7",
-        "@ccms/nodejs": "^0.28.0-beta.7",
-        "@ccms/nukkit": "^0.28.0-beta.7",
-        "@ccms/plugin": "^0.28.0-beta.7",
-        "@ccms/polyfill": "^0.28.0-beta.7",
-        "@ccms/protocol": "^0.28.0-beta.7",
-        "@ccms/qrcode": "^0.28.0-beta.7",
-        "@ccms/sponge": "^0.28.0-beta.7",
-        "@ccms/websocket": "^0.28.0-beta.7"
+        "@ccms/api": "^0.28.0-beta.8",
+        "@ccms/bukkit": "^0.28.0-beta.8",
+        "@ccms/bungee": "^0.28.0-beta.8",
+        "@ccms/common": "^0.28.0-beta.8",
+        "@ccms/container": "^0.28.0-beta.8",
+        "@ccms/core": "^0.28.0-beta.8",
+        "@ccms/database": "^0.28.0-beta.8",
+        "@ccms/i18n": "^0.28.0-beta.8",
+        "@ccms/molang": "^0.28.0-beta.8",
+        "@ccms/nashorn": "^0.28.0-beta.8",
+        "@ccms/nodejs": "^0.28.0-beta.8",
+        "@ccms/nukkit": "^0.28.0-beta.8",
+        "@ccms/plugin": "^0.28.0-beta.8",
+        "@ccms/polyfill": "^0.28.0-beta.8",
+        "@ccms/protocol": "^0.28.0-beta.8",
+        "@ccms/qrcode": "^0.28.0-beta.8",
+        "@ccms/sponge": "^0.28.0-beta.8",
+        "@ccms/websocket": "^0.28.0-beta.8"
     }
 }

@@ -1,6 +1,6 @@
 {
     "name": "@ccms/container",
-    "version": "0.28.0-beta.7",
+    "version": "0.28.0-beta.8",
     "description": "MiaoScript container package",
     "keywords": [
         "miaoscript",
@@ -24,7 +24,7 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "devDependencies": {
-        "@ccms/nashorn": "^0.28.0-beta.7"
+        "@ccms/nashorn": "^0.28.0-beta.8"
     },
     "dependencies": {
         "inversify": "^6.0.1",
