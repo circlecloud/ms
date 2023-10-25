@@ -8,9 +8,9 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "files": [
-        "dist/*.js",
-        "dist/*.ts",
-        "dist/*.map"
+        "dist/**/*.js",
+        "dist/**/*.ts",
+        "dist/**/*.map"
     ],
     "scripts": {
         "clean": "rimraf dist",
@@ -21,7 +21,7 @@
     "dependencies": {
         "@ccms/i18n": "^0.28.0-beta.7",
         "@ccms/nodejs": "^0.28.0-beta.7",
-        "core-js": "^3.32.2"
+        "core-js": "^3.33.1"
     },
     "devDependencies": {
         "@ccms/nashorn": "^0.28.0-beta.7"

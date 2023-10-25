@@ -13,9 +13,9 @@
     "license": "ISC",
     "main": "dist/index.js",
     "files": [
-        "dist/*.js",
-        "dist/*.ts",
-        "dist/*.map",
+        "dist/**/*.js",
+        "dist/**/*.ts",
+        "dist/**/*.map",
         "languages"
     ],
     "scripts": {

@@ -1,5 +1,5 @@
 #!/bin/bash
-DISTTAG=${1:latest}
+DISTTAG=${1:beta}
 for package in `ls packages`; do
     echo $package
     pushd packages/$package
