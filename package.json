@@ -25,6 +25,7 @@
         "@javatypes/jdk": "^0.0.3",
         "@lerna-lite/cli": "^2.6.0",
         "@lerna-lite/publish": "^2.6.0",
+        "@lerna-lite/run": "^2.6.0",
         "@types/node": "^20.8.8",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^5.0.5",
