@@ -6,7 +6,7 @@
     "author": "MiaoWoo <admin@yumc.pw>",
     "license": "MIT",
     "scripts": {
-        "bs": "lerna bootstrap",
+        "bs": "pnpm install",
         "clean": "lerna run clean",
         "watch": "lerna run watch --parallel",
         "build": "lerna run build",
@@ -17,19 +17,18 @@
         "lpb": "lerna publish prerelease --preid beta --dist-tag beta --force-publish",
         "lpc": "lerna publish --canary --preid beta --pre-dist-tag beta --force-publish",
         "lpf": "lerna publish from-package --yes",
-        "sync": "./script/sync.sh"
+        "sync": "./script/sync.sh",
+        "postpublish": "pnpm sync"
     },
-    "workspaces": [
-        "packages/*"
-    ],
     "devDependencies": {
-        "lerna": "^7.2.0",
+        "@ccms/nashorn": "^0.28.0-beta.3",
+        "@javatypes/jdk": "^0.0.3",
+        "@lerna-lite/cli": "^2.6.0",
+        "@lerna-lite/publish": "^2.6.0",
+        "@types/node": "^20.8.8",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^5.0.5",
-        "typescript": "^5.2.2",
         "tslib": "^2.6.2",
-        "@types/node": "^20.8.8",
-        "@ccms/nashorn": "^0.28.0-beta.3",
-        "@javatypes/jdk": "^0.0.3"
+        "typescript": "^5.2.2"
     }
 }
