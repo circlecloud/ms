@@ -13,7 +13,9 @@
     "license": "ISC",
     "main": "dist/index.js",
     "files": [
-        "dist"
+        "dist/*.js",
+        "dist/*.ts",
+        "dist/*.map"
     ],
     "scripts": {
         "clean": "rimraf dist",
