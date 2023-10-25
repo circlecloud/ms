@@ -1,9 +1,4 @@
 .yarn*
 .vscode
-.theia
 node_modules
 dist
-package-lock.json
-yarn.lock
-packages/nashorn/docs
-!packages/types/dist

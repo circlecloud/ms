@@ -14,7 +14,7 @@
         "np": "./script/push.sh",
         "lsp": "npm login -scope=@ccms",
         "lp": "lerna publish --force-publish",
-        "lpb": "lerna publish --preid beta --dist-tag beta --force-publish",
+        "lpb": "lerna publish prerelease --preid beta --dist-tag beta --force-publish",
         "lpc": "lerna publish --canary --preid beta --pre-dist-tag beta --force-publish",
         "lpf": "lerna publish from-package --yes",
         "sync": "./script/sync.sh"
