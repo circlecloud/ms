@@ -1,6 +1,6 @@
 {
     "name": "@ccms/common",
-    "version": "0.28.0-beta.4",
+    "version": "0.28.0-beta.5",
     "description": "MiaoScript common package",
     "keywords": [
         "miaoscript",
@@ -24,7 +24,7 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "devDependencies": {
-        "@ccms/nashorn": "^0.28.0-beta.4",
+        "@ccms/nashorn": "^0.28.0-beta.5",
         "@javatypes/jdk": "^0.0.3"
     },
     "gitHead": "562e2d00175c9d3a99c8b672aa07e6d92706a027"
