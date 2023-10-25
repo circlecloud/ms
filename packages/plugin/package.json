@@ -1,6 +1,6 @@
 {
     "name": "@ccms/plugin",
-    "version": "0.28.0-beta.5",
+    "version": "0.28.0-beta.6",
     "description": "MiaoScript plugin package",
     "keywords": [
         "miaoscript",
@@ -28,10 +28,10 @@
         "@types/js-yaml": "^4.0.5"
     },
     "dependencies": {
-        "@ccms/api": "^0.28.0-beta.5",
-        "@ccms/common": "^0.28.0-beta.5",
-        "@ccms/container": "^0.28.0-beta.5",
-        "@ccms/i18n": "^0.28.0-beta.5",
+        "@ccms/api": "^0.28.0-beta.6",
+        "@ccms/common": "^0.28.0-beta.6",
+        "@ccms/container": "^0.28.0-beta.6",
+        "@ccms/i18n": "^0.28.0-beta.6",
         "@ccms/verify": "^0.26.1",
         "crypto-js": "^4.1.1",
         "js-yaml": "^4.1.0"
