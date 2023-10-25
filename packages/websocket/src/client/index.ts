@@ -9,7 +9,7 @@ export class WebSocketManager {
     constructor() {
         process.on('exit', () => {
             for (const client of this.clients.values()) {
-                client.close(0, `client ${client.id} close connect`)
+                client.close(1000, `client ${client.id} close connect due process exit.`)
             }
             this.clients.clear()
         })

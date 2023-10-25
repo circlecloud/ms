@@ -34,9 +34,7 @@ export namespace task {
 
         protected pluginDisable(plugin: plugin.Plugin) {
             if (this.pluginCacheTasks.has(plugin.description.name)) {
-                this.pluginCacheTasks.get(plugin.description.name).forEach((task) => {
-                    task.cancel()
-                })
+                this.pluginCacheTasks.get(plugin.description.name).forEach((task) => task.cancel())
                 this.pluginCacheTasks.delete(plugin.description.name)
             }
         }
@@ -151,8 +149,9 @@ export namespace task {
                 this.func(...args)
                 this.emit('after', this)
             } catch (error: any) {
-                this.emit('error', error)
-                if (!error.processed) {
+                try {
+                    this.emit('error', error)
+                } catch (ignore) {
                     console.console('§4插件执行任务时发生错误', error)
                     console.ex(error)
                     this.cancel()
@@ -181,7 +180,7 @@ export namespace task {
          * 提交任务
          * @param args 任务参数
          */
-        protected abstract submit0(...args: any[]): any
+        protected abstract submit0(...args: any[]): Cancelable
         /**
          * 取消任务
          */

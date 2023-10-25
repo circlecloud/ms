@@ -9,8 +9,7 @@ export namespace command {
          * first time script engine need optimize jit code
          * so ignore first slow exec notify
          */
-        private cacheSlowCommandKey = {};
-        private cacheSlowCompleteKey = {};
+        private cacheSlowKeys = {};
 
         /**
          * 注册插件命令
@@ -53,32 +52,13 @@ export namespace command {
                 try {
                     let time = Date.now()
                     let result = executor(sender, command, Java.from(args))
-                    let cost = Date.now() - time
-                    if (cost > global.ScriptSlowExecuteTime) {
-                        let commandKey = `${plugin.description.name}-${command}-${sender.name}`
-                        if (!this.cacheSlowCommandKey[commandKey]) { return this.cacheSlowCommandKey[commandKey] = cost }
-                        console.i18n("ms.api.command.execute.slow", {
-                            player: sender.name,
-                            plugin: plugin.description.name,
-                            command,
-                            args: Java.from(args).join(' '),
-                            cost
-                        })
-                    }
+                    this.checkSlow(Date.now() - time,
+                        "ms.api.command.execute.slow",
+                        plugin, command, sender, args)
                     return result
                 } catch (ex: any) {
-                    let message = i18n.translate("ms.api.command.execute.error", {
-                        player: sender.name,
-                        plugin: plugin.description.name,
-                        command,
-                        args: Java.from(args).join(' '),
-                        ex
-                    })
-                    console.console(message)
-                    console.ex(ex)
-                    if (sender.name != 'CONSOLE') {
-                        console.sender(sender, [message, ...console.stack(ex)])
-                    }
+                    this.printError(ex, "ms.api.command.execute.error",
+                        plugin, command, sender, args)
                     return true
                 }
             }
@@ -90,36 +70,18 @@ export namespace command {
                     var token = args[args.length - 1]
                     var complete = tabCompleter(sender, command, Java.from(args)) || []
                     let result = this.copyPartialMatches(complete, token)
-                    let cost = Date.now() - time
-                    if (cost > global.ScriptSlowExecuteTime) {
-                        let completerKey = `${plugin.description.name}-${command}-${sender.name}`
-                        if (!this.cacheSlowCompleteKey[completerKey]) { return this.cacheSlowCompleteKey[completerKey] = cost }
-                        console.i18n("ms.api.command.tab.completer.slow", {
-                            player: sender.name,
-                            plugin: plugin.description.name,
-                            command,
-                            args: Java.from(args).join(' '),
-                            cost
-                        })
-                    }
+                    this.checkSlow(Date.now() - time,
+                        "ms.api.command.tab.completer.slow",
+                        plugin, command, sender, args)
                     return result
                 } catch (ex: any) {
-                    let message = i18n.translate("ms.api.command.tab.completer.error", {
-                        player: sender.name,
-                        plugin: plugin.description.name,
-                        command,
-                        args: Java.from(args).join(' '),
-                        ex
-                    })
-                    console.console(message)
-                    console.ex(ex)
-                    if (sender.name != 'CONSOLE') {
-                        console.sender(sender, [message, ...console.stack(ex)])
-                    }
+                    this.printError(ex, "ms.api.command.tab.completer.error",
+                        plugin, command, sender, args)
                     return []
                 }
             }
         }
+
         protected copyPartialMatches(complete: string[], token: string, array: string[] = []): string[] {
             if (!token) { return complete }
             complete.forEach(function (e) {
@@ -128,6 +90,36 @@ export namespace command {
                 }
             })
             return array
+        }
+
+        private checkSlow(cost: number, key: string, plugin: plugin.Plugin, command: string, sender: any, args: any[]) {
+            if (cost > global.ScriptSlowExecuteTime) {
+                let completerKey = `${plugin.description.name}-${key}-${command}-${sender.name}`
+                if (!this.cacheSlowKeys[completerKey]) {
+                    return this.cacheSlowKeys[completerKey] = cost
+                }
+                console.i18n(key, {
+                    player: sender.name,
+                    plugin: plugin.description.name,
+                    command,
+                    args: Java.from(args).join(' '),
+                    cost
+                })
+            }
+        }
+        private printError(error: Error, key: string, plugin: plugin.Plugin, command: string, sender: any, args: any[]) {
+            let message = i18n.translate(key, {
+                player: sender.name,
+                plugin: plugin.description.name,
+                command,
+                args: Java.from(args).join(' '),
+                error
+            })
+            console.console(message)
+            console.ex(error)
+            if (sender.name != 'CONSOLE') {
+                console.sender(sender, [message, ...console.stack(error)])
+            }
         }
     }
 }

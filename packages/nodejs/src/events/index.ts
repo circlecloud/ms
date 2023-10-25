@@ -145,8 +145,8 @@ EventEmitter.prototype.emit = function emit(type) {
         if (er.error instanceof Error || er.error instanceof Throwable) {
             throw er.error; // Unhandled 'error' event
         }
-        if (er.cause instanceof Error || er.error instanceof Throwable) {
-            throw er.error; // Unhandled 'error' event
+        if (er.cause instanceof Error || er.cause instanceof Throwable) {
+            throw er.cause; // Unhandled 'error' event
         }
         // At least give some kind of context to the user
         var err = new Error('Unhandled error.' + (er ? ' (' + (er.message || er.error || er.cause || er) + ')' : ''));

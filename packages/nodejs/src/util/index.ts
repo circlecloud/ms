@@ -715,6 +715,7 @@ function callbackify(original) {
         // implications (stack, `uncaughtException`, `async_hooks`)
         // @ts-ignore
         original.apply(this, args)
+            // @ts-ignore
             .then(function (ret) { process.nextTick(cb.bind(null, null, ret)) },
                 function (rej) { process.nextTick(callbackifyOnRejected.bind(null, rej, cb)) });
     }

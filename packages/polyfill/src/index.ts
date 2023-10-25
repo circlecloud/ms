@@ -7,7 +7,7 @@ console.i18n("ms.polyfill.initialize")
 import './openjdk-nashorn-shim'
 import './es5-ext'
 import './node-shim'
-import 'core-js'
+import './core-js'
 //@ts-ignore
 process.on('exit', () => require.disable())
 global.setGlobal('Proxy', require('./proxy').Proxy)

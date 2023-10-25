@@ -45,11 +45,13 @@ class Process extends EventEmitter {
     execArgv = ''
     execPath = ''
 
+    private queueMicrotaskExecuteTimeout = 5000
+
     constructor() {
         super()
         this.on('exit', () => {
             console.log(`await microTaskPool termination! queueTask: ${microTaskPool.shutdownNow().size()} remainTask: ${threadGroup.activeCount()}`)
-            microTaskPool.awaitTermination(3000, TimeUnit.MILLISECONDS)
+            microTaskPool.awaitTermination(this.queueMicrotaskExecuteTimeout, TimeUnit.MILLISECONDS)
         })
     }
     on(event: string | symbol, listener: (...args: any[]) => void) {
@@ -67,18 +69,30 @@ class Process extends EventEmitter {
         })
     }
     nextTick(callback: Function, ...args: any[]): void {
-        microTaskPool.execute(() => {
-            try {
-                callback(args)
-            } catch (origin: any) {
-                try {
-                    super.emit('error', origin)
-                } catch (error: any) {
-                    console.ex(origin)
-                    console.ex(error)
+        try {
+            microTaskPool.submit(new Callable({
+                call: () => {
+                    try {
+                        callback(args)
+                    } catch (origin: any) {
+                        try {
+                            super.emit('error', origin)
+                        } catch (error: any) {
+                            console.ex(origin)
+                            console.ex(error)
+                        }
+                    }
                 }
+            })).get(this.queueMicrotaskExecuteTimeout, TimeUnit.MILLISECONDS)
+        } catch (error: any) {
+            if (error instanceof InterruptedException) {
+                return console.warn(`FixedThreadPool isInterrupted exit! Task ${callback.name || '<anonymous>'} exec exit!`)
             }
-        })
+            if (error instanceof TimeoutException) {
+                return console.warn(`Task ${callback.name || '<anonymous>'} => ${callback} exec time greater than ${this.queueMicrotaskExecuteTimeout}ms!`)
+            }
+            throw error.getCause && error.getCause() || error
+        }
     }
     exit(code: number) {
         console.log(`process exit by code ${code}!`)
@@ -119,9 +133,6 @@ class Process extends EventEmitter {
     kill(pid: number, signal?: string | number): true {
         throw new Error('MiaoScript unsupport kill.')
         return true
-    }
-    toString() {
-        return "[object process]"
     }
 }
 
@@ -174,7 +185,7 @@ class EventLoop {
             this.eventLoopMainThread.interrupt()
             this.fixedThreadPool.shutdownNow()
             console.log(`await fixedThreadPool termination!`)
-            this.fixedThreadPool.awaitTermination(3000, TimeUnit.MILLISECONDS)
+            this.fixedThreadPool.awaitTermination(this.taskExecuteTimeout, TimeUnit.MILLISECONDS)
         })
     }
 
@@ -261,7 +272,7 @@ class EventLoop {
     }
 }
 global.setGlobal('process', new Process(), {})
-Object.defineProperty(process, require('core-js/es/symbol/to-string-tag'), { value: '[object process]' })
+Object.defineProperty(process, require('core-js/es/symbol/to-string-tag'), { value: 'process' })
 const eventLoop = new EventLoop()
 Object.defineProperty(process, 'eventLoop', { value: eventLoop })
 eventLoop.startEventLoop()

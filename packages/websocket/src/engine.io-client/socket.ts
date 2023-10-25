@@ -711,6 +711,7 @@ export class Socket extends Emitter<{}, {}, SocketReservedEvents> {
      * @api private
      */
     private resetPingTimeout() {
+        // @ts-ignore
         this.clearTimeoutFn(this.pingTimeoutTimer)
         this.pingTimeoutTimer = this.setTimeoutFn(() => {
             this.onClose("ping timeout")
@@ -919,6 +920,7 @@ export class Socket extends Emitter<{}, {}, SocketReservedEvents> {
         ) {
             debug('socket close with reason: "%s"', reason)
 
+            // @ts-ignore
             // clear timers
             this.clearTimeoutFn(this.pingTimeoutTimer)
 
