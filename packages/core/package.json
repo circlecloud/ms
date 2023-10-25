@@ -1,6 +1,6 @@
 {
     "name": "@ccms/core",
-    "version": "0.28.0-beta.3",
+    "version": "0.28.0-beta.4",
     "description": "MiaoScript core package",
     "keywords": [
         "miaoscript",
@@ -28,9 +28,9 @@
         "rollup-plugin-peer-deps-external": "^2.2.4"
     },
     "dependencies": {
-        "@ccms/api": "^0.28.0-beta.3",
-        "@ccms/common": "^0.28.0-beta.3",
-        "@ccms/container": "^0.28.0-beta.3",
+        "@ccms/api": "^0.28.0-beta.4",
+        "@ccms/common": "^0.28.0-beta.4",
+        "@ccms/container": "^0.28.0-beta.4",
         "js-yaml": "^4.1.0"
     },
     "gitHead": "781524f83e52cad26d7c480513e3c525df867121"

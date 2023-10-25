@@ -1,6 +1,6 @@
 {
     "name": "@ccms/bungee",
-    "version": "0.28.0-beta.3",
+    "version": "0.28.0-beta.4",
     "description": "MiaoScript bungee package",
     "keywords": [
         "miaoscript",
@@ -25,8 +25,8 @@
         "@javatypes/bungee-api": "^0.0.3"
     },
     "dependencies": {
-        "@ccms/api": "^0.28.0-beta.3",
-        "@ccms/common": "^0.28.0-beta.3",
-        "@ccms/container": "^0.28.0-beta.3"
+        "@ccms/api": "^0.28.0-beta.4",
+        "@ccms/common": "^0.28.0-beta.4",
+        "@ccms/container": "^0.28.0-beta.4"
     }
 }

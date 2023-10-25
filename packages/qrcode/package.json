@@ -1,6 +1,6 @@
 {
     "name": "@ccms/qrcode",
-    "version": "0.28.0-beta.3",
+    "version": "0.28.0-beta.4",
     "description": "MiaoScript qrcode package",
     "keywords": [
         "miaoscript",
@@ -20,6 +20,5 @@
         "watch": "tsc --watch",
         "build": "pnpm clean && tsc",
         "test": "echo \"Error: run tests from root\" && exit 1"
-    },
-    "devDependencies": {}
+    }
 }
