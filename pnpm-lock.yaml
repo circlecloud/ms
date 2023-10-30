@@ -42,16 +42,16 @@ importers:
   packages/api:
     dependencies:
       '@ccms/common':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../common
       '@ccms/container':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../container
       '@ccms/i18n':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../i18n
       '@ccms/polyfill':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../polyfill
       base64-js:
         specifier: ^1.5.1
@@ -67,13 +67,13 @@ importers:
   packages/bukkit:
     dependencies:
       '@ccms/api':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../api
       '@ccms/common':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../common
       '@ccms/container':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../container
     devDependencies:
       '@javatypes/spigot-api':
@@ -83,13 +83,13 @@ importers:
   packages/bungee:
     dependencies:
       '@ccms/api':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../api
       '@ccms/common':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../common
       '@ccms/container':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../container
     devDependencies:
       '@javatypes/bungee-api':
@@ -99,7 +99,7 @@ importers:
   packages/common:
     devDependencies:
       '@ccms/nashorn':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../nashorn
       '@javatypes/jdk':
         specifier: ^0.0.3
@@ -108,58 +108,58 @@ importers:
   packages/compile:
     devDependencies:
       '@ccms/api':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../api
       '@ccms/bukkit':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../bukkit
       '@ccms/bungee':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../bungee
       '@ccms/common':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../common
       '@ccms/container':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../container
       '@ccms/core':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../core
       '@ccms/database':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../database
       '@ccms/i18n':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../i18n
       '@ccms/molang':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../molang
       '@ccms/nashorn':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../nashorn
       '@ccms/nodejs':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../nodejs
       '@ccms/nukkit':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../nukkit
       '@ccms/plugin':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../plugin
       '@ccms/polyfill':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../polyfill
       '@ccms/protocol':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../protocol
       '@ccms/qrcode':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../qrcode
       '@ccms/sponge':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../sponge
       '@ccms/websocket':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../websocket
 
   packages/container:
@@ -172,19 +172,19 @@ importers:
         version: 4.0.0
     devDependencies:
       '@ccms/nashorn':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../nashorn
 
   packages/core:
     dependencies:
       '@ccms/api':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../api
       '@ccms/common':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../common
       '@ccms/container':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../container
       js-yaml:
         specifier: ^4.1.0
@@ -206,10 +206,10 @@ importers:
   packages/database:
     dependencies:
       '@ccms/api':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../api
       '@ccms/container':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../container
     devDependencies:
       '@javatypes/spring-jdbc':
@@ -223,7 +223,7 @@ importers:
         version: 4.1.0
     devDependencies:
       '@ccms/nashorn':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../nashorn
       '@types/js-yaml':
         specifier: ^4.0.5
@@ -240,19 +240,19 @@ importers:
   packages/nodejs:
     devDependencies:
       '@ccms/nashorn':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../nashorn
 
   packages/nukkit:
     dependencies:
       '@ccms/api':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../api
       '@ccms/common':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../common
       '@ccms/container':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../container
     devDependencies:
       '@javatypes/nukkit-api':
@@ -262,16 +262,16 @@ importers:
   packages/plugin:
     dependencies:
       '@ccms/api':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../api
       '@ccms/common':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../common
       '@ccms/container':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../container
       '@ccms/i18n':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../i18n
       '@ccms/verify':
         specifier: ^0.26.1
@@ -293,17 +293,17 @@ importers:
   packages/polyfill:
     dependencies:
       '@ccms/i18n':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../i18n
       '@ccms/nodejs':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../nodejs
       core-js:
-        specifier: ^3.32.2
-        version: 3.32.2
+        specifier: ^3.33.1
+        version: 3.33.1
     devDependencies:
       '@ccms/nashorn':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../nashorn
 
   packages/protocol: {}
@@ -313,13 +313,13 @@ importers:
   packages/sponge:
     dependencies:
       '@ccms/api':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../api
       '@ccms/common':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../common
       '@ccms/container':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../container
     devDependencies:
       '@javatypes/sponge-api':
@@ -339,7 +339,7 @@ importers:
         version: 0.0.6
     devDependencies:
       '@ccms/nashorn':
-        specifier: ^0.28.0-beta.5
+        specifier: ^0.28.0-beta.8
         version: link:../nashorn
       '@javatypes/tomcat-websocket-api':
         specifier: ^0.0.3
@@ -405,7 +405,7 @@ packages:
     dependencies:
       '@ccms/i18n': 0.27.6
       '@ccms/nodejs': 0.27.6
-      core-js: 3.32.2
+      core-js: 3.33.1
     dev: false
 
   /@ccms/verify@0.26.1:
@@ -1776,8 +1776,8 @@ packages:
       meow: 8.1.2
     dev: true
 
-  /core-js@3.32.2:
-    resolution: {integrity: sha512-pxXSw1mYZPDGvTQqEc5vgIb83jGQKFGYWY76z4a7weZXUolw3G+OvpZqSRcfYOoOVUQJYEPsWeQK8pKEnUtWxQ==}
+  /core-js@3.33.1:
+    resolution: {integrity: sha512-qVSq3s+d4+GsqN0teRCJtM6tdEEXyWxjzbhVrCHmBS5ZTM0FS2MOS0D13dUXAWDUN6a+lHI/N1hF9Ytz6iLl9Q==}
     requiresBuild: true
     dev: false
 
